@@ -1,0 +1,23 @@
+﻿@using LevelTagWebApp.Security
+
+@inject IUserInfoProvider UserInfoProvider
+
+@if (_IsLoggedIn)
+	return;
+
+<div class="bg-warning-subtle shadow-sm">
+	<div class="content py-2 text-center">
+		Please log in with your Steam account to be able to apply or remove tags.
+	</div>
+</div>
+
+@code {
+
+	private bool _IsLoggedIn = false;
+
+	protected override async Task OnInitializedAsync()
+	{
+		_IsLoggedIn = await UserInfoProvider.GetUserInfoAsync() != null;
+	}
+
+}
