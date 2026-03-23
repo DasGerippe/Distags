@@ -53,10 +53,18 @@ public class SteamWebApiClient
             throw new SteamWebApiRequestException(responseMessage);
 
         Stream responseContentStream = await responseMessage.Content.ReadAsStreamAsync(cancellationToken).ConfigureAwait(false);
-        SteamResponse<TResponseContent>? steamResponse = await JsonSerializer
-            .DeserializeAsync<SteamResponse<TResponseContent>>(responseContentStream, cancellationToken: cancellationToken)
-            .ConfigureAwait(false);
+        SteamResponse<TResponseContent>? steamResponse;
+        try
+        {
+            steamResponse = await JsonSerializer
+                .DeserializeAsync<SteamResponse<TResponseContent>>(responseContentStream, cancellationToken: cancellationToken)
+                .ConfigureAwait(false);
+        }
+        catch (Exception ex)
+        {
+            throw new SteamWebApiResponseException("Could not deserialize Steam response.", ex);
+        }
 
-        return steamResponse?.Content ?? throw new SteamWebApiResponseException("HTTP response content was null.");
+        return steamResponse?.Content ?? throw new SteamWebApiResponseException("Steam response content was null.");
     }
 }

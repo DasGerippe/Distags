@@ -5,5 +5,5 @@ namespace SteamWebApi.Dtos.SteamUser;
 public class PlayerSummaries
 {
     [JsonPropertyName("players")]
-    public List<PlayerSummary> Players { get; set; } = [];
+    public required List<PlayerSummary> Players { get; set; }
 }

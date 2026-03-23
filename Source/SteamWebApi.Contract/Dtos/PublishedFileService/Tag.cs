@@ -5,8 +5,8 @@ namespace SteamWebApi.Dtos.PublishedFileService;
 public class Tag
 {
     [JsonPropertyName("tag")]
-    public string Name { get; set; } = string.Empty;
+    public required string Name { get; set; }
 
     [JsonPropertyName("display_name")]
-    public string DisplayName { get; set; } = string.Empty;
+    public required string DisplayName { get; set; }
 }

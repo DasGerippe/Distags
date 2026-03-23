@@ -5,5 +5,5 @@ namespace SteamWebApi.Dtos;
 public class SteamResponse<TResponseContent>
 {
     [JsonPropertyName("response")]
-    public TResponseContent? Content { get; set; }
+    public required TResponseContent Content { get; set; }
 }

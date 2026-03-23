@@ -6,151 +6,151 @@ namespace SteamWebApi.Dtos.PublishedFileService;
 public class PublishedFileDetail
 {
     //[JsonPropertyName("result")]
-    //public int Result { get; set; }
+    //public required int Result { get; set; }
     
     [JsonPropertyName("publishedfileid")]
-    public string? PublishedFileId { get; set; }
+    public required string PublishedFileId { get; set; }
     
     [JsonPropertyName("creator")]
-    public string? CreatorId { get; set; }
+    public required string CreatorId { get; set; }
     
     //[JsonPropertyName("creator_appid")]
-    //public int CreatorAppId { get; set; }
+    //public required int CreatorAppId { get; set; }
     
     //[JsonPropertyName("consumer_appid")]
-    //public int ConsumerAppId { get; set; }
+    //public required int ConsumerAppId { get; set; }
     
     //[JsonPropertyName("consumer_shortcutid")]
-    //public int ConsumerShortcutId { get; set; }
+    //public required int ConsumerShortcutId { get; set; }
     
     [JsonPropertyName("filename")]
-    public string? Filename { get; set; }
+    public required string Filename { get; set; }
     
     //[JsonPropertyName("file_size")]
-    //public string FileSize { get; set; }
+    //public required string FileSize { get; set; }
     
     //[JsonPropertyName("preview_file_size")]
-    //public string PreviewFileSize { get; set; }
+    //public required string PreviewFileSize { get; set; }
     
     [JsonPropertyName("file_url")]
-    public string? FileUrl { get; set; }
+    public required string FileUrl { get; set; }
     
     [JsonPropertyName("preview_url")]
-    public string? PreviewUrl { get; set; }
+    public required string PreviewUrl { get; set; }
     
     //[JsonPropertyName("url")]
-    //public string Url { get; set; }
+    //public required string Url { get; set; }
     
     //[JsonPropertyName("hcontent_file")]
-    //public string HcontentFile { get; set; }
+    //public required string HcontentFile { get; set; }
     
     //[JsonPropertyName("hcontent_preview")]
-    //public string HcontentPreview { get; set; }
+    //public required string HcontentPreview { get; set; }
     
     [JsonPropertyName("title")]
-    public string? Title { get; set; }
+    public required string Title { get; set; }
     
     //[JsonPropertyName("file_description")]
-    //public string FileDescription { get; set; }
+    //public required string FileDescription { get; set; }
     
     [JsonPropertyName("time_created")]
     [JsonConverter(typeof(UnixDateTimeConverter))]
-    public DateTime? TimeCreated { get; set; }
+    public required DateTime TimeCreated { get; set; }
     
     [JsonPropertyName("time_updated")]
     [JsonConverter(typeof(UnixDateTimeConverter))]
-    public DateTime? TimeUpdated { get; set; }
+    public required DateTime TimeUpdated { get; set; }
     
     //[JsonPropertyName("visibility")]
-    //public int Visibility { get; set; }
+    //public required int Visibility { get; set; }
     
     //[JsonPropertyName("flags")]
-    //public int Flags { get; set; }
+    //public required int Flags { get; set; }
     
     //[JsonPropertyName("workshop_file")]
-    //public bool WorkshopFile { get; set; }
+    //public required bool WorkshopFile { get; set; }
     
     //[JsonPropertyName("workshop_accepted")]
-    //public bool WorkshopAccepted { get; set; }
+    //public required bool WorkshopAccepted { get; set; }
     
     //[JsonPropertyName("show_subscribe_all")]
-    //public bool ShowSubscribeAll { get; set; }
+    //public required bool ShowSubscribeAll { get; set; }
     
     //[JsonPropertyName("num_comments_public")]
-    //public int NumCommentsPublic { get; set; }
+    //public required int NumCommentsPublic { get; set; }
     
     //[JsonPropertyName("banned")]
-    //public bool Banned { get; set; }
+    //public required bool Banned { get; set; }
     
     //[JsonPropertyName("ban_reason")]
-    //public string BanReason { get; set; }
+    //public required string BanReason { get; set; }
     
     //[JsonPropertyName("banner")]
-    //public string Banner { get; set; }
+    //public required string Banner { get; set; }
     
     //[JsonPropertyName("can_be_deleted")]
-    //public bool CanBeDeleted { get; set; }
+    //public required bool CanBeDeleted { get; set; }
     
     //[JsonPropertyName("app_name")]
-    //public string AppName { get; set; }
+    //public required string AppName { get; set; }
     
     //[JsonPropertyName("file_type")]
-    //public int FileType { get; set; }
+    //public required int FileType { get; set; }
     
     //[JsonPropertyName("can_subscribe")]
-    //public bool CanSubscribe { get; set; }
+    //public required bool CanSubscribe { get; set; }
     
     //[JsonPropertyName("subscriptions")]
-    //public int Subscriptions { get; set; }
+    //public required int Subscriptions { get; set; }
     
     //[JsonPropertyName("favorited")]
-    //public int Favorited { get; set; }
+    //public required int Favorited { get; set; }
     
     //[JsonPropertyName("followers")]
-    //public int Followers { get; set; }
+    //public required int Followers { get; set; }
     
     //[JsonPropertyName("lifetime_subscriptions")]
-    //public int LifetimeSubscriptions { get; set; }
+    //public required int LifetimeSubscriptions { get; set; }
     
     //[JsonPropertyName("lifetime_favorited")]
-    //public int LifetimeFavorited { get; set; }
+    //public required int LifetimeFavorited { get; set; }
 
     //[JsonPropertyName("lifetime_followers")]
-    //public int LifetimeFollowers { get; set; }
+    //public required int LifetimeFollowers { get; set; }
 
     //[JsonPropertyName("lifetime_playtime")]
-    //public string LifetimePlaytime { get; set; }
+    //public required string LifetimePlaytime { get; set; }
 
     //[JsonPropertyName("lifetime_playtime_sessions")]
-    //public string LifetimePlaytimeSessions { get; set; }
+    //public required string LifetimePlaytimeSessions { get; set; }
 
     //[JsonPropertyName("views")]
-    //public int Views { get; set; }
+    //public required int Views { get; set; }
 
     //[JsonPropertyName("num_children")]
-    //public int NumChildren { get; set; }
+    //public required int NumChildren { get; set; }
 
     //[JsonPropertyName("num_reports")]
-    //public int NumReports { get; set; }
+    //public required int NumReports { get; set; }
 
     [JsonPropertyName("tags")]
-    public List<Tag> Tags { get; set; } = [];
+    public required List<Tag> Tags { get; set; }
 
     //[JsonPropertyName("language")]
-    //public int Language { get; set; }
+    //public required int Language { get; set; }
     
     //[JsonPropertyName("maybe_inappropriate_sex")]
-    //public bool MaybeInappropriateSex { get; set; }
+    //public required bool MaybeInappropriateSex { get; set; }
     
     //[JsonPropertyName("maybe_inappropriate_violence")]
-    //public bool MaybeInappropriateViolence { get; set; }
+    //public required bool MaybeInappropriateViolence { get; set; }
     
     //[JsonPropertyName("revision_change_number")]
-    //public string RevisionChangeNumber { get; set; }
+    //public required string RevisionChangeNumber { get; set; }
     
     //[JsonPropertyName("revision")]
-    //public int Revision { get; set; }
+    //public required int Revision { get; set; }
     
     //[JsonPropertyName("ban_text_check_result")]
-    //public int BanTextCheckResult { get; set; }
+    //public required int BanTextCheckResult { get; set; }
 }
