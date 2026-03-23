@@ -31,8 +31,12 @@
 
 	private string GetContributorNameClass()
 	{
-		bool useMutedNameStyle = Contributor is ContributorUserDto user && (user.IsAnonymous || user.SteamName == null);
-		return useMutedNameStyle ? "fst-italic text-muted" : string.Empty;
+		return Contributor switch
+		{
+			ContributorUserDto user when user.IsAnonymous || user.SteamName == null => "fst-italic text-muted",
+			ContributorAppDto => "fst-italic",
+			_ => string.Empty,
+		};
 	}
 
 	private string GetContributorName()
