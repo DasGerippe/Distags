@@ -19,6 +19,16 @@ public class Repository<TEntity, TDbContext> : IRepository<TEntity>
         return _DbContext.Set<TEntity>();
     }
 
+    public async Task<TEntity?> FindAsync(params object?[]? keyValues)
+    {
+        return await _DbContext.Set<TEntity>().FindAsync(keyValues);
+    }
+
+    public async Task<TEntity?> FindAsync(object?[]? keyValues, CancellationToken cancellationToken)
+    {
+        return await _DbContext.Set<TEntity>().FindAsync(keyValues, cancellationToken);
+    }
+
     public void Add(TEntity entity)
     {
         _DbContext.Set<TEntity>().Add(entity);
@@ -34,8 +44,8 @@ public class Repository<TEntity, TDbContext> : IRepository<TEntity>
         _DbContext.Set<TEntity>().Remove(entity);
     }
 
-    public Task SaveChangesAsync()
+    public Task SaveChangesAsync(CancellationToken cancellationToken = default)
     {
-        return _DbContext.SaveChangesAsync();
+        return _DbContext.SaveChangesAsync(cancellationToken);
     }
 }
