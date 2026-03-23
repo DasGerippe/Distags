@@ -44,7 +44,10 @@ public class LevelTagManager : ILevelTagManager
             return [];
 
         List<LevelTag> conflictingLevelTags = await _DbContext.Set<LevelTag>()
-            .Where(levelTag => levelTag.Level == level && levelTag.Tag.Exclusivity == tag.Exclusivity)
+            .Where(levelTag =>
+                levelTag.Level == level &&
+                levelTag.Tag.Group == tag.Group &&
+                levelTag.Tag.Exclusivity == tag.Exclusivity)
             .ToListAsync();
 
         _DbContext.RemoveRange(conflictingLevelTags);
