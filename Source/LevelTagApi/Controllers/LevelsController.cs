@@ -1,6 +1,5 @@
 ﻿using DataClasses;
 using DataStoring;
-using LevelTagApi.DtoConverter;
 using LevelTagApi.Dtos;
 using LevelTagApi.Sorting;
 using Microsoft.AspNetCore.Mvc;
@@ -13,16 +12,13 @@ namespace LevelTagApi.Controllers;
 public class LevelsController : ControllerBase
 {
     private readonly LevelTagDbContext _LevelTagDbContext;
-    private readonly IDtoConverter<Level, GetLevelDto> _LevelDtoConverter;
     private readonly IQueryableSorterFactory<Level, LevelSortProperty> _LevelSorterFactory;
 
     public LevelsController(
         LevelTagDbContext levelTagDbContext,
-        IDtoConverter<Level, GetLevelDto> levelDtoConverter,
         IQueryableSorterFactory<Level, LevelSortProperty> levelSorterFactory)
     {
         _LevelTagDbContext = levelTagDbContext;
-        _LevelDtoConverter = levelDtoConverter;
         _LevelSorterFactory = levelSorterFactory;
     }
 
@@ -57,17 +53,9 @@ public class LevelsController : ControllerBase
         }
 
         List<GetLevelDto> levelDtos = await levels
-            .Select(level => new GetLevelDto
-            {
-                Id = level.Id,
-                Name = level.Name,
-                Creator = level.Creator!.Name,
-                FileName = level.FileName,
-                FileUrl = level.FileUrl,
-                IconUrl = level.IconUrl,
-                CreatedOn = level.CreatedOn,
-                UpdatedOn = level.UpdatedOn,
-            })
+            .Include(level => level.Creator)
+            .Include(level => level.Tags)
+            .Select(level => level.ToDto())
             .ToListAsync();
 
         GetLevelsResponse response = new GetLevelsResponse
@@ -89,11 +77,15 @@ public class LevelsController : ControllerBase
     [HttpGet("{levelId}")]
     public async Task<ActionResult<GetLevelDto>> GetLevel(long levelId)
     {
-        Level? level = await _LevelTagDbContext.Levels.FindAsync(levelId);
+        Level? level = await _LevelTagDbContext.Set<Level>()
+            .Include(level => level.Creator)
+            .Include(level => level.Tags)
+            .FirstOrDefaultAsync(level => level.Id == levelId);
+
         if (level == null)
             return NotFound();
 
-        GetLevelDto levelDto = _LevelDtoConverter.ToDto(level);
+        GetLevelDto levelDto = level.ToDto();
         return Ok(levelDto);
     }
 

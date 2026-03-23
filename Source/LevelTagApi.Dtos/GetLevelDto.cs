@@ -6,7 +6,11 @@ public class GetLevelDto
 
     public string Name { get; set; } = string.Empty;
 
-    public string? Creator { get; set; }
+    public long CreatorId { get; set; }
+
+    public string? CreatorName { get; set; }
+
+    public string? CreatorAvatarHash { get; set; }
 
     public string FileName { get; set; } = string.Empty;
 
@@ -17,4 +21,6 @@ public class GetLevelDto
     public DateTime CreatedOn { get; set; }
 
     public DateTime UpdatedOn { get; set; }
+
+    public List<string> Tags { get; set; } = [];
 }
