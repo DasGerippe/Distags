@@ -21,6 +21,8 @@ public class LevelTagDbContext : DbContext
 
     public DbSet<ApiKey> ApiKeys { get; set; }
 
+    public DbSet<Contribution> Contributions { get; set; }
+
     public LevelTagDbContext(DbContextOptions<LevelTagDbContext> options)
         : base(options)
     {

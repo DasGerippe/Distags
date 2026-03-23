@@ -52,6 +52,43 @@ namespace DataStoringMigrations.Migrations
                     b.ToTable("api_keys", (string)null);
                 });
 
+            modelBuilder.Entity("DataClasses.Contribution", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint")
+                        .HasColumnName("id");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
+
+                    b.Property<int>("Action")
+                        .HasColumnType("integer")
+                        .HasColumnName("action");
+
+                    b.Property<DateTime>("ContributedOn")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("contributed_on");
+
+                    b.Property<long>("LevelId")
+                        .HasColumnType("bigint")
+                        .HasColumnName("level_id");
+
+                    b.Property<long?>("UserId")
+                        .HasColumnType("bigint")
+                        .HasColumnName("user_id");
+
+                    b.HasKey("Id")
+                        .HasName("pk_contributions");
+
+                    b.HasIndex("LevelId")
+                        .HasDatabaseName("ix_contributions_level_id");
+
+                    b.HasIndex("UserId")
+                        .HasDatabaseName("ix_contributions_user_id");
+
+                    b.ToTable("contributions", (string)null);
+                });
+
             modelBuilder.Entity("DataClasses.Creator", b =>
                 {
                     b.Property<long>("Id")
@@ -278,6 +315,25 @@ namespace DataStoringMigrations.Migrations
                         .HasDatabaseName("ix_user_sessions_user_id");
 
                     b.ToTable("user_sessions", (string)null);
+                });
+
+            modelBuilder.Entity("DataClasses.Contribution", b =>
+                {
+                    b.HasOne("DataClasses.Level", "Level")
+                        .WithMany()
+                        .HasForeignKey("LevelId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("fk_contributions_levels_level_id");
+
+                    b.HasOne("DataClasses.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .HasConstraintName("fk_contributions_users_user_id");
+
+                    b.Navigation("Level");
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("DataClasses.Level", b =>

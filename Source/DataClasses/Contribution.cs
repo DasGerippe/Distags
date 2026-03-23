@@ -1,0 +1,18 @@
+﻿namespace DataClasses;
+
+public class Contribution
+{
+    public long Id { get; set; }
+
+    public long LevelId { get; set; }
+
+    public Level Level { get; set; }
+
+    public long? UserId { get; set; }
+
+    public User? User { get; set; }
+
+    public ContributionAction Action { get; set; }
+
+    public DateTime ContributedOn { get; set; }
+}
