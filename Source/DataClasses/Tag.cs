@@ -8,6 +8,8 @@ public class Tag
 
     public string DisplayName { get; set; } = string.Empty;
 
+    public int Order { get; set; } = 0;
+
     public long? GroupId { get; set; }
 
     public TagGroup? Group { get; set; }

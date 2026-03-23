@@ -143,6 +143,10 @@ namespace DataStoringMigrations.Migrations
                         .HasColumnType("character varying(30)")
                         .HasColumnName("name");
 
+                    b.Property<int>("Order")
+                        .HasColumnType("integer")
+                        .HasColumnName("order");
+
                     b.HasKey("Id")
                         .HasName("pk_tags");
 
@@ -173,6 +177,10 @@ namespace DataStoringMigrations.Migrations
                         .IsRequired()
                         .HasColumnType("text")
                         .HasColumnName("name");
+
+                    b.Property<int>("Order")
+                        .HasColumnType("integer")
+                        .HasColumnName("order");
 
                     b.Property<long?>("ParentGroupId")
                         .HasColumnType("bigint")

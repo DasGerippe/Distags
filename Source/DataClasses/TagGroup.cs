@@ -8,6 +8,8 @@ public class TagGroup
 
     public TagCompatibility Compatibility { get; set; } = TagCompatibility.Exclusive;
 
+    public int Order { get; set; } = 0;
+
     public long? ParentGroupId { get; set; }
 
     public TagGroup? ParentGroup { get; set; }
