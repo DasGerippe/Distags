@@ -8,6 +8,10 @@ public class Contribution
 
     public Level Level { get; set; }
 
+    public long TagId { get; set; }
+
+    public Tag Tag { get; set; }
+
     public long? UserId { get; set; }
 
     public User? User { get; set; }

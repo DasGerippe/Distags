@@ -73,6 +73,10 @@ namespace DataStoringMigrations.Migrations
                         .HasColumnType("bigint")
                         .HasColumnName("level_id");
 
+                    b.Property<long>("TagId")
+                        .HasColumnType("bigint")
+                        .HasColumnName("tag_id");
+
                     b.Property<long?>("UserId")
                         .HasColumnType("bigint")
                         .HasColumnName("user_id");
@@ -82,6 +86,9 @@ namespace DataStoringMigrations.Migrations
 
                     b.HasIndex("LevelId")
                         .HasDatabaseName("ix_contributions_level_id");
+
+                    b.HasIndex("TagId")
+                        .HasDatabaseName("ix_contributions_tag_id");
 
                     b.HasIndex("UserId")
                         .HasDatabaseName("ix_contributions_user_id");
@@ -326,12 +333,21 @@ namespace DataStoringMigrations.Migrations
                         .IsRequired()
                         .HasConstraintName("fk_contributions_levels_level_id");
 
+                    b.HasOne("DataClasses.Tag", "Tag")
+                        .WithMany()
+                        .HasForeignKey("TagId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("fk_contributions_tags_tag_id");
+
                     b.HasOne("DataClasses.User", "User")
                         .WithMany()
                         .HasForeignKey("UserId")
                         .HasConstraintName("fk_contributions_users_user_id");
 
                     b.Navigation("Level");
+
+                    b.Navigation("Tag");
 
                     b.Navigation("User");
                 });
