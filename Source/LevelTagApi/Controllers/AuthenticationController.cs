@@ -2,12 +2,12 @@
 using DataClasses;
 using DataStoring;
 using LevelTagApi.Dtos;
+using LevelTagApi.Management;
 using LevelTagApi.Security;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.WebUtilities;
-using Microsoft.EntityFrameworkCore;
 using SteamWebApi;
 using SteamWebApi.ApiInterfaces;
 using SteamWebApi.Dtos.SteamUser;
@@ -23,6 +23,7 @@ public class AuthenticationController : ControllerBase
     private readonly LevelTagDbContext _DbContext;
     private readonly ITicketStore<long> _TicketStore;
     private readonly ITokenGenerator _TokenGenerator;
+    private readonly IUserManager _UserManager;
     private readonly ISteamUser _SteamUser;
     private readonly ILogger<AuthenticationController> _Logger;
 
@@ -33,6 +34,7 @@ public class AuthenticationController : ControllerBase
         LevelTagDbContext dbContext,
         ITicketStore<long> ticketStore,
         ITokenGenerator tokenGenerator,
+        IUserManager userManager,
         ISteamUser steamUser,
         SteamWebApiSettings steamWebApiSettings,
         ILogger<AuthenticationController> logger)
@@ -41,6 +43,7 @@ public class AuthenticationController : ControllerBase
         _DbContext = dbContext;
         _TicketStore = ticketStore;
         _TokenGenerator = tokenGenerator;
+        _UserManager = userManager;
         _SteamUser = steamUser;
         _Logger = logger;
 
@@ -110,7 +113,7 @@ public class AuthenticationController : ControllerBase
     [Authorize(AuthenticationSchemes = Constants.Authentication.SessionTokenScheme.Name)]
     public async Task<IActionResult> Logout()
     {
-        UserSession? userSession = await _DbContext.GetUserSession(User);
+        UserSession? userSession = await _UserManager.GetCurrentUserSessionAsync();
         if (userSession == null)
             return Unauthorized();
 
@@ -124,7 +127,7 @@ public class AuthenticationController : ControllerBase
     [Authorize(AuthenticationSchemes = Constants.Authentication.SessionTokenScheme.Name)]
     public async Task<IActionResult> LogoutAll()
     {
-        User? user = await _DbContext.GetUser(User, includes: nameof(user.Sessions));
+        User? user = await _UserManager.GetCurrentUserAsync(includes: nameof(user.Sessions));
         if (user == null)
             return Unauthorized();
 

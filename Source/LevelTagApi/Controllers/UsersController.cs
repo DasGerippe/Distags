@@ -1,6 +1,7 @@
 ﻿using DataClasses;
 using DataStoring;
 using LevelTagApi.Dtos;
+using LevelTagApi.Management;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -11,17 +12,19 @@ namespace LevelTagApi.Controllers;
 public class UsersController : ControllerBase
 {
     private readonly LevelTagDbContext _DbContext;
+    private readonly IUserManager _UserManager;
 
-    public UsersController(LevelTagDbContext dbContext)
+    public UsersController(LevelTagDbContext dbContext, IUserManager userManager)
     {
         _DbContext = dbContext;
+        _UserManager = userManager;
     }
 
     [HttpGet("me")]
     [Authorize]
     public async Task<ActionResult<UserDto>> GetMe()
     {
-        User? user = await _DbContext.GetUser(User);
+        User? user = await _UserManager.GetCurrentUserAsync();
         if (user == null)
             return Unauthorized();
 
@@ -33,7 +36,7 @@ public class UsersController : ControllerBase
     [Authorize]
     public async Task<IActionResult> PatchSettings([FromBody] PatchSettingsParameters parameters)
     {
-        User? user = await _DbContext.GetUser(User);
+        User? user = await _UserManager.GetCurrentUserAsync();
         if (user == null)
             return Unauthorized();
 

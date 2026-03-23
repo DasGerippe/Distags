@@ -1,24 +1,23 @@
 ﻿using DataClasses;
 using DataStoring;
-using System.Security.Claims;
 
 namespace LevelTagApi.Management;
 
 public class ContributionManager : IContributionManager
 {
-    private readonly IHttpContextAccessor _HttpContextAccessor;
     private readonly LevelTagDbContext _DbContext;
+    private readonly IUserManager _UserManager;
 
-    public ContributionManager(IHttpContextAccessor httpContextAccessor, LevelTagDbContext dbContext)
+    public ContributionManager(LevelTagDbContext dbContext, IUserManager userManager)
     {
-        _HttpContextAccessor = httpContextAccessor;
         _DbContext = dbContext;
+        _UserManager = userManager;
     }
 
     public async Task CreateAddTagContributionAsync(
         long levelId, long tagId, IEnumerable<long> removedConflictingTagIds)
     {
-        User? user = await GetCurrentUser();
+        User? user = await _UserManager.GetCurrentUserAsync();
         DateTime utcNow = DateTime.UtcNow;
 
         _DbContext.Add(new Contribution
@@ -42,7 +41,7 @@ public class ContributionManager : IContributionManager
 
     public async Task CreateRemoveTagContributionAsync(long levelId, long tagId)
     {
-        User? user = await GetCurrentUser();
+        User? user = await _UserManager.GetCurrentUserAsync();
 
         _DbContext.Add(new Contribution
         {
@@ -52,14 +51,5 @@ public class ContributionManager : IContributionManager
             Action = ContributionAction.TagRemoved,
             ContributedOn = DateTime.UtcNow,
         });
-    }
-
-    private async Task<User?> GetCurrentUser()
-    {
-        ClaimsPrincipal? httpContextUser = _HttpContextAccessor.HttpContext?.User;
-        if (httpContextUser == null)
-            return null;
-
-        return await _DbContext.GetUser(httpContextUser);
     }
 }

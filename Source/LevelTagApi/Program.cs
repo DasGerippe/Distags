@@ -53,6 +53,7 @@ public class Program
             builder.Services.AddTransient<IQueryableFilterFactory<Level, BrowseLevelsParameters>, BrowseLevelsFilterFactory>();
             builder.Services.AddTransient<IQueryableSorterFactory<Level, LevelSortStrategy>, LevelSorterFactory>();
 
+            builder.Services.AddTransient<IUserManager, UserManager>();
             builder.Services.AddTransient<ILevelTagManager, LevelTagManager>();
             builder.Services.AddTransient<IContributionManager, ContributionManager>();
 
