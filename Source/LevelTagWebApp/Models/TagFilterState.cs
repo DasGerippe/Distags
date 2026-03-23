@@ -1,4 +1,4 @@
-﻿namespace LevelTagWebApp.Filters;
+﻿namespace LevelTagWebApp.Models;
 
 public enum TagFilterState
 {
