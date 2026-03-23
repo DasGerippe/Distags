@@ -2,7 +2,7 @@
 
 namespace LevelTagApi.Dtos;
 
-public class GetLevelsParameters
+public class BrowseLevelsParameters
 {
     public string? LevelFilter { get; set; }
 

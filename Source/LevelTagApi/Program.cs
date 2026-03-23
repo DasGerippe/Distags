@@ -36,7 +36,7 @@ namespace LevelTagApi
 
             AddValidatedConfigOptions<LevelTagApiSettings>(builder, "LevelTagApiSettings");
 
-            builder.Services.AddTransient<IQueryableFilterFactory<Level, GetLevelsParameters>, BrowseLevelsFilterFactory>();
+            builder.Services.AddTransient<IQueryableFilterFactory<Level, BrowseLevelsParameters>, BrowseLevelsFilterFactory>();
             builder.Services.AddTransient<IQueryableSorterFactory<Level, LevelSortStrategy>, LevelSorterFactory>();
 
             builder.Services.AddSingleton<ITicketStore<long>, ConcurrentTicketStore<long>>();

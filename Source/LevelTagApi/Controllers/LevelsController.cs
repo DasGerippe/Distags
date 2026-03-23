@@ -16,12 +16,12 @@ namespace LevelTagApi.Controllers;
 public class LevelsController : ControllerBase
 {
     private readonly LevelTagDbContext _DbContext;
-    private readonly IQueryableFilterFactory<Level, GetLevelsParameters> _LevelFilterFactory;
+    private readonly IQueryableFilterFactory<Level, BrowseLevelsParameters> _LevelFilterFactory;
     private readonly IQueryableSorterFactory<Level, LevelSortStrategy> _LevelSorterFactory;
 
     public LevelsController(
         LevelTagDbContext dbContext,
-        IQueryableFilterFactory<Level, GetLevelsParameters> levelFilterFactory,
+        IQueryableFilterFactory<Level, BrowseLevelsParameters> levelFilterFactory,
         IQueryableSorterFactory<Level, LevelSortStrategy> levelSorterFactory)
     {
         _DbContext = dbContext;
@@ -31,9 +31,9 @@ public class LevelsController : ControllerBase
 
     [HttpGet]
     [AllowAnonymous]
-    public async Task<ActionResult<IEnumerable<LevelDto>>> GetLevels([FromQuery] GetLevelsParameters parameters)
+    public async Task<ActionResult<IEnumerable<LevelDto>>> BrowseLevels([FromQuery] BrowseLevelsParameters parameters)
     {
-        GetLevelsResponse response = new GetLevelsResponse
+        BrowseLevelsResponse response = new BrowseLevelsResponse
         {
             PageSize = parameters.PageSize,
             PageNumber = parameters.PageNumber,

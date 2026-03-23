@@ -3,9 +3,9 @@ using LevelTagApi.Dtos;
 
 namespace LevelTagApi.Filtering;
 
-public class BrowseLevelsFilterFactory : IQueryableFilterFactory<Level, GetLevelsParameters>
+public class BrowseLevelsFilterFactory : IQueryableFilterFactory<Level, BrowseLevelsParameters>
 {
-    public IQueryableFilter<Level> GetQueryableFilter(GetLevelsParameters parameters)
+    public IQueryableFilter<Level> GetQueryableFilter(BrowseLevelsParameters parameters)
     {
         FilterGroup<Level> levelFilterGroup = new FilterGroup<Level>();
 

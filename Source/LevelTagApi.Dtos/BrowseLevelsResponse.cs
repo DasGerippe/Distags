@@ -1,6 +1,6 @@
 ﻿namespace LevelTagApi.Dtos;
 
-public class GetLevelsResponse
+public class BrowseLevelsResponse
 {
     public int PageSize { get; set; }
 

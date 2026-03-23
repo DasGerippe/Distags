@@ -43,14 +43,14 @@ public class LevelTagApiClient : IDisposable
         return tagTree;
     }
 
-    public async Task<GetLevelsResponse> GetLevelsAsync(
-        GetLevelsParameters parameters, CancellationToken cancellationToken = default)
+    public async Task<BrowseLevelsResponse> BrowseLevelsAsync(
+        BrowseLevelsParameters parameters, CancellationToken cancellationToken = default)
     {
         string query = QueryBuilder.BuildQueryString(parameters);
         string requestUri = $"api/levels?{query}";
 
         HttpResponseMessage responseMessage = await _HttpClient.GetAsync(requestUri, cancellationToken).ConfigureAwait(false);
-        GetLevelsResponse levelsResponse = await GetContentAsync<GetLevelsResponse>(responseMessage, cancellationToken).ConfigureAwait(false);
+        BrowseLevelsResponse levelsResponse = await GetContentAsync<BrowseLevelsResponse>(responseMessage, cancellationToken).ConfigureAwait(false);
         return levelsResponse;
     }
 

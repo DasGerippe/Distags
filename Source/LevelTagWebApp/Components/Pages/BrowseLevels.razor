@@ -199,7 +199,7 @@
 
 	private async Task QueryLevelsAsync(int page = 1)
 	{
-		GetLevelsParameters parameters = new GetLevelsParameters
+		BrowseLevelsParameters parameters = new BrowseLevelsParameters
 		{
 			LevelFilter = GetFilterTermOrNullIfEmpty(LevelFilter),
 			CreatorFilter = GetFilterTermOrNullIfEmpty(CreatorFilter),
@@ -209,7 +209,7 @@
 			PageNumber = page,
 			SortStrategy = SortStrategy,
 		};
-		GetLevelsResponse levelsResponse = await LevelTagApi.GetLevelsAsync(parameters);
+		BrowseLevelsResponse levelsResponse = await LevelTagApi.BrowseLevelsAsync(parameters);
 		Page = page;
 		_PageCount = (int)Math.Ceiling((double)levelsResponse.TotalLevels / PageSize);
 		_Levels = levelsResponse.Levels;
