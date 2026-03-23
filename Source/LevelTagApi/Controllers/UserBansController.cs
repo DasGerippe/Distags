@@ -10,7 +10,7 @@ using Microsoft.EntityFrameworkCore;
 namespace LevelTagApi.Controllers;
 
 [ApiController]
-[Route("api/[controller]")]
+[Route("[controller]")]
 public class UserBansController : ControllerBase
 {
     private readonly LevelTagDbContext _DbContext;

@@ -11,14 +11,14 @@ public class LevelTagApiClient
 
     public async Task PostLevelTagAsync(long levelId, string tagName, CancellationToken cancellationToken = default)
     {
-        string requestUri = $"api/levels/{levelId}/tags/{tagName}";
+        string requestUri = $"levels/{levelId}/tags/{tagName}";
         HttpResponseMessage responseMessage = await _HttpClient.PostAsync(requestUri, null, cancellationToken).ConfigureAwait(false);
         responseMessage.EnsureSuccessStatusCode();
     }
 
     public async Task DeleteLevelTagAsync(long levelId, string tagName, CancellationToken cancellationToken = default)
     {
-        string requestUri = $"api/levels/{levelId}/tags/{tagName}";
+        string requestUri = $"levels/{levelId}/tags/{tagName}";
         HttpResponseMessage responseMessage = await _HttpClient.DeleteAsync(requestUri, cancellationToken).ConfigureAwait(false);
         responseMessage.EnsureSuccessStatusCode();
     }

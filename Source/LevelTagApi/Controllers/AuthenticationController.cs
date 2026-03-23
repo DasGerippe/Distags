@@ -16,7 +16,7 @@ using System.Security.Claims;
 namespace LevelTagApi.Controllers;
 
 [ApiController]
-[Route("api/[controller]")]
+[Route("[controller]")]
 public class AuthenticationController : ControllerBase
 {
     private readonly LevelTagApiSettings _Settings;

@@ -10,7 +10,7 @@ using System.Text.Json;
 namespace LevelTagApi.Controllers;
 
 [ApiController]
-[Route("api/[controller]")]
+[Route("[controller]")]
 public class GuidelinesController : ControllerBase
 {
     private readonly LevelTagDbContext _DbContext;
