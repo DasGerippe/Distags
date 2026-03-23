@@ -23,4 +23,9 @@ internal static class Constants
     {
         internal const string Tagging = "TaggingPolicy";
     }
+
+    internal static class Claims
+    {
+        internal const string SteamId = "Steam ID";
+    }
 }

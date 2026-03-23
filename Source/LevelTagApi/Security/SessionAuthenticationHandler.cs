@@ -36,7 +36,16 @@ public class SessionAuthenticationHandler : AuthenticationHandler<Authentication
         if (userSession == null)
             return AuthenticateResult.Fail("Invalid session token.");
 
-        IEnumerable<Claim> claims = userSession.User.Roles.Select(role => new Claim(ClaimTypes.Role, role));
+        User user = userSession.User;
+        if (user.SteamId == null)
+            return AuthenticateResult.Fail("Session belongs to unknown Steam user.");
+
+        List<Claim> claims =
+        [
+            new Claim(Constants.Claims.SteamId, user.SteamId.Value.ToString()),
+            .. user.Roles.Select(role => new Claim(ClaimTypes.Role, role)),
+        ];
+
         ClaimsPrincipal principal = new ClaimsPrincipal(new ClaimsIdentity(claims));
         AuthenticationTicket authTicket = new AuthenticationTicket(principal, Scheme.Name);
         return AuthenticateResult.Success(authTicket);
