@@ -315,6 +315,29 @@ namespace DataStoringMigrations.Migrations
                     b.ToTable("users", (string)null);
                 });
 
+            modelBuilder.Entity("DataClasses.UserBan", b =>
+                {
+                    b.Property<long>("SteamId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint")
+                        .HasColumnName("steam_id");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("SteamId"));
+
+                    b.Property<DateTime>("BannedOn")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("banned_on");
+
+                    b.Property<string>("Reason")
+                        .HasColumnType("text")
+                        .HasColumnName("reason");
+
+                    b.HasKey("SteamId")
+                        .HasName("pk_user_bans");
+
+                    b.ToTable("user_bans", (string)null);
+                });
+
             modelBuilder.Entity("DataClasses.UserSession", b =>
                 {
                     b.Property<string>("Token")
