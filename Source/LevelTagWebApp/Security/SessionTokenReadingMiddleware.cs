@@ -11,7 +11,7 @@ public class SessionTokenReadingMiddleware
         _Next = next;
     }
 
-    public Task InvokeAsync(HttpContext httpContext, ISessionTokenProvider sessionTokenProvider, LevelTagApiClient levelTagApi)
+    public Task InvokeAsync(HttpContext httpContext, ISessionTokenProvider sessionTokenProvider)
     {
         if (httpContext.Request.Cookies.TryGetValue(Constants.SessionTokenCookieName, out string? sessionToken))
             sessionTokenProvider.SessionToken = sessionToken;
