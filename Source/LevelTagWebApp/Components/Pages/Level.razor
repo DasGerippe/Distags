@@ -109,12 +109,16 @@
 		_TagTree = await LevelTagApi.GetTagTreeAsync();
 		InitializeTagStates();
 
-		await SetUpLevelHubConnection();
-
 		_IsLoadingData = false;
 	}
 
-	private void InitializeTagStates()
+	protected override async Task OnAfterRenderAsync(bool firstRender)
+	{
+		if (firstRender)
+            await SetUpLevelHubConnection();
+	}
+
+    private void InitializeTagStates()
 	{
 		if (_LevelDto == null || _TagTree == null)
 			return;
