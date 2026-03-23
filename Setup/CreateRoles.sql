@@ -47,4 +47,3 @@ GRANT distance_level_tags_manage_levels TO distance_level_tags_scraper;
 
 CREATE ROLE distance_level_tags_auto_tagger WITH LOGIN PASSWORD '';
 GRANT distance_level_tags_read_levels TO distance_level_tags_auto_tagger;
-GRANT distance_level_tags_assign_tags TO distance_level_tags_auto_tagger;
