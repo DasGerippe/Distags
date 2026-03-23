@@ -51,7 +51,7 @@ public class Program
             builder.Services.AddSingleton<ContributionsNotificator>();
 
             builder.Services.AddSignalR();
-            builder.Services.AddTransient<ILevelHubServer, LevelHubServer>();
+            builder.Services.AddTransient<ILevelTagBroadcaster, LevelTagBroadcaster>();
             builder.Services.AddTransient<IContributionBroadcaster, ContributionBroadcaster>();
 
             builder.Services.AddSteamWebApi("SteamWebApi");
@@ -84,7 +84,7 @@ public class Program
 
             app.MapControllers();
 
-            app.MapHub<LevelHub>("/levelHub");
+            app.MapHub<LevelHub>("/hubs/levels");
             app.MapHub<ContributionHub>("/hubs/contributions");
 
             app.Run();

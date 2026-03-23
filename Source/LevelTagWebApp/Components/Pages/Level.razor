@@ -124,7 +124,7 @@
 	private async Task SetUpLevelHubConnection()
 	{
 		_LevelHubConnection = new HubConnectionBuilder()
-			.WithUrl("https://localhost:7159/levelHub")
+			.WithUrl(LevelTagApi.LevelHubEndpoint)
 			.WithAutomaticReconnect()
 			.Build();
 

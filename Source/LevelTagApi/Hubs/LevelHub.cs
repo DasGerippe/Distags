@@ -2,7 +2,7 @@
 
 namespace LevelTagApi.Hubs;
 
-public class LevelHub : Hub
+public class LevelHub : Hub<ILevelHubClient>
 {
     public async Task JoinLevelGroup(long levelId)
     {

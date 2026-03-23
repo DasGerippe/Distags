@@ -11,10 +11,17 @@ public class LevelTagApiClient : IDisposable
     private readonly HttpClient _HttpClient;
     private readonly ISessionTokenProvider _SessionTokenProvider;
 
+    public Uri LevelHubEndpoint { get; }
+
     public LevelTagApiClient(HttpClient httpClient, ISessionTokenProvider sessionTokenProvider)
     {
         _HttpClient = httpClient;
         _SessionTokenProvider = sessionTokenProvider;
+
+        if (_HttpClient.BaseAddress == null)
+            throw new ArgumentException("BaseAddress of HttpClient not set.", nameof(httpClient));
+
+        LevelHubEndpoint = new Uri(_HttpClient.BaseAddress, "hubs/levels");
 
         UpdateAuthorizationRequestHeader();
         _SessionTokenProvider.SessionTokenChanged += OnSessionTokenChanged;
