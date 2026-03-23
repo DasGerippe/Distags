@@ -118,7 +118,7 @@ public class LevelTagApiClient : IDisposable
         responseMessage.EnsureSuccessStatusCode();
     }
 
-    public async Task<UserDto> GetUser(CancellationToken cancellationToken = default)
+    public async Task<UserDto> GetMe(CancellationToken cancellationToken = default)
     {
         HttpResponseMessage responseMessage = await _HttpClient.GetAsync("api/users/me", cancellationToken).ConfigureAwait(false);
         UserDto user = await GetContentAsync<UserDto>(responseMessage, cancellationToken).ConfigureAwait(false);

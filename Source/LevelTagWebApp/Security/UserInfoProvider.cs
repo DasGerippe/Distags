@@ -56,7 +56,7 @@ public sealed class UserInfoProvider : IUserInfoProvider, IDisposable
     {
         try
         {
-            UserDto user = await _LevelTagApi.GetUser();
+            UserDto user = await _LevelTagApi.GetMe();
 
 
             RaiseUserInfoChanged();
