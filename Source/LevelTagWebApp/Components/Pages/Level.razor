@@ -1,11 +1,11 @@
 ﻿@page "/level/{levelId:long}"
 @rendermode InteractiveServer
 
-@using System.Net
 @using LevelTagApi.Dtos
 @using LevelTagWebApp.Components.Inputs
 @using LevelTagWebApp.Services
 @using Microsoft.AspNetCore.SignalR.Client
+@using System.Net
 
 @implements IAsyncDisposable
 @inject LevelTagApiClient LevelTagApi
