@@ -16,12 +16,16 @@ a, .btn-link {
   box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #258cfb;
 }
 
+.content-wide{
+    max-width: 1600px;
+}
+
 .content {
-    max-width: 1800px;
+    max-width: 1200px;
 }
 
 .content-narrow {
-    max-width: 1400px;
+    max-width: 800px;
 }
 
 h1:focus {
