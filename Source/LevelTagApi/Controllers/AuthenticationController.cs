@@ -109,6 +109,25 @@ public class AuthenticationController : ControllerBase
         return Ok();
     }
 
+    [HttpPost("logout-all")]
+    [Authorize(AuthenticationSchemes = Constants.Session.AuthenticationScheme)]
+    public async Task<IActionResult> LogoutAll([FromHeader(Name = LevelTagApiConstants.SessionTokenHeader)] string sessionToken)
+    {
+        UserSession? userSession = await _DbContext.Set<UserSession>()
+            .Include(session => session.User)
+            .ThenInclude(user => user.Sessions)
+            .Where(session => session.Token == sessionToken)
+            .FirstOrDefaultAsync();
+
+        if (userSession == null)
+            return Unauthorized();
+
+        _DbContext.RemoveRange(userSession.User.Sessions);
+        await _DbContext.SaveChangesAsync();
+
+        return Ok();
+    }
+
     private async Task<SessionResponse> CreateSessionResponseForNewUserSession(long steamId)
     {
         User user = GetOrCreateUser(steamId);
