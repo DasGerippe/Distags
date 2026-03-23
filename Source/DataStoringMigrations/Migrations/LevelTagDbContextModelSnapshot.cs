@@ -288,6 +288,10 @@ namespace DataStoringMigrations.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
 
+                    b.Property<bool>("AcceptedContributionGuidelines")
+                        .HasColumnType("boolean")
+                        .HasColumnName("accepted_contribution_guidelines");
+
                     b.Property<bool>("IsAnonymous")
                         .HasColumnType("boolean")
                         .HasColumnName("is_anonymous");
