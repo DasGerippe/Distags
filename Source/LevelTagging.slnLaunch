@@ -1,0 +1,28 @@
+[
+  {
+    "Name": "API, WebApp",
+    "Projects": [
+      {
+        "Path": "LevelTagApi\\LevelTagApi.csproj",
+        "Action": "Start"
+      },
+      {
+        "Path": "LevelTagWebApp\\LevelTagWebApp.csproj",
+        "Action": "Start"
+      }
+    ]
+  },
+  {
+    "Name": "API, AutoTagger (All)",
+    "Projects": [
+      {
+        "Path": "LevelTagApi\\LevelTagApi.csproj",
+        "Action": "Start"
+      },
+      {
+        "Path": "AutoTaggerRunner\\AutoTaggerRunner.csproj",
+        "Action": "Start"
+      }
+    ]
+  }
+]
