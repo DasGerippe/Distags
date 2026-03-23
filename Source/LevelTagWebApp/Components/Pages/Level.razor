@@ -3,12 +3,15 @@
 
 @using LevelTagApi.Dtos
 @using LevelTagWebApp.Components.Inputs
+@using LevelTagWebApp.Security
 @using LevelTagWebApp.Services
 @using Microsoft.AspNetCore.SignalR.Client
 @using System.Net
 
 @implements IAsyncDisposable
+
 @inject LevelTagApiClient LevelTagApi
+@inject IUserInfoProvider UserInfoProvider
 
 @if (_IsLoadingData)
 {
@@ -49,6 +52,7 @@
 						}
 
 						<AsyncIconCheckbox TState="bool"
+										   ReadOnly="_IsReadOnly || tag.IsAutoTag"
 										   Label="@tag.DisplayName"
 										   @bind-State="_TagStates[tag.Name].State"
 										   AsyncOperation="state => TryChangeTagState(tag.Name, state)"
@@ -66,6 +70,7 @@
 @code {
 
 	private bool _IsLoadingData = true;
+	private bool _IsReadOnly;
 
 	private LevelDto? _LevelDto;
 	private List<TagGroupDto>? _TagTree;
@@ -91,6 +96,8 @@
 			_IsLoadingData = false;
 			return;
 		}
+
+		_IsReadOnly = await UserInfoProvider.GetUserInfoAsync() == null;
 
 		_TagTree = await LevelTagApi.GetTagTreeAsync();
 		InitializeTagStates();

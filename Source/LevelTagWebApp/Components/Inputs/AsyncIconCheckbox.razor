@@ -2,7 +2,7 @@
 @typeparam TState
 
 <div class="custom-checkbox d-flex align-items-start gap-2"
-     @onclick="HandleClick">
+     @onclick="ReadOnly ? null : HandleClick">
 	
 	 @if (_IsInAsyncOperation)
 	 {
@@ -27,6 +27,9 @@
 @code {
 
 	private bool _IsInAsyncOperation;
+
+	[Parameter]
+	public bool ReadOnly { get; set; }
 
 	[Parameter]
 	public string? Label { get; set; }
