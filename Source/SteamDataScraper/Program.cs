@@ -57,7 +57,7 @@ internal class Program
 
                 string levelTagsDbConnectionString = context.Configuration.GetConnectionString("LevelTagsDatabase") ??
                                                      throw new InvalidOperationException("Connection string not configured.");
-                services.AddPostgreSqlLevelTagDbContext(levelTagsDbConnectionString);
+                services.AddNpgsqlLevelTagDbContext(levelTagsDbConnectionString);
 
                 services.AddTransient<Program>();
                 services.AddTransient<LevelScraper>();

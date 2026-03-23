@@ -25,7 +25,7 @@ internal class Program
         {
             string connectionString = context.Configuration.GetConnectionString("LevelTagsDatabase")
                                       ?? throw new Exception("Connection string missing.");
-            services.AddPostgreSqlLevelTagDbContext(connectionString);
+            services.AddNpgsqlLevelTagDbContext(connectionString);
         });
 
         IHost host = builder.Build();

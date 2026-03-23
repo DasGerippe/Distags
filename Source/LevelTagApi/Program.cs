@@ -41,7 +41,7 @@ public class Program
 
             string levelTagsDbConnectionString = builder.Configuration.GetConnectionString("LevelTagsDatabase") ??
                                                  throw new InvalidOperationException("Connection string not configured.");
-            builder.Services.AddPostgreSqlLevelTagDbContext(levelTagsDbConnectionString);
+            builder.Services.AddNpgsqlLevelTagDbContext(levelTagsDbConnectionString);
 
             builder.Services.AddSignalR();
 
