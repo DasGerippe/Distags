@@ -79,7 +79,7 @@ internal class Program
         {
             //QueryFileParameters queryFilesParameters = new QueryFileParameters
             //{
-            //    SteamApiKey = _Configuration["SteamWebApi:Key"],
+            //    Key = _Configuration["SteamWebApi:Key"],
             //    AppId = 233610,
             //    QueryType = QueryType.RankedByPublicationDate,
             //    ItemsPerPage = 10,
@@ -96,7 +96,7 @@ internal class Program
 
             GetPlayerSummariesParameters getPlayerSummariesParameters = new GetPlayerSummariesParameters
             {
-                SteamApiKey = _Configuration["SteamWebApi:Key"],
+                Key = _Configuration["SteamWebApi:Key"],
                 SteamIds =
                 [
                     76561198032726698,

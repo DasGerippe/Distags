@@ -26,7 +26,7 @@ public class SteamUser : ISteamUser
 
         GetPlayerSummariesParameters chunkParameters = new GetPlayerSummariesParameters()
         {
-            SteamApiKey = parameters.SteamApiKey,
+            Key = parameters.Key,
         };
 
         foreach (long[] steamUserIdChunk in steamUserIdChunks)

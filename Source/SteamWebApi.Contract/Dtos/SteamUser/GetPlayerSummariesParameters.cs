@@ -3,7 +3,7 @@
 public class GetPlayerSummariesParameters
 {
     [QueryParameter("key")]
-    public string? SteamApiKey { get; set; }
+    public string? Key { get; set; }
 
     [QueryParameter("steamids")]
     public IEnumerable<long> SteamIds { get; set; } = [];

@@ -16,7 +16,7 @@ public static class ServiceCollectionExtensions
             .ValidateDataAnnotations()
             .ValidateOnStart();
 
-        services.AddKeyedSingleton<string>("SteamApiKey", (serviceProvider, key) =>
+        services.AddKeyedSingleton<string>("SteamWebApiKey", (serviceProvider, key) =>
             serviceProvider.GetRequiredService<IOptions<SteamWebApiSettings>>().Value.ApiKey);
 
         services.AddTransient<RetrySettings>(serviceProvider =>

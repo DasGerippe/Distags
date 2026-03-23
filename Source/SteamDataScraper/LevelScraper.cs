@@ -14,19 +14,19 @@ public class LevelScraper
 
     private readonly LevelTagDbContext _LevelTagDbContext;
     private readonly IPublishedFileService _PublishedFileService;
-    private readonly string _SteamApiKey;
+    private readonly string _SteamWebApiKey;
 
     private readonly ILogger<LevelScraper> _Logger;
 
     public LevelScraper(
         LevelTagDbContext levelTagDbContext,
         IPublishedFileService publishedFileService,
-        [FromKeyedServices("SteamApiKey")] string steamApiKey,
+        [FromKeyedServices("SteamWebApiKey")] string steamWebApiKey,
         ILogger<LevelScraper> logger)
     {
         _LevelTagDbContext = levelTagDbContext;
         _PublishedFileService = publishedFileService;
-        _SteamApiKey = steamApiKey;
+        _SteamWebApiKey = steamWebApiKey;
 
         _Logger = logger;
     }
@@ -150,7 +150,7 @@ public class LevelScraper
     {
         return new QueryFileParameters
         {
-            SteamApiKey = _SteamApiKey,
+            Key = _SteamWebApiKey,
             AppId = DistanceAppId,
             QueryType = queryType,
             ItemsPerPage = itemsPerPage,

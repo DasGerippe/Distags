@@ -12,19 +12,19 @@ public class LevelCreatorScraper
 {
     private readonly LevelTagDbContext _LevelTagDbContext;
     private readonly ISteamUser _SteamUser;
-    private readonly string _SteamApiKey;
+    private readonly string _SteamWebApiKey;
 
     private readonly ILogger<LevelCreatorScraper> _Logger;
 
     public LevelCreatorScraper(
         LevelTagDbContext levelTagDbContext,
         ISteamUser steamUser,
-        [FromKeyedServices("SteamApiKey")] string steamApiKey,
+        [FromKeyedServices("SteamWebApiKey")] string steamWebApiKey,
         ILogger<LevelCreatorScraper> logger)
     {
         _LevelTagDbContext = levelTagDbContext;
         _SteamUser = steamUser;
-        _SteamApiKey = steamApiKey;
+        _SteamWebApiKey = steamWebApiKey;
 
         _Logger = logger;
     }
@@ -124,7 +124,7 @@ public class LevelCreatorScraper
     {
         return new GetPlayerSummariesParameters
         {
-            SteamApiKey = _SteamApiKey,
+            Key = _SteamWebApiKey,
             SteamIds = creatorIds,
         };
     }

@@ -3,7 +3,7 @@
 public class QueryFileParameters
 {
     [QueryParameter("key")]
-    public string? SteamApiKey { get; set; }
+    public string? Key { get; set; }
 
     [QueryParameter("appid")]
     public int? AppId { get; set; }
