@@ -2,12 +2,14 @@
 @page "/browse"
 @rendermode InteractiveServer
 
+@using HttpUtils
 @using LevelTagApi.Dtos
 @using LevelTagWebApp.Components.Filters
 @using LevelTagWebApp.Components.Inputs
 @using LevelTagWebApp.Models
 @using LevelTagWebApp.Services
 
+@inject HistoryService History
 @inject NavigationManager Navigation
 @inject LevelTagApiClient LevelTagApi
 
@@ -57,6 +59,14 @@
 
 	private List<GetLevelDto> _Levels = [];
 
+	[Parameter]
+	[SupplyParameterFromQuery]
+	public string? IncludeTags { get; set; }
+
+	[Parameter]
+	[SupplyParameterFromQuery]
+	public string? ExcludeTags { get; set; }
+
 	protected override async Task OnInitializedAsync()
 	{
 		_TagGroups = await LevelTagApi.GetTagTreeAsync();
@@ -65,6 +75,26 @@
 			.ToDictionary(tagFilter => tagFilter.Tag.Name);
 
 		_IsInitialized = true;
+	}
+
+	protected override void OnParametersSet()
+	{
+		if (IncludeTags != null)
+			LoadFilterStates(IncludeTags, TagFilterState.Required);
+
+		if (ExcludeTags != null)
+			LoadFilterStates(ExcludeTags, TagFilterState.Forbidden);
+	}
+
+	private void LoadFilterStates(string commaSeparatedTags, TagFilterState filterState)
+	{
+		string[] tagNames = commaSeparatedTags.Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+		foreach (string tagName in tagNames)
+		{
+			bool filterExists = _TagFilters.TryGetValue(tagName, out TagFilter? tagFilter);
+			if (filterExists)
+				tagFilter!.State = filterState;
+		}
 	}
 
 	private ICheckboxLogic<TagFilterState> GetCheckboxLogic(int? tagExclusivity)
@@ -97,9 +127,21 @@
 		return string.IsNullOrEmpty(tagsParameter) ? null : tagsParameter;
 	}
 
-	private void TagFilterStateChanged(TagFilter tagFilter, TagFilterState newState)
+	private async Task TagFilterStateChanged(TagFilter tagFilter, TagFilterState newState)
 	{
 		tagFilter.State = newState;
+		await UpdateBrowserUrl();
+	}
+
+	private async Task UpdateBrowserUrl()
+	{
+		Dictionary<string, object?> queryParameters = new Dictionary<string, object?>
+		{
+			{ nameof(IncludeTags), GetTagParameterByState(TagFilterState.Required) },
+			{ nameof(ExcludeTags), GetTagParameterByState(TagFilterState.Forbidden) },
+		};
+		string uri = Navigation.GetUriWithQueryParameters(queryParameters);
+		await History.ReplaceState(uri);
 	}
 
 	private class TagFilter
