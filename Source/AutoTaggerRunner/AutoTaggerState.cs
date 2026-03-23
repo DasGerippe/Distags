@@ -2,7 +2,7 @@
 
 public class AutoTaggerState
 {
-    public static AutoTaggerState New { get; } = new AutoTaggerState
+    public static AutoTaggerState New => new AutoTaggerState
     {
         LastAutoTagging = DateTime.MinValue,
     };

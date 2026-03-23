@@ -39,7 +39,11 @@ public class AutoTaggerStateFileManager : IAutoTaggerStateManager
                 .DeserializeAsync<AutoTaggerState>(fileStream, _JsonSerializerOptions)
                 .ConfigureAwait(false);
 
-            return state ?? AutoTaggerState.New;
+            if (state != null)
+                return state;
+
+            _Logger.LogDebug("Could not deserialize existing state. Returning new state.");
+            return AutoTaggerState.New;
         }
         catch (Exception ex)
         {
