@@ -5,7 +5,6 @@ internal static class Constants
     internal static class Session
     {
         internal const string AuthenticationScheme = "SessionToken";
-        internal const string TokenHeader = "Session-Token";
     }
 
     internal static class Steam

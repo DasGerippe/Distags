@@ -16,8 +16,6 @@ namespace LevelTagApi.Controllers;
 [Route("api/[controller]")]
 public class AuthenticationController : ControllerBase
 {
-    private const string TicketQueryParamName = "ticket";
-
     private readonly LevelTagApiSettings _Settings;
     private readonly LevelTagDbContext _DbContext;
     private readonly ITicketStore<long> _TicketStore;
@@ -67,7 +65,7 @@ public class AuthenticationController : ControllerBase
             string ticket = _TokenGenerator.GenerateToken(8);
             _TicketStore.Store(ticket, steamId);
 
-            string returnUrlWithTicket = QueryHelpers.AddQueryString(returnUrl, TicketQueryParamName, ticket);
+            string returnUrlWithTicket = QueryHelpers.AddQueryString(returnUrl, LevelTagApiConstants.TicketQueryParameterName, ticket);
             return Redirect(returnUrlWithTicket);
         }
 
@@ -89,7 +87,7 @@ public class AuthenticationController : ControllerBase
 
     [HttpPost("logout")]
     [Authorize(AuthenticationSchemes = Constants.Session.AuthenticationScheme)]
-    public async Task<IActionResult> Logout([FromHeader(Name = Constants.Session.TokenHeader)] string sessionToken)
+    public async Task<IActionResult> Logout([FromHeader(Name = LevelTagApiConstants.SessionTokenHeader)] string sessionToken)
     {
         UserSession? userSession = await _DbContext.Set<UserSession>()
             .Where(session => session.Token == sessionToken)

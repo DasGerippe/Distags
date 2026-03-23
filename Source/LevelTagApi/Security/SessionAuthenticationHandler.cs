@@ -1,5 +1,6 @@
 ﻿using DataClasses;
 using DataStoring;
+using LevelTagApi.Dtos;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
@@ -25,7 +26,7 @@ public class SessionAuthenticationHandler : AuthenticationHandler<Authentication
 
     protected override async Task<AuthenticateResult> HandleAuthenticateAsync()
     {
-        if (!Request.Headers.TryGetValue(Constants.Session.TokenHeader, out StringValues sessionToken))
+        if (!Request.Headers.TryGetValue(LevelTagApiConstants.SessionTokenHeader, out StringValues sessionToken))
             return AuthenticateResult.NoResult();
 
         UserSession? userSession = await _DbContext.Set<UserSession>()
