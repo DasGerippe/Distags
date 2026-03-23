@@ -21,6 +21,7 @@ public class ContributionDtoConverter
         return IncludeRequiredNavigations(contributions)
             .Select(contribution => new ContributionDto
             {
+                Id = contribution.Id,
                 Level = contribution.Level.ToDto(),
                 Tag = contribution.Tag.ToDto(),
                 Contributor = GetContributorDto(contribution, respectAnonymity),
@@ -33,6 +34,7 @@ public class ContributionDtoConverter
     {
         return new ContributionDto
         {
+            Id = contribution.Id,
             Level = contribution.Level.ToDto(),
             Tag = contribution.Tag.ToDto(),
             Contributor = GetContributorDto(contribution, respectAnonymity),

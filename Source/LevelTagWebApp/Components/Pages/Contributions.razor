@@ -60,11 +60,11 @@
 		{
 			Limit = 100,
 		};
-		List<ContributionDto> contributions = await LevelTagApi.GetContributionsAsync(parameters);
-		int startIndex = Math.Min(_Contributions.Capacity, contributions.Count) - 1;
+		GetContributionsResponse response = await LevelTagApi.GetContributionsAsync(parameters);
+		int startIndex = Math.Min(_Contributions.Capacity, response.Contributions.Count) - 1;
 		for (int i = startIndex; i >= 0; i--)
 		{
-			ContributionDto contribution = contributions[i];
+			ContributionDto contribution = response.Contributions[i];
 			_Contributions.Push(new ContributionInfo(contribution));
 		}
 	}

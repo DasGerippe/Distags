@@ -28,7 +28,7 @@ public class ContributionsController : ControllerBase
     }
 
     [HttpGet]
-    public async Task<IActionResult> GetContributions([FromQuery] GetContributionsParameters parameters)
+    public async Task<ActionResult<GetContributionsResponse>> GetContributions([FromQuery] GetContributionsParameters parameters)
     {
         IQueryable<Contribution> contributions = _DbContext.Set<Contribution>()
             .Where(contribution => !contribution.IsReverted);
@@ -39,12 +39,27 @@ public class ContributionsController : ControllerBase
         if (parameters.UserSteamId != null)
             contributions = contributions.Where(contribution => contribution.User!.SteamId == parameters.UserSteamId);
 
-        contributions = contributions.OrderByDescending(contribution => contribution.Id);
+        if (!string.IsNullOrEmpty(parameters.Cursor))
+        {
+            bool isLong = long.TryParse(parameters.Cursor, out long lastContributionId);
+            if (isLong)
+                contributions = contributions.Where(contribution => contribution.Id < lastContributionId);
+        }
+
+        contributions = contributions
+            .OrderByDescending(contribution => contribution.Id)
+            .Take(parameters.Limit);
 
         bool respectAnonymity = !User.IsInRole(Constants.Roles.Moderator);
         List<ContributionDto> contributionDtos = await _DtoConverter.SelectDto(contributions, respectAnonymity).ToListAsync();
 
-        return Ok(contributionDtos);
+        GetContributionsResponse response = new GetContributionsResponse
+        {
+            Contributions = contributionDtos,
+            NextCursor = contributionDtos.LastOrDefault()?.Id.ToString(),
+        };
+
+        return Ok(response);
     }
 
     [HttpPost("revert")]

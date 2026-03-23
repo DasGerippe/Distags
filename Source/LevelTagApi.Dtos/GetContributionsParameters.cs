@@ -10,4 +10,6 @@ public class GetContributionsParameters
 
     [Range(1, 100, ErrorMessage = $"{nameof(Limit)} must be between 1 and 100.")]
     public int Limit { get; set; } = 100;
+
+    public string? Cursor { get; set; }
 }

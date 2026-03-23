@@ -2,6 +2,8 @@
 
 public class ContributionDto
 {
+    public long Id { get; set; }
+
     public required LevelDto Level { get; set; }
 
     public required TagDto Tag { get; set; }
