@@ -48,6 +48,7 @@ public class SessionAuthenticationHandler : AuthenticationHandler<Authentication
 
         List<Claim> claims =
         [
+            new Claim(Constants.Claims.UserId, user.Id.ToString()),
             new Claim(Constants.Claims.SteamId, user.SteamId.Value.ToString()),
             new Claim(Constants.Claims.SessionToken, userSession.Token),
             .. user.Roles.Select(role => new Claim(ClaimTypes.Role, role)),

@@ -7,16 +7,18 @@ public class ContributionManager : IContributionManager
 {
     private readonly LevelTagDbContext _DbContext;
     private readonly IUserManager _UserManager;
+    private readonly IAppManager _AppManager;
 
-    public ContributionManager(LevelTagDbContext dbContext, IUserManager userManager)
+    public ContributionManager(LevelTagDbContext dbContext, IUserManager userManager, IAppManager appManager)
     {
         _DbContext = dbContext;
         _UserManager = userManager;
+        _AppManager = appManager;
     }
     public async Task CreateContributionsAsync(IEnumerable<LevelTag> addedLevelTags, IEnumerable<LevelTag> removedLevelTags)
     {
         User? user = await _UserManager.GetCurrentUserAsync();
-        App? app = null;
+        App? app = await _AppManager.GetCurrentAppAsync();
         DateTime utcNow = DateTime.UtcNow;
 
         _DbContext.AddRange(removedLevelTags.Select(levelTag => new Contribution

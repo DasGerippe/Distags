@@ -40,7 +40,11 @@ public class ApiKeyAuthenticationHandler : AuthenticationHandler<AuthenticationS
         if (app == null)
             return AuthenticateResult.Fail("Invalid API key.");
 
-        List<Claim> claims = [new Claim(ClaimTypes.Role, Constants.Roles.AutoTagger)];
+        List<Claim> claims =
+        [
+            new Claim(Constants.Claims.AppId, app.Id.ToString()),
+            new Claim(ClaimTypes.Role, Constants.Roles.AutoTagger),
+        ];
         ClaimsIdentity identity = new ClaimsIdentity(claims, Scheme.Name);
         ClaimsPrincipal principal = new ClaimsPrincipal(identity);
         AuthenticationTicket authTicket = new AuthenticationTicket(principal, Scheme.Name);

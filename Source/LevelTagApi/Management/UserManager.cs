@@ -18,15 +18,18 @@ public class UserManager : IUserManager
 
     public async Task<User?> GetCurrentUserAsync(params string[] includes)
     {
-        Claim? steamIdClaim = _HttpContextAccessor.HttpContext?.User.FindFirst(Constants.Claims.SteamId);
-        if (steamIdClaim == null)
+        Claim? userIdClaim = _HttpContextAccessor.HttpContext?.User.FindFirst(Constants.Claims.UserId);
+        if (userIdClaim == null)
             return null;
 
-        if (!long.TryParse(steamIdClaim.Value, out long steamId))
+        if (!long.TryParse(userIdClaim.Value, out long userId))
             return null;
+
+        if (includes.Length == 0)
+            return await _DbContext.FindAsync<User>(userId);
 
         IQueryable<User> users = _DbContext.Set<User>()
-            .Where(user => user.SteamId == steamId);
+            .Where(user => user.Id == userId);
 
         foreach (string include in includes)
         {

@@ -32,6 +32,8 @@ internal static class Constants
 
     internal static class Claims
     {
+        internal const string AppId = "App ID";
+        internal const string UserId = "User ID";
         internal const string SteamId = "Steam ID";
         internal const string SessionToken = "Session";
     }
