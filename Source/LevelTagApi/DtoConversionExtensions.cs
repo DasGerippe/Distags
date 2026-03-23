@@ -57,4 +57,12 @@ public static class DtoConversionExtensions
             Roles = user.Roles,
         };
     }
+
+    public static ApiKeyDto ToDto(this ApiKey apiKey)
+    {
+        return new ApiKeyDto
+        {
+            ApiKey = apiKey.Value,
+        };
+    }
 }
