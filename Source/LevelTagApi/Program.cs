@@ -3,6 +3,7 @@ using DataStoring;
 using LevelTagApi.Dtos;
 using LevelTagApi.Filtering;
 using LevelTagApi.Hubs;
+using LevelTagApi.Management;
 using LevelTagApi.Security;
 using LevelTagApi.Sorting;
 using Microsoft.AspNetCore.Authentication;
@@ -51,6 +52,9 @@ public class Program
 
             builder.Services.AddTransient<IQueryableFilterFactory<Level, BrowseLevelsParameters>, BrowseLevelsFilterFactory>();
             builder.Services.AddTransient<IQueryableSorterFactory<Level, LevelSortStrategy>, LevelSorterFactory>();
+
+            builder.Services.AddTransient<ILevelTagManager, LevelTagManager>();
+            builder.Services.AddTransient<ILevelHubServer, LevelHubServer>();
 
             builder.Services.AddSingleton<ITicketStore<long>, ConcurrentTicketStore<long>>();
             builder.Services.AddTransient<ITokenGenerator, RandomBase64UrlTokenGenerator>();
