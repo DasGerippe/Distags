@@ -1,0 +1,46 @@
+﻿@page "/moderation"
+@rendermode InteractiveServer
+
+@using LevelTagApi.Dtos
+@using LevelTagWebApp.Components.Dialogs
+@using LevelTagWebApp.Components.Moderation
+@using LevelTagWebApp.Security
+
+@* @implements IAsyncDisposable *@
+
+@inject IUserInfoProvider UserInfoProvider
+
+@if (_User?.Roles.Contains("Moderator") != true)
+{
+	<div class="text-center my-3">Never Gonna Give You Up</div>
+	return;
+}
+
+<div class="container-fluid content-narrow my-3">
+	<CascadingValue Value="_BanUserDialog">
+		<CascadingValue Value="_RevertContributionsDialog">
+			<CascadingValue Value="_RevertContributionsResultDialog">
+				<ContributionModerationList/>
+			</CascadingValue>
+		</CascadingValue>
+	</CascadingValue>
+</div>
+
+<BanUserDialog @ref="_BanUserDialog" />
+<RevertContributionsDialog @ref="_RevertContributionsDialog" />
+<RevertContributionsResultDialog @ref="_RevertContributionsResultDialog" />
+
+@code {
+
+	private UserDto? _User;
+
+	private BanUserDialog? _BanUserDialog;
+	private RevertContributionsDialog? _RevertContributionsDialog;
+	private RevertContributionsResultDialog? _RevertContributionsResultDialog;
+
+	protected override async Task OnInitializedAsync()
+	{
+		_User = await UserInfoProvider.GetUserInfoAsync();
+	}
+
+}
