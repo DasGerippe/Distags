@@ -12,7 +12,7 @@ ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT ALL PRIVILEGES ON TABLES TO dist
 
 CREATE ROLE distance_level_tags_read_levels NOLOGIN;
 GRANT distance_level_tags_user TO distance_level_tags_read_levels;
-GRANT SELECT ON TABLE levels, creators TO distance_level_tags_read_levels;
+GRANT SELECT ON TABLE levels, creators, level_tags, tags TO distance_level_tags_read_levels;
 
 CREATE ROLE distance_level_tags_manage_levels NOLOGIN;
 GRANT distance_level_tags_user TO distance_level_tags_manage_levels;
