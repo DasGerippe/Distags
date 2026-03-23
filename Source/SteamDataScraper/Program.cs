@@ -64,8 +64,8 @@ internal class Program
             await levelScraper.ScrapeLevelsAsync().ConfigureAwait(false);
 
             LevelCreatorScraper levelCreatorScraper = scope.ServiceProvider.GetRequiredService<LevelCreatorScraper>();
-            await levelCreatorScraper.ScrapeUnknownLevelCreatorsAsync().ConfigureAwait(false);
             await levelCreatorScraper.ScrapeOutdatedLevelCreatorsAsync().ConfigureAwait(false);
+            await levelCreatorScraper.ScrapeUnknownLevelCreatorsAsync().ConfigureAwait(false);
         }
         catch (Exception ex)
         {
