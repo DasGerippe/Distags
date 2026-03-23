@@ -40,6 +40,7 @@ internal class Program
                                                  throw new InvalidOperationException("Connection string not configured.");
             services.AddPostgreSqlLevelTagDbContext(levelTagsDbConnectionString);
 
+            services.AddTransient<Program>();
             services.AddTransient<LevelScraper>();
             services.AddTransient<LevelCreatorScraper>();
         });
@@ -52,26 +53,43 @@ internal class Program
 
         IHost host = hostBuilder.Build();
 
-        ILogger<Program> logger = host.Services.GetRequiredService<ILogger<Program>>();
-        logger.LogDebug("Host setup completed. Starting application.");
-
         AsyncServiceScope scope = host.Services.CreateAsyncScope();
         await using ConfiguredAsyncDisposable awaitedScope = scope.ConfigureAwait(false);
 
+        ILogger<Program> logger = scope.ServiceProvider.GetRequiredService<ILogger<Program>>();
+        logger.LogDebug("Host setup completed.");
+
+        Program program = scope.ServiceProvider.GetRequiredService<Program>();
+        await program.RunAsync();
+    }
+
+    private readonly LevelScraper _LevelScraper;
+    private readonly LevelCreatorScraper _CreatorScraper;
+    private readonly ILogger<Program> _Logger;
+
+    public Program(LevelScraper levelScraper, LevelCreatorScraper creatorScraper, ILogger<Program> logger)
+    {
+        _LevelScraper = levelScraper;
+        _CreatorScraper = creatorScraper;
+        _Logger = logger;
+    }
+
+    public async Task RunAsync()
+    {
+        _Logger.LogDebug("Starting application...");
+
         try
         {
-            LevelScraper levelScraper = scope.ServiceProvider.GetRequiredService<LevelScraper>();
-            await levelScraper.ScrapeLevelsAsync().ConfigureAwait(false);
+            await _LevelScraper.ScrapeLevelsAsync().ConfigureAwait(false);
 
-            LevelCreatorScraper levelCreatorScraper = scope.ServiceProvider.GetRequiredService<LevelCreatorScraper>();
-            await levelCreatorScraper.ScrapeOutdatedLevelCreatorsAsync().ConfigureAwait(false);
-            await levelCreatorScraper.ScrapeUnknownLevelCreatorsAsync().ConfigureAwait(false);
+            await _CreatorScraper.ScrapeOutdatedLevelCreatorsAsync().ConfigureAwait(false);
+            await _CreatorScraper.ScrapeUnknownLevelCreatorsAsync().ConfigureAwait(false);
         }
         catch (Exception ex)
         {
-            logger.LogError(ex, "An unhandled error occured during application lifetime.");
+            _Logger.LogError(ex, "An unhandled error occured during application lifetime.");
         }
 
-        logger.LogDebug("End of application.");
+        _Logger.LogDebug("End of application.");
     }
 }
