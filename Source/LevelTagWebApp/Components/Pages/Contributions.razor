@@ -20,7 +20,7 @@
 	<div class="d-flex flex-column gap-3 gap-md-2">
 		@foreach (ContributionInfo contributionInfo in _Contributions)
 		{
-			<div class="@GetAnimationClass(contributionInfo.State)" @key="contributionInfo.Id">
+			<div class="@GetAnimationClass(contributionInfo.State)" @key="contributionInfo.Contribution.Id">
 				<ContributionDisplay Contribution="contributionInfo.Contribution" />
 			</div>
 
@@ -122,10 +122,6 @@
 
 	private class ContributionInfo
 	{
-		private static int NextId;
-
-		public int Id { get; } = NextId++;
-
 		public ContributionDto Contribution { get; }
 
 		public ContributionState State { get; set; }
