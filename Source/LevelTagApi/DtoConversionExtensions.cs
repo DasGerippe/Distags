@@ -1,5 +1,6 @@
 ﻿using DataClasses;
 using LevelTagApi.Dtos;
+using TagCompatibility = LevelTagApi.Dtos.TagCompatibility;
 
 namespace LevelTagApi;
 
@@ -20,6 +21,26 @@ public static class DtoConversionExtensions
             CreatedOn = level.CreatedOn,
             UpdatedOn = level.UpdatedOn,
             Tags = level.Tags.Select(t => t.Name).ToList(),
+        };
+    }
+
+    public static TagDto ToDto(this Tag tag)
+    {
+        return new TagDto
+        {
+            Name = tag.Name,
+            DisplayName = tag.DisplayName,
+        };
+    }
+
+    public static TagGroupDto ToDtoTree(this TagGroup tagGroup)
+    {
+        return new TagGroupDto
+        {
+            Name = tagGroup.Name,
+            TagCompatibility = (TagCompatibility)tagGroup.Compatibility,
+            Tags = tagGroup.Tags.Select(ToDto).ToList(),
+            SubGroups = tagGroup.SubGroups.Select(ToDtoTree).ToList(),
         };
     }
 }
