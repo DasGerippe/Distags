@@ -4,6 +4,7 @@ using LevelTagApi.Dtos;
 using LevelTagApi.Sorting;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using TagCompatibility = DataClasses.TagCompatibility;
 
 namespace LevelTagApi.Controllers;
 
@@ -25,7 +26,7 @@ public class LevelsController : ControllerBase
     [HttpGet]
     public async Task<ActionResult<IEnumerable<GetLevelDto>>> GetLevels([FromQuery] GetLevelsParameters parameters)
     {
-        IQueryable<Level> levels = _LevelTagDbContext.Levels;
+        IQueryable<Level> levels = _LevelTagDbContext.Set<Level>();
 
         if (!string.IsNullOrEmpty(parameters.IncludeTags))
         {
@@ -92,84 +93,79 @@ public class LevelsController : ControllerBase
     [HttpGet("{levelId}/tags")]
     public async Task<ActionResult<IEnumerable<string>>> GetLevelTags(long levelId)
     {
-        Level? level = await _LevelTagDbContext.Levels.FindAsync(levelId);
+        Level? level = await _LevelTagDbContext.Set<Level>()
+            .Include(level => level.Tags)
+            .FirstOrDefaultAsync(level => level.Id == levelId);
 
         if (level == null)
-            return NotFound();
+            return LevelNotFound(levelId);
 
-        await _LevelTagDbContext.Entry(level).Collection(level => level.Tags).LoadAsync();
 
         return level.Tags.Select(tag => tag.Name).ToList();
     }
 
-    [HttpPost("{levelId}/tags")]
-    public async Task<IActionResult> PostLevelTag(long levelId, [FromBody] AssignTagRequest request)
+    [HttpPost("{levelId}/tags/{tagName}")]
+    public async Task<IActionResult> PostLevelTag(long levelId, string tagName)
     {
-        Level? level = await _LevelTagDbContext.Levels.FindAsync(levelId);
+        Level? level = await _LevelTagDbContext.Set<Level>().FirstOrDefaultAsync(level => level.Id == levelId);
         if (level == null)
-            return NotFound($"Level {levelId} not found.");
+            return LevelNotFound(levelId);
 
-        Tag tag = await GetOrCreateTag(request.Tag);
+        Tag? tag = await _LevelTagDbContext.Set<Tag>()
+            .Include(tag => tag.Group)
+            .FirstOrDefaultAsync(tag => tag.Name == tagName);
+        if (tag == null)
+            return BadRequest($"Tag '{tagName}' is not supported.");
 
-        if (await _LevelTagDbContext.LevelTags.FindAsync(levelId, tag.Id) != null)
+        if (await _LevelTagDbContext.Set<LevelTag>().FindAsync(levelId, tag.Id) != null)
             return NoContent();
+
+        if (tag.Group?.Compatibility == TagCompatibility.Exclusive)
+        {
+            List<LevelTag> conflictingLevelTags = await _LevelTagDbContext.Set<LevelTag>()
+                .Where(levelTag => levelTag.Level == level && levelTag.Tag.Group == tag.Group)
+                .ToListAsync();
+
+            foreach (LevelTag conflictingLevelTag in conflictingLevelTags)
+            {
+                _LevelTagDbContext.Remove(conflictingLevelTag);
+            }
+        }
 
         LevelTag levelTag = new LevelTag
         {
-            LevelId = levelId,
-            TagId = tag.Id,
+            Level = level,
+            Tag = tag,
         };
 
-        _LevelTagDbContext.LevelTags.Add(levelTag);
+        _LevelTagDbContext.Add(levelTag);
         await _LevelTagDbContext.SaveChangesAsync();
 
-        return Created(
-            string.Empty,
-            new
-            {
-                level_id = levelId,
-                tag = tag.Name,
-            });
+        return Created();
     }
 
-    [HttpDelete("{levelId}/tags/{tag}")]
-    public async Task<IActionResult> DeleteLevelTag(long levelId, string tag)
+    [HttpDelete("{levelId}/tags/{tagName}")]
+    public async Task<IActionResult> DeleteLevelTag(long levelId, string tagName)
     {
-        Level? level = await _LevelTagDbContext.Levels.FindAsync(levelId);
+        Level? level = await _LevelTagDbContext.Set<Level>().FindAsync(levelId);
 
         if (level == null)
-            return NotFound();
+            return LevelNotFound(levelId);
 
-        LevelTag? levelTag = await _LevelTagDbContext.LevelTags
-            .FirstOrDefaultAsync(levelTag => levelTag.LevelId == levelId && levelTag.Tag.Name == tag);
+        LevelTag? levelTag = await _LevelTagDbContext.Set<LevelTag>()
+            .FirstOrDefaultAsync(levelTag => levelTag.LevelId == levelId && levelTag.Tag.Name == tagName);
 
         if (levelTag != null)
         {
-            _LevelTagDbContext.LevelTags.Remove(levelTag);
+            _LevelTagDbContext.Remove(levelTag);
             await _LevelTagDbContext.SaveChangesAsync();
         }
 
         return NoContent();
     }
 
-    private async Task<Tag> GetOrCreateTag(string tagName)
+    private NotFoundObjectResult LevelNotFound(long levelId)
     {
-        Tag? tag = _LevelTagDbContext.Tags.FirstOrDefault(tag => tag.Name == tagName);
-        if (tag != null)
-            return tag;
-
-        tag = new Tag { Name = tagName };
-        _LevelTagDbContext.Tags.Add(tag);
-
-        try
-        {
-            await _LevelTagDbContext.SaveChangesAsync();
-        }
-        catch (DbUpdateException)
-        {
-            tag = _LevelTagDbContext.Tags.First(tag => tag.Name == tagName);
-        }
-
-        return tag;
+        return NotFound($"Could not find level with ID {levelId}.");
     }
 }
