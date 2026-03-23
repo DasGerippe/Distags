@@ -15,15 +15,12 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\LevelTagApi.Dtos\LevelTagApi.Dtos.csproj" />
+    <ProjectReference Include="..\DataStoring\DataStoring.csproj" />
     <ProjectReference Include="..\SteamWebApi.Contract\SteamWebApi.Contract.csproj" />
     <ProjectReference Include="..\SteamWebApi\SteamWebApi.csproj" />
   </ItemGroup>
 
   <ItemGroup>
-    <None Update="appsettings.Development.json">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
     <None Update="appsettings.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>

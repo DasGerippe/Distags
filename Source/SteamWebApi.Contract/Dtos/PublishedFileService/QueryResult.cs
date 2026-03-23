@@ -8,7 +8,7 @@ public class QueryResult
     public required int Total { get; set; }
 
     [JsonPropertyName("publishedfiledetails")]
-    public required List<PublishedFileDetail> Files { get; set; }
+    public List<PublishedFileDetail> Files { get; set; } = [];
 
     [JsonPropertyName("next_cursor")]
     public required string NextCursor { get; set; }

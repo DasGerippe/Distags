@@ -1,9 +1,10 @@
-﻿using System.Runtime.CompilerServices;
+﻿using DataStoring;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using SteamWebApi;
+using System.Runtime.CompilerServices;
 
 namespace SteamDataScraper;
 
@@ -17,8 +18,8 @@ internal class Program
         {
             IHostEnvironment environment = context.HostingEnvironment;
 
-            configBuilder.AddJsonFile("appsettings.json", optional: false, reloadOnChange: true);
-            configBuilder.AddJsonFile($"appsettings.{environment.EnvironmentName}.json", optional: true, reloadOnChange: true);
+            configBuilder.AddJsonFile("appsettings.json", optional: false);
+            configBuilder.AddJsonFile($"appsettings.{environment.EnvironmentName}.json", optional: true);
 
             if (environment.IsDevelopment())
                 configBuilder.AddUserSecrets<Program>();
@@ -28,8 +29,14 @@ internal class Program
 
         hostBuilder.ConfigureServices((context, services) =>
         {
-            services.AddSteamWebApi("SteamWebApi:Settings");
-            services.AddTransient<LevelDataPopulator>();
+            services.AddSteamWebApi("SteamWebApi");
+
+            string levelTagsDbConnectionString = context.Configuration.GetConnectionString("LevelTagsDatabase") ??
+                                                 throw new InvalidOperationException("Connection string not configured.");
+            services.AddPostgreSqlLevelTagDbContext(levelTagsDbConnectionString);
+
+            services.AddTransient<LevelScraper>();
+            services.AddTransient<LevelCreatorScraper>();
         });
 
         hostBuilder.ConfigureLogging(loggingBuilder =>
@@ -48,8 +55,12 @@ internal class Program
 
         try
         {
-            LevelDataPopulator levelDataPopulator = scope.ServiceProvider.GetRequiredService<LevelDataPopulator>();
-            await levelDataPopulator.SyncLevelsFromSteamApiAsync().ConfigureAwait(false);
+            LevelScraper levelScraper = scope.ServiceProvider.GetRequiredService<LevelScraper>();
+            await levelScraper.ScrapeLevelsAsync().ConfigureAwait(false);
+
+            LevelCreatorScraper levelCreatorScraper = scope.ServiceProvider.GetRequiredService<LevelCreatorScraper>();
+            await levelCreatorScraper.ScrapeUnknownLevelCreatorsAsync().ConfigureAwait(false);
+            await levelCreatorScraper.ScrapeOutdatedLevelCreatorsAsync().ConfigureAwait(false);
         }
         catch (Exception ex)
         {
