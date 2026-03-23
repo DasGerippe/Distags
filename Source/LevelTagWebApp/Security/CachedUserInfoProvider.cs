@@ -1,5 +1,6 @@
 ﻿using LevelTagApi.Dtos;
 using LevelTagWebApp.Services;
+using System.Net;
 
 namespace LevelTagWebApp.Security;
 
@@ -21,22 +22,30 @@ public class CachedUserInfoProvider : IUserInfoProvider
     {
         if (!_IsInitialized)
         {
-            await TryCacheUserInfo(cancellationToken);
+            _CachedUser = await TryGetUserInfo(cancellationToken);
             _IsInitialized = true;
         }
 
         return _CachedUser;
     }
 
-    private async Task TryCacheUserInfo(CancellationToken cancellationToken = default)
+    private async Task<UserDto?> TryGetUserInfo(CancellationToken cancellationToken = default)
     {
+        _Logger.LogDebug("Trying to retrieve user info from API...");
         try
         {
-            _CachedUser = await _LevelTagApi.GetMe(cancellationToken);
+            UserDto user = await _LevelTagApi.GetMe(cancellationToken);
+            _Logger.LogDebug("Retrieved user info.");
+            return user;
         }
         catch (Exception ex)
         {
-            _Logger.LogDebug(ex, "An error occurred while trying to get user info.");
+            if (ex is HttpRequestException { StatusCode: HttpStatusCode.Unauthorized })
+                _Logger.LogDebug("User is not logged in.");
+            else
+                _Logger.LogDebug(ex, "An error occurred while trying to get user info.");
+
+            return null;
         }
     }
 }
