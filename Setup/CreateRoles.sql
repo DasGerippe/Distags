@@ -31,13 +31,15 @@ CREATE ROLE distance_level_tags_manage_users NOLOGIN;
 GRANT distance_level_tags_user TO distance_level_tags_manage_users;
 GRANT SELECT, INSERT, UPDATE, DELETE ON TABLE users, user_sessions TO distance_level_tags_manage_users;
 
-CREATE ROLE distance_level_tags_manage_api_keys NOLOGIN;
-GRANT distance_level_tags_user TO distance_level_tags_manage_api_keys;
-GRANT SELECT, INSERT, UPDATE, DELETE ON TABLE api_keys TO distance_level_tags_manage_api_keys;
+CREATE ROLE distance_level_tags_manage_apps NOLOGIN;
+GRANT distance_level_tags_user TO distance_level_tags_manage_apps;
+GRANT SELECT, INSERT, UPDATE, DELETE ON TABLE apps TO distance_level_tags_manage_apps;
+GRANT USAGE, SELECT, UPDATE ON SEQUENCE apps_id_seq TO distance_level_tags_manage_apps;
 
 CREATE ROLE distance_level_tags_manage_contributions NOLOGIN;
 GRANT distance_level_tags_user TO distance_level_tags_manage_contributions;
-GRANT SELECT, INSERT, UPDATE, DELETE ON TABLE contributions TO distance_level_tags_manage_api_keys;
+GRANT SELECT, INSERT, UPDATE, DELETE ON TABLE contributions TO distance_level_tags_manage_contributions;
+GRANT USAGE, SELECT, UPDATE ON SEQUENCE contributions_id_seq TO distance_level_tags_manage_contributions;
 
 -- Users --
 
@@ -49,7 +51,7 @@ GRANT distance_level_tags_read_levels TO distance_level_tags_api;
 GRANT distance_level_tags_manage_tags TO distance_level_tags_api;
 GRANT distance_level_tags_assign_tags TO distance_level_tags_api;
 GRANT distance_level_tags_manage_users TO distance_level_tags_api;
-GRANT distance_level_tags_manage_api_keys TO distance_level_tags_api;
+GRANT distance_level_tags_manage_apps TO distance_level_tags_api;
 GRANT distance_level_tags_manage_contributions TO distance_level_tags_api;
 
 CREATE ROLE distance_level_tags_scraper WITH LOGIN PASSWORD '';
