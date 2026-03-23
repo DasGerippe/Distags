@@ -176,7 +176,6 @@
 
 	private async Task OnPageChanged(int newPage)
 	{
-		Page = newPage;
 		await QueryLevelsAsync(newPage);
 	}
 
@@ -211,8 +210,9 @@
 			SortStrategy = SortStrategy,
 		};
 		GetLevelsResponse levelsResponse = await LevelTagApi.GetLevelsAsync(parameters);
-		_Levels = levelsResponse.Levels;
+		Page = page;
 		_PageCount = (int)Math.Ceiling((double)levelsResponse.TotalLevels / PageSize);
+		_Levels = levelsResponse.Levels;
 	}
 
 	private string? GetFilterTermOrNullIfEmpty(string filterTerm)
