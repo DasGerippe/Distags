@@ -46,9 +46,11 @@ public class Program
                                                  throw new InvalidOperationException("Connection string not configured.");
             builder.Services.AddNpgsqlLevelTagDbContext(levelTagsDbConnectionString, (sp, options) =>
             {
-                options.AddInterceptors(sp.GetRequiredService<ContributionsNotificator>());
+                options.AddInterceptors(sp.GetRequiredService<ContributionTrackingInterceptor>());
+                options.AddInterceptors(sp.GetRequiredService<ContributionBroadcastingInterceptor>());
             });
-            builder.Services.AddSingleton<ContributionsNotificator>();
+            builder.Services.AddSingleton<ContributionTrackingInterceptor>();
+            builder.Services.AddSingleton<ContributionBroadcastingInterceptor>();
 
             builder.Services.AddSignalR();
             builder.Services.AddTransient<ILevelTagBroadcaster, LevelTagBroadcaster>();

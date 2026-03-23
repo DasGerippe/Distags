@@ -8,25 +8,19 @@ namespace LevelTagApi.Management;
 public class LevelTagManager : ILevelTagManager
 {
     private readonly LevelTagDbContext _DbContext;
-    private readonly IContributionManager _ContributionManager;
     private readonly ILevelTagBroadcaster _LevelTagBroadcaster;
 
     public LevelTagManager(
         LevelTagDbContext dbContext,
-        IContributionManager contributionManager,
         ILevelTagBroadcaster levelTagBroadcaster)
     {
         _DbContext = dbContext;
-        _ContributionManager = contributionManager;
         _LevelTagBroadcaster = levelTagBroadcaster;
     }
 
     public async Task AddTagToLevelAsync(Level level, Tag tag)
     {
         List<Tag> removedTags = await RemoveConflictingTagsAsync(level, tag);
-
-        IEnumerable<long> removedConflictingTagIds = removedTags.Select(removedTag => removedTag.Id);
-        await _ContributionManager.CreateAddTagContributionAsync(level.Id, tag.Id, removedConflictingTagIds);
 
         _DbContext.Add(new LevelTag
         {
@@ -44,8 +38,6 @@ public class LevelTagManager : ILevelTagManager
 
     public async Task RemoveTagFromLevelAsync(LevelTag levelTag)
     {
-        await _ContributionManager.CreateRemoveTagContributionAsync(levelTag.LevelId, levelTag.TagId);
-
         _DbContext.Remove(levelTag);
         await _DbContext.SaveChangesAsync();
 

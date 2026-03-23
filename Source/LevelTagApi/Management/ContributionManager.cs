@@ -13,43 +13,30 @@ public class ContributionManager : IContributionManager
         _DbContext = dbContext;
         _UserManager = userManager;
     }
-
-    public async Task CreateAddTagContributionAsync(
-        long levelId, long tagId, IEnumerable<long> removedConflictingTagIds)
+    public async Task CreateContributionsAsync(IEnumerable<LevelTag> addedLevelTags, IEnumerable<LevelTag> removedLevelTags)
     {
         User? user = await _UserManager.GetCurrentUserAsync();
+        App? app = null;
         DateTime utcNow = DateTime.UtcNow;
 
-        _DbContext.AddRange(removedConflictingTagIds.Select(removedTagId => new Contribution
+        _DbContext.AddRange(removedLevelTags.Select(levelTag => new Contribution
         {
-            LevelId = levelId,
-            TagId = removedTagId,
+            LevelId = levelTag.LevelId,
+            TagId = levelTag.TagId,
             User = user,
+            App = app,
             Action = ContributionAction.TagRemoved,
             ContributedOn = utcNow,
         }));
 
-        _DbContext.Add(new Contribution
+        _DbContext.AddRange(addedLevelTags.Select(levelTag => new Contribution
         {
-            LevelId = levelId,
-            TagId = tagId,
+            LevelId = levelTag.LevelId,
+            TagId = levelTag.TagId,
             User = user,
+            App = app,
             Action = ContributionAction.TagAdded,
             ContributedOn = utcNow,
-        });
-    }
-
-    public async Task CreateRemoveTagContributionAsync(long levelId, long tagId)
-    {
-        User? user = await _UserManager.GetCurrentUserAsync();
-
-        _DbContext.Add(new Contribution
-        {
-            LevelId = levelId,
-            TagId = tagId,
-            User = user,
-            Action = ContributionAction.TagRemoved,
-            ContributedOn = DateTime.UtcNow,
-        });
+        }));
     }
 }

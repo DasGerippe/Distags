@@ -8,14 +8,14 @@ using Microsoft.EntityFrameworkCore.Infrastructure;
 
 namespace LevelTagApi.Interceptors;
 
-public class ContributionsNotificator : SaveChangesInterceptor
+public class ContributionBroadcastingInterceptor : SaveChangesInterceptor
 {
-    private readonly ILogger<ContributionsNotificator> _Logger;
+    private readonly ILogger<ContributionBroadcastingInterceptor> _Logger;
 
     private readonly ConcurrentDictionary<DbContextId, List<Contribution>> _AddedContributions =
         new ConcurrentDictionary<DbContextId, List<Contribution>>();
 
-    public ContributionsNotificator(ILogger<ContributionsNotificator> logger)
+    public ContributionBroadcastingInterceptor(ILogger<ContributionBroadcastingInterceptor> logger)
     {
         _Logger = logger;
     }
