@@ -76,6 +76,10 @@ namespace DataStoringMigrations.Migrations
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("contributed_on");
 
+                    b.Property<bool>("IsReverted")
+                        .HasColumnType("boolean")
+                        .HasColumnName("is_reverted");
+
                     b.Property<long>("LevelId")
                         .HasColumnType("bigint")
                         .HasColumnName("level_id");

@@ -7,21 +7,26 @@ namespace LevelTagApi.Management;
 public class LevelTagManager : ILevelTagManager
 {
     private readonly LevelTagDbContext _DbContext;
+    private readonly IContributionManager _ContributionManager;
 
-    public LevelTagManager(LevelTagDbContext dbContext)
+    public LevelTagManager(LevelTagDbContext dbContext, IContributionManager contributionManager)
     {
         _DbContext = dbContext;
+        _ContributionManager = contributionManager;
     }
 
     public async Task AddTagToLevelAsync(Level level, Tag tag)
     {
-        await RemoveConflictingTagsAsync(level, tag);
-
-        _DbContext.Add(new LevelTag
+        List<LevelTag> removedLevelTags = await RemoveConflictingTagsAsync(level, tag);
+        
+        LevelTag addedLevelTag = new LevelTag
         {
             Level = level,
             Tag = tag,
-        });
+        };
+        _DbContext.Add(addedLevelTag);
+
+        await _ContributionManager.CreateContributionsAsync([addedLevelTag], removedLevelTags);
         await _DbContext.SaveChangesAsync();
     }
 
@@ -31,15 +36,16 @@ public class LevelTagManager : ILevelTagManager
         await _DbContext.SaveChangesAsync();
     }
 
-    private async Task RemoveConflictingTagsAsync(Level level, Tag tag)
+    private async Task<List<LevelTag>> RemoveConflictingTagsAsync(Level level, Tag tag)
     {
         if (tag.Exclusivity == null)
-            return;
+            return [];
 
         List<LevelTag> conflictingLevelTags = await _DbContext.Set<LevelTag>()
             .Where(levelTag => levelTag.Level == level && levelTag.Tag.Exclusivity == tag.Exclusivity)
             .ToListAsync();
 
         _DbContext.RemoveRange(conflictingLevelTags);
+        return conflictingLevelTags;
     }
 }

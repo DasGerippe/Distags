@@ -27,15 +27,20 @@ public class LevelTagBroadcaster : ILevelTagBroadcaster
             addedCollection.Select(levelTag => levelTag.TagId),
             removedCollection.Select(levelTag => levelTag.TagId));
 
+        // Load all relevant tags into context at once, so we can access their names.
         await _DbContext.Set<Tag>().Where(tag => tagIds.Contains(tag.Id)).LoadAsync();
 
         foreach (LevelTag levelTag in removedCollection)
         {
-            await GetLevelGroup(levelTag.LevelId).TagRemoved(levelTag.Tag.Name);
+            // EF Core won't populate LevelTag.Tag of untracked LevelTags, so we have to find the Tag ourselves.
+            // This shouldn't cause a database query because we loaded all relevant tags earlier.
+            Tag removedTag = (await _DbContext.FindAsync<Tag>(levelTag.TagId))!;
+            await GetLevelGroup(levelTag.LevelId).TagRemoved(removedTag.Name);
         }
 
         foreach (LevelTag levelTag in addedCollection)
         {
+            // EF Core populated LevelTag.Tag when we loaded all relevant tags earlier.
             await GetLevelGroup(levelTag.LevelId).TagAdded(levelTag.Tag.Name);
         }
     }
