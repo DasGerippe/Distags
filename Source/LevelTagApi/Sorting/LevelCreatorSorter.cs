@@ -10,7 +10,7 @@ public class LevelCreatorSorter : DefaultQueryableSorter<Level>
 
     public override IOrderedQueryable<Level> Sort(IQueryable<Level> source)
     {
-        // Creators can have multiple levels, so we additionally sort by level ID.
-        return base.Sort(source).ThenBy(level => level.Id);
+        // Creators can have multiple levels, so we additionally sort by level ID (newer levels first).
+        return base.Sort(source).ThenByDescending(level => level.Id);
     }
 }

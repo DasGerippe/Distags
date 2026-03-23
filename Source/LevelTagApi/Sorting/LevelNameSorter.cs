@@ -10,7 +10,7 @@ public class LevelNameSorter : DefaultQueryableSorter<Level>
 
     public override IOrderedQueryable<Level> Sort(IQueryable<Level> source)
     {
-        // Duplicate level names exist, so we additionally sort by level ID.
-        return base.Sort(source).ThenBy(level => level.Id);
+        // Duplicate level names exist, so we additionally sort by level ID (newer levels first).
+        return base.Sort(source).ThenByDescending(level => level.Id);
     }
 }
