@@ -19,9 +19,9 @@ public class UsersController : ControllerBase
 
     [HttpGet("me")]
     [Authorize]
-    public async Task<ActionResult<UserDto>> GetMe([FromHeader(Name = LevelTagApiConstants.SessionTokenHeader)] string sessionToken)
+    public async Task<ActionResult<UserDto>> GetMe()
     {
-        User? user = await _DbContext.GetSessionUser(User);
+        User? user = await _DbContext.GetUser(User);
         if (user == null)
             return Unauthorized();
 
@@ -33,10 +33,10 @@ public class UsersController : ControllerBase
     [Authorize]
     public async Task<IActionResult> PatchSettings([FromBody] PatchSettingsParameters parameters)
     {
-        User? user = await _DbContext.GetSessionUser(User);
+        User? user = await _DbContext.GetUser(User);
         if (user == null)
             return Unauthorized();
-        
+
         user.IsAnonymous = parameters.IsAnonymous ?? user.IsAnonymous;
 
         return Ok();

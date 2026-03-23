@@ -100,20 +100,17 @@ public class AuthenticationController : ControllerBase
     }
 
     [HttpGet("validate-session")]
-    [Authorize(AuthenticationSchemes = Constants.Session.AuthenticationScheme)]
+    [Authorize(AuthenticationSchemes = Constants.Authentication.SessionTokenScheme.Name)]
     public IActionResult ValidateSession()
     {
         return Ok();
     }
 
     [HttpPost("logout")]
-    [Authorize(AuthenticationSchemes = Constants.Session.AuthenticationScheme)]
-    public async Task<IActionResult> Logout([FromHeader(Name = LevelTagApiConstants.SessionTokenHeader)] string sessionToken)
+    [Authorize(AuthenticationSchemes = Constants.Authentication.SessionTokenScheme.Name)]
+    public async Task<IActionResult> Logout()
     {
-        UserSession? userSession = await _DbContext.Set<UserSession>()
-            .Where(session => session.Token == sessionToken)
-            .FirstOrDefaultAsync();
-
+        UserSession? userSession = await _DbContext.GetUserSession(User);
         if (userSession == null)
             return Unauthorized();
 
@@ -124,19 +121,14 @@ public class AuthenticationController : ControllerBase
     }
 
     [HttpPost("logout-all")]
-    [Authorize(AuthenticationSchemes = Constants.Session.AuthenticationScheme)]
-    public async Task<IActionResult> LogoutAll([FromHeader(Name = LevelTagApiConstants.SessionTokenHeader)] string sessionToken)
+    [Authorize(AuthenticationSchemes = Constants.Authentication.SessionTokenScheme.Name)]
+    public async Task<IActionResult> LogoutAll()
     {
-        UserSession? userSession = await _DbContext.Set<UserSession>()
-            .Include(session => session.User)
-            .ThenInclude(user => user.Sessions)
-            .Where(session => session.Token == sessionToken)
-            .FirstOrDefaultAsync();
-
-        if (userSession == null)
+        User? user = await _DbContext.GetUser(User, includes: nameof(user.Sessions));
+        if (user == null)
             return Unauthorized();
 
-        _DbContext.RemoveRange(userSession.User.Sessions);
+        _DbContext.RemoveRange(user.Sessions);
         await _DbContext.SaveChangesAsync();
 
         return Ok();

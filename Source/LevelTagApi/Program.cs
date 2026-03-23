@@ -11,6 +11,7 @@ using Microsoft.Extensions.Options;
 using Serilog;
 using SerilogUtils;
 using SteamWebApi;
+using System.Net.Http.Headers;
 
 namespace LevelTagApi;
 
@@ -98,19 +99,46 @@ public class Program
 
     private static void AddAuthentication(WebApplicationBuilder builder)
     {
+        const string autoAuthScheme = "AutoAuth";
+        const string anonymousAuthScheme = "Anonymous";
+        const string steamLoginCookieScheme = "SteamLoginCookie";
+
         builder.Services
             .AddAuthentication(options =>
             {
-                options.DefaultAuthenticateScheme = Constants.Session.AuthenticationScheme;
-                options.DefaultChallengeScheme = Constants.Session.AuthenticationScheme;
+                options.DefaultAuthenticateScheme = autoAuthScheme;
+                options.DefaultChallengeScheme = autoAuthScheme;
+            })
+            .AddPolicyScheme(autoAuthScheme, null, options =>
+            {
+                options.ForwardDefaultSelector = context =>
+                {
+                    AuthenticationHeaderValue.TryParse(
+                        context.Request.Headers.Authorization.ToString(), out AuthenticationHeaderValue? authHeader);
+
+                    return authHeader?.Scheme switch
+                    {
+                        LevelTagApiConstants.AuthorizationHeaderSchemes.SessionToken => Constants.Authentication.SessionTokenScheme.Name,
+                        LevelTagApiConstants.AuthorizationHeaderSchemes.ApiKey => Constants.Authentication.ApiKeyScheme.Name,
+                        _ => anonymousAuthScheme,
+                    };
+                };
             })
             .AddScheme<AuthenticationSchemeOptions, SessionAuthenticationHandler>(
-                Constants.Session.AuthenticationScheme,
-                options => {})
-            .AddCookie(Constants.Steam.LoginCookieScheme)
+                Constants.Authentication.SessionTokenScheme.Name,
+                Constants.Authentication.SessionTokenScheme.DisplayName,
+                _ => { })
+            .AddScheme<AuthenticationSchemeOptions, ApiKeyAuthenticationHandler>(
+                Constants.Authentication.ApiKeyScheme.Name,
+                Constants.Authentication.ApiKeyScheme.DisplayName,
+                _ => { })
+            .AddScheme<AuthenticationSchemeOptions, AnonymousAuthenticationHandler>(
+                anonymousAuthScheme,
+                _ => { })
+            .AddCookie(steamLoginCookieScheme)
             .AddSteam(options =>
             {
-                options.SignInScheme = Constants.Steam.LoginCookieScheme;
+                options.SignInScheme = steamLoginCookieScheme;
             });
     }
 

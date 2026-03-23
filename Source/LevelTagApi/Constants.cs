@@ -2,14 +2,19 @@
 
 internal static class Constants
 {
-    internal static class Session
+    internal static class Authentication
     {
-        internal const string AuthenticationScheme = "SessionToken";
-    }
+        internal static class SessionTokenScheme
+        {
+            internal const string Name = "SessionToken";
+            internal const string DisplayName = "Session Token Authentication";
+        }
 
-    internal static class Steam
-    {
-        internal const string LoginCookieScheme = "SteamLoginCookie";
+        internal static class ApiKeyScheme
+        {
+            internal const string Name = "ApiKey";
+            internal const string DisplayName = "API Key Authentication";
+        }
     }
 
     internal static class Roles
@@ -26,5 +31,6 @@ internal static class Constants
     internal static class Claims
     {
         internal const string SteamId = "Steam ID";
+        internal const string SessionToken = "Session";
     }
 }

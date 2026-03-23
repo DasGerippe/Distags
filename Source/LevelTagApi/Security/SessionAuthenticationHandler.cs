@@ -4,7 +4,7 @@ using LevelTagApi.Dtos;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
-using Microsoft.Extensions.Primitives;
+using System.Net.Http.Headers;
 using System.Security.Claims;
 using System.Text.Encodings.Web;
 
@@ -26,10 +26,14 @@ public class SessionAuthenticationHandler : AuthenticationHandler<Authentication
 
     protected override async Task<AuthenticateResult> HandleAuthenticateAsync()
     {
-        if (!Request.Headers.TryGetValue(LevelTagApiConstants.SessionTokenHeader, out StringValues sessionTokenValue))
+        AuthenticationHeaderValue.TryParse(Request.Headers.Authorization.ToString(), out AuthenticationHeaderValue? authHeader);
+        if (authHeader?.Scheme != LevelTagApiConstants.AuthorizationHeaderSchemes.SessionToken)
             return AuthenticateResult.NoResult();
 
-        string sessionToken = sessionTokenValue.ToString();
+        string? sessionToken = authHeader.Parameter;
+        if (sessionToken == null)
+            return AuthenticateResult.Fail("Invalid session token.");
+
         UserSession? userSession = await _DbContext.Set<UserSession>()
             .Include(session => session.User)
             .Where(session => session.Token == sessionToken)
@@ -45,6 +49,7 @@ public class SessionAuthenticationHandler : AuthenticationHandler<Authentication
         List<Claim> claims =
         [
             new Claim(Constants.Claims.SteamId, user.SteamId.Value.ToString()),
+            new Claim(Constants.Claims.SessionToken, userSession.Token),
             .. user.Roles.Select(role => new Claim(ClaimTypes.Role, role)),
         ];
 

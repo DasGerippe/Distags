@@ -1,6 +1,7 @@
 ﻿using HttpUtils;
 using LevelTagApi.Dtos;
 using LevelTagWebApp.Security;
+using System.Net.Http.Headers;
 using System.Text.Json;
 
 namespace LevelTagWebApp.Services;
@@ -15,7 +16,7 @@ public class LevelTagApiClient : IDisposable
         _HttpClient = httpClient;
         _SessionTokenProvider = sessionTokenProvider;
 
-        UpdateSessionTokenRequestHeader();
+        UpdateAuthorizationRequestHeader();
         _SessionTokenProvider.SessionTokenChanged += OnSessionTokenChanged;
     }
 
@@ -26,14 +27,15 @@ public class LevelTagApiClient : IDisposable
 
     private void OnSessionTokenChanged(object? sender, EventArgs args)
     {
-        UpdateSessionTokenRequestHeader();
+        UpdateAuthorizationRequestHeader();
     }
 
-    private void UpdateSessionTokenRequestHeader()
+    private void UpdateAuthorizationRequestHeader()
     {
-        _HttpClient.DefaultRequestHeaders.Remove(LevelTagApiConstants.SessionTokenHeader);
-        if (_SessionTokenProvider.SessionToken != null)
-            _HttpClient.DefaultRequestHeaders.Add(LevelTagApiConstants.SessionTokenHeader, _SessionTokenProvider.SessionToken);
+        string? sessionToken = _SessionTokenProvider.SessionToken;
+        _HttpClient.DefaultRequestHeaders.Authorization = sessionToken != null
+            ? new AuthenticationHeaderValue(LevelTagApiConstants.AuthorizationHeaderSchemes.SessionToken, sessionToken)
+            : null;
     }
 
     public async Task<List<TagGroupDto>> GetTagTreeAsync(CancellationToken cancellationToken = default)
