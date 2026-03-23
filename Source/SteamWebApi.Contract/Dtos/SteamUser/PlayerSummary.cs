@@ -23,17 +23,17 @@ public class PlayerSummary
     //[JsonPropertyName("profileurl")]
     //public required string ProfileUrl { get; set; }
 
-    [JsonPropertyName("avatar")]
-    public required string AvatarUrl { get; set; }
+    //[JsonPropertyName("avatar")]
+    //public required string AvatarSmallUrl { get; set; }
 
-    [JsonPropertyName("avatarmedium")]
-    public required string AvatarMediumUrl { get; set; }
+    //[JsonPropertyName("avatarmedium")]
+    //public required string AvatarMediumUrl { get; set; }
 
-    [JsonPropertyName("avatarfull")]
-    public required string AvatarFullUrl { get; set; }
+    //[JsonPropertyName("avatarfull")]
+    //public required string AvatarFullUrl { get; set; }
 
-    //[JsonPropertyName("avatarhash")]
-    //public required string AvatarHash { get; set; }
+    [JsonPropertyName("avatarhash")]
+    public required string AvatarHash { get; set; }
 
     //[JsonPropertyName("lastlogoff")]
     //public required int LastLogOff { get; set; }

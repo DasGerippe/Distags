@@ -28,6 +28,11 @@ namespace DataStoringMigrations.Migrations
                         .HasColumnType("bigint")
                         .HasColumnName("id");
 
+                    b.Property<string>("AvatarHash")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("avatar_hash");
+
                     b.Property<DateTime>("CachedOn")
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("cached_on");

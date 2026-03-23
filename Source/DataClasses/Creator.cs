@@ -6,6 +6,8 @@ public class Creator
 
     public string Name { get; set; } = string.Empty;
 
+    public string AvatarHash { get; set; } = string.Empty;
+
     public DateTime CachedOn { get; set; }
 
     public List<Level> CreatedLevels { get; set; } = [];
