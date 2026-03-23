@@ -35,6 +35,10 @@ CREATE ROLE distance_level_tags_manage_api_keys NOLOGIN;
 GRANT distance_level_tags_user TO distance_level_tags_manage_api_keys;
 GRANT SELECT, INSERT, UPDATE, DELETE ON TABLE api_keys TO distance_level_tags_manage_api_keys;
 
+CREATE ROLE distance_level_tags_manage_contributions NOLOGIN;
+GRANT distance_level_tags_user TO distance_level_tags_manage_contributions;
+GRANT SELECT, INSERT, UPDATE, DELETE ON TABLE contributions TO distance_level_tags_manage_api_keys;
+
 -- Users --
 
 CREATE ROLE distance_level_tags_migrator WITH LOGIN PASSWORD '';
@@ -46,6 +50,7 @@ GRANT distance_level_tags_manage_tags TO distance_level_tags_api;
 GRANT distance_level_tags_assign_tags TO distance_level_tags_api;
 GRANT distance_level_tags_manage_users TO distance_level_tags_api;
 GRANT distance_level_tags_manage_api_keys TO distance_level_tags_api;
+GRANT distance_level_tags_manage_contributions TO distance_level_tags_api;
 
 CREATE ROLE distance_level_tags_scraper WITH LOGIN PASSWORD '';
 GRANT distance_level_tags_manage_levels TO distance_level_tags_scraper;
