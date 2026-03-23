@@ -20,15 +20,6 @@ public class ContributionManager : IContributionManager
         User? user = await _UserManager.GetCurrentUserAsync();
         DateTime utcNow = DateTime.UtcNow;
 
-        _DbContext.Add(new Contribution
-        {
-            LevelId = levelId,
-            TagId = tagId,
-            User = user,
-            Action = ContributionAction.TagAdded,
-            ContributedOn = utcNow,
-        });
-
         _DbContext.AddRange(removedConflictingTagIds.Select(removedTagId => new Contribution
         {
             LevelId = levelId,
@@ -37,6 +28,15 @@ public class ContributionManager : IContributionManager
             Action = ContributionAction.TagRemoved,
             ContributedOn = utcNow,
         }));
+
+        _DbContext.Add(new Contribution
+        {
+            LevelId = levelId,
+            TagId = tagId,
+            User = user,
+            Action = ContributionAction.TagAdded,
+            ContributedOn = utcNow,
+        });
     }
 
     public async Task CreateRemoveTagContributionAsync(long levelId, long tagId)

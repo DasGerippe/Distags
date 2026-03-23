@@ -1,8 +1,10 @@
 using DataClasses;
 using DataStoring;
+using LevelTagApi.Conversion;
 using LevelTagApi.Dtos;
 using LevelTagApi.Filtering;
 using LevelTagApi.Hubs;
+using LevelTagApi.Interceptors;
 using LevelTagApi.Management;
 using LevelTagApi.Security;
 using LevelTagApi.Sorting;
@@ -42,13 +44,21 @@ public class Program
 
             string levelTagsDbConnectionString = builder.Configuration.GetConnectionString("LevelTagsDatabase") ??
                                                  throw new InvalidOperationException("Connection string not configured.");
-            builder.Services.AddNpgsqlLevelTagDbContext(levelTagsDbConnectionString);
+            builder.Services.AddNpgsqlLevelTagDbContext(levelTagsDbConnectionString, (sp, options) =>
+            {
+                options.AddInterceptors(sp.GetRequiredService<ContributionsNotificator>());
+            });
+            builder.Services.AddSingleton<ContributionsNotificator>();
 
             builder.Services.AddSignalR();
+            builder.Services.AddTransient<ILevelHubServer, LevelHubServer>();
+            builder.Services.AddTransient<IContributionBroadcaster, ContributionBroadcaster>();
 
             builder.Services.AddSteamWebApi("SteamWebApi");
 
             AddValidatedConfigOptions<LevelTagApiSettings>(builder, "LevelTagApiSettings");
+
+            builder.Services.AddTransient<ContributionDtoConverter>();
 
             builder.Services.AddTransient<IQueryableFilterFactory<Level, BrowseLevelsParameters>, BrowseLevelsFilterFactory>();
             builder.Services.AddTransient<IQueryableSorterFactory<Level, LevelSortStrategy>, LevelSorterFactory>();
@@ -56,8 +66,6 @@ public class Program
             builder.Services.AddTransient<IUserManager, UserManager>();
             builder.Services.AddTransient<ILevelTagManager, LevelTagManager>();
             builder.Services.AddTransient<IContributionManager, ContributionManager>();
-
-            builder.Services.AddTransient<ILevelHubServer, LevelHubServer>();
 
             builder.Services.AddSingleton<ITicketStore<long>, ConcurrentTicketStore<long>>();
             builder.Services.AddTransient<ITokenGenerator, RandomBase64UrlTokenGenerator>();
@@ -77,6 +85,7 @@ public class Program
             app.MapControllers();
 
             app.MapHub<LevelHub>("/levelHub");
+            app.MapHub<ContributionHub>("/hubs/contributions");
 
             app.Run();
         }

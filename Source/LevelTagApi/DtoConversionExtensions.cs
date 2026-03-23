@@ -66,43 +66,4 @@ public static class DtoConversionExtensions
             ApiKey = app.ApiKey,
         };
     }
-
-    public static ContributionDto ToDto(this Contribution contribution, bool respectAnonymity)
-    {
-        return new ContributionDto
-        {
-            Level = contribution.Level.ToDto(),
-            Tag = contribution.Tag.ToDto(),
-            Contributor = GetContributorDto(contribution, respectAnonymity),
-            Action = (ContributionAction)contribution.Action,
-            ContributedOn = contribution.ContributedOn,
-        };
-    }
-
-    private static ContributorDto GetContributorDto(Contribution contribution, bool respectAnonymity)
-    {
-        if (contribution.User != null)
-        {
-            return new ContributorUserDto
-            {
-                IsAnonymous = contribution.User.IsAnonymous,
-                SteamId = respectAnonymity && contribution.User.IsAnonymous ? null : contribution.User.SteamId,
-                SteamName = respectAnonymity && contribution.User.IsAnonymous ? null : contribution.User.SteamName,
-                SteamAvatarHash = respectAnonymity && contribution.User.IsAnonymous ? null : contribution.User.SteamAvatarHash,
-            };
-        }
-        else if (contribution.App != null)
-        {
-            return new ContributorAppDto
-            {
-                Name = contribution.App.Name,
-            };
-        }
-        else
-        {
-            throw new ArgumentException(
-                $"{nameof(Contribution)} has neither {nameof(Contribution.User)} nor {nameof(Contribution.App)}.",
-                nameof(contribution));
-        }
-    }
 }
