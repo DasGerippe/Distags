@@ -15,6 +15,8 @@ public class LevelTagDbContext : DbContext
 
     public DbSet<LevelTag> LevelTags { get; set; }
 
+    public DbSet<Setting> Settings { get; set; }
+
     public DbSet<Tag> Tags { get; set; }
 
     public DbSet<TagGroup> TagGroups { get; set; }
@@ -35,6 +37,7 @@ public class LevelTagDbContext : DbContext
         ConfigureAppEntity(modelBuilder);
         ConfigureCreatorEntity(modelBuilder);
         ConfigureLevelEntity(modelBuilder);
+        ConfigureSettingEntity(modelBuilder);
         ConfigureTagEntity(modelBuilder);
         ConfigureUserEntity(modelBuilder);
         ConfigureUserBanEntity(modelBuilder);
@@ -74,6 +77,12 @@ public class LevelTagDbContext : DbContext
             .HasOne(level => level.Creator)
             .WithMany(user => user.CreatedLevels)
             .IsRequired(false);
+    }
+
+    private void ConfigureSettingEntity(ModelBuilder modelBuilder)
+    {
+        modelBuilder.Entity<Setting>()
+            .HasKey(setting => setting.Key);
     }
 
     private void ConfigureTagEntity(ModelBuilder modelBuilder)

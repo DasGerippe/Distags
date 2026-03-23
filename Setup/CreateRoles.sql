@@ -45,6 +45,10 @@ CREATE ROLE distags_manage_user_bans NOLOGIN;
 GRANT distags_user TO distags_manage_user_bans;
 GRANT SELECT, INSERT, UPDATE, DELETE ON TABLE user_bans TO distags_manage_user_bans;
 
+CREATE ROLE distags_manage_settings NOLOGIN;
+GRANT distags_user TO distags_manage_settings;
+GRANT SELECT, INSERT, UPDATE, DELETE ON TABLE settings TO distags_manage_settings;
+
 -- Users --
 
 CREATE ROLE distags_migrator WITH LOGIN PASSWORD '';
@@ -58,6 +62,7 @@ GRANT distags_manage_users TO distags_api;
 GRANT distags_manage_apps TO distags_api;
 GRANT distags_manage_contributions TO distags_api;
 GRANT distags_manage_user_bans TO distags_api;
+GRANT distags_manage_settings TO distags_api;
 
 CREATE ROLE distags_scraper WITH LOGIN PASSWORD '';
 GRANT distags_manage_levels TO distags_scraper;

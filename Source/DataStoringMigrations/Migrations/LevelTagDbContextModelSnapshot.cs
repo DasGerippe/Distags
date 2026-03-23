@@ -207,6 +207,22 @@ namespace DataStoringMigrations.Migrations
                     b.ToTable("level_tags", (string)null);
                 });
 
+            modelBuilder.Entity("DataClasses.Setting", b =>
+                {
+                    b.Property<string>("Key")
+                        .HasColumnType("text")
+                        .HasColumnName("key");
+
+                    b.Property<string>("Value")
+                        .HasColumnType("text")
+                        .HasColumnName("value");
+
+                    b.HasKey("Key")
+                        .HasName("pk_settings");
+
+                    b.ToTable("settings", (string)null);
+                });
+
             modelBuilder.Entity("DataClasses.Tag", b =>
                 {
                     b.Property<long>("Id")
