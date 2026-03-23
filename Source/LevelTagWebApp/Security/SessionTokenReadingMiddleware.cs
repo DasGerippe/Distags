@@ -1,6 +1,4 @@
-﻿using LevelTagWebApp.Services;
-
-namespace LevelTagWebApp.Security;
+﻿namespace LevelTagWebApp.Security;
 
 public class SessionTokenReadingMiddleware
 {
