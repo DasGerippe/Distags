@@ -1,0 +1,34 @@
+﻿@page "/contributions"
+@rendermode InteractiveServer
+
+@using LevelTagApi.Dtos
+@using LevelTagWebApp.Services
+
+@inject LevelTagApiClient LevelTagApi
+
+@if (!_IsInitialized)
+	return;
+
+<div class="container-fluid content-narrow my-3">
+	<div class="d-flex flex-column gap-3 gap-md-2">
+		@foreach (ContributionDto contribution in _Contributions!)
+		{
+			<ContributionDisplay Contribution="contribution" />
+		}
+	</div>
+</div>
+
+@code {
+
+	private bool _IsInitialized;
+
+	private List<ContributionDto>? _Contributions;
+
+	protected override async Task OnInitializedAsync()
+	{
+		_Contributions = await LevelTagApi.GetContributionsAsync();
+
+		_IsInitialized = true;
+	}
+
+}

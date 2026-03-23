@@ -127,6 +127,14 @@ public class LevelTagApiClient : IDisposable
         return user;
     }
 
+    public async Task<List<ContributionDto>> GetContributionsAsync(CancellationToken cancellationToken = default)
+    {
+        HttpResponseMessage responseMessage = await _HttpClient.GetAsync("api/contributions", cancellationToken).ConfigureAwait(false);
+        List<ContributionDto> contributions =
+            await GetContentAsync<List<ContributionDto>>(responseMessage, cancellationToken).ConfigureAwait(false);
+        return contributions;
+    }
+
     private async Task<TResponseContent> GetContentAsync<TResponseContent>(
         HttpResponseMessage responseMessage, CancellationToken cancellationToken = default)
     {

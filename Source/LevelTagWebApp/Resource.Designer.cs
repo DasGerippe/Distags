@@ -61,6 +61,60 @@ namespace LevelTagWebApp {
         }
         
         /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Anonymous ähnelt.
+        /// </summary>
+        internal static string Contributor_AnonymousUserName {
+            get {
+                return ResourceManager.GetString("Contributor_AnonymousUserName", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Unknown User ähnelt.
+        /// </summary>
+        internal static string Contributor_UnknownUserName {
+            get {
+                return ResourceManager.GetString("Contributor_UnknownUserName", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die {0} days ago ähnelt.
+        /// </summary>
+        internal static string DateTimeDaysAgo {
+            get {
+                return ResourceManager.GetString("DateTimeDaysAgo", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die {0} hours ago ähnelt.
+        /// </summary>
+        internal static string DateTimeHoursAgo {
+            get {
+                return ResourceManager.GetString("DateTimeHoursAgo", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die {0} minutes ago ähnelt.
+        /// </summary>
+        internal static string DateTimeMinutesAgo {
+            get {
+                return ResourceManager.GetString("DateTimeMinutesAgo", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die a few seconds ago ähnelt.
+        /// </summary>
+        internal static string DateTimeSecondsAgo {
+            get {
+                return ResourceManager.GetString("DateTimeSecondsAgo", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Sucht eine lokalisierte Zeichenfolge, die Created Date (Old → New) ähnelt.
         /// </summary>
         internal static string Enum_LevelSortStrategy_CreatedAsc {

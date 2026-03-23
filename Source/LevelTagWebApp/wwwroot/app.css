@@ -20,6 +20,10 @@ a, .btn-link {
     max-width: 1800px;
 }
 
+.content-narrow {
+    max-width: 1400px;
+}
+
 h1:focus {
     outline: none;
 }

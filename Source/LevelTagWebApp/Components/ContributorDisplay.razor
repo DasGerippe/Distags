@@ -1,0 +1,50 @@
+﻿@using LevelTagApi.Dtos
+
+<div class="d-flex align-items-center">
+	@switch (Contributor)
+	{
+		case ContributorAppDto:
+			<svg style="width: 2rem; height: 2rem;"><use href="icons.svg#microchip-solid" /></svg>
+			break;
+
+		case ContributorUserDto user:
+			if (user.IsAnonymous || user.SteamAvatarHash == null)
+			{
+				<svg style="width: 2rem; height: 2rem;"><use href="icons.svg#user-solid" /></svg>
+			}
+			else
+			{
+				<img class="rounded-5" src="https://avatars.steamstatic.com/@(user.SteamAvatarHash).jpg" alt="Contributor Avatar" />
+			}
+			break;
+
+		default:
+			throw new ArgumentOutOfRangeException();
+	}
+	<span class="ps-2 @GetContributorNameClass()">@GetContributorName()</span>
+</div>
+
+@code {
+
+	[Parameter]
+	public required ContributorDto Contributor { get; set; }
+
+	private string GetContributorNameClass()
+	{
+		bool useMutedNameStyle = Contributor is ContributorUserDto user && (user.IsAnonymous || user.SteamName == null);
+		return useMutedNameStyle ? "fst-italic text-muted" : string.Empty;
+	}
+
+	private string GetContributorName()
+	{
+		return Contributor switch
+		{
+			ContributorAppDto app => app.Name,
+			ContributorUserDto user => user.IsAnonymous
+				? Resource.Contributor_AnonymousUserName
+				: user.SteamName ?? Resource.Contributor_UnknownUserName,
+			_ => throw new ArgumentOutOfRangeException(),
+		};
+	}
+
+}

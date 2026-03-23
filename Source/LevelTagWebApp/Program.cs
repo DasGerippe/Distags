@@ -42,6 +42,8 @@ public class Program
             builder.Services.AddScoped<ISessionTokenProvider, SessionTokenProvider>();
             builder.Services.AddScoped<IUserInfoProvider, CachedUserInfoProvider>();
 
+            builder.Services.AddScoped<TimeRefreshService>();
+
             WebApplication app = builder.Build();
 
             // Configure the HTTP request pipeline.

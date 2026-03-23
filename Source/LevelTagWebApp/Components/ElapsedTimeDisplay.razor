@@ -1,0 +1,33 @@
+﻿@using LevelTagWebApp.Services
+
+@implements IDisposable
+
+@inject TimeRefreshService TimeRefreshService
+
+<span @attributes="AdditionalAttributes">@Timestamp.ToElapsedString()</span>
+
+@code {
+
+	[Parameter]
+	public required DateTime Timestamp { get; set; }
+
+	[Parameter(CaptureUnmatchedValues = true)]
+	public IDictionary<string, object>? AdditionalAttributes { get; set; }
+
+	protected override void OnAfterRender(bool firstRender)
+	{
+		if (firstRender)
+			TimeRefreshService.OnTick += HandleTimeRefresh;
+	}
+
+	public void Dispose()
+	{
+		TimeRefreshService.OnTick -= HandleTimeRefresh;
+	}
+
+	private void HandleTimeRefresh()
+	{
+		InvokeAsync(StateHasChanged);
+	}
+
+}
