@@ -11,4 +11,8 @@ public class TagGroup
     public long? ParentGroupId { get; set; }
 
     public TagGroup? ParentGroup { get; set; }
+
+    public List<TagGroup> SubGroups { get; set; } = [];
+
+    public List<Tag> Tags { get; set; } = [];
 }
