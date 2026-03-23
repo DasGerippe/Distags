@@ -19,6 +19,7 @@
   <ItemGroup>
     <ProjectReference Include="..\DataStoring\DataStoring.csproj" />
     <ProjectReference Include="..\LevelTagApi.Dtos\LevelTagApi.Dtos.csproj" />
+    <ProjectReference Include="..\SteamWebApi\SteamWebApi.csproj" />
   </ItemGroup>
 
 </Project>

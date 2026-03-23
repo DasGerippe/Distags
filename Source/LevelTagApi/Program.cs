@@ -8,6 +8,7 @@ using LevelTagApi.Sorting;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.Extensions.Options;
+using SteamWebApi;
 
 namespace LevelTagApi
 {
@@ -30,6 +31,8 @@ namespace LevelTagApi
             builder.Services.AddPostgreSqlLevelTagDbContext(levelTagsDbConnectionString);
 
             builder.Services.AddSignalR();
+
+            builder.Services.AddSteamWebApi("SteamWebApi");
 
             AddValidatedConfigOptions<LevelTagApiSettings>(builder, "LevelTagApiSettings");
 

@@ -8,6 +8,9 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.EntityFrameworkCore;
+using SteamWebApi;
+using SteamWebApi.ApiInterfaces;
+using SteamWebApi.Dtos.SteamUser;
 using System.Security.Claims;
 
 namespace LevelTagApi.Controllers;
@@ -20,17 +23,28 @@ public class AuthenticationController : ControllerBase
     private readonly LevelTagDbContext _DbContext;
     private readonly ITicketStore<long> _TicketStore;
     private readonly ITokenGenerator _TokenGenerator;
+    private readonly ISteamUser _SteamUser;
+    private readonly ILogger<AuthenticationController> _Logger;
+
+    private readonly string _SteamWebApiKey;
 
     public AuthenticationController(
         LevelTagApiSettings settings,
         LevelTagDbContext dbContext,
         ITicketStore<long> ticketStore,
-        ITokenGenerator tokenGenerator)
+        ITokenGenerator tokenGenerator,
+        ISteamUser steamUser,
+        SteamWebApiSettings steamWebApiSettings,
+        ILogger<AuthenticationController> logger)
     {
         _Settings = settings;
         _DbContext = dbContext;
         _TicketStore = ticketStore;
         _TokenGenerator = tokenGenerator;
+        _SteamUser = steamUser;
+        _Logger = logger;
+
+        _SteamWebApiKey = steamWebApiSettings.ApiKey;
     }
 
     [HttpGet("steam-login")]
@@ -130,7 +144,7 @@ public class AuthenticationController : ControllerBase
 
     private async Task<SessionResponse> CreateSessionResponseForNewUserSession(long steamId)
     {
-        User user = GetOrCreateUser(steamId);
+        User user = await GetOrCreateUser(steamId);
         UserSession userSession = CreateUserSession(user);
         await _DbContext.SaveChangesAsync();
 
@@ -138,7 +152,7 @@ public class AuthenticationController : ControllerBase
         return sessionResponse;
     }
 
-    private User GetOrCreateUser(long steamId)
+    private async Task<User> GetOrCreateUser(long steamId)
     {
         User? user = _DbContext.Set<User>().FirstOrDefault(user => user.SteamId == steamId);
         if (user == null)
@@ -151,7 +165,32 @@ public class AuthenticationController : ControllerBase
             _DbContext.Add(user);
         }
 
+        await TrySetSteamData(user);
+
         return user;
+    }
+
+    private async Task TrySetSteamData(User user)
+    {
+        try
+        {
+            GetPlayerSummariesParameters parameters = new GetPlayerSummariesParameters
+            {
+                Key = _SteamWebApiKey,
+                SteamIds = [user.SteamId!.Value],
+            };
+
+            IAsyncEnumerator<PlayerSummary> playerEnumerator = _SteamUser.GetPlayerSummariesAsync(parameters).GetAsyncEnumerator();
+            await playerEnumerator.MoveNextAsync();
+
+            PlayerSummary playerSummary = playerEnumerator.Current;
+            user.SteamName = playerSummary.PersonaName;
+            user.SteamAvatarHash = playerSummary.AvatarHash;
+        }
+        catch (Exception ex)
+        {
+            _Logger.LogWarning(ex, "An error occurred while trying to get user data from Steam.");
+        }
     }
 
     private UserSession CreateUserSession(User user)
