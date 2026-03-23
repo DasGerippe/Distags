@@ -2,6 +2,6 @@
 
 public enum TagCompatibility
 {
-    Exclusive,
     Combinable,
+    Exclusive,
 }
