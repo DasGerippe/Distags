@@ -1,0 +1,20 @@
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace LevelTagApi.Dtos;
+
+public class GetLevelsParameters
+{
+    public string? IncludeTags { get; set; }
+
+    public string? ExcludeTags { get; set; }
+
+    public LevelSortProperty SortBy { get; set; } = LevelSortProperty.Created;
+
+    public SortOrder SortOrder { get; set; } = SortOrder.Descending;
+
+    [Range(1, int.MaxValue, ErrorMessage = "PageNumber must be at least 1.")]
+    public int PageNumber { get; set; } = 1;
+
+    [Range(1, 100, ErrorMessage = "PageSize must be between 1 and 100.")]
+    public int PageSize { get; set; } = 25;
+}

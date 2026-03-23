@@ -2,6 +2,7 @@
 using DataStoring;
 using LevelTagApi.DtoConverter;
 using LevelTagApi.Dtos;
+using LevelTagApi.Sorting;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -13,28 +14,46 @@ public class LevelsController : ControllerBase
 {
     private readonly LevelTagDbContext _LevelTagDbContext;
     private readonly IDtoConverter<Level, GetLevelDto> _LevelDtoConverter;
+    private readonly IQueryableSorterFactory<Level, LevelSortProperty> _LevelSorterFactory;
 
-    public LevelsController(LevelTagDbContext levelTagDbContext, IDtoConverter<Level, GetLevelDto> levelDtoConverter)
+    public LevelsController(
+        LevelTagDbContext levelTagDbContext,
+        IDtoConverter<Level, GetLevelDto> levelDtoConverter,
+        IQueryableSorterFactory<Level, LevelSortProperty> levelSorterFactory)
     {
         _LevelTagDbContext = levelTagDbContext;
         _LevelDtoConverter = levelDtoConverter;
+        _LevelSorterFactory = levelSorterFactory;
     }
 
     [HttpGet]
-    public async Task<ActionResult<IEnumerable<GetLevelDto>>> GetLevels([FromQuery] string? includeTags, [FromQuery] string? excludeTags)
+    public async Task<ActionResult<IEnumerable<GetLevelDto>>> GetLevels([FromQuery] GetLevelsParameters parameters)
     {
         IQueryable<Level> levels = _LevelTagDbContext.Levels;
 
-        if (!string.IsNullOrEmpty(includeTags))
+        if (!string.IsNullOrEmpty(parameters.IncludeTags))
         {
-            string[] tags = includeTags.Split(',');
-            levels = levels.Where(level => tags.All(tagName => level.Tags.Any(tag => tag.Name == tagName)));
+            IEnumerable<string> includeTagNames = GetNormalizedTagNames(parameters.IncludeTags);
+            levels = levels.Where(level => includeTagNames.All(tagName => level.Tags.Any(tag => tag.Name == tagName)));
         }
 
-        if (!string.IsNullOrEmpty(excludeTags))
+        if (!string.IsNullOrEmpty(parameters.ExcludeTags))
         {
-            string[] tags = excludeTags.Split(',');
-            levels = levels.Where(level => tags.All(tagName => level.Tags.All(tag => tag.Name != tagName)));
+            IEnumerable<string> excludeTagNames = GetNormalizedTagNames(parameters.ExcludeTags);
+            levels = levels.Where(level => !excludeTagNames.Any(tagName => level.Tags.Any(tag => tag.Name == tagName)));
+        }
+
+        int totalLevelCount = await levels.CountAsync();
+
+        IQueryableSorter<Level> levelSorter = _LevelSorterFactory.GetQueryableSorter(parameters.SortBy);
+        levels = levelSorter.Sort(levels, parameters.SortOrder);
+
+        if (totalLevelCount > parameters.PageSize)
+        {
+            if (parameters.PageNumber > 1)
+                levels = levels.Skip((parameters.PageNumber - 1) * parameters.PageSize);
+
+            levels = levels.Take(parameters.PageSize);
         }
 
         List<GetLevelDto> levelDtos = await levels
@@ -51,7 +70,20 @@ public class LevelsController : ControllerBase
             })
             .ToListAsync();
 
-        return Ok(levelDtos);
+        GetLevelsResponse response = new GetLevelsResponse
+        {
+            TotalLevels = totalLevelCount,
+            Levels = levelDtos,
+        };
+
+        return Ok(response);
+    }
+
+    private IEnumerable<string> GetNormalizedTagNames(string commaSeparatedTags)
+    {
+        string[] tagNames = commaSeparatedTags.Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+        IEnumerable<string> normalizedTagNames = tagNames.Select(tag => tag.ToLowerInvariant());
+        return normalizedTagNames;
     }
 
     [HttpGet("{levelId}")]

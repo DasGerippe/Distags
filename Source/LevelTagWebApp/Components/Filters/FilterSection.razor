@@ -49,10 +49,10 @@
 		HttpResponseMessage httpResponseMessage = await _HttpClient.GetAsync(url);
 		
 		Stream responseStream = await httpResponseMessage.Content.ReadAsStreamAsync();
-		List<GetLevelDto> levels = await JsonSerializer.DeserializeAsync<List<GetLevelDto>>(
-			responseStream, JsonSerializerOptions.Web) ?? [];
+		GetLevelsResponse? getLevelsResponse = await JsonSerializer.DeserializeAsync<GetLevelsResponse>(
+			responseStream, JsonSerializerOptions.Web);
 
-		await FilesQueried.InvokeAsync(levels);
+		await FilesQueried.InvokeAsync(getLevelsResponse?.Levels ?? []);
 	}
 
 	private List<string> GetTagsByState(TagFilterState tagFilterState)
