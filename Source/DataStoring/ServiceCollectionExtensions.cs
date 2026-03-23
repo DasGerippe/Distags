@@ -1,26 +1,50 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
+using Npgsql.EntityFrameworkCore.PostgreSQL.Infrastructure;
 
 namespace DataStoring;
 
 public static class ServiceCollectionExtensions
 {
-    public static IServiceCollection AddNpgsqlLevelTagDbContext(this IServiceCollection services, string connectionString)
+    public static IServiceCollection AddNpgsqlLevelTagDbContext(
+        this IServiceCollection services,
+        string connectionString,
+        Action<IServiceProvider, DbContextOptionsBuilder>? optionsAction = null,
+        Action<NpgsqlDbContextOptionsBuilder>? npgsqlOptionsAction = null)
     {
-        services.AddDbContext<LevelTagDbContext>(ConfigureNpgsqlOptions(connectionString));
-        return services;
+        return services.AddDbContext<LevelTagDbContext>(ConfigureOptions(connectionString, optionsAction, npgsqlOptionsAction));
     }
 
-    public static IServiceCollection AddNpgsqlLevelTagDbContextFactory(this IServiceCollection services, string connectionString)
+    public static IServiceCollection AddNpgsqlLevelTagDbContextFactory(
+        this IServiceCollection services,
+        string connectionString,
+        Action<IServiceProvider, DbContextOptionsBuilder>? optionsAction = null,
+        Action<NpgsqlDbContextOptionsBuilder>? npgsqlOptionsAction = null)
     {
-        services.AddDbContextFactory<LevelTagDbContext>(ConfigureNpgsqlOptions(connectionString));
-        return services;
+        return services.AddDbContextFactory<LevelTagDbContext>(ConfigureOptions(connectionString, optionsAction, npgsqlOptionsAction));
     }
 
-    private static Action<DbContextOptionsBuilder> ConfigureNpgsqlOptions(string connectionString)
+    private static Action<IServiceProvider, DbContextOptionsBuilder> ConfigureOptions(
+        string connectionString,
+        Action<IServiceProvider, DbContextOptionsBuilder>? optionsAction = null,
+        Action<NpgsqlDbContextOptionsBuilder>? npgsqlOptionsAction = null)
     {
-        return options => options
-            .UseNpgsql(connectionString, dbOptions => dbOptions.MigrationsAssembly("DataStoringMigrations"))
-            .UseSnakeCaseNamingConvention();
+        return (services, options) =>
+        {
+            options
+                .UseNpgsql(connectionString, ConfigureNpgsqlOptions(npgsqlOptionsAction))
+                .UseSnakeCaseNamingConvention();
+
+            optionsAction?.Invoke(services, options);
+        };
+    }
+
+    private static Action<NpgsqlDbContextOptionsBuilder> ConfigureNpgsqlOptions(
+        Action<NpgsqlDbContextOptionsBuilder>? npgsqlOptionsAction = null)
+    {
+        return npgsqlOptions =>
+        {
+            npgsqlOptionsAction?.Invoke(npgsqlOptions);
+        };
     }
 }

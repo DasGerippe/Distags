@@ -25,7 +25,9 @@ internal class Program
         {
             string connectionString = context.Configuration.GetConnectionString("LevelTagsDatabase")
                                       ?? throw new Exception("Connection string missing.");
-            services.AddNpgsqlLevelTagDbContext(connectionString);
+            services.AddNpgsqlLevelTagDbContext(
+                connectionString,
+                npgsqlOptionsAction: npgsqlOptions => npgsqlOptions.MigrationsAssembly(nameof(DataStoringMigrations)));
         });
 
         IHost host = builder.Build();
