@@ -29,6 +29,20 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HttpUtils", "HttpUtils\Http
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SerilogUtils", "SerilogUtils\SerilogUtils.csproj", "{536B7A38-DEBE-48D9-A340-EFC84DD3B6CD}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "AutoTaggingPlugins", "AutoTaggingPlugins", "{02EA681E-C7D8-13C7-8484-4AC65E1B71E8}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AutoTagging.MissingLevel", "AutoTagging.MissingLevel\AutoTagging.MissingLevel.csproj", "{392CB2E5-41B3-9E24-A87F-023DF9CC4D18}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AutoTagging.GameMode", "AutoTagging.GameMode\AutoTagging.GameMode.csproj", "{1B4236C6-D385-8BB1-DEB3-56E66649E190}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AutoTaggerRunner", "AutoTaggerRunner\AutoTaggerRunner.csproj", "{DDA5BC0C-5BBF-50BF-1574-B4D1EF540B49}"
+	ProjectSection(ProjectDependencies) = postProject
+		{1B4236C6-D385-8BB1-DEB3-56E66649E190} = {1B4236C6-D385-8BB1-DEB3-56E66649E190}
+		{392CB2E5-41B3-9E24-A87F-023DF9CC4D18} = {392CB2E5-41B3-9E24-A87F-023DF9CC4D18}
+	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AutoTagging.Abstractions", "AutoTagging.Abstractions\AutoTagging.Abstractions.csproj", "{8D8B87B5-5710-C492-BFC6-396E75828C12}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -87,9 +101,29 @@ Global
 		{536B7A38-DEBE-48D9-A340-EFC84DD3B6CD}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{536B7A38-DEBE-48D9-A340-EFC84DD3B6CD}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{536B7A38-DEBE-48D9-A340-EFC84DD3B6CD}.Release|Any CPU.Build.0 = Release|Any CPU
+		{392CB2E5-41B3-9E24-A87F-023DF9CC4D18}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{392CB2E5-41B3-9E24-A87F-023DF9CC4D18}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{392CB2E5-41B3-9E24-A87F-023DF9CC4D18}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{392CB2E5-41B3-9E24-A87F-023DF9CC4D18}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1B4236C6-D385-8BB1-DEB3-56E66649E190}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1B4236C6-D385-8BB1-DEB3-56E66649E190}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1B4236C6-D385-8BB1-DEB3-56E66649E190}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1B4236C6-D385-8BB1-DEB3-56E66649E190}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DDA5BC0C-5BBF-50BF-1574-B4D1EF540B49}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DDA5BC0C-5BBF-50BF-1574-B4D1EF540B49}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DDA5BC0C-5BBF-50BF-1574-B4D1EF540B49}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DDA5BC0C-5BBF-50BF-1574-B4D1EF540B49}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8D8B87B5-5710-C492-BFC6-396E75828C12}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8D8B87B5-5710-C492-BFC6-396E75828C12}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8D8B87B5-5710-C492-BFC6-396E75828C12}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8D8B87B5-5710-C492-BFC6-396E75828C12}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{392CB2E5-41B3-9E24-A87F-023DF9CC4D18} = {02EA681E-C7D8-13C7-8484-4AC65E1B71E8}
+		{1B4236C6-D385-8BB1-DEB3-56E66649E190} = {02EA681E-C7D8-13C7-8484-4AC65E1B71E8}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {AA7EDBC3-335C-4567-BF43-795798227B77}

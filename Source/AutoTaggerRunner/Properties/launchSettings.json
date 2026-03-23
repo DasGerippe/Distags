@@ -1,0 +1,17 @@
+{
+  "profiles": {
+    "Run All": {
+      "commandName": "Project",
+      "environmentVariables": {
+        "DOTNET_ENVIRONMENT": "Development"
+      }
+    },
+    "Run GameMode, MissingLevel": {
+      "commandName": "Project",
+      "commandLineArgs": "GameMode MissingLevel",
+      "environmentVariables": {
+        "DOTNET_ENVIRONMENT": "Development"
+      }
+    }
+  }
+}
