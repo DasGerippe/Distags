@@ -149,6 +149,25 @@ public class LevelTagApiClient : IDisposable
         return response;
     }
 
+    public async Task<HttpResponseMessage> PostUserBan(
+        CreateUserBanDto createUserBanDto, CancellationToken cancellationToken = default)
+    {
+        return await _HttpClient.PostAsJsonAsync("api/userbans", createUserBanDto, cancellationToken).ConfigureAwait(false);
+    }
+
+    public async Task<RevertContributionsResponse> RevertContributionsAsync(
+        RevertContributionsParameters parameters, CancellationToken cancellationToken = default)
+    {
+        string requestUri = "api/contributions/revert";
+
+        HttpResponseMessage responseMessage =
+            await _HttpClient.PostAsJsonAsync(requestUri, parameters, cancellationToken).ConfigureAwait(false);
+        RevertContributionsResponse response =
+            await GetContentAsync<RevertContributionsResponse>(responseMessage, cancellationToken);
+
+        return response;
+    }
+
     private async Task<TResponseContent> GetContentAsync<TResponseContent>(
         HttpResponseMessage responseMessage, CancellationToken cancellationToken = default)
     {
