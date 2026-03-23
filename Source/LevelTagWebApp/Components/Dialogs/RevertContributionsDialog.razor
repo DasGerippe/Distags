@@ -1,0 +1,117 @@
+﻿@using LevelTagApi.Dtos
+@using LevelTagWebApp.Services
+
+@implements IAsyncDisposable
+
+@inject IJSRuntime JsRuntime
+@inject LevelTagApiClient LevelTagApi
+
+<div class="modal fade" id="@ModalId" tabindex="-1" aria-hidden="true">
+	<div class="modal-dialog modal-dialog-centered">
+		<div class="modal-content">
+			<div class="modal-header">
+				<h5 class="modal-title">Revert Contributions</h5>
+				<button class="btn-close" data-bs-dismiss="modal"></button>
+			</div>
+			<div class="modal-body">
+				<form>
+					<label for="revertSteamIdInput" class="col-form-label">User Steam ID:</label>
+					<input id="revertSteamIdInput" class="form-control" value="@_RevertUserSteamId" disabled readonly />
+
+					<label for="revertSteamNameInput" class="col-form-label">User Steam Name:</label>
+					<input id="revertSteamNameInput" class="form-control" value="@_RevertUserSteamName" disabled readonly />
+					
+					<label class="col-form-label">Reversal mode:</label>
+					<InputRadioGroup @bind-Value="_RevertAllUserContributions">
+						<div class="form-check">
+							<InputRadio Value="false" class="form-check-input"/>
+							<label class="form-check-label">Revert since @(_RevertDateTime?.ToString("G"))</label>
+						</div>
+						<div class="form-check">
+							<InputRadio Value="true" class="form-check-input" />
+							<label class="form-check-label">Revert all</label>
+						</div>
+					</InputRadioGroup>
+				</form>
+			</div>
+			<div class="modal-footer">
+				<button class="btn btn-primary" @onclick="RevertContributions">Revert</button>
+			</div>
+		</div>
+	</div>
+</div>
+
+@code {
+
+	private const string ModalId = "revertContributionsModal";
+
+	private IJSObjectReference? _BootstrapModalModule;
+
+	private long? _RevertUserSteamId;
+	private string? _RevertUserSteamName;
+	private DateTime? _RevertDateTime;
+	private bool _RevertAllUserContributions;
+
+	private bool _Disposed;
+
+	public event EventHandler<RevertContributionsResponse>? ContributionsReverted;
+
+	protected override async Task OnAfterRenderAsync(bool firstRender)
+	{
+		if (firstRender)
+		{
+			_BootstrapModalModule = await JsRuntime.InvokeAsync<IJSObjectReference>("import", "./js/bootstrap-modal.js");
+		}
+	}
+
+	public async Task ShowAsync(ContributionDto contribution)
+	{
+		ContributorUserDto? user = contribution.Contributor as ContributorUserDto;
+		_RevertUserSteamId = user?.SteamId;
+		_RevertUserSteamName = user?.SteamName;
+		_RevertDateTime = contribution.ContributedOn;
+		StateHasChanged();
+
+		await _BootstrapModalModule!.InvokeVoidAsync("showModal", $"#{ModalId}");
+	}
+
+	public async Task CloseAsync()
+	{
+		await _BootstrapModalModule!.InvokeVoidAsync("hideModal", $"#{ModalId}");
+	}
+
+	private async Task RevertContributions()
+	{
+		if (_RevertUserSteamId == null)
+			return;
+
+		RevertContributionsParameters parameters = new RevertContributionsParameters
+		{
+			SteamId = _RevertUserSteamId.Value,
+			RevertStartDate = _RevertAllUserContributions ? null : _RevertDateTime,
+		};
+		RevertContributionsResponse response = await LevelTagApi.RevertContributionsAsync(parameters);
+
+		await CloseAsync();
+
+		ContributionsReverted?.Invoke(this, response);
+	}
+
+	public async ValueTask DisposeAsync()
+	{
+		if (_Disposed)
+			return;
+
+		if (_BootstrapModalModule != null)
+		{
+			try
+			{
+				await _BootstrapModalModule.DisposeAsync();
+			}
+			catch (JSDisconnectedException) { }
+		}
+
+		_Disposed = true;
+	}
+
+}
