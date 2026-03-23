@@ -3,7 +3,6 @@ using DataStoring;
 using LevelTagApi.Dtos;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 
 namespace LevelTagApi.Controllers;
 
@@ -22,14 +21,24 @@ public class UsersController : ControllerBase
     [Authorize]
     public async Task<ActionResult<UserDto>> GetMe([FromHeader(Name = LevelTagApiConstants.SessionTokenHeader)] string sessionToken)
     {
-        UserSession? userSession = await _DbContext.Set<UserSession>()
-            .Include(session => session.User)
-            .FirstOrDefaultAsync(session => session.Token == sessionToken);
-
-        if (userSession?.User.SteamId == null)
+        User? user = await _DbContext.GetSessionUser(User);
+        if (user == null)
             return Unauthorized();
 
-        UserDto userDto = userSession.User.ToDto();
+        UserDto userDto = user.ToDto();
         return Ok(userDto);
+    }
+
+    [HttpPatch("me/settings")]
+    [Authorize]
+    public async Task<IActionResult> PatchSettings([FromBody] PatchSettingsParameters parameters)
+    {
+        User? user = await _DbContext.GetSessionUser(User);
+        if (user == null)
+            return Unauthorized();
+        
+        user.IsAnonymous = parameters.IsAnonymous ?? user.IsAnonymous;
+
+        return Ok();
     }
 }
