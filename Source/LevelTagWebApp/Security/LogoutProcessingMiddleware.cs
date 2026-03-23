@@ -29,17 +29,17 @@ public class LogoutProcessingMiddleware
         {
             LevelTagApiClient levelTagApi = httpContext.RequestServices.GetRequiredService<LevelTagApiClient>();
             await levelTagApi.PostLogout();
+            httpContext.Response.Cookies.Delete(Constants.SessionTokenCookieName);
         }
         catch (HttpRequestException httpRequestEx) when (httpRequestEx.StatusCode == HttpStatusCode.Unauthorized)
         {
             _Logger.LogDebug("Unauthorized to perform logout. SessionToken is probably already invalid.");
+            httpContext.Response.Cookies.Delete(Constants.SessionTokenCookieName);
         }
         catch (Exception ex)
         {
             _Logger.LogError(ex, "An error occurred while trying to log out.");
         }
-
-        httpContext.Response.Cookies.Delete(Constants.SessionTokenCookieName);
 
         IEnumerable<KeyValuePair<string, StringValues>> newQueryParams = httpContext.Request.Query
             .Where(queryParam => queryParam.Key != LogoutParameterName);
