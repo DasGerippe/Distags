@@ -25,6 +25,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DataStoringMigrator", "Data
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LevelTagWebApp", "LevelTagWebApp\LevelTagWebApp.csproj", "{CCFC3169-44F6-4874-AF8F-BC5D102EB375}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HttpUtils", "HttpUtils\HttpUtils.csproj", "{26C1F54E-BA8A-46C7-85E5-92DA03CB7A70}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -75,6 +77,10 @@ Global
 		{CCFC3169-44F6-4874-AF8F-BC5D102EB375}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{CCFC3169-44F6-4874-AF8F-BC5D102EB375}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{CCFC3169-44F6-4874-AF8F-BC5D102EB375}.Release|Any CPU.Build.0 = Release|Any CPU
+		{26C1F54E-BA8A-46C7-85E5-92DA03CB7A70}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{26C1F54E-BA8A-46C7-85E5-92DA03CB7A70}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{26C1F54E-BA8A-46C7-85E5-92DA03CB7A70}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{26C1F54E-BA8A-46C7-85E5-92DA03CB7A70}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
