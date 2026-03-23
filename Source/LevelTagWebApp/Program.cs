@@ -19,6 +19,8 @@ namespace LevelTagWebApp
                 httpClient.BaseAddress = new Uri(levelTagApiUri);
             });
 
+            builder.Services.AddLocalization();
+
             builder.Services.AddScoped<HistoryService>();
 
             WebApplication app = builder.Build();

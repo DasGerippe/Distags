@@ -1,7 +1,6 @@
 ﻿using HttpUtils;
 using LevelTagApi.Dtos;
 using System.Text.Json;
-using System.Threading;
 
 namespace LevelTagWebApp.Services;
 
