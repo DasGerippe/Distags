@@ -27,6 +27,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LevelTagWebApp", "LevelTagW
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HttpUtils", "HttpUtils\HttpUtils.csproj", "{26C1F54E-BA8A-46C7-85E5-92DA03CB7A70}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SerilogUtils", "SerilogUtils\SerilogUtils.csproj", "{536B7A38-DEBE-48D9-A340-EFC84DD3B6CD}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -81,6 +83,10 @@ Global
 		{26C1F54E-BA8A-46C7-85E5-92DA03CB7A70}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{26C1F54E-BA8A-46C7-85E5-92DA03CB7A70}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{26C1F54E-BA8A-46C7-85E5-92DA03CB7A70}.Release|Any CPU.Build.0 = Release|Any CPU
+		{536B7A38-DEBE-48D9-A340-EFC84DD3B6CD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{536B7A38-DEBE-48D9-A340-EFC84DD3B6CD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{536B7A38-DEBE-48D9-A340-EFC84DD3B6CD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{536B7A38-DEBE-48D9-A340-EFC84DD3B6CD}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

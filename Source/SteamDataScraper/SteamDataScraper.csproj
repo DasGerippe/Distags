@@ -12,10 +12,14 @@
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="9.0.6" />
     <PackageReference Include="Microsoft.Extensions.Hosting" Version="9.0.6" />
     <PackageReference Include="Microsoft.Extensions.Http" Version="9.0.6" />
+    <PackageReference Include="Serilog" Version="4.2.0" />
+    <PackageReference Include="Serilog.Extensions.Hosting" Version="9.0.0" />
+    <PackageReference Include="Serilog.Settings.Configuration" Version="9.0.0" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\DataStoring\DataStoring.csproj" />
+    <ProjectReference Include="..\SerilogUtils\SerilogUtils.csproj" />
     <ProjectReference Include="..\SteamWebApi.Contract\SteamWebApi.Contract.csproj" />
     <ProjectReference Include="..\SteamWebApi\SteamWebApi.csproj" />
   </ItemGroup>

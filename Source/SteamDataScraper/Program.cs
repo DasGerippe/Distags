@@ -4,10 +4,12 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using Serilog;
 using SteamDataScraper.Creators;
 using SteamDataScraper.Levels;
 using SteamWebApi;
 using System.Runtime.CompilerServices;
+using SerilogUtils;
 
 namespace SteamDataScraper;
 
@@ -15,60 +17,73 @@ internal class Program
 {
     static async Task Main(string[] args)
     {
-        IHostBuilder hostBuilder = Host.CreateDefaultBuilder();
+        Log.Logger = new LoggerConfiguration()
+            .ConfigureConsoleAndFileSinks(nameof(SteamDataScraper))
+            .CreateBootstrapLogger();
 
-        hostBuilder.ConfigureAppConfiguration((context, configBuilder) =>
+        try
         {
-            IHostEnvironment environment = context.HostingEnvironment;
+            Log.Debug("Setting up application host...");
 
-            configBuilder.AddJsonFile("appsettings.json", optional: false);
-            configBuilder.AddJsonFile($"appsettings.{environment.EnvironmentName}.json", optional: true);
+            IHostBuilder hostBuilder = Host.CreateDefaultBuilder();
 
-            if (environment.IsDevelopment())
-                configBuilder.AddUserSecrets<Program>();
+            hostBuilder.ConfigureAppConfiguration((context, configBuilder) =>
+            {
+                IHostEnvironment environment = context.HostingEnvironment;
 
-            configBuilder.AddEnvironmentVariables();
-        });
+                configBuilder.AddJsonFile("appsettings.json", optional: false);
+                configBuilder.AddJsonFile($"appsettings.{environment.EnvironmentName}.json", optional: true);
 
-        hostBuilder.ConfigureServices((context, services) =>
+                if (environment.IsDevelopment())
+                    configBuilder.AddUserSecrets<Program>();
+
+                configBuilder.AddEnvironmentVariables();
+            });
+
+            hostBuilder.ConfigureServices((context, services) =>
+            {
+                services.AddSerilog(loggerConfig => loggerConfig
+                    .ReadFrom.Configuration(context.Configuration)
+                    .ConfigureConsoleAndFileSinks(nameof(SteamDataScraper)));
+
+                services.AddSteamWebApi("SteamWebApi");
+
+                services.AddOptions<CreatorRefreshSettings>()
+                    .BindConfiguration($"{nameof(SteamDataScraper)}:{nameof(CreatorRefreshSettings)}")
+                    .ValidateDataAnnotations()
+                    .ValidateOnStart();
+                services.AddTransient<CreatorRefreshSettings>(services =>
+                    services.GetRequiredService<IOptions<CreatorRefreshSettings>>().Value);
+
+                string levelTagsDbConnectionString = context.Configuration.GetConnectionString("LevelTagsDatabase") ??
+                                                     throw new InvalidOperationException("Connection string not configured.");
+                services.AddPostgreSqlLevelTagDbContext(levelTagsDbConnectionString);
+
+                services.AddTransient<Program>();
+                services.AddTransient<LevelScraper>();
+                services.AddTransient<CreatorScraper>();
+                services.AddTransient<ICreatorRefreshDateManager, CreatorRefreshDateFileManager>();
+                services.AddTransient<ICreatorRefreshCountCalculator, CreatorRefreshCountCalculator>();
+            });
+
+            IHost host = hostBuilder.Build();
+
+            Log.Debug("Application host setup completed.");
+
+            AsyncServiceScope scope = host.Services.CreateAsyncScope();
+            await using ConfiguredAsyncDisposable awaitedScope = scope.ConfigureAwait(false);
+
+            Program program = scope.ServiceProvider.GetRequiredService<Program>();
+            await program.RunAsync();
+        }
+        catch (Exception ex)
         {
-            services.AddSteamWebApi("SteamWebApi");
-
-            services.AddOptions<CreatorRefreshSettings>()
-                .BindConfiguration($"{nameof(SteamDataScraper)}:{nameof(CreatorRefreshSettings)}")
-                .ValidateDataAnnotations()
-                .ValidateOnStart();
-            services.AddTransient<CreatorRefreshSettings>(services =>
-                services.GetRequiredService<IOptions<CreatorRefreshSettings>>().Value);
-
-            string levelTagsDbConnectionString = context.Configuration.GetConnectionString("LevelTagsDatabase") ??
-                                                 throw new InvalidOperationException("Connection string not configured.");
-            services.AddPostgreSqlLevelTagDbContext(levelTagsDbConnectionString);
-
-
-            services.AddTransient<Program>();
-            services.AddTransient<LevelScraper>();
-            services.AddTransient<CreatorScraper>();
-            services.AddTransient<ICreatorRefreshDateManager, CreatorRefreshDateFileManager>();
-            services.AddTransient<ICreatorRefreshCountCalculator, CreatorRefreshCountCalculator>();
-        });
-
-        hostBuilder.ConfigureLogging(loggingBuilder =>
+            Log.Fatal(ex, "An unexpected error occurred causing the Host to terminate.");
+        }
+        finally
         {
-            loggingBuilder.ClearProviders();
-            loggingBuilder.AddConsole();
-        });
-
-        IHost host = hostBuilder.Build();
-
-        AsyncServiceScope scope = host.Services.CreateAsyncScope();
-        await using ConfiguredAsyncDisposable awaitedScope = scope.ConfigureAwait(false);
-
-        ILogger<Program> logger = scope.ServiceProvider.GetRequiredService<ILogger<Program>>();
-        logger.LogDebug("Host setup completed.");
-
-        Program program = scope.ServiceProvider.GetRequiredService<Program>();
-        await program.RunAsync();
+            await Log.CloseAndFlushAsync();
+        }
     }
 
     private readonly LevelScraper _LevelScraper;
