@@ -15,6 +15,7 @@ public class LevelTagApiClient : IDisposable
         _HttpClient = httpClient;
         _SessionTokenProvider = sessionTokenProvider;
 
+        UpdateSessionTokenRequestHeader();
         _SessionTokenProvider.SessionTokenChanged += OnSessionTokenChanged;
     }
 
@@ -25,9 +26,14 @@ public class LevelTagApiClient : IDisposable
 
     private void OnSessionTokenChanged(object? sender, EventArgs args)
     {
-        _HttpClient.DefaultRequestHeaders.Remove(Constants.SessionTokenCookieName);
+        UpdateSessionTokenRequestHeader();
+    }
+
+    private void UpdateSessionTokenRequestHeader()
+    {
+        _HttpClient.DefaultRequestHeaders.Remove(LevelTagApiConstants.SessionTokenHeader);
         if (_SessionTokenProvider.SessionToken != null)
-            _HttpClient.DefaultRequestHeaders.Add(Constants.SessionTokenCookieName, _SessionTokenProvider.SessionToken);
+            _HttpClient.DefaultRequestHeaders.Add(LevelTagApiConstants.SessionTokenHeader, _SessionTokenProvider.SessionToken);
     }
 
     public async Task<List<TagGroupDto>> GetTagTreeAsync(CancellationToken cancellationToken = default)
