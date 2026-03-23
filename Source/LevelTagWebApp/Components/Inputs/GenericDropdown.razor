@@ -1,0 +1,32 @@
+﻿@using System.Globalization
+
+@typeparam TValue where TValue : notnull
+
+<select class="form-select" value="@BindConverter.FormatValue(Value)" @onchange="OnValueChanged">
+	@foreach (KeyValuePair<TValue, string> dropdownItem in ItemProvider.Items)
+	{
+		<option value="@BindConverter.FormatValue(dropdownItem.Key)">@dropdownItem.Value</option>
+	}
+</select>
+
+@code {
+	
+	[Parameter]
+	public required IGenericDropdownItemProvider<TValue> ItemProvider { get; set; }
+
+	[Parameter]
+	public required TValue Value { get; set; }
+
+	[Parameter]
+	public EventCallback<TValue> ValueChanged { get; set; }
+
+	private async Task OnValueChanged(ChangeEventArgs args)
+	{
+		if (BindConverter.TryConvertTo(args.Value, CultureInfo.InvariantCulture, out TValue? newTypedValue))
+		{
+			Value = newTypedValue!;
+			await ValueChanged.InvokeAsync(newTypedValue);
+		}
+	}
+
+}
