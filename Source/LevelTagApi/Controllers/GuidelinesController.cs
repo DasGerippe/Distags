@@ -5,6 +5,7 @@ using LevelTagApi.Management;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System.Text.Json;
 
 namespace LevelTagApi.Controllers;
 
@@ -22,36 +23,11 @@ public class GuidelinesController : ControllerBase
     }
 
     [HttpGet("contribution")]
-    public ActionResult<GuidelinesDto> GetContributionGuidelines()
+    public async Task<ActionResult<GuidelinesDto?>> GetContributionGuidelines()
     {
-        GuidelinesDto guidelines = new GuidelinesDto
-        {
-            Guidelines =
-            [
-                new GuidelineDto
-                {
-                    Title = "Tag in Good Faith",
-                    Text = "Only add or remove tags when you genuinely believe the change is accurate.",
-                },
-                new GuidelineDto
-                {
-                    Title = "Follow the Official Tag Definitions",
-                    Text = "Please follow our official tag definitions and do not reinterpret tags based on personal opinions or alternate meanings.",
-                },
-                new GuidelineDto
-                {
-                    Title = "No Vandalism or Malicious Editing",
-                    Text = "Knowingly removing correct tags or adding incorrect ones is considered vandalism and is not allowed. Honest mistakes are fine - intentional misuse is not.",
-                },
-                new GuidelineDto
-                {
-                    Title = "Consequences for Violations",
-                    Text = "Serious violations of those guidelines may result in your contribution rights being revoked and/or your account being banned.",
-                },
-            ],
-        };
-
-        return Ok(guidelines);
+        await using Stream fileStream = new FileStream("contribution-guidelines.json", FileMode.Open, FileAccess.Read);
+        GuidelinesDto? guidelinesDto = await JsonSerializer.DeserializeAsync<GuidelinesDto>(fileStream);
+        return Ok(guidelinesDto);
     }
 
     [HttpPost("contribution/accept")]
