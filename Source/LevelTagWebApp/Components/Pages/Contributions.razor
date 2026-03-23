@@ -2,8 +2,15 @@
 @rendermode InteractiveServer
 
 @using LevelTagApi.Dtos
+@using LevelTagWebApp.Collections
+@using LevelTagWebApp.Security
 @using LevelTagWebApp.Services
+@using Microsoft.AspNetCore.SignalR.Client
+@using Microsoft.Net.Http.Headers
 
+@implements IAsyncDisposable
+
+@inject ISessionTokenProvider SessionTokenProvider
 @inject LevelTagApiClient LevelTagApi
 
 @if (!_IsInitialized)
@@ -11,9 +18,14 @@
 
 <div class="container-fluid content-narrow my-3">
 	<div class="d-flex flex-column gap-3 gap-md-2">
-		@foreach (ContributionDto contribution in _Contributions!)
+		@foreach (ContributionInfo contributionInfo in _Contributions)
 		{
-			<ContributionDisplay Contribution="contribution" />
+			<div class="@GetAnimationClass(contributionInfo.State)" @key="contributionInfo.Id">
+				<ContributionDisplay Contribution="contributionInfo.Contribution" />
+			</div>
+
+			if (contributionInfo.State == ContributionState.Add)
+				contributionInfo.State = ContributionState.Unchanged;
 		}
 	</div>
 </div>
@@ -22,13 +34,114 @@
 
 	private bool _IsInitialized;
 
-	private List<ContributionDto>? _Contributions;
+	private readonly FeedBuffer<ContributionInfo> _Contributions = new FeedBuffer<ContributionInfo>(101);
+
+	private HubConnection? _ContributionsHubConnection;
+
+	private bool _Disposed;
 
 	protected override async Task OnInitializedAsync()
 	{
-		_Contributions = await LevelTagApi.GetContributionsAsync();
-
+		await InitializeContributions();
 		_IsInitialized = true;
+	}
+
+	protected override async Task OnAfterRenderAsync(bool firstRender)
+	{
+		if (firstRender)
+		{
+			await SetUpHubConnection();
+		}
+	}
+
+	private async Task InitializeContributions()
+	{
+		GetContributionsParameters parameters = new GetContributionsParameters
+		{
+			Limit = 100,
+		};
+		List<ContributionDto> contributions = await LevelTagApi.GetContributionsAsync(parameters);
+		int startIndex = Math.Min(_Contributions.Capacity, contributions.Count) - 1;
+		for (int i = startIndex; i >= 0; i--)
+		{
+			ContributionDto contribution = contributions[i];
+			_Contributions.Push(new ContributionInfo(contribution));
+		}
+	}
+
+	private async Task SetUpHubConnection()
+	{
+		_ContributionsHubConnection = new HubConnectionBuilder()
+			.WithUrl(LevelTagApi.ContributionHubEndpoint, options =>
+			{
+				options.Headers.Add(
+					HeaderNames.Authorization,
+					$"{LevelTagApiConstants.AuthorizationHeaderSchemes.SessionToken} {SessionTokenProvider.SessionToken}");
+			})
+			.WithAutomaticReconnect()
+			.Build();
+
+		_ContributionsHubConnection.On<ContributionDto>("NewContribution", ProcessNewContribution);
+
+		await _ContributionsHubConnection.StartAsync();
+	}
+
+	private async Task ProcessNewContribution(ContributionDto contribution)
+	{
+		await InvokeAsync(() =>
+		{
+			ContributionInfo contributionInfo = new ContributionInfo(contribution, ContributionState.Add);
+			_Contributions.Push(contributionInfo);
+			if (_Contributions.Count == _Contributions.Capacity)
+				_Contributions.LastOrDefault()!.State = ContributionState.Remove;
+
+			StateHasChanged();
+		});
+	}
+
+	private string GetAnimationClass(ContributionState contributionState)
+	{
+		return contributionState switch
+		{
+			ContributionState.Add => "slide-in",
+			ContributionState.Remove => "slide-out",
+			_ => string.Empty,
+		};
+	}
+
+	public async ValueTask DisposeAsync()
+	{
+		if (_Disposed)
+			return;
+
+		if (_ContributionsHubConnection != null)
+			await _ContributionsHubConnection.DisposeAsync();
+
+		_Disposed = true;
+	}
+
+	private class ContributionInfo
+	{
+		private static int NextId;
+
+		public int Id { get; } = NextId++;
+
+		public ContributionDto Contribution { get; }
+
+		public ContributionState State { get; set; }
+
+		public ContributionInfo(ContributionDto contribution, ContributionState state = ContributionState.Unchanged)
+		{
+			Contribution = contribution;
+			State = state;
+		}
+	}
+
+	private enum ContributionState
+	{
+		Add,
+		Unchanged,
+		Remove,
 	}
 
 }

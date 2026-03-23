@@ -13,6 +13,8 @@ public class LevelTagApiClient : IDisposable
 
     public Uri LevelHubEndpoint { get; }
 
+    public Uri ContributionHubEndpoint { get; }
+
     public LevelTagApiClient(HttpClient httpClient, ISessionTokenProvider sessionTokenProvider)
     {
         _HttpClient = httpClient;
@@ -22,6 +24,7 @@ public class LevelTagApiClient : IDisposable
             throw new ArgumentException("BaseAddress of HttpClient not set.", nameof(httpClient));
 
         LevelHubEndpoint = new Uri(_HttpClient.BaseAddress, "hubs/levels");
+        ContributionHubEndpoint = new Uri(_HttpClient.BaseAddress, "hubs/contributions");
 
         UpdateAuthorizationRequestHeader();
         _SessionTokenProvider.SessionTokenChanged += OnSessionTokenChanged;
@@ -134,9 +137,13 @@ public class LevelTagApiClient : IDisposable
         return user;
     }
 
-    public async Task<List<ContributionDto>> GetContributionsAsync(CancellationToken cancellationToken = default)
+    public async Task<List<ContributionDto>> GetContributionsAsync(
+        GetContributionsParameters parameters, CancellationToken cancellationToken = default)
     {
-        HttpResponseMessage responseMessage = await _HttpClient.GetAsync("api/contributions", cancellationToken).ConfigureAwait(false);
+        string query = QueryBuilder.BuildQueryString(parameters);
+        string requestUri = $"api/contributions?{query}";
+
+        HttpResponseMessage responseMessage = await _HttpClient.GetAsync(requestUri, cancellationToken).ConfigureAwait(false);
         List<ContributionDto> contributions =
             await GetContentAsync<List<ContributionDto>>(responseMessage, cancellationToken).ConfigureAwait(false);
         return contributions;
