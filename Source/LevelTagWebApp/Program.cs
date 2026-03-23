@@ -19,6 +19,8 @@ namespace LevelTagWebApp
                 httpClient.BaseAddress = new Uri(levelTagApiUri);
             });
 
+            builder.Services.AddScoped<HistoryService>();
+
             WebApplication app = builder.Build();
 
             // Configure the HTTP request pipeline.
