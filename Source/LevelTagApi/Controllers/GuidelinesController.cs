@@ -68,11 +68,14 @@ public class GuidelinesController : ControllerBase
         if (userBan != null)
             return Unauthorized("You have been banned.");
 
-        if (user.Roles.Contains(Constants.Roles.Tagger))
-            return NoContent();
+        if (!user.AcceptedContributionGuidelines)
+        {
+            user.AcceptedContributionGuidelines = true;
+            if (!user.Roles.Contains(Constants.Roles.Tagger))
+                user.Roles.Add(Constants.Roles.Tagger);
 
-        user.Roles.Add(Constants.Roles.Tagger);
-        await _DbContext.SaveChangesAsync();
+            await _DbContext.SaveChangesAsync();
+        }
 
         return NoContent();
     }
