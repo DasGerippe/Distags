@@ -1,0 +1,122 @@
+﻿@page "/level/{levelId:long}"
+
+@using System.Net
+@using LevelTagApi.Dtos
+@using LevelTagWebApp.Services
+
+@inject LevelTagApiClient LevelTagApi
+
+@if (_IsLoadingData)
+{
+	<div class="d-flex justify-content-center align-items-center">
+		<div class="spinner-border" style="width: 4rem; height: 4rem;" role="status">
+			<span class="sr-only">Loading level...</span>
+		</div>
+	</div>
+	return;
+}
+
+@if (_LevelDto == null)
+{
+	<div class="d-flex flex-column align-items-center text-center">
+		<h1 class="display-4 fw-bold text-danger">404</h1>
+		<p class="text-danger-emphasis">Could not find level with ID @LevelId.</p>
+	</div>
+	return;
+}
+
+<LevelHeroSection Level="_LevelDto"/>
+
+<div class="container-fluid content">
+	<div class="row">
+		@foreach (TagGroupDto tagGroup in _TagTree!)
+		{
+			<TagGroupColumnCard Title="@tagGroup.Name">
+				@if (tagGroup.TagCompatibility == TagCompatibility.Combinable)
+				{
+					@foreach (TagDto tag in tagGroup.Tags)
+					{
+						<div class="form-check">
+							<label class="form-check-label">
+								<input type="checkbox" class="form-check-input"/>
+								@tag.DisplayName
+							</label>
+						</div>
+					}
+				}
+				else
+				{
+					@foreach (TagDto tag in tagGroup.Tags)
+					{
+						<div class="form-check">
+							<label class="form-check-label">
+								<input type="radio" name="@tagGroup.Name" class="form-check-input" />
+								@tag.DisplayName
+							</label>
+						</div>
+					}
+				}
+						
+				@foreach (TagGroupDto subTagGroup in tagGroup.SubGroups)
+				{
+					<div class="mb-3">
+						<div class="fw-semibold text-muted mb-1">@subTagGroup.Name</div>
+
+						@if (subTagGroup.TagCompatibility == TagCompatibility.Combinable)
+						{
+							foreach (TagDto tag in subTagGroup.Tags)
+							{
+								<div class="form-check">
+									<label class="form-check-label">
+										<input type="checkbox" class="form-check-input"/>
+										@tag.DisplayName
+									</label>
+								</div>
+							}
+						}
+						else
+						{
+							foreach (TagDto tag in subTagGroup.Tags)
+							{
+								<div class="form-check">
+									<label class="form-check-label">
+										<input type="radio" name="@subTagGroup.Name" class="form-check-input" />
+										@tag.DisplayName
+									</label>
+								</div>
+							}
+						}
+					</div>
+				}
+			</TagGroupColumnCard>
+		}
+	</div>
+</div>
+
+@code {
+
+	private bool _IsLoadingData = true;
+
+	private GetLevelDto? _LevelDto;
+	private List<TagGroupDto>? _TagTree;
+
+	[Parameter]
+	public long LevelId { get; set; }
+
+	protected override async Task OnInitializedAsync()
+	{
+		try
+		{
+			_LevelDto = await LevelTagApi.GetLevelAsync(LevelId);
+			_TagTree = await LevelTagApi.GetTagTreeAsync();
+		}
+		catch (HttpRequestException httpRequestException)
+			when (httpRequestException.StatusCode == HttpStatusCode.NotFound && _LevelDto == null)
+		{
+			// This page will handle invalid level IDs.
+		}
+
+		_IsLoadingData = false;
+	}
+
+}
