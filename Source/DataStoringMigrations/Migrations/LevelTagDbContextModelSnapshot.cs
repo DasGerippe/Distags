@@ -99,6 +99,10 @@ namespace DataStoringMigrations.Migrations
                         .HasColumnType("bigint")
                         .HasColumnName("id");
 
+                    b.Property<DateTime>("CachedOn")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("cached_on");
+
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("text")
