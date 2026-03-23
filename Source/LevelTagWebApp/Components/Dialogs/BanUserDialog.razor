@@ -1,0 +1,103 @@
+﻿@using LevelTagApi.Dtos
+@using LevelTagWebApp.Services
+
+@implements IAsyncDisposable
+
+@inject IJSRuntime JsRuntime
+@inject LevelTagApiClient LevelTagApi
+
+<div class="modal fade" id="@ModalId" tabindex="-1" aria-hidden="true">
+	<div class="modal-dialog modal-dialog-centered">
+		<div class="modal-content">
+			<div class="modal-header">
+				<h5 class="modal-title">Ban User</h5>
+				<button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+			</div>
+			<div class="modal-body">
+				<form>
+					<label for="banUserSteamIdInput" class="col-form-label">User Steam ID:</label>
+					<input id="banUserSteamIdInput" class="form-control" disabled readonly />
+
+					<label for="banUserSteamNameInput" class="col-form-label">User Steam Name:</label>
+					<input id="banUserSteamNameInput" class="form-control" disabled readonly />
+
+					<label for="banUserReasonInput" class="col-form-label">Ban Reason:</label>
+					<textarea id="banUserReasonInput" class="form-control" @bind="_Reason"></textarea>
+				</form>
+			</div>
+			<div class="modal-footer">
+				<button class="btn btn-primary" data-bs-dismiss="modal" @onclick="SubmitUserBan">Submit</button>
+			</div>
+		</div>
+	</div>
+</div>
+
+@code {
+
+	private const string ModalId = "banUserModal";
+
+	private IJSObjectReference? _DialogModule;
+	private DotNetObjectReference<BanUserDialog>? _DotNetReference;
+
+	private long? _SteamId;
+	private string? _SteamName;
+	private string? _Reason;
+
+	private bool _Disposed;
+
+	protected override async Task OnAfterRenderAsync(bool firstRender)
+	{
+		if (firstRender)
+		{
+			_DialogModule = await JsRuntime.InvokeAsync<IJSObjectReference>(
+				"import", "./Components/Dialogs/BanUserDialog.razor.js");
+
+			_DotNetReference = DotNetObjectReference.Create(this);
+			await _DialogModule.InvokeVoidAsync("setUpModal", ModalId, _DotNetReference);
+		}
+	}
+
+	[JSInvokable]
+	public void SetUserInputValues(string? steamIdString, string? steamName)
+	{
+		bool isLong = long.TryParse(steamIdString, out long steamId);
+		_SteamId = isLong ? steamId : null;
+		_SteamName = steamName;
+	}
+
+	private async Task SubmitUserBan()
+	{
+		if (_SteamId == null)
+			return;
+
+		CreateUserBanDto createUserBanDto = new CreateUserBanDto
+		{
+			SteamId = _SteamId!.Value,
+			Reason = _Reason,
+		};
+		await LevelTagApi.PostUserBan(createUserBanDto);
+	}
+
+	public async ValueTask DisposeAsync()
+	{
+		if (_Disposed)
+			return;
+
+		if (_DialogModule != null)
+		{
+			try
+			{
+				await _DialogModule.InvokeVoidAsync("cleanUpModal", ModalId);
+				await _DialogModule.DisposeAsync();
+			}
+			catch (JSDisconnectedException)
+			{
+			}
+		}
+
+		_DotNetReference?.Dispose();
+
+		_Disposed = true;
+	}
+
+}
