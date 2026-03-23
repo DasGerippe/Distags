@@ -1,6 +1,6 @@
 ﻿namespace DataClasses;
 
-public class SteamUser
+public class Creator
 {
     public long Id { get; set; }
 

@@ -22,6 +22,27 @@ namespace DataStoringMigrations.Migrations
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
+            modelBuilder.Entity("DataClasses.Creator", b =>
+                {
+                    b.Property<long>("Id")
+                        .HasColumnType("bigint")
+                        .HasColumnName("id");
+
+                    b.Property<DateTime>("CachedOn")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("cached_on");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("name");
+
+                    b.HasKey("Id")
+                        .HasName("pk_creators");
+
+                    b.ToTable("creators", (string)null);
+                });
+
             modelBuilder.Entity("DataClasses.Level", b =>
                 {
                     b.Property<long>("Id")
@@ -93,27 +114,6 @@ namespace DataStoringMigrations.Migrations
                     b.ToTable("level_tags", (string)null);
                 });
 
-            modelBuilder.Entity("DataClasses.SteamUser", b =>
-                {
-                    b.Property<long>("Id")
-                        .HasColumnType("bigint")
-                        .HasColumnName("id");
-
-                    b.Property<DateTime>("CachedOn")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("cached_on");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("text")
-                        .HasColumnName("name");
-
-                    b.HasKey("Id")
-                        .HasName("pk_steam_users");
-
-                    b.ToTable("steam_users", (string)null);
-                });
-
             modelBuilder.Entity("DataClasses.Tag", b =>
                 {
                     b.Property<long>("Id")
@@ -172,10 +172,10 @@ namespace DataStoringMigrations.Migrations
 
             modelBuilder.Entity("DataClasses.Level", b =>
                 {
-                    b.HasOne("DataClasses.SteamUser", "Creator")
+                    b.HasOne("DataClasses.Creator", "Creator")
                         .WithMany("CreatedLevels")
                         .HasForeignKey("CreatorId")
-                        .HasConstraintName("fk_levels_steam_users_creator_id");
+                        .HasConstraintName("fk_levels_creators_creator_id");
 
                     b.Navigation("Creator");
                 });
@@ -211,14 +211,14 @@ namespace DataStoringMigrations.Migrations
                     b.Navigation("Group");
                 });
 
+            modelBuilder.Entity("DataClasses.Creator", b =>
+                {
+                    b.Navigation("CreatedLevels");
+                });
+
             modelBuilder.Entity("DataClasses.Level", b =>
                 {
                     b.Navigation("LevelTags");
-                });
-
-            modelBuilder.Entity("DataClasses.SteamUser", b =>
-                {
-                    b.Navigation("CreatedLevels");
                 });
 
             modelBuilder.Entity("DataClasses.Tag", b =>

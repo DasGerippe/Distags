@@ -8,7 +8,7 @@ public class Level
 
     public long CreatorId { get; set; }
 
-    public SteamUser? Creator { get; set; }
+    public Creator? Creator { get; set; }
 
     public string FileName { get; set; } = string.Empty;
 

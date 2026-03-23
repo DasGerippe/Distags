@@ -24,7 +24,7 @@ public static class ServiceCollectionExtensions
         services.AddScoped<IRepository<Tag>, Repository<Tag, LevelTagDbContext>>();
         services.AddScoped<IRepository<Level>, Repository<Level, LevelTagDbContext>>();
         services.AddScoped<IRepository<LevelTag>, Repository<LevelTag, LevelTagDbContext>>();
-        services.AddScoped<IRepository<SteamUser>, Repository<SteamUser, LevelTagDbContext>>();
+        services.AddScoped<IRepository<Creator>, Repository<Creator, LevelTagDbContext>>();
 
         return services;
     }

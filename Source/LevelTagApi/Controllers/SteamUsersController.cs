@@ -21,19 +21,19 @@ public class SteamUsersController : ControllerBase
     public async Task<IActionResult> PutSteamUsers([FromBody] List<SteamUserDto> steamUserDtos)
     {
         List<long> steamUserIds = steamUserDtos.Select(steamUserDto => steamUserDto.Id).ToList();
-        List<SteamUser> existingSteamUsers = await _LevelTagDbContext.SteamUsers
+        List<Creator> existingSteamUsers = await _LevelTagDbContext.Creators
             .Where(steamUser => steamUserIds.Contains(steamUser.Id))
             .ToListAsync();
 
         foreach (SteamUserDto steamUserDto in steamUserDtos)
         {
-            SteamUser? steamUser = existingSteamUsers.FirstOrDefault(steamUser => steamUser.Id == steamUserDto.Id);
+            Creator? steamUser = existingSteamUsers.FirstOrDefault(steamUser => steamUser.Id == steamUserDto.Id);
             if (steamUser == null)
             {
-                steamUser = new SteamUser();
+                steamUser = new Creator();
                 steamUser.Id = steamUserDto.Id;
 
-                _LevelTagDbContext.SteamUsers.Add(steamUser);
+                _LevelTagDbContext.Creators.Add(steamUser);
             }
             steamUser.Name = steamUserDto.Name;
         }

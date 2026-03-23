@@ -13,7 +13,7 @@ public class LevelTagDbContext : DbContext
 
     public DbSet<LevelTag> LevelTags { get; set; }
 
-    public DbSet<SteamUser> SteamUsers { get; set; }
+    public DbSet<Creator> Creators { get; set; }
 
     public LevelTagDbContext(DbContextOptions<LevelTagDbContext> options)
         : base(options)
@@ -63,10 +63,10 @@ public class LevelTagDbContext : DbContext
 
     private void ConfigureSteamUserEntity(ModelBuilder modelBuilder)
     {
-        modelBuilder.Entity<SteamUser>()
+        modelBuilder.Entity<Creator>()
             .HasKey(user => user.Id);
 
-        modelBuilder.Entity<SteamUser>()
+        modelBuilder.Entity<Creator>()
             .Property(user => user.Id)
             .ValueGeneratedNever();
     }
