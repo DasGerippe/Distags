@@ -1,9 +1,13 @@
 ﻿@page "/level/{levelId:long}"
+@rendermode InteractiveServer
 
 @using System.Net
 @using LevelTagApi.Dtos
 @using LevelTagWebApp.Services
+@using Microsoft.AspNetCore.SignalR.Client
+@using LevelTagWebApp.Components.Inputs
 
+@implements IAsyncDisposable
 @inject LevelTagApiClient LevelTagApi
 
 @if (_IsLoadingData)
@@ -25,66 +29,33 @@
 	return;
 }
 
-<LevelHeroSection Level="_LevelDto"/>
+<LevelHeroSection Level="_LevelDto" />
 
 <div class="container-fluid content">
 	<div class="row">
 		@foreach (TagGroupDto tagGroup in _TagTree!)
 		{
 			<TagGroupColumnCard Title="@tagGroup.Name">
-				@if (tagGroup.TagCompatibility == TagCompatibility.Combinable)
+				@foreach (TagDto tag in tagGroup.Tags)
 				{
-					@foreach (TagDto tag in tagGroup.Tags)
-					{
-						<div class="form-check">
-							<label class="form-check-label">
-								<input type="checkbox" class="form-check-input"/>
-								@tag.DisplayName
-							</label>
-						</div>
-					}
+					<AsyncIconCheckbox TState="bool"
+									   Label="@tag.DisplayName"
+									   @bind-State="_TagStates[tag.Name].State"
+					                   AsyncOperation="state => TryChangeTagState(tag.Name, state)"
+					                   IconProvider="_CheckboxIconProvider"/>
 				}
-				else
-				{
-					@foreach (TagDto tag in tagGroup.Tags)
-					{
-						<div class="form-check">
-							<label class="form-check-label">
-								<input type="radio" name="@tagGroup.Name" class="form-check-input" />
-								@tag.DisplayName
-							</label>
-						</div>
-					}
-				}
-						
+
 				@foreach (TagGroupDto subTagGroup in tagGroup.SubGroups)
 				{
 					<div class="mb-3">
 						<div class="fw-semibold text-muted mb-1">@subTagGroup.Name</div>
-
-						@if (subTagGroup.TagCompatibility == TagCompatibility.Combinable)
+						@foreach (TagDto tag in subTagGroup.Tags)
 						{
-							foreach (TagDto tag in subTagGroup.Tags)
-							{
-								<div class="form-check">
-									<label class="form-check-label">
-										<input type="checkbox" class="form-check-input"/>
-										@tag.DisplayName
-									</label>
-								</div>
-							}
-						}
-						else
-						{
-							foreach (TagDto tag in subTagGroup.Tags)
-							{
-								<div class="form-check">
-									<label class="form-check-label">
-										<input type="radio" name="@subTagGroup.Name" class="form-check-input" />
-										@tag.DisplayName
-									</label>
-								</div>
-							}
+							<AsyncIconCheckbox TState="bool"
+											   Label="@tag.DisplayName"
+											   @bind-State="_TagStates[tag.Name].State"
+							                   AsyncOperation="state => TryChangeTagState(tag.Name, state)"
+							                   IconProvider="_CheckboxIconProvider"/>
 						}
 					</div>
 				}
@@ -100,6 +71,12 @@
 	private GetLevelDto? _LevelDto;
 	private List<TagGroupDto>? _TagTree;
 
+	private readonly ICheckboxIconProvider<bool> _CheckboxIconProvider = new BoolCheckboxIconProvider();
+
+	private readonly Dictionary<string,TagState> _TagStates = new Dictionary<string, TagState>();
+
+	private HubConnection? _LevelHubConnection;
+
 	[Parameter]
 	public long LevelId { get; set; }
 
@@ -109,14 +86,86 @@
 		{
 			_LevelDto = await LevelTagApi.GetLevelAsync(LevelId);
 			_TagTree = await LevelTagApi.GetTagTreeAsync();
+			InitializeTagStates();
 		}
 		catch (HttpRequestException httpRequestException)
 			when (httpRequestException.StatusCode == HttpStatusCode.NotFound && _LevelDto == null)
 		{
 			// This page will handle invalid level IDs.
+			_IsLoadingData = false;
+			return;
 		}
 
+		await SetUpLevelHubConnection();
+
 		_IsLoadingData = false;
+	}
+
+	private void InitializeTagStates()
+	{
+		if (_LevelDto == null || _TagTree == null)
+			return;
+
+		foreach (string levelTag in _LevelDto.Tags)
+		{
+			_TagStates[levelTag] = new TagState
+			{
+				State = true,
+			};
+		}
+
+		IEnumerable<TagDto> allTags = _TagTree.SelectMany(tagGroup => tagGroup.Tags)
+			.Union(_TagTree.SelectMany(tagGroup => tagGroup.SubGroups.SelectMany(subGroup => subGroup.Tags)));
+
+		foreach (TagDto tag in allTags)
+		{
+			if (!_TagStates.ContainsKey(tag.Name))
+				_TagStates[tag.Name] = new TagState();
+		}
+	}
+
+	private async Task SetUpLevelHubConnection()
+	{
+		_LevelHubConnection = new HubConnectionBuilder()
+			.WithUrl("https://localhost:7159/levelHub")
+			.WithAutomaticReconnect()
+			.Build();
+
+		_LevelHubConnection.On<string>("TagAdded", tagName =>
+		{
+			_TagStates[tagName].State = true;
+			InvokeAsync(StateHasChanged);
+		});
+
+		_LevelHubConnection.On<string>("TagRemoved", tagName =>
+		{
+			_TagStates[tagName].State = false;
+			InvokeAsync(StateHasChanged);
+		});
+
+		await _LevelHubConnection.StartAsync();
+		await _LevelHubConnection.InvokeAsync("JoinLevelGroup", _LevelDto!.Id);
+	}
+
+	private async Task TryChangeTagState(string tag, bool state)
+	{
+		if (state)
+			await LevelTagApi.DeleteLevelTag(LevelId, tag);
+		else
+			await LevelTagApi.PostLevelTag(LevelId, tag);
+	}
+
+	public async ValueTask DisposeAsync()
+	{
+		if (_LevelHubConnection != null)
+		{
+			await _LevelHubConnection.DisposeAsync();
+		}
+	}
+
+	private class TagState
+	{
+		public bool State { get; set; }
 	}
 
 }
