@@ -39,8 +39,8 @@ public static class DtoConversionExtensions
         {
             Name = tagGroup.Name,
             TagCompatibility = (TagCompatibility)tagGroup.Compatibility,
-            Tags = tagGroup.Tags.Select(ToDto).ToList(),
-            SubGroups = tagGroup.SubGroups.Select(ToDtoTree).ToList(),
+            Tags = tagGroup.Tags.OrderBy(tag => tag.Order).Select(ToDto).ToList(),
+            SubGroups = tagGroup.SubGroups.OrderBy(tagGroup => tagGroup.Order).Select(ToDtoTree).ToList(),
         };
     }
 }

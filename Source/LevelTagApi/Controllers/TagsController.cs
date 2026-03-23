@@ -26,6 +26,7 @@ public class TagsController : ControllerBase
             .Include(tagGroup => tagGroup.Tags)
             .AsSplitQuery()
             .Where(tagGroup => tagGroup.ParentGroupId == null)
+            .OrderBy(tagGroup => tagGroup.Order)
             .Select(tagGroup => tagGroup.ToDtoTree())
             .ToListAsync();
 
