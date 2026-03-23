@@ -110,7 +110,7 @@
 			ExcludeTags = GetTagParameterByState(TagFilterState.Forbidden),
 			PageSize = 25,
 			PageNumber = 1,
-			SortBy = LevelSortProperty.Created,
+			SortStrategy = LevelSortStrategy.CreatedDesc,
 			SortOrder = SortOrder.Descending,
 		};
 		GetLevelsResponse levelsResponse = await LevelTagApi.GetLevelsAsync(parameters);

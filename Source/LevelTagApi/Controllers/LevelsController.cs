@@ -14,11 +14,11 @@ namespace LevelTagApi.Controllers;
 public class LevelsController : ControllerBase
 {
     private readonly LevelTagDbContext _LevelTagDbContext;
-    private readonly IQueryableSorterFactory<Level, LevelSortProperty> _LevelSorterFactory;
+    private readonly IQueryableSorterFactory<Level, LevelSortStrategy> _LevelSorterFactory;
 
     public LevelsController(
         LevelTagDbContext levelTagDbContext,
-        IQueryableSorterFactory<Level, LevelSortProperty> levelSorterFactory)
+        IQueryableSorterFactory<Level, LevelSortStrategy> levelSorterFactory)
     {
         _LevelTagDbContext = levelTagDbContext;
         _LevelSorterFactory = levelSorterFactory;
@@ -43,8 +43,8 @@ public class LevelsController : ControllerBase
 
         int totalLevelCount = await levels.CountAsync();
 
-        IQueryableSorter<Level> levelSorter = _LevelSorterFactory.GetQueryableSorter(parameters.SortBy);
-        levels = levelSorter.Sort(levels, parameters.SortOrder);
+        IQueryableSorter<Level> levelSorter = _LevelSorterFactory.GetQueryableSorter(parameters.SortStrategy);
+        levels = levelSorter.Sort(levels);
 
         if (totalLevelCount > parameters.PageSize)
         {

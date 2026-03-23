@@ -1,0 +1,16 @@
+﻿using DataClasses;
+
+namespace LevelTagApi.Sorting;
+
+public class LevelCreatorSorter : DefaultQueryableSorter<Level>
+{
+    public LevelCreatorSorter(SortOrder sortOrder) : base(level => level.Creator!.Name, sortOrder)
+    {
+    }
+
+    public override IOrderedQueryable<Level> Sort(IQueryable<Level> source)
+    {
+        // Creators can have multiple levels, so we additionally sort by level ID.
+        return base.Sort(source).ThenBy(level => level.Id);
+    }
+}

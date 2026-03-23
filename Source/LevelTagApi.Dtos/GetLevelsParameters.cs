@@ -8,9 +8,7 @@ public class GetLevelsParameters
 
     public string? ExcludeTags { get; set; }
 
-    public LevelSortProperty SortBy { get; set; } = LevelSortProperty.Created;
-
-    public SortOrder SortOrder { get; set; } = SortOrder.Descending;
+    public LevelSortStrategy SortStrategy { get; set; } = LevelSortStrategy.CreatedDesc;
 
     [Range(1, int.MaxValue, ErrorMessage = "PageNumber must be at least 1.")]
     public int PageNumber { get; set; } = 1;

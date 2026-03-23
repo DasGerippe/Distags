@@ -1,4 +1,4 @@
-﻿namespace LevelTagApi.Dtos;
+﻿namespace LevelTagApi.Sorting;
 
 public enum SortOrder
 {

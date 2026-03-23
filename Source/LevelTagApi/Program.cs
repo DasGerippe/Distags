@@ -23,7 +23,7 @@ namespace LevelTagApi
 
             builder.Services.AddSignalR();
 
-            builder.Services.AddTransient<IQueryableSorterFactory<Level, LevelSortProperty>, LevelSorterFactory>();
+            builder.Services.AddTransient<IQueryableSorterFactory<Level, LevelSortStrategy>, LevelSorterFactory>();
 
             var app = builder.Build();
 
