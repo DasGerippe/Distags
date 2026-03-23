@@ -1,12 +1,16 @@
 ﻿@inherits LayoutComponentBase
 
-<header>
-	<NavMenu />
-</header>
+<PageTitle>Distags</PageTitle>
 
-<main>
-	@Body
-</main>
+<div class="d-flex flex-column vh-100">
+	<header>
+		<NavMenu />
+	</header>
+
+	<main class="flex-grow-1">
+		@Body
+	</main>
+</div>
 
 <div id="blazor-error-ui" data-nosnippet>
 	An unhandled error has occurred.
