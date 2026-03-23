@@ -1,28 +1,116 @@
 ﻿@page "/"
-@page "/search"
+@page "/browse"
+@rendermode InteractiveServer
+
 @using LevelTagApi.Dtos
 @using LevelTagWebApp.Components.Filters
-@rendermode InteractiveServer
+@using LevelTagWebApp.Components.Inputs
+@using LevelTagWebApp.Filters
+@using LevelTagWebApp.Services
+
+@inject NavigationManager Navigation
+@inject LevelTagApiClient LevelTagApi
+
+@if (!_IsInitialized)
+	return;
 
 <div class="container-fluid content">
 
 	<div class="row">
-		<FilterSection FilesQueried="UpdateResultTable"/>
+		@foreach (TagGroupDto tagGroup in _TagGroups)
+		{
+			<TagGroupColumnCard Title="@tagGroup.Name">
+				@foreach (TagDto tag in tagGroup.Tags)
+				{
+					TagFilter tagFilter = _TagFilters[tag.Name];
+					<IconCheckbox TState="TagFilterState"
+								  Label="@tag.DisplayName"
+								  Logic="GetCheckboxLogic(tag.Exclusivity)"
+								  IconProvider="_TagFilterStateIconProvider"
+								  State="tagFilter.State"
+								  StateChanged="newState => TagFilterStateChanged(tagFilter, newState)" />
+				}
+			</TagGroupColumnCard>
+		}
+	</div>
+
+	<div class="text-center">
+		<button class="btn btn-primary w-100" type="submit" @onclick="QueryLevelsAsync">Query</button>
 	</div>
 
 	<div class="row">
-		<ResultSection Levels="_Levels"/>
+		<ResultSection Levels="_Levels" />
 	</div>
 
 </div>
 
 @code {
 
+	private bool _IsInitialized;
+
+	private List<TagGroupDto> _TagGroups = [];
+	private Dictionary<string, TagFilter> _TagFilters = [];
+
+	private readonly ICheckboxLogic<TagFilterState> _ExclusiveTagFilterLogic = new ExclusiveTagCheckboxLogic();
+	private readonly ICheckboxLogic<TagFilterState> _CombinableTagFilterLogic = new CombinableTagCheckboxLogic();
+	private readonly ICheckboxIconProvider<TagFilterState> _TagFilterStateIconProvider = new TagFilterStateIconProvider();
+
 	private List<GetLevelDto> _Levels = [];
 
-	private void UpdateResultTable(List<GetLevelDto> levels)
+	protected override async Task OnInitializedAsync()
 	{
-		_Levels = levels;
+		_TagGroups = await LevelTagApi.GetTagTreeAsync();
+		_TagFilters = _TagGroups
+			.SelectMany(tagGroup => tagGroup.Tags.Select(tag => new TagFilter(tag)))
+			.ToDictionary(tagFilter => tagFilter.Tag.Name);
+
+		_IsInitialized = true;
+	}
+
+	private ICheckboxLogic<TagFilterState> GetCheckboxLogic(int? tagExclusivity)
+	{
+		return tagExclusivity == null ? _CombinableTagFilterLogic : _ExclusiveTagFilterLogic;
+	}
+
+	private async Task QueryLevelsAsync()
+	{
+		GetLevelsParameters parameters = new GetLevelsParameters
+		{
+			IncludeTags = GetTagParameterByState(TagFilterState.Required),
+			ExcludeTags = GetTagParameterByState(TagFilterState.Forbidden),
+			PageSize = 25,
+			PageNumber = 1,
+			SortBy = LevelSortProperty.Created,
+			SortOrder = SortOrder.Descending,
+		};
+		GetLevelsResponse levelsResponse = await LevelTagApi.GetLevelsAsync(parameters);
+		_Levels = levelsResponse.Levels;
+	}
+
+	private string? GetTagParameterByState(TagFilterState tagFilterState)
+	{
+		IEnumerable<string> tagNames = _TagFilters
+			.Where(tagFilter => tagFilter.Value.State == tagFilterState)
+			.Select(tagFilter => tagFilter.Key);
+
+		string tagsParameter = string.Join(',', tagNames);
+		return string.IsNullOrEmpty(tagsParameter) ? null : tagsParameter;
+	}
+
+	private void TagFilterStateChanged(TagFilter tagFilter, TagFilterState newState)
+	{
+		tagFilter.State = newState;
+	}
+
+	private class TagFilter
+	{
+		public TagDto Tag { get; }
+		public TagFilterState State { get; set; } = TagFilterState.Neutral;
+
+		public TagFilter(TagDto tag)
+		{
+			Tag = tag;
+		}
 	}
 
 }
