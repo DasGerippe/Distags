@@ -28,7 +28,7 @@ namespace LevelTagWebApp
 
             builder.Services.AddScoped<CircuitHandler, CircuitSessionTokenInitializer>();
             builder.Services.AddScoped<ISessionTokenProvider, SessionTokenProvider>();
-            builder.Services.AddScoped<IUserInfoProvider, UserInfoProvider>();
+            builder.Services.AddScoped<IUserInfoProvider, CachedUserInfoProvider>();
 
             WebApplication app = builder.Build();
 

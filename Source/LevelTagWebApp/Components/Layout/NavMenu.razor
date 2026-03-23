@@ -1,4 +1,5 @@
-﻿@using LevelTagWebApp.Security
+﻿@using LevelTagApi.Dtos
+@using LevelTagWebApp.Security
 @using LevelTagWebApp.Services
 @using Microsoft.AspNetCore.WebUtilities
 
@@ -6,7 +7,6 @@
 
 @inject NavigationManager NavigationManager
 @inject LevelTagApiClient LevelTagApi
-@inject ISessionTokenProvider SessionTokenProvider
 @inject IUserInfoProvider UserInfoProvider
 
 <nav class="navbar navbar-expand-md shadow">
@@ -38,7 +38,7 @@
 
 			<!-- Profile Section -->
 			<ul class="navbar-nav">
-				@if (SessionTokenProvider.SessionToken == null)
+				@if (_UserInfo == null)
 				{
 					<!-- Steam Login Button -->
 					<li class="nav-item">
@@ -53,15 +53,15 @@
 					<li class="nav-item dropdown">
 						<a id="userDropdown" class="nav-link dropdown-toggle d-flex align-items-center"
 						   href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-							@if (UserInfoProvider.SteamAvatarHash == null)
+							@if (_UserInfo.SteamAvatarHash == null)
 							{
 								<svg style="width: 2rem; height: 2rem;"><use href="icons.svg#user-solid" /></svg>
 							}
 							else
 							{
-								<img src="https://avatars.steamstatic.com/@(UserInfoProvider.SteamAvatarHash).jpg" alt="User Avatar" />
+								<img src="https://avatars.steamstatic.com/@(_UserInfo.SteamAvatarHash).jpg" alt="User Avatar" />
 							}
-							@(UserInfoProvider.SteamName ?? "Profile")
+							@(_UserInfo.SteamName ?? "Profile")
 						</a>
 						<ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
 							<li><a class="dropdown-item" href="profile">Profile</a></li>
@@ -77,6 +77,13 @@
 </nav>
 
 @code {
+
+	private UserDto? _UserInfo;
+
+	protected override async Task OnInitializedAsync()
+	{
+		_UserInfo = await UserInfoProvider.GetUserInfoAsync();
+	}
 
 	private void Logout(bool logoutEverywhere)
 	{
