@@ -1,6 +1,8 @@
 ﻿using DataClasses;
 using DataStoring;
+using LevelTagApi.Conversion;
 using LevelTagApi.Dtos;
+using LevelTagApi.Management;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -12,34 +14,21 @@ namespace LevelTagApi.Controllers;
 public class UserBansController : ControllerBase
 {
     private readonly LevelTagDbContext _DbContext;
+    private readonly IUserManager _UserManager;
+    private readonly UserBanDtoConverter _DtoConverter;
 
-    public UserBansController(LevelTagDbContext dbContext)
+    public UserBansController(LevelTagDbContext dbContext, IUserManager userManager, UserBanDtoConverter dtoConverter)
     {
         _DbContext = dbContext;
+        _UserManager = userManager;
+        _DtoConverter = dtoConverter;
     }
 
     [HttpGet]
     [Authorize(Roles = Constants.Roles.Moderator)]
     public async Task<ActionResult<List<UserBanDto>>> GetUserBans()
     {
-        List<UserBanDto> userBanDtos = await _DbContext.Set<UserBan>()
-            .GroupJoin(
-                _DbContext.Set<User>(),
-                userBan => userBan.SteamId,
-                user => user.SteamId,
-                (userBan, users) => new { UserBan = userBan, Users = users })
-            .SelectMany(
-                userBans => userBans.Users.DefaultIfEmpty(),
-                (joinedUserBan, user) => new UserBanDto
-                {
-                    SteamId = joinedUserBan.UserBan.SteamId,
-                    SteamName = user!.SteamName,
-                    SteamAvatarHash = user!.SteamAvatarHash,
-                    BannedOn = joinedUserBan.UserBan.BannedOn,
-                    Reason = joinedUserBan.UserBan.Reason,
-                })
-            .OrderByDescending(userBanDto => userBanDto.BannedOn)
-            .ToListAsync();
+        List<UserBanDto> userBanDtos = await _DtoConverter.SelectDto(_DbContext.Set<UserBan>()).ToListAsync();
 
         return Ok(userBanDtos);
     }
@@ -48,12 +37,14 @@ public class UserBansController : ControllerBase
     [Authorize(Roles = Constants.Roles.Moderator)]
     public async Task<ActionResult<UserBanDto>> GetUserBan(long steamId)
     {
-        UserBan? userBan = await _DbContext.Set<UserBan>()
-            .Where(userBan => userBan.SteamId == steamId)
-            .FirstOrDefaultAsync();
+        IQueryable<UserBan> userBanQuery = _DbContext.Set<UserBan>()
+            .Include(userBan => userBan.Banner)
+            .Where(userBan => userBan.SteamId == steamId);
 
-        return userBan != null
-            ? Ok(userBan)
+        UserBanDto? userBanDto = await _DtoConverter.SelectDto(userBanQuery).FirstOrDefaultAsync();
+
+        return userBanDto != null
+            ? Ok(userBanDto)
             : NotFound("The Steam ID is not banned.");
     }
 
@@ -61,6 +52,10 @@ public class UserBansController : ControllerBase
     [Authorize(Roles = Constants.Roles.Moderator)]
     public async Task<IActionResult> PostUserBan([FromBody] CreateUserBanDto userBanDto)
     {
+        User? banner = await _UserManager.GetCurrentUserAsync();
+        if (banner == null)
+            return Unauthorized();
+
         UserBan? userBan = await _DbContext.Set<UserBan>()
             .Where(userBan => userBan.SteamId == userBanDto.SteamId)
             .FirstOrDefaultAsync();
@@ -68,17 +63,18 @@ public class UserBansController : ControllerBase
         if (userBan != null)
             return Conflict("The Steam ID is already banned.");
 
-        User? user = await _DbContext.Set<User>()
+        User? bannedUser = await _DbContext.Set<User>()
             .Where(user => user.SteamId == userBanDto.SteamId)
             .FirstOrDefaultAsync();
 
-        if (user != null)
-            user.Roles = [];
+        if (bannedUser != null)
+            bannedUser.Roles = [];
 
         userBan = new UserBan
         {
             SteamId = userBanDto.SteamId,
             BannedOn = DateTime.UtcNow,
+            Banner = banner,
             Reason = userBanDto.Reason,
         };
         _DbContext.Add(userBan);

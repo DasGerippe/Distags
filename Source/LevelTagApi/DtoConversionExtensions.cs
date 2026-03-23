@@ -59,6 +59,16 @@ public static class DtoConversionExtensions
         };
     }
 
+    public static UserDisplayDto ToDisplayDto(this User user)
+    {
+        return new UserDisplayDto
+        {
+            SteamId = user.SteamId,
+            SteamName = user.SteamName,
+            SteamAvatarHash = user.SteamAvatarHash,
+        };
+    }
+
     public static AppDto ToDto(this App app)
     {
         return new AppDto

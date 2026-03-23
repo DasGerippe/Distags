@@ -61,6 +61,7 @@ public class Program
             AddValidatedConfigOptions<LevelTagApiSettings>(builder, "LevelTagApiSettings");
 
             builder.Services.AddTransient<ContributionDtoConverter>();
+            builder.Services.AddTransient<UserBanDtoConverter>();
 
             builder.Services.AddTransient<IQueryableFilterFactory<Level, BrowseLevelsParameters>, BrowseLevelsFilterFactory>();
             builder.Services.AddTransient<IQueryableSorterFactory<Level, LevelSortStrategy>, LevelSorterFactory>();

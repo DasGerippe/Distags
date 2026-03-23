@@ -18,7 +18,7 @@ namespace DataStoringMigrations.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "9.0.6")
+                .HasAnnotation("ProductVersion", "10.0.4")
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
@@ -343,12 +343,19 @@ namespace DataStoringMigrations.Migrations
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("banned_on");
 
+                    b.Property<long>("BannerId")
+                        .HasColumnType("bigint")
+                        .HasColumnName("banner_id");
+
                     b.Property<string>("Reason")
                         .HasColumnType("text")
                         .HasColumnName("reason");
 
                     b.HasKey("SteamId")
                         .HasName("pk_user_bans");
+
+                    b.HasIndex("BannerId")
+                        .HasDatabaseName("ix_user_bans_banner_id");
 
                     b.ToTable("user_bans", (string)null);
                 });
@@ -450,6 +457,18 @@ namespace DataStoringMigrations.Migrations
                         .HasConstraintName("fk_tags_tag_groups_group_id");
 
                     b.Navigation("Group");
+                });
+
+            modelBuilder.Entity("DataClasses.UserBan", b =>
+                {
+                    b.HasOne("DataClasses.User", "Banner")
+                        .WithMany()
+                        .HasForeignKey("BannerId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("fk_user_bans_users_banner_id");
+
+                    b.Navigation("Banner");
                 });
 
             modelBuilder.Entity("DataClasses.UserSession", b =>
