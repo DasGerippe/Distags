@@ -6,7 +6,6 @@ using LevelTagApi.Sorting;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
-using TagCompatibility = DataClasses.TagCompatibility;
 
 namespace LevelTagApi.Controllers;
 
@@ -122,12 +121,12 @@ public class LevelsController : ControllerBase
         if (await _LevelTagDbContext.Set<LevelTag>().FindAsync(levelId, tag.Id) != null)
             return NoContent();
 
-        List<LevelTag> conflictingLevelTags = null;
-        if (tag.Group?.Compatibility == TagCompatibility.Exclusive)
+        List<LevelTag>? conflictingLevelTags = null;
+        if (tag.Exclusivity != null)
         {
             conflictingLevelTags = await _LevelTagDbContext.Set<LevelTag>()
                 .Include(levelTag => levelTag.Tag)
-                .Where(levelTag => levelTag.Level == level && levelTag.Tag.Group == tag.Group)
+                .Where(levelTag => levelTag.Level == level && levelTag.Tag.Exclusivity == tag.Exclusivity)
                 .ToListAsync();
 
             foreach (LevelTag conflictingLevelTag in conflictingLevelTags)

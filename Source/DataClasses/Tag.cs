@@ -10,6 +10,8 @@ public class Tag
 
     public int Order { get; set; } = 0;
 
+    public int? Exclusivity { get; set; }
+
     public long? GroupId { get; set; }
 
     public TagGroup? Group { get; set; }

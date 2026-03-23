@@ -21,13 +21,9 @@ public class TagsController : ControllerBase
     public async Task<ActionResult<IEnumerable<TagGroupDto>>> GetTagTreeAsync()
     {
         List<TagGroupDto> tagGroupTree = await _DbContext.Set<TagGroup>()
-            .Include(tagGroup => tagGroup.SubGroups)
-            .ThenInclude(subGroup => subGroup.Tags)
             .Include(tagGroup => tagGroup.Tags)
-            .AsSplitQuery()
-            .Where(tagGroup => tagGroup.ParentGroupId == null)
             .OrderBy(tagGroup => tagGroup.Order)
-            .Select(tagGroup => tagGroup.ToDtoTree())
+            .Select(tagGroup => tagGroup.ToDto())
             .ToListAsync();
 
         return Ok(tagGroupTree);

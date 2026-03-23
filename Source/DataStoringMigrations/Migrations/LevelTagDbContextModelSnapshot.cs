@@ -133,6 +133,10 @@ namespace DataStoringMigrations.Migrations
                         .HasColumnType("text")
                         .HasColumnName("display_name");
 
+                    b.Property<int?>("Exclusivity")
+                        .HasColumnType("integer")
+                        .HasColumnName("exclusivity");
+
                     b.Property<long?>("GroupId")
                         .HasColumnType("bigint")
                         .HasColumnName("group_id");
@@ -169,10 +173,6 @@ namespace DataStoringMigrations.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
 
-                    b.Property<int>("Compatibility")
-                        .HasColumnType("integer")
-                        .HasColumnName("compatibility");
-
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("text")
@@ -182,15 +182,8 @@ namespace DataStoringMigrations.Migrations
                         .HasColumnType("integer")
                         .HasColumnName("order");
 
-                    b.Property<long?>("ParentGroupId")
-                        .HasColumnType("bigint")
-                        .HasColumnName("parent_group_id");
-
                     b.HasKey("Id")
                         .HasName("pk_tag_groups");
-
-                    b.HasIndex("ParentGroupId")
-                        .HasDatabaseName("ix_tag_groups_parent_group_id");
 
                     b.ToTable("tag_groups", (string)null);
                 });
@@ -236,16 +229,6 @@ namespace DataStoringMigrations.Migrations
                     b.Navigation("Group");
                 });
 
-            modelBuilder.Entity("DataClasses.TagGroup", b =>
-                {
-                    b.HasOne("DataClasses.TagGroup", "ParentGroup")
-                        .WithMany("SubGroups")
-                        .HasForeignKey("ParentGroupId")
-                        .HasConstraintName("fk_tag_groups_tag_groups_parent_group_id");
-
-                    b.Navigation("ParentGroup");
-                });
-
             modelBuilder.Entity("DataClasses.Creator", b =>
                 {
                     b.Navigation("CreatedLevels");
@@ -263,8 +246,6 @@ namespace DataStoringMigrations.Migrations
 
             modelBuilder.Entity("DataClasses.TagGroup", b =>
                 {
-                    b.Navigation("SubGroups");
-
                     b.Navigation("Tags");
                 });
 #pragma warning restore 612, 618

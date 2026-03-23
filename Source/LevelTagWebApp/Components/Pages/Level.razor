@@ -3,9 +3,9 @@
 
 @using System.Net
 @using LevelTagApi.Dtos
+@using LevelTagWebApp.Components.Inputs
 @using LevelTagWebApp.Services
 @using Microsoft.AspNetCore.SignalR.Client
-@using LevelTagWebApp.Components.Inputs
 
 @implements IAsyncDisposable
 @inject LevelTagApiClient LevelTagApi
@@ -36,28 +36,25 @@
 		@foreach (TagGroupDto tagGroup in _TagTree!)
 		{
 			<TagGroupColumnCard Title="@tagGroup.Name">
-				@foreach (TagDto tag in tagGroup.Tags)
-				{
-					<AsyncIconCheckbox TState="bool"
-									   Label="@tag.DisplayName"
-									   @bind-State="_TagStates[tag.Name].State"
-					                   AsyncOperation="state => TryChangeTagState(tag.Name, state)"
-					                   IconProvider="_CheckboxIconProvider"/>
-				}
-
-				@foreach (TagGroupDto subTagGroup in tagGroup.SubGroups)
-				{
-					<div class="mb-3">
-						<div class="fw-semibold text-muted mb-1">@subTagGroup.Name</div>
-						@foreach (TagDto tag in subTagGroup.Tags)
+				@{
+					bool isFirst = true;
+					int? lastExclusivity = null;
+					foreach (TagDto tag in tagGroup.Tags)
+					{
+						if (!isFirst && tag.Exclusivity != lastExclusivity)
 						{
-							<AsyncIconCheckbox TState="bool"
-											   Label="@tag.DisplayName"
-											   @bind-State="_TagStates[tag.Name].State"
-							                   AsyncOperation="state => TryChangeTagState(tag.Name, state)"
-							                   IconProvider="_CheckboxIconProvider"/>
+							<div class="my-2"></div>
 						}
-					</div>
+
+						<AsyncIconCheckbox TState="bool"
+										   Label="@tag.DisplayName"
+										   @bind-State="_TagStates[tag.Name].State"
+										   AsyncOperation="state => TryChangeTagState(tag.Name, state)"
+										   IconProvider="_CheckboxIconProvider" />
+
+						lastExclusivity = tag.Exclusivity;
+						isFirst = false;
+					}
 				}
 			</TagGroupColumnCard>
 		}
@@ -73,7 +70,7 @@
 
 	private readonly ICheckboxIconProvider<bool> _CheckboxIconProvider = new BoolCheckboxIconProvider();
 
-	private readonly Dictionary<string,TagState> _TagStates = new Dictionary<string, TagState>();
+	private readonly Dictionary<string, TagState> _TagStates = new Dictionary<string, TagState>();
 
 	private HubConnection? _LevelHubConnection;
 
@@ -85,16 +82,16 @@
 		try
 		{
 			_LevelDto = await LevelTagApi.GetLevelAsync(LevelId);
-			_TagTree = await LevelTagApi.GetTagTreeAsync();
-			InitializeTagStates();
 		}
-		catch (HttpRequestException httpRequestException)
-			when (httpRequestException.StatusCode == HttpStatusCode.NotFound && _LevelDto == null)
+		catch (HttpRequestException httpRequestException) when (httpRequestException.StatusCode == HttpStatusCode.NotFound)
 		{
 			// This page will handle invalid level IDs.
 			_IsLoadingData = false;
 			return;
 		}
+
+		_TagTree = await LevelTagApi.GetTagTreeAsync();
+		InitializeTagStates();
 
 		await SetUpLevelHubConnection();
 
@@ -106,21 +103,12 @@
 		if (_LevelDto == null || _TagTree == null)
 			return;
 
-		foreach (string levelTag in _LevelDto.Tags)
+		foreach (TagDto tag in _TagTree.SelectMany(tagGroup => tagGroup.Tags))
 		{
-			_TagStates[levelTag] = new TagState
+			_TagStates[tag.Name] = new TagState
 			{
-				State = true,
+				State = _LevelDto.Tags.Contains(tag.Name),
 			};
-		}
-
-		IEnumerable<TagDto> allTags = _TagTree.SelectMany(tagGroup => tagGroup.Tags)
-			.Union(_TagTree.SelectMany(tagGroup => tagGroup.SubGroups.SelectMany(subGroup => subGroup.Tags)));
-
-		foreach (TagDto tag in allTags)
-		{
-			if (!_TagStates.ContainsKey(tag.Name))
-				_TagStates[tag.Name] = new TagState();
 		}
 	}
 
