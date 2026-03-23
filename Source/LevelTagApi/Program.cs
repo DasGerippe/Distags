@@ -94,10 +94,12 @@ namespace LevelTagApi
         {
             builder.Services.AddAuthorization(options =>
             {
-                options.AddPolicy(Constants.Policies.PostAutoTag, policy => policy.Requirements.Add(new PostAutoTagRequirement()));
+                options.AddPolicy(
+                    Constants.Policies.Tagging,
+                    policy => policy.Requirements.Add(new TaggingAuthorizationRequirement()));
             });
 
-            builder.Services.AddScoped<IAuthorizationHandler, PostAutoTagHandler>();
+            builder.Services.AddScoped<IAuthorizationHandler, TaggingAuthorizationHandler>();
         }
     }
 }

@@ -2,21 +2,23 @@
 using DataStoring;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.EntityFrameworkCore;
+using System.Security.Claims;
 
 namespace LevelTagApi.Security;
 
-public class PostAutoTagHandler : AuthorizationHandler<PostAutoTagRequirement>
+public class TaggingAuthorizationHandler : AuthorizationHandler<TaggingAuthorizationRequirement>
 {
     private readonly IHttpContextAccessor _HttpContextAccessor;
     private readonly LevelTagDbContext _DbContext;
 
-    public PostAutoTagHandler(IHttpContextAccessor httpContextAccessor, LevelTagDbContext dbContext)
+    public TaggingAuthorizationHandler(IHttpContextAccessor httpContextAccessor, LevelTagDbContext dbContext)
     {
         _HttpContextAccessor = httpContextAccessor;
         _DbContext = dbContext;
     }
 
-    protected override async Task HandleRequirementAsync(AuthorizationHandlerContext context, PostAutoTagRequirement requirement)
+    protected override async Task HandleRequirementAsync(
+        AuthorizationHandlerContext context, TaggingAuthorizationRequirement requirement)
     {
         HttpContext? httpContext = _HttpContextAccessor.HttpContext;
         if (httpContext == null)
@@ -30,8 +32,13 @@ public class PostAutoTagHandler : AuthorizationHandler<PostAutoTagRequirement>
         if (tag == null)
             return;
 
-        bool userCanPostTag = !tag.IsAutoTag || context.User.IsInRole(Constants.Roles.AutoTagger);
-        if (userCanPostTag)
+        ClaimsPrincipal user = context.User;
+
+        bool canModifyLevelTag =
+            !tag.IsAutoTag && user.IsInRole(Constants.Roles.Tagger) ||
+            tag.IsAutoTag && user.IsInRole(Constants.Roles.AutoTagger);
+
+        if (canModifyLevelTag)
             context.Succeed(requirement);
     }
 }

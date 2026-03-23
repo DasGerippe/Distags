@@ -2,6 +2,6 @@
 
 namespace LevelTagApi.Security;
 
-public class PostAutoTagRequirement : IAuthorizationRequirement
+public class TaggingAuthorizationRequirement : IAuthorizationRequirement
 {
 }

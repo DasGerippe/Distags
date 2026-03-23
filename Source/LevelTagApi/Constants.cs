@@ -21,6 +21,6 @@ internal static class Constants
 
     internal static class Policies
     {
-        internal const string PostAutoTag = "PostAutoTagPolicy";
+        internal const string Tagging = "TaggingPolicy";
     }
 }
