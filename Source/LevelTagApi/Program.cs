@@ -65,6 +65,7 @@ public class Program
 
             builder.Services.AddTransient<IQueryableFilterFactory<Level, BrowseLevelsParameters>, BrowseLevelsFilterFactory>();
             builder.Services.AddTransient<IQueryableSorterFactory<Level, LevelSortStrategy>, LevelSorterFactory>();
+            builder.Services.AddTransient<IQueryableFilterFactory<Contribution, ContributionFilterParameters>, ContributionFilterFactory>();
 
             builder.Services.AddTransient<IAppManager, AppManager>();
             builder.Services.AddTransient<IUserManager, UserManager>();

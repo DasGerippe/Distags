@@ -2,6 +2,7 @@
 using DataStoring;
 using LevelTagApi.Conversion;
 using LevelTagApi.Dtos;
+using LevelTagApi.Filtering;
 using LevelTagApi.Management;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -14,15 +15,18 @@ namespace LevelTagApi.Controllers;
 public class ContributionsController : ControllerBase
 {
     private readonly LevelTagDbContext _DbContext;
+    private readonly IQueryableFilterFactory<Contribution, ContributionFilterParameters> _ContributionFilterFactory;
     private readonly IContributionManager _ContributionManager;
     private readonly ContributionDtoConverter _DtoConverter;
 
     public ContributionsController(
         LevelTagDbContext dbContext,
+        IQueryableFilterFactory<Contribution, ContributionFilterParameters> contributionFilterFactory,
         IContributionManager contributionManager,
         ContributionDtoConverter dtoConverter)
     {
         _DbContext = dbContext;
+        _ContributionFilterFactory = contributionFilterFactory;
         _ContributionManager = contributionManager;
         _DtoConverter = dtoConverter;
     }
@@ -30,14 +34,14 @@ public class ContributionsController : ControllerBase
     [HttpGet]
     public async Task<ActionResult<GetContributionsResponse>> GetContributions([FromQuery] GetContributionsParameters parameters)
     {
+        bool respectAnonymity = !User.IsInRole(Constants.Roles.Moderator);
+
         IQueryable<Contribution> contributions = _DbContext.Set<Contribution>()
             .Where(contribution => !contribution.IsReverted);
 
-        if (parameters.LevelId != null)
-            contributions = contributions.Where(contribution => contribution.LevelId == parameters.LevelId);
-
-        if (parameters.UserSteamId != null)
-            contributions = contributions.Where(contribution => contribution.User!.SteamId == parameters.UserSteamId);
+        ContributionFilterParameters filterParams = GetFilterParameters(parameters, respectAnonymity);
+        IQueryableFilter<Contribution> contributionFilter = _ContributionFilterFactory.GetQueryableFilter(filterParams);
+        contributions = contributionFilter.Filter(contributions);
 
         if (!string.IsNullOrEmpty(parameters.Cursor))
         {
@@ -50,7 +54,6 @@ public class ContributionsController : ControllerBase
             .OrderByDescending(contribution => contribution.Id)
             .Take(parameters.Limit);
 
-        bool respectAnonymity = !User.IsInRole(Constants.Roles.Moderator);
         List<ContributionDto> contributionDtos = await _DtoConverter.SelectDto(contributions, respectAnonymity).ToListAsync();
 
         GetContributionsResponse response = new GetContributionsResponse
@@ -71,5 +74,16 @@ public class ContributionsController : ControllerBase
 
         RevertContributionsResponse response = await _ContributionManager.RevertContributionsAsync(steamId, revertStartDate);
         return Ok(response);
+    }
+
+    private ContributionFilterParameters GetFilterParameters(GetContributionsParameters parameters, bool respectAnonymity)
+    {
+        return new ContributionFilterParameters
+        {
+            UserSteamId = parameters.UserSteamId,
+            LevelId = parameters.LevelId,
+            TagName = parameters.Tag,
+            RespectAnonymity = respectAnonymity,
+        };
     }
 }
