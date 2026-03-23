@@ -11,22 +11,22 @@
 		<div class="modal-content">
 			<div class="modal-header">
 				<h5 class="modal-title">Ban User</h5>
-				<button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+				<button class="btn-close" data-bs-dismiss="modal"></button>
 			</div>
 			<div class="modal-body">
 				<form>
 					<label for="banUserSteamIdInput" class="col-form-label">User Steam ID:</label>
-					<input id="banUserSteamIdInput" class="form-control" disabled readonly />
+					<input id="banUserSteamIdInput" class="form-control" value="@_SteamId" disabled readonly />
 
 					<label for="banUserSteamNameInput" class="col-form-label">User Steam Name:</label>
-					<input id="banUserSteamNameInput" class="form-control" disabled readonly />
+					<input id="banUserSteamNameInput" class="form-control" value="@_SteamName" disabled readonly />
 
 					<label for="banUserReasonInput" class="col-form-label">Ban Reason:</label>
 					<textarea id="banUserReasonInput" class="form-control" @bind="_Reason"></textarea>
 				</form>
 			</div>
 			<div class="modal-footer">
-				<button class="btn btn-primary" data-bs-dismiss="modal" @onclick="SubmitUserBan">Submit</button>
+				<button class="btn btn-primary" @onclick="SubmitUserBan">Submit Ban</button>
 			</div>
 		</div>
 	</div>
@@ -36,8 +36,7 @@
 
 	private const string ModalId = "banUserModal";
 
-	private IJSObjectReference? _DialogModule;
-	private DotNetObjectReference<BanUserDialog>? _DotNetReference;
+	private IJSObjectReference? _BootstrapModalModule;
 
 	private long? _SteamId;
 	private string? _SteamName;
@@ -49,20 +48,22 @@
 	{
 		if (firstRender)
 		{
-			_DialogModule = await JsRuntime.InvokeAsync<IJSObjectReference>(
-				"import", "./Components/Dialogs/BanUserDialog.razor.js");
-
-			_DotNetReference = DotNetObjectReference.Create(this);
-			await _DialogModule.InvokeVoidAsync("setUpModal", ModalId, _DotNetReference);
+			_BootstrapModalModule = await JsRuntime.InvokeAsync<IJSObjectReference>("import", "./js/bootstrap-modal.js");
 		}
 	}
 
-	[JSInvokable]
-	public void SetUserInputValues(string? steamIdString, string? steamName)
+	public async Task ShowAsync(long steamId, string? steamName)
 	{
-		bool isLong = long.TryParse(steamIdString, out long steamId);
-		_SteamId = isLong ? steamId : null;
+		_SteamId = steamId;
 		_SteamName = steamName;
+		StateHasChanged();
+
+		await _BootstrapModalModule!.InvokeVoidAsync("showModal", $"#{ModalId}");
+	}
+
+	public async Task HideAsync()
+	{
+		await _BootstrapModalModule!.InvokeVoidAsync("hideModal", $"#{ModalId}");
 	}
 
 	private async Task SubmitUserBan()
@@ -76,6 +77,8 @@
 			Reason = _Reason,
 		};
 		await LevelTagApi.PostUserBan(createUserBanDto);
+
+		await HideAsync();
 	}
 
 	public async ValueTask DisposeAsync()
@@ -83,19 +86,14 @@
 		if (_Disposed)
 			return;
 
-		if (_DialogModule != null)
+		if (_BootstrapModalModule != null)
 		{
 			try
 			{
-				await _DialogModule.InvokeVoidAsync("cleanUpModal", ModalId);
-				await _DialogModule.DisposeAsync();
+				await _BootstrapModalModule.DisposeAsync();
 			}
-			catch (JSDisconnectedException)
-			{
-			}
+			catch (JSDisconnectedException) { }
 		}
-
-		_DotNetReference?.Dispose();
 
 		_Disposed = true;
 	}
