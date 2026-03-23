@@ -6,8 +6,6 @@ namespace LevelTagWebApp.Security;
 
 public class TicketProcessingMiddleware
 {
-    private const string TicketParameterName = "ticket";
-
     private readonly RequestDelegate _Next;
     private readonly ILogger<TicketProcessingMiddleware> _Logger;
 
@@ -17,9 +15,9 @@ public class TicketProcessingMiddleware
         _Logger = logger;
     }
 
-    public async Task InvokeAsync(HttpContext httpContext)
+    public async Task InvokeAsync(HttpContext httpContext, LevelTagApiClient levelTagApi)
     {
-        if (!httpContext.Request.Query.TryGetValue(TicketParameterName, out StringValues value))
+        if (!httpContext.Request.Query.TryGetValue(LevelTagApiConstants.TicketQueryParameterName, out StringValues ticketValue))
         {
             await _Next(httpContext);
             return;
@@ -27,9 +25,7 @@ public class TicketProcessingMiddleware
 
         try
         {
-            string ticket = value.ToString();
-
-            LevelTagApiClient levelTagApi = httpContext.RequestServices.GetRequiredService<LevelTagApiClient>();
+            string ticket = ticketValue.ToString();
             SessionResponse sessionResponse = await levelTagApi.PostRedeemTicketAsync(ticket);
 
             httpContext.Response.Cookies.Append(Constants.SessionTokenCookieName, sessionResponse.Token, new CookieOptions
@@ -45,7 +41,7 @@ public class TicketProcessingMiddleware
         }
 
         IEnumerable<KeyValuePair<string, StringValues>> newQueryParams = httpContext.Request.Query
-            .Where(queryParam => queryParam.Key != TicketParameterName);
+            .Where(queryParam => queryParam.Key != LevelTagApiConstants.TicketQueryParameterName);
         string redirectUrl = httpContext.Request.Path + QueryString.Create(newQueryParams).ToUriComponent();
         httpContext.Response.Redirect(redirectUrl);
     }

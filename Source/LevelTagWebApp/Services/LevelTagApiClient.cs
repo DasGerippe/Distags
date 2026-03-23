@@ -111,6 +111,13 @@ public class LevelTagApiClient : IDisposable
         responseMessage.EnsureSuccessStatusCode();
     }
 
+    public async Task PostLogoutAll(CancellationToken cancellationToken = default)
+    {
+        string requestUri = "api/authentication/logout-all";
+        HttpResponseMessage responseMessage = await _HttpClient.PostAsync(requestUri, null, cancellationToken).ConfigureAwait(false);
+        responseMessage.EnsureSuccessStatusCode();
+    }
+
     public async Task<UserDto> GetUser(CancellationToken cancellationToken = default)
     {
         HttpResponseMessage responseMessage = await _HttpClient.GetAsync("api/users/me", cancellationToken).ConfigureAwait(false);

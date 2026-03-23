@@ -6,8 +6,6 @@ namespace LevelTagWebApp.Security;
 
 public class LogoutProcessingMiddleware
 {
-    private const string LogoutParameterName = "logout";
-
     private readonly RequestDelegate _Next;
     private readonly ILogger<LogoutProcessingMiddleware> _Logger;
 
@@ -17,9 +15,9 @@ public class LogoutProcessingMiddleware
         _Logger = logger;
     }
 
-    public async Task InvokeAsync(HttpContext httpContext)
+    public async Task InvokeAsync(HttpContext httpContext, LevelTagApiClient levelTagApi)
     {
-        if (!httpContext.Request.Query.TryGetValue(LogoutParameterName, out StringValues value))
+        if (!httpContext.Request.Query.TryGetValue(Constants.LogoutQueryParameterName, out StringValues logoutValue))
         {
             await _Next(httpContext);
             return;
@@ -27,14 +25,13 @@ public class LogoutProcessingMiddleware
 
         try
         {
-            LevelTagApiClient levelTagApi = httpContext.RequestServices.GetRequiredService<LevelTagApiClient>();
-            await levelTagApi.PostLogout();
-            httpContext.Response.Cookies.Delete(Constants.SessionTokenCookieName);
+            await PerformLogout(levelTagApi, logoutValue.ToString());
+            DeleteSessionTokenCookie(httpContext);
         }
         catch (HttpRequestException httpRequestEx) when (httpRequestEx.StatusCode == HttpStatusCode.Unauthorized)
         {
             _Logger.LogDebug("Unauthorized to perform logout. SessionToken is probably already invalid.");
-            httpContext.Response.Cookies.Delete(Constants.SessionTokenCookieName);
+            DeleteSessionTokenCookie(httpContext);
         }
         catch (Exception ex)
         {
@@ -42,8 +39,22 @@ public class LogoutProcessingMiddleware
         }
 
         IEnumerable<KeyValuePair<string, StringValues>> newQueryParams = httpContext.Request.Query
-            .Where(queryParam => queryParam.Key != LogoutParameterName);
+            .Where(queryParam => queryParam.Key != Constants.LogoutQueryParameterName);
         string redirectUrl = httpContext.Request.Path + QueryString.Create(newQueryParams).ToUriComponent();
         httpContext.Response.Redirect(redirectUrl);
+    }
+
+    private Task PerformLogout(LevelTagApiClient levelTagApi, string logoutValue)
+    {
+        return logoutValue switch
+        {
+            Constants.LogoutAllQueryParameterValue => levelTagApi.PostLogoutAll(),
+            _ => levelTagApi.PostLogout(),
+        };
+    }
+
+    private void DeleteSessionTokenCookie(HttpContext httpContext)
+    {
+        httpContext.Response.Cookies.Delete(Constants.SessionTokenCookieName);
     }
 }
