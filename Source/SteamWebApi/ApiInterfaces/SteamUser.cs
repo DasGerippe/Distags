@@ -24,18 +24,19 @@ public class SteamUser : ISteamUser
         IEnumerable<long[]> steamUserIdChunks = parameters.SteamIds.Chunk(MaxSteamUserIdCount);
         QueryBuilder queryBuilder = new QueryBuilder();
 
+        GetPlayerSummariesParameters chunkParameters = new GetPlayerSummariesParameters()
+        {
+            SteamApiKey = parameters.SteamApiKey,
+        };
+
         foreach (long[] steamUserIdChunk in steamUserIdChunks)
         {
             if (steamUserIdChunk.Length == 0)
                 continue;
 
-            GetPlayerSummariesParameters tempParams = new GetPlayerSummariesParameters
-            {
-                SteamApiKey = parameters.SteamApiKey,
-                SteamIds = steamUserIdChunk,
-            };
+            chunkParameters.SteamIds = steamUserIdChunk;
 
-            string query = queryBuilder.BuildQueryString(tempParams);
+            string query = queryBuilder.BuildQueryString(chunkParameters);
             string relativeRequestUri = $"{GetPlayerSummariesEndpoint}?{query}";
 
             _Logger.LogDebug("Getting next batch of player summaries.");
