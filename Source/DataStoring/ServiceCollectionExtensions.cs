@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using DataStoring.Seeding;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Infrastructure;
 
@@ -31,9 +32,13 @@ public static class ServiceCollectionExtensions
     {
         return (services, options) =>
         {
+            DataSeeder dataSeeder = new DataSeeder();
+
             options
                 .UseNpgsql(connectionString, ConfigureNpgsqlOptions(npgsqlOptionsAction))
-                .UseSnakeCaseNamingConvention();
+                .UseSnakeCaseNamingConvention()
+                .UseSeeding(dataSeeder.Seed)
+                .UseAsyncSeeding(dataSeeder.SeedAsync);
 
             optionsAction?.Invoke(services, options);
         };
