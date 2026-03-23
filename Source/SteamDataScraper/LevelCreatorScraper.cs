@@ -3,6 +3,7 @@ using DataStoring;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using SteamWebApi.ApiInterfaces;
 using SteamWebApi.Dtos.SteamUser;
 
@@ -13,6 +14,7 @@ public class LevelCreatorScraper
     private readonly LevelTagDbContext _LevelTagDbContext;
     private readonly ISteamUser _SteamUser;
     private readonly string _SteamWebApiKey;
+    private readonly SteamDataScraperSettings _Settings;
 
     private readonly ILogger<LevelCreatorScraper> _Logger;
 
@@ -20,11 +22,13 @@ public class LevelCreatorScraper
         LevelTagDbContext levelTagDbContext,
         ISteamUser steamUser,
         [FromKeyedServices("SteamWebApiKey")] string steamWebApiKey,
+        IOptions<SteamDataScraperSettings> settings,
         ILogger<LevelCreatorScraper> logger)
     {
         _LevelTagDbContext = levelTagDbContext;
         _SteamUser = steamUser;
         _SteamWebApiKey = steamWebApiKey;
+        _Settings = settings.Value;
 
         _Logger = logger;
     }
@@ -101,16 +105,14 @@ public class LevelCreatorScraper
             return 0;
         }
 
-        int refreshCycleInDays = 30;
-
         DateTime latestCacheDate = await _LevelTagDbContext.Set<Creator>()
             .MaxAsync(creator => creator.CachedOn, cancellationToken)
             .ConfigureAwait(false);
 
-        double refreshPercentage = (DateTime.UtcNow - latestCacheDate).TotalDays / refreshCycleInDays;
+        double refreshPercentage = (DateTime.UtcNow - latestCacheDate).TotalDays / _Settings.CreatorRefreshCycleDays;
         int refreshCount = (int)Math.Round(refreshPercentage * creatorCount);
 
-        if (refreshCount is > 0 and < 10)
+        if (refreshCount > 0 && refreshCount < _Settings.MinCreatorRefreshCount)
         {
             _Logger.LogDebug("Calculated refresh count is {refreshCount}. Not worth it. Return 0 instead.", refreshCount);
             return 0;

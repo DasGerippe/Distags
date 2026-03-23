@@ -31,6 +31,11 @@ internal class Program
         {
             services.AddSteamWebApi("SteamWebApi");
 
+            services.AddOptions<SteamDataScraperSettings>()
+                .BindConfiguration("SteamDataScraper")
+                .ValidateDataAnnotations()
+                .ValidateOnStart();
+
             string levelTagsDbConnectionString = context.Configuration.GetConnectionString("LevelTagsDatabase") ??
                                                  throw new InvalidOperationException("Connection string not configured.");
             services.AddPostgreSqlLevelTagDbContext(levelTagsDbConnectionString);
