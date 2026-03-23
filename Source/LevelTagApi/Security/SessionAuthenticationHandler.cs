@@ -26,9 +26,10 @@ public class SessionAuthenticationHandler : AuthenticationHandler<Authentication
 
     protected override async Task<AuthenticateResult> HandleAuthenticateAsync()
     {
-        if (!Request.Headers.TryGetValue(LevelTagApiConstants.SessionTokenHeader, out StringValues sessionToken))
+        if (!Request.Headers.TryGetValue(LevelTagApiConstants.SessionTokenHeader, out StringValues sessionTokenValue))
             return AuthenticateResult.NoResult();
 
+        string sessionToken = sessionTokenValue.ToString();
         UserSession? userSession = await _DbContext.Set<UserSession>()
             .Include(session => session.User)
             .Where(session => session.Token == sessionToken)
@@ -47,7 +48,8 @@ public class SessionAuthenticationHandler : AuthenticationHandler<Authentication
             .. user.Roles.Select(role => new Claim(ClaimTypes.Role, role)),
         ];
 
-        ClaimsPrincipal principal = new ClaimsPrincipal(new ClaimsIdentity(claims));
+        ClaimsIdentity identity = new ClaimsIdentity(claims, Scheme.Name);
+        ClaimsPrincipal principal = new ClaimsPrincipal(identity);
         AuthenticationTicket authTicket = new AuthenticationTicket(principal, Scheme.Name);
         return AuthenticateResult.Success(authTicket);
     }
