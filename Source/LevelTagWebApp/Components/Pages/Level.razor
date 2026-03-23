@@ -97,7 +97,8 @@
 			return;
 		}
 
-		_IsReadOnly = await UserInfoProvider.GetUserInfoAsync() == null;
+		UserDto? user = await UserInfoProvider.GetUserInfoAsync();
+		_IsReadOnly = user?.AcceptedContributionGuidelines != true || !user.Roles.Contains("Tagger");
 
 		_TagTree = await LevelTagApi.GetTagTreeAsync();
 		InitializeTagStates();
