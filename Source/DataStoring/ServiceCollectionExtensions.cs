@@ -7,13 +7,6 @@ namespace DataStoring;
 
 public static class ServiceCollectionExtensions
 {
-    public static IServiceCollection AddInMemoryLevelTagDbContext(this IServiceCollection services)
-    {
-        services.AddDbContext<LevelTagDbContext>(options => options.UseInMemoryDatabase("LevelTagDatabase"));
-
-        return services;
-    }
-
     public static IServiceCollection AddPostgreSqlLevelTagDbContext(this IServiceCollection services, string connectionString)
     {
         services.AddDbContext<LevelTagDbContext>(options => options
@@ -25,13 +18,6 @@ public static class ServiceCollectionExtensions
         services.AddScoped<IRepository<Level>, Repository<Level, LevelTagDbContext>>();
         services.AddScoped<IRepository<LevelTag>, Repository<LevelTag, LevelTagDbContext>>();
         services.AddScoped<IRepository<Creator>, Repository<Creator, LevelTagDbContext>>();
-
-        return services;
-    }
-
-    public static IServiceCollection AddSqliteLevelTagDbContext(this IServiceCollection services, string connectionString)
-    {
-        services.AddDbContext<LevelTagDbContext>(options => options.UseSqlite(connectionString));
 
         return services;
     }
