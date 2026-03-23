@@ -2,13 +2,11 @@
 
 public class UserDto
 {
-    public long SteamId { get; set; }
+    public required long SteamId { get; set; }
 
-    public string? SteamName { get; set; }
+    public required string SteamName { get; set; }
 
-    public string? SteamAvatarHash { get; set; }
-
-    public bool IsAnonymous { get; set; }
+    public required string SteamAvatarHash { get; set; }
 
     public List<string> Roles { get; set; } = [];
 }
