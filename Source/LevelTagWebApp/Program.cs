@@ -1,5 +1,7 @@
 using LevelTagWebApp.Components;
+using LevelTagWebApp.Security;
 using LevelTagWebApp.Services;
+using Microsoft.AspNetCore.Components.Server.Circuits;
 
 namespace LevelTagWebApp
 {
@@ -20,8 +22,11 @@ namespace LevelTagWebApp
             });
 
             builder.Services.AddLocalization();
+            builder.Services.AddHttpContextAccessor();
 
             builder.Services.AddTransient<HistoryManager>();
+
+            builder.Services.AddScoped<CircuitHandler, CircuitSessionTokenInitializer>();
             builder.Services.AddScoped<ISessionTokenProvider, SessionTokenProvider>();
 
             WebApplication app = builder.Build();
@@ -37,6 +42,10 @@ namespace LevelTagWebApp
             app.UseHttpsRedirection();
 
             app.UseAntiforgery();
+
+            app.UseMiddleware<TicketProcessingMiddleware>();
+            app.UseMiddleware<SessionTokenReadingMiddleware>();
+            app.UseMiddleware<LogoutProcessingMiddleware>();
 
             app.MapStaticAssets();
             app.MapRazorComponents<App>()
