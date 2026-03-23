@@ -134,7 +134,6 @@ public class LevelsController : ControllerBase
             return LevelNotFound(levelId);
 
         LevelTag? levelTag = await _DbContext.Set<LevelTag>()
-            .Include(levelTag => levelTag.Tag)
             .FirstOrDefaultAsync(levelTag => levelTag.LevelId == levelId && levelTag.Tag.Name == tagName);
 
         if (levelTag != null)

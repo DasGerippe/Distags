@@ -1,6 +1,5 @@
 ﻿using DataClasses;
 using DataStoring;
-using LevelTagApi.Hubs;
 using Microsoft.EntityFrameworkCore;
 
 namespace LevelTagApi.Management;
@@ -8,19 +7,15 @@ namespace LevelTagApi.Management;
 public class LevelTagManager : ILevelTagManager
 {
     private readonly LevelTagDbContext _DbContext;
-    private readonly ILevelTagBroadcaster _LevelTagBroadcaster;
 
-    public LevelTagManager(
-        LevelTagDbContext dbContext,
-        ILevelTagBroadcaster levelTagBroadcaster)
+    public LevelTagManager(LevelTagDbContext dbContext)
     {
         _DbContext = dbContext;
-        _LevelTagBroadcaster = levelTagBroadcaster;
     }
 
     public async Task AddTagToLevelAsync(Level level, Tag tag)
     {
-        List<Tag> removedTags = await RemoveConflictingTagsAsync(level, tag);
+        await RemoveConflictingTagsAsync(level, tag);
 
         _DbContext.Add(new LevelTag
         {
@@ -28,39 +23,23 @@ public class LevelTagManager : ILevelTagManager
             Tag = tag,
         });
         await _DbContext.SaveChangesAsync();
-
-        foreach (Tag removedTag in removedTags)
-        {
-            await _LevelTagBroadcaster.BroadcastLevelTagRemovedAsync(level.Id, removedTag.Name);
-        }
-        await _LevelTagBroadcaster.BroadcastLevelTagAddedAsync(level.Id, tag.Name);
     }
 
     public async Task RemoveTagFromLevelAsync(LevelTag levelTag)
     {
         _DbContext.Remove(levelTag);
         await _DbContext.SaveChangesAsync();
-
-        // Make sure it's safe to access levelTag.Tag.Name
-        await _DbContext.Entry(levelTag).Reference(levelTag => levelTag.Tag).LoadAsync();
-        await _LevelTagBroadcaster.BroadcastLevelTagRemovedAsync(levelTag.LevelId, levelTag.Tag.Name);
     }
 
-    private async Task<List<Tag>> RemoveConflictingTagsAsync(Level level, Tag tag)
+    private async Task RemoveConflictingTagsAsync(Level level, Tag tag)
     {
         if (tag.Exclusivity == null)
-            return [];
+            return;
 
         List<LevelTag> conflictingLevelTags = await _DbContext.Set<LevelTag>()
-            .Include(levelTag => levelTag.Tag)
             .Where(levelTag => levelTag.Level == level && levelTag.Tag.Exclusivity == tag.Exclusivity)
             .ToListAsync();
 
-        foreach (LevelTag conflictingLevelTag in conflictingLevelTags)
-        {
-            _DbContext.Remove(conflictingLevelTag);
-        }
-
-        return conflictingLevelTags.Select(levelTag => levelTag.Tag).ToList();
+        _DbContext.RemoveRange(conflictingLevelTags);
     }
 }
