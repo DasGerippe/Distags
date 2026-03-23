@@ -8,7 +8,7 @@
 	<CascadingValue Value="_TagFilterStateIconProvider">
 		@foreach (FilterGroupBase filterGroup in _FilterGroups)
 		{
-			<div class="col-12 col-sm-6 col-md-4 col-lg-3 col-xl-2 my-2">
+			<div class="col-12 col-sm-6 col-md-4 col-lg-3 col-xxl-2 my-2">
 				<FilterGroupCard FilterGroupBase="filterGroup" />
 			</div>
 		}
@@ -16,7 +16,7 @@
 </CascadingValue>
 
 <div class="text-center">
-	<button class="w-75" type="submit" @onclick="QueryLevelsAsync">Query</button>
+	<button class="btn btn-primary w-100" type="submit" @onclick="QueryLevelsAsync">Query</button>
 </div>
 
 @code {
