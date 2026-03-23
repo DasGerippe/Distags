@@ -7,7 +7,7 @@ using Microsoft.EntityFrameworkCore;
 namespace LevelTagApi.Controllers;
 
 [ApiController]
-[Route("[controller]")]
+[Route("api/[controller]")]
 public class SteamUsersController : ControllerBase
 {
     private readonly LevelTagDbContext _LevelTagDbContext;

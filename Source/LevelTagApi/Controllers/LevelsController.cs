@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore;
 namespace LevelTagApi.Controllers;
 
 [ApiController]
-[Route("[controller]")]
+[Route("api/[controller]")]
 public class LevelsController : ControllerBase
 {
     private readonly LevelTagDbContext _LevelTagDbContext;

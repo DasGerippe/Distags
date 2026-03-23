@@ -44,7 +44,7 @@
 		List<string> requiredTags = GetTagsByState(TagFilterState.Required);
 		List<string> forbiddenTags = GetTagsByState(TagFilterState.Forbidden);
 
-		string url = $"https://localhost:7159/levels?includeTags={Uri.EscapeDataString(string.Join(',', requiredTags))}&excludeTags={Uri.EscapeDataString(string.Join(',', forbiddenTags))}";
+		string url = $"https://localhost:7159/api/levels?includeTags={Uri.EscapeDataString(string.Join(',', requiredTags))}&excludeTags={Uri.EscapeDataString(string.Join(',', forbiddenTags))}";
 
 		HttpResponseMessage httpResponseMessage = await _HttpClient.GetAsync(url);
 		
