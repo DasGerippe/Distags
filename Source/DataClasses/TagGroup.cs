@@ -7,4 +7,8 @@ public class TagGroup
     public string Name { get; set; } = string.Empty;
 
     public TagCompatibility Compatibility { get; set; } = TagCompatibility.Exclusive;
+
+    public long? ParentGroupId { get; set; }
+
+    public TagGroup? ParentGroup { get; set; }
 }

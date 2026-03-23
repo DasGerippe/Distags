@@ -128,6 +128,11 @@ namespace DataStoringMigrations.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
 
+                    b.Property<string>("DisplayName")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("display_name");
+
                     b.Property<long?>("GroupId")
                         .HasColumnType("bigint")
                         .HasColumnName("group_id");
@@ -169,8 +174,15 @@ namespace DataStoringMigrations.Migrations
                         .HasColumnType("text")
                         .HasColumnName("name");
 
+                    b.Property<long?>("ParentGroupId")
+                        .HasColumnType("bigint")
+                        .HasColumnName("parent_group_id");
+
                     b.HasKey("Id")
                         .HasName("pk_tag_groups");
+
+                    b.HasIndex("ParentGroupId")
+                        .HasDatabaseName("ix_tag_groups_parent_group_id");
 
                     b.ToTable("tag_groups", (string)null);
                 });
@@ -214,6 +226,16 @@ namespace DataStoringMigrations.Migrations
                         .HasConstraintName("fk_tags_tag_groups_group_id");
 
                     b.Navigation("Group");
+                });
+
+            modelBuilder.Entity("DataClasses.TagGroup", b =>
+                {
+                    b.HasOne("DataClasses.TagGroup", "ParentGroup")
+                        .WithMany()
+                        .HasForeignKey("ParentGroupId")
+                        .HasConstraintName("fk_tag_groups_tag_groups_parent_group_id");
+
+                    b.Navigation("ParentGroup");
                 });
 
             modelBuilder.Entity("DataClasses.Creator", b =>

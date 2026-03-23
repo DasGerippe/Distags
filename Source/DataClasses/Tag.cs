@@ -6,6 +6,8 @@ public class Tag
 
     public string Name { get; set; } = string.Empty;
 
+    public string DisplayName { get; set; } = string.Empty;
+
     public long? GroupId { get; set; }
 
     public TagGroup? Group { get; set; }
