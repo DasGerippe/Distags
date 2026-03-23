@@ -55,8 +55,6 @@ public class Program
             builder.Services.AddSingleton<ITicketStore<long>, ConcurrentTicketStore<long>>();
             builder.Services.AddTransient<ITokenGenerator, RandomBase64UrlTokenGenerator>();
 
-            builder.Services.AddTransient<RoleProvider>();
-
             WebApplication app = builder.Build();
 
             // Configure the HTTP request pipeline.
