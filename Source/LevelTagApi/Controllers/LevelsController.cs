@@ -31,25 +31,33 @@ public class LevelsController : ControllerBase
     [HttpGet]
     public async Task<ActionResult<IEnumerable<GetLevelDto>>> GetLevels([FromQuery] GetLevelsParameters parameters)
     {
+        GetLevelsResponse response = new GetLevelsResponse
+        {
+            PageSize = parameters.PageSize,
+            PageNumber = parameters.PageNumber,
+        };
+
         IQueryable<Level> levels = _LevelTagDbContext.Set<Level>();
 
         IQueryableFilter<Level> levelFilter = _LevelFilterFactory.GetQueryableFilter(parameters);
         levels = levelFilter.Filter(levels);
 
-        int totalLevelCount = await levels.CountAsync();
-        if (totalLevelCount == 0)
-            return Ok(new GetLevelsResponse());
+        response.TotalLevels = await levels.CountAsync();
+        if (response.TotalLevels == 0)
+            return Ok(response);
+
+        response.TotalPages = (int)Math.Ceiling((double)response.TotalLevels / parameters.PageSize);
+        if (parameters.PageNumber > response.TotalPages)
+            return Ok(response);
 
         IQueryableSorter<Level> levelSorter = _LevelSorterFactory.GetQueryableSorter(parameters.SortStrategy);
         levels = levelSorter.Sort(levels);
 
-        if (totalLevelCount > parameters.PageSize)
-        {
-            if (parameters.PageNumber > 1)
-                levels = levels.Skip((parameters.PageNumber - 1) * parameters.PageSize);
+        if (parameters.PageNumber > 1)
+            levels = levels.Skip((parameters.PageNumber - 1) * parameters.PageSize);
 
+        if (response.TotalLevels > parameters.PageSize)
             levels = levels.Take(parameters.PageSize);
-        }
 
         List<GetLevelDto> levelDtos = await levels
             .Include(level => level.Creator)
@@ -57,12 +65,7 @@ public class LevelsController : ControllerBase
             .Select(level => level.ToDto())
             .ToListAsync();
 
-        GetLevelsResponse response = new GetLevelsResponse
-        {
-            TotalLevels = totalLevelCount,
-            Levels = levelDtos,
-        };
-
+        response.Levels = levelDtos;
         return Ok(response);
     }
 
