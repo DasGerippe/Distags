@@ -90,6 +90,8 @@ public class LevelScraper
             SetLevelProperties(level, publishedFile);
 
             _DbContext.Add(level);
+
+            _Logger.LogDebug("Added level {id}.", level.Id);
         }
     }
 
@@ -120,7 +122,10 @@ public class LevelScraper
             long levelId = long.Parse(publishedFile.PublishedFileId);
             Level? level = await _DbContext.FindAsync<Level>([levelId], cancellationToken).ConfigureAwait(false);
             if (level != null)
+            {
                 SetLevelProperties(level, publishedFile);
+                _Logger.LogDebug("Updated level {id}.", level.Id);
+            }
         }
     }
 

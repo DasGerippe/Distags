@@ -57,6 +57,8 @@ public class CreatorScraper
             SetCreatorProperties(creator, playerSummary);
 
             _DbContext.Add(creator);
+
+            _Logger.LogDebug("Added creator {id}.", creator.Id);
         }
 
         _Logger.LogDebug("Saving scraped level creators.");
@@ -89,7 +91,10 @@ public class CreatorScraper
             long creatorId = long.Parse(playerSummary.SteamId);
             Creator? creator = await _DbContext.FindAsync<Creator>([creatorId], cancellationToken).ConfigureAwait(false);
             if (creator != null)
+            {
                 SetCreatorProperties(creator, playerSummary);
+                _Logger.LogDebug("Updated creator {id}.", creator.Id);
+            }
         }
 
         _Logger.LogDebug("Saving scraped level creators.");
