@@ -6,6 +6,12 @@ public class User
 
     public long? SteamId { get; set; }
 
+    public string? SteamName { get; set; }
+
+    public string? SteamAvatarHash { get; set; }
+
+    public bool IsAnonymous { get; set; } = true;
+
     public List<string> Roles { get; set; } = [];
 
     public List<UserSession> Sessions { get; set; } = [];

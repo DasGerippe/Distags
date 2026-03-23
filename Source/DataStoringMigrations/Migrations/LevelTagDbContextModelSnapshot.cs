@@ -201,14 +201,26 @@ namespace DataStoringMigrations.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
 
+                    b.Property<bool>("IsAnonymous")
+                        .HasColumnType("boolean")
+                        .HasColumnName("is_anonymous");
+
                     b.PrimitiveCollection<List<string>>("Roles")
                         .IsRequired()
                         .HasColumnType("text[]")
                         .HasColumnName("roles");
 
+                    b.Property<string>("SteamAvatarHash")
+                        .HasColumnType("text")
+                        .HasColumnName("steam_avatar_hash");
+
                     b.Property<long?>("SteamId")
                         .HasColumnType("bigint")
                         .HasColumnName("steam_id");
+
+                    b.Property<string>("SteamName")
+                        .HasColumnType("text")
+                        .HasColumnName("steam_name");
 
                     b.HasKey("Id")
                         .HasName("pk_users");
@@ -283,7 +295,7 @@ namespace DataStoringMigrations.Migrations
             modelBuilder.Entity("DataClasses.UserSession", b =>
                 {
                     b.HasOne("DataClasses.User", "User")
-                        .WithMany()
+                        .WithMany("Sessions")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired()
@@ -310,6 +322,11 @@ namespace DataStoringMigrations.Migrations
             modelBuilder.Entity("DataClasses.TagGroup", b =>
                 {
                     b.Navigation("Tags");
+                });
+
+            modelBuilder.Entity("DataClasses.User", b =>
+                {
+                    b.Navigation("Sessions");
                 });
 #pragma warning restore 612, 618
         }
