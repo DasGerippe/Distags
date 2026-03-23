@@ -60,6 +60,11 @@ namespace DataStoringMigrations.Migrations
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("updated_on");
 
+                    b.PrimitiveCollection<string[]>("WorkshopTags")
+                        .IsRequired()
+                        .HasColumnType("text[]")
+                        .HasColumnName("workshop_tags");
+
                     b.HasKey("Id")
                         .HasName("pk_levels");
 
@@ -135,8 +140,6 @@ namespace DataStoringMigrations.Migrations
                     b.HasOne("DataClasses.SteamUser", "Creator")
                         .WithMany("CreatedLevels")
                         .HasForeignKey("CreatorId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired()
                         .HasConstraintName("fk_levels_steam_users_creator_id");
 
                     b.Navigation("Creator");

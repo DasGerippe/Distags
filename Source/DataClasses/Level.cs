@@ -20,6 +20,8 @@ public class Level
 
     public DateTime UpdatedOn { get; set; }
 
+    public string[] WorkshopTags { get; set; } = [];
+
     public List<Tag> Tags { get; } = [];
 
     public List<LevelTag> LevelTags { get; } = [];
