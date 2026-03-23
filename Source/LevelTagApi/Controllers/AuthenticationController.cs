@@ -155,7 +155,6 @@ public class AuthenticationController : ControllerBase
             user = new User
             {
                 SteamId = steamId,
-                Roles = _Settings.DefaultUserRoles.ToList(),
             };
             _DbContext.Add(user);
         }
