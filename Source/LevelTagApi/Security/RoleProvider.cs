@@ -4,6 +4,6 @@ public class RoleProvider
 {
     public List<string> GetAvailableRoles()
     {
-        return [Constants.Auth.TaggerRole, Constants.Auth.AutoTaggerRole];
+        return [Constants.Roles.Tagger, Constants.Roles.AutoTagger];
     }
 }

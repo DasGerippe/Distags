@@ -2,11 +2,25 @@
 
 internal static class Constants
 {
-    internal static class Auth
+    internal static class Session
     {
-        internal const string TaggerRole = "Tagger";
-        internal const string AutoTaggerRole = "AutoTagger";
+        internal const string AuthenticationScheme = "SessionToken";
+        internal const string Header = "Session-Token";
+    }
 
-        internal const string PostAutoTagPolicy = "PostAutoTagPolicy";
+    internal static class Steam
+    {
+        internal const string LoginCookieScheme = "SteamLoginCookie";
+    }
+
+    internal static class Roles
+    {
+        internal const string Tagger = "Tagger";
+        internal const string AutoTagger = "AutoTagger";
+    }
+
+    internal static class Policies
+    {
+        internal const string PostAutoTag = "PostAutoTagPolicy";
     }
 }

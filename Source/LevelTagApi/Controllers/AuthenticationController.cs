@@ -8,8 +8,6 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.IdentityModel.Tokens;
-using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 
 namespace LevelTagApi.Controllers;
@@ -23,24 +21,18 @@ public class AuthenticationController : ControllerBase
     private readonly LevelTagApiSettings _Settings;
     private readonly LevelTagDbContext _DbContext;
     private readonly ITicketStore<long> _TicketStore;
-    private readonly ITicketGenerator _TicketGenerator;
-    private readonly IAccessTokenGenerator _AccessTokenGenerator;
-    private readonly IRefreshTokenGenerator _RefreshTokenGenerator;
+    private readonly ITokenGenerator _TokenGenerator;
 
     public AuthenticationController(
         LevelTagApiSettings settings,
         LevelTagDbContext dbContext,
         ITicketStore<long> ticketStore,
-        ITicketGenerator ticketGenerator,
-        IAccessTokenGenerator accessTokenGenerator,
-        IRefreshTokenGenerator refreshTokenGenerator)
+        ITokenGenerator tokenGenerator)
     {
         _Settings = settings;
         _DbContext = dbContext;
         _TicketStore = ticketStore;
-        _TicketGenerator = ticketGenerator;
-        _AccessTokenGenerator = accessTokenGenerator;
-        _RefreshTokenGenerator = refreshTokenGenerator;
+        _TokenGenerator = tokenGenerator;
     }
 
     [HttpGet("steam-login")]
@@ -72,51 +64,39 @@ public class AuthenticationController : ControllerBase
 
         if (!string.IsNullOrEmpty(returnUrl))
         {
-            string ticket = _TicketGenerator.GenerateTicket();
+            string ticket = _TokenGenerator.GenerateToken(8);
             _TicketStore.Store(ticket, steamId);
 
             string returnUrlWithTicket = QueryHelpers.AddQueryString(returnUrl, TicketQueryParamName, ticket);
             return Redirect(returnUrlWithTicket);
         }
 
-        TokensResponse tokensResponse = await CreateTokensResponseForNewUserSession(steamId);
-        return Ok(tokensResponse);
+        SessionResponse sessionResponse = await CreateSessionResponseForNewUserSession(steamId);
+        return Ok(sessionResponse);
     }
 
     [HttpPost("redeem-ticket")]
     [AllowAnonymous]
-    public async Task<ActionResult<TokensResponse>> RedeemTicket(string ticket)
+    public async Task<ActionResult<SessionResponse>> RedeemTicket(string ticket)
     {
         long? steamId = _TicketStore.Retrieve(ticket);
         if (steamId == null)
             return BadRequest("Ticket is invalid or expired.");
 
-        TokensResponse tokensResponse = await CreateTokensResponseForNewUserSession(steamId.Value);
-        return Ok(tokensResponse);
+        SessionResponse sessionResponse = await CreateSessionResponseForNewUserSession(steamId.Value);
+        return Ok(sessionResponse);
     }
 
-    [HttpPost("refresh-session")]
-    [AllowAnonymous]
-    public async Task<ActionResult<TokensResponse>> RefreshAccessToken([FromQuery] string refreshToken)
+    [HttpPost("logout")]
+    [Authorize(AuthenticationSchemes = Constants.Session.AuthenticationScheme)]
+    public async Task<IActionResult> Logout([FromHeader(Name = Constants.Session.Header)] string sessionToken)
     {
-        UserSession? userSession = await GetUserSessionByRefreshToken(refreshToken);
+        UserSession? userSession = await _DbContext.Set<UserSession>()
+            .Where(session => session.Token == sessionToken)
+            .FirstOrDefaultAsync();
+
         if (userSession == null)
-            return BadRequest("Refresh token is invalid or expired.");
-
-        RenewSession(userSession);
-        await _DbContext.SaveChangesAsync();
-
-        TokensResponse tokensResponse = CreateTokensResponse(userSession);
-        return Ok(tokensResponse);
-    }
-
-    [HttpPost("steam-logout")]
-    [AllowAnonymous]
-    public async Task<IActionResult> SteamLogout([FromQuery] string refreshToken)
-    {
-        UserSession? userSession = await GetUserSessionByRefreshToken(refreshToken);
-        if (userSession == null)
-            return BadRequest("Refresh token is invalid or expired.");
+            return Unauthorized();
 
         _DbContext.Remove(userSession);
         await _DbContext.SaveChangesAsync();
@@ -124,14 +104,14 @@ public class AuthenticationController : ControllerBase
         return Ok();
     }
 
-    private async Task<TokensResponse> CreateTokensResponseForNewUserSession(long steamId)
+    private async Task<SessionResponse> CreateSessionResponseForNewUserSession(long steamId)
     {
         User user = GetOrCreateUser(steamId);
         UserSession userSession = CreateUserSession(user);
         await _DbContext.SaveChangesAsync();
 
-        TokensResponse tokensResponse = CreateTokensResponse(userSession);
-        return tokensResponse;
+        SessionResponse sessionResponse = new SessionResponse { Token = userSession.Token };
+        return sessionResponse;
     }
 
     private User GetOrCreateUser(long steamId)
@@ -155,39 +135,10 @@ public class AuthenticationController : ControllerBase
         UserSession userSession = new UserSession
         {
             User = user,
+            Token = _TokenGenerator.GenerateToken(32),
         };
-        RenewSession(userSession);
 
         _DbContext.Add(userSession);
         return userSession;
-    }
-
-    private async Task<UserSession?> GetUserSessionByRefreshToken(string refreshToken)
-    {
-        return await _DbContext.Set<UserSession>()
-            .Include(session => session.User)
-            .Where(session => session.RefreshToken == refreshToken)
-            .FirstOrDefaultAsync();
-    }
-
-    private void RenewSession(UserSession userSession)
-    {
-        userSession.RefreshToken = _RefreshTokenGenerator.GenerateRefreshToken();
-        userSession.ExpiresOn = DateTime.UtcNow + _Settings.SessionExpirationDelay;
-    }
-
-    private TokensResponse CreateTokensResponse(UserSession userSession)
-    {
-        SecurityToken accessToken = _AccessTokenGenerator.GenerateAccessToken(userSession.User);
-
-        JwtSecurityTokenHandler jwtTokenHandler = new JwtSecurityTokenHandler();
-
-        return new TokensResponse
-        {
-            AccessToken = jwtTokenHandler.WriteToken(accessToken),
-            AccessTokenExpiration = accessToken.ValidTo,
-            RefreshToken = userSession.RefreshToken,
-            RefreshTokenExpiration = userSession.ExpiresOn,
-        };
     }
 }

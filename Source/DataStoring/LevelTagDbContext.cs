@@ -87,7 +87,6 @@ public class LevelTagDbContext : DbContext
     private void ConfigureUserSessionEntity(ModelBuilder modelBuilder)
     {
         modelBuilder.Entity<UserSession>()
-            .HasIndex(session => session.RefreshToken)
-            .IsUnique();
+            .HasKey(session => session.Token);
     }
 }

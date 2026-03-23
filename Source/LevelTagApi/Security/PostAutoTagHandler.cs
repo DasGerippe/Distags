@@ -30,7 +30,7 @@ public class PostAutoTagHandler : AuthorizationHandler<PostAutoTagRequirement>
         if (tag == null)
             return;
 
-        bool userCanPostTag = !tag.IsAutoTag || context.User.IsInRole(Constants.Auth.AutoTaggerRole);
+        bool userCanPostTag = !tag.IsAutoTag || context.User.IsInRole(Constants.Roles.AutoTagger);
         if (userCanPostTag)
             context.Succeed(requirement);
     }

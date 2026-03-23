@@ -103,8 +103,8 @@ public class LevelsController : ControllerBase
     }
 
     [HttpPost("{levelId}/tags/{tagName}")]
-    [Authorize(Roles = Constants.Auth.TaggerRole)]
-    [Authorize(Policy = Constants.Auth.PostAutoTagPolicy)]
+    [Authorize(Roles = Constants.Roles.Tagger)]
+    [Authorize(Policy = Constants.Policies.PostAutoTag)]
     public async Task<IActionResult> PostLevelTag(long levelId, string tagName, [FromServices] IHubContext<LevelHub> levelHub)
     {
         Level? level = await _LevelTagDbContext.Set<Level>().FirstOrDefaultAsync(level => level.Id == levelId);
@@ -156,8 +156,8 @@ public class LevelsController : ControllerBase
     }
 
     [HttpDelete("{levelId}/tags/{tagName}")]
-    [Authorize(Roles = Constants.Auth.TaggerRole)]
-    [Authorize(Policy = Constants.Auth.PostAutoTagPolicy)]
+    [Authorize(Roles = Constants.Roles.Tagger)]
+    [Authorize(Policy = Constants.Policies.PostAutoTag)]
     public async Task<IActionResult> DeleteLevelTag(long levelId, string tagName, [FromServices] IHubContext<LevelHub> levelHub)
     {
         Level? level = await _LevelTagDbContext.Set<Level>().FindAsync(levelId);

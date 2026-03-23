@@ -216,32 +216,16 @@ namespace DataStoringMigrations.Migrations
 
             modelBuilder.Entity("DataClasses.UserSession", b =>
                 {
-                    b.Property<long>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("bigint")
-                        .HasColumnName("id");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
-
-                    b.Property<DateTime>("ExpiresOn")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("expires_on");
-
-                    b.Property<string>("RefreshToken")
-                        .IsRequired()
+                    b.Property<string>("Token")
                         .HasColumnType("text")
-                        .HasColumnName("refresh_token");
+                        .HasColumnName("token");
 
                     b.Property<long>("UserId")
                         .HasColumnType("bigint")
                         .HasColumnName("user_id");
 
-                    b.HasKey("Id")
+                    b.HasKey("Token")
                         .HasName("pk_user_sessions");
-
-                    b.HasIndex("RefreshToken")
-                        .IsUnique()
-                        .HasDatabaseName("ix_user_sessions_refresh_token");
 
                     b.HasIndex("UserId")
                         .HasDatabaseName("ix_user_sessions_user_id");
