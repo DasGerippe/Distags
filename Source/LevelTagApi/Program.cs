@@ -1,6 +1,7 @@
 using DataClasses;
 using DataStoring;
 using LevelTagApi.Dtos;
+using LevelTagApi.Hubs;
 using LevelTagApi.Sorting;
 
 namespace LevelTagApi
@@ -20,6 +21,8 @@ namespace LevelTagApi
                                                  throw new InvalidOperationException("Connection string not configured.");
             builder.Services.AddPostgreSqlLevelTagDbContext(levelTagsDbConnectionString);
 
+            builder.Services.AddSignalR();
+
             builder.Services.AddTransient<IQueryableSorterFactory<Level, LevelSortProperty>, LevelSorterFactory>();
 
             var app = builder.Build();
@@ -34,8 +37,9 @@ namespace LevelTagApi
 
             app.UseAuthorization();
 
-
             app.MapControllers();
+
+            app.MapHub<LevelHub>("/levelHub");
 
             app.Run();
         }

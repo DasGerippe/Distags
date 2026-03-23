@@ -1,8 +1,10 @@
 ﻿using DataClasses;
 using DataStoring;
 using LevelTagApi.Dtos;
+using LevelTagApi.Hubs;
 using LevelTagApi.Sorting;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
 using TagCompatibility = DataClasses.TagCompatibility;
 
@@ -105,7 +107,7 @@ public class LevelsController : ControllerBase
     }
 
     [HttpPost("{levelId}/tags/{tagName}")]
-    public async Task<IActionResult> PostLevelTag(long levelId, string tagName)
+    public async Task<IActionResult> PostLevelTag(long levelId, string tagName, [FromServices] IHubContext<LevelHub> levelHub)
     {
         Level? level = await _LevelTagDbContext.Set<Level>().FirstOrDefaultAsync(level => level.Id == levelId);
         if (level == null)
@@ -120,9 +122,11 @@ public class LevelsController : ControllerBase
         if (await _LevelTagDbContext.Set<LevelTag>().FindAsync(levelId, tag.Id) != null)
             return NoContent();
 
+        List<LevelTag> conflictingLevelTags = null;
         if (tag.Group?.Compatibility == TagCompatibility.Exclusive)
         {
-            List<LevelTag> conflictingLevelTags = await _LevelTagDbContext.Set<LevelTag>()
+            conflictingLevelTags = await _LevelTagDbContext.Set<LevelTag>()
+                .Include(levelTag => levelTag.Tag)
                 .Where(levelTag => levelTag.Level == level && levelTag.Tag.Group == tag.Group)
                 .ToListAsync();
 
@@ -141,11 +145,20 @@ public class LevelsController : ControllerBase
         _LevelTagDbContext.Add(levelTag);
         await _LevelTagDbContext.SaveChangesAsync();
 
+        if (conflictingLevelTags?.Any() == true)
+        {
+            foreach (LevelTag conflictingLevelTag in conflictingLevelTags)
+            {
+                await levelHub.Clients.Group(levelId.ToString()).SendAsync("TagRemoved", conflictingLevelTag.Tag.Name);
+            }
+        }
+        await levelHub.Clients.Group(levelId.ToString()).SendAsync("TagAdded", tagName);
+
         return Created();
     }
 
     [HttpDelete("{levelId}/tags/{tagName}")]
-    public async Task<IActionResult> DeleteLevelTag(long levelId, string tagName)
+    public async Task<IActionResult> DeleteLevelTag(long levelId, string tagName, [FromServices] IHubContext<LevelHub> levelHub)
     {
         Level? level = await _LevelTagDbContext.Set<Level>().FindAsync(levelId);
 
@@ -159,6 +172,8 @@ public class LevelsController : ControllerBase
         {
             _LevelTagDbContext.Remove(levelTag);
             await _LevelTagDbContext.SaveChangesAsync();
+
+            await levelHub.Clients.Group(levelId.ToString()).SendAsync("TagRemoved", tagName);
         }
 
         return NoContent();
