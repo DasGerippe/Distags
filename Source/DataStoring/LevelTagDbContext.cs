@@ -19,7 +19,7 @@ public class LevelTagDbContext : DbContext
 
     public DbSet<UserSession> UserSessions { get; set; }
 
-    public DbSet<ApiKey> ApiKeys { get; set; }
+    public DbSet<App> Apps { get; set; }
 
     public DbSet<Contribution> Contributions { get; set; }
 
@@ -35,7 +35,7 @@ public class LevelTagDbContext : DbContext
         ConfigureCreatorEntity(modelBuilder);
         ConfigureUserEntity(modelBuilder);
         ConfigureUserSessionEntity(modelBuilder);
-        ConfigureApiKeyEntity(modelBuilder);
+        ConfigureAppEntity(modelBuilder);
     }
 
     private void ConfigureLevelEntity(ModelBuilder modelBuilder)
@@ -82,10 +82,14 @@ public class LevelTagDbContext : DbContext
             .HasKey(session => session.Token);
     }
 
-    private void ConfigureApiKeyEntity(ModelBuilder modelBuilder)
+    private void ConfigureAppEntity(ModelBuilder modelBuilder)
     {
-        modelBuilder.Entity<ApiKey>()
-            .HasIndex(apiKey => apiKey.Value)
+        modelBuilder.Entity<App>()
+            .HasIndex(app => app.Name)
+            .IsUnique();
+
+        modelBuilder.Entity<App>()
+            .HasIndex(app => app.ApiKey)
             .IsUnique();
     }
 }

@@ -23,7 +23,7 @@ namespace DataStoringMigrations.Migrations
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
-            modelBuilder.Entity("DataClasses.ApiKey", b =>
+            modelBuilder.Entity("DataClasses.App", b =>
                 {
                     b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
@@ -32,24 +32,27 @@ namespace DataStoringMigrations.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
 
-                    b.Property<string>("Comment")
-                        .IsRequired()
+                    b.Property<string>("ApiKey")
                         .HasColumnType("text")
-                        .HasColumnName("comment");
+                        .HasColumnName("api_key");
 
-                    b.Property<string>("Value")
+                    b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("text")
-                        .HasColumnName("value");
+                        .HasColumnName("name");
 
                     b.HasKey("Id")
-                        .HasName("pk_api_keys");
+                        .HasName("pk_apps");
 
-                    b.HasIndex("Value")
+                    b.HasIndex("ApiKey")
                         .IsUnique()
-                        .HasDatabaseName("ix_api_keys_value");
+                        .HasDatabaseName("ix_apps_api_key");
 
-                    b.ToTable("api_keys", (string)null);
+                    b.HasIndex("Name")
+                        .IsUnique()
+                        .HasDatabaseName("ix_apps_name");
+
+                    b.ToTable("apps", (string)null);
                 });
 
             modelBuilder.Entity("DataClasses.Contribution", b =>
