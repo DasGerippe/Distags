@@ -7,4 +7,6 @@ public class TagDto
     public required string DisplayName { get; set; }
 
     public int? Exclusivity { get; set; }
+
+    public bool IsAutoTag { get; set; }
 }

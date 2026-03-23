@@ -12,6 +12,8 @@ public class Tag
 
     public int? Exclusivity { get; set; }
 
+    public bool IsAutoTag { get; set; }
+
     public long? GroupId { get; set; }
 
     public TagGroup? Group { get; set; }

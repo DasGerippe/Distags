@@ -15,6 +15,10 @@ public class LevelTagDbContext : DbContext
 
     public DbSet<Creator> Creators { get; set; }
 
+    public DbSet<User> Users { get; set; }
+
+    public DbSet<UserSession> UserSessions { get; set; }
+
     public LevelTagDbContext(DbContextOptions<LevelTagDbContext> options)
         : base(options)
     {
@@ -24,7 +28,9 @@ public class LevelTagDbContext : DbContext
     {
         ConfigureLevelEntity(modelBuilder);
         ConfigureTagEntity(modelBuilder);
-        ConfigureSteamUserEntity(modelBuilder);
+        ConfigureCreatorEntity(modelBuilder);
+        ConfigureUserEntity(modelBuilder);
+        ConfigureUserSessionEntity(modelBuilder);
     }
 
     private void ConfigureLevelEntity(ModelBuilder modelBuilder)
@@ -61,13 +67,27 @@ public class LevelTagDbContext : DbContext
             .HasMaxLength(30);
     }
 
-    private void ConfigureSteamUserEntity(ModelBuilder modelBuilder)
+    private void ConfigureCreatorEntity(ModelBuilder modelBuilder)
     {
         modelBuilder.Entity<Creator>()
-            .HasKey(user => user.Id);
+            .HasKey(creator => creator.Id);
 
         modelBuilder.Entity<Creator>()
+            .Property(creator => creator.Id)
+            .ValueGeneratedNever();
+    }
+
+    private void ConfigureUserEntity(ModelBuilder modelBuilder)
+    {
+        modelBuilder.Entity<User>()
             .Property(user => user.Id)
             .ValueGeneratedNever();
+    }
+
+    private void ConfigureUserSessionEntity(ModelBuilder modelBuilder)
+    {
+        modelBuilder.Entity<UserSession>()
+            .HasIndex(session => session.RefreshToken)
+            .IsUnique();
     }
 }

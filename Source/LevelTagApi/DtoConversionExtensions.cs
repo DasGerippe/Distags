@@ -42,6 +42,7 @@ public static class DtoConversionExtensions
             Name = tag.Name,
             DisplayName = tag.DisplayName,
             Exclusivity = tag.Exclusivity,
+            IsAutoTag = tag.IsAutoTag,
         };
     }
 }
