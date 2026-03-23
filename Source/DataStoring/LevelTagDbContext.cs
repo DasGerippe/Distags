@@ -19,6 +19,8 @@ public class LevelTagDbContext : DbContext
 
     public DbSet<UserSession> UserSessions { get; set; }
 
+    public DbSet<ApiKey> ApiKeys { get; set; }
+
     public LevelTagDbContext(DbContextOptions<LevelTagDbContext> options)
         : base(options)
     {
@@ -31,6 +33,7 @@ public class LevelTagDbContext : DbContext
         ConfigureCreatorEntity(modelBuilder);
         ConfigureUserEntity(modelBuilder);
         ConfigureUserSessionEntity(modelBuilder);
+        ConfigureApiKeyEntity(modelBuilder);
     }
 
     private void ConfigureLevelEntity(ModelBuilder modelBuilder)
@@ -75,5 +78,12 @@ public class LevelTagDbContext : DbContext
     {
         modelBuilder.Entity<UserSession>()
             .HasKey(session => session.Token);
+    }
+
+    private void ConfigureApiKeyEntity(ModelBuilder modelBuilder)
+    {
+        modelBuilder.Entity<ApiKey>()
+            .HasIndex(apiKey => apiKey.Value)
+            .IsUnique();
     }
 }
