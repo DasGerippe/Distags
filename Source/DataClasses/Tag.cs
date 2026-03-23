@@ -10,7 +10,7 @@ public class Tag
 
     public string Description { get; set; } = string.Empty;
 
-    public int Order { get; set; } = 0;
+    public int Position { get; set; } = 0;
 
     public int? Exclusivity { get; set; }
 

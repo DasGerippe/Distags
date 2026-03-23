@@ -29,7 +29,7 @@ public static class DtoConversionExtensions
         {
             Name = tagGroup.Name,
             Tags = tagGroup.Tags
-                .OrderBy(tag => tag.Order)
+                .OrderBy(tag => tag.Position)
                 .Select(tag => tag.ToDto())
                 .ToList(),
         };

@@ -24,7 +24,7 @@ public class TagsController : ControllerBase
     {
         List<TagGroupDto> tagGroupTree = await _DbContext.Set<TagGroup>()
             .Include(tagGroup => tagGroup.Tags)
-            .OrderBy(tagGroup => tagGroup.Order)
+            .OrderBy(tagGroup => tagGroup.Position)
             .Select(tagGroup => tagGroup.ToDto())
             .ToListAsync();
 

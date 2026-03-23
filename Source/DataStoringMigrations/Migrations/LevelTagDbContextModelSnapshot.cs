@@ -243,9 +243,9 @@ namespace DataStoringMigrations.Migrations
                         .HasColumnType("text")
                         .HasColumnName("name");
 
-                    b.Property<int>("Order")
+                    b.Property<int>("Position")
                         .HasColumnType("integer")
-                        .HasColumnName("order");
+                        .HasColumnName("position");
 
                     b.HasKey("Id")
                         .HasName("pk_tags");
@@ -279,9 +279,9 @@ namespace DataStoringMigrations.Migrations
                         .HasColumnType("text")
                         .HasColumnName("name");
 
-                    b.Property<int>("Order")
+                    b.Property<int>("Position")
                         .HasColumnType("integer")
-                        .HasColumnName("order");
+                        .HasColumnName("position");
 
                     b.HasKey("Id")
                         .HasName("pk_tag_groups");
