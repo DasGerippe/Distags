@@ -68,6 +68,10 @@ namespace DataStoringMigrations.Migrations
                         .HasColumnType("integer")
                         .HasColumnName("action");
 
+                    b.Property<long?>("AppId")
+                        .HasColumnType("bigint")
+                        .HasColumnName("app_id");
+
                     b.Property<DateTime>("ContributedOn")
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("contributed_on");
@@ -86,6 +90,9 @@ namespace DataStoringMigrations.Migrations
 
                     b.HasKey("Id")
                         .HasName("pk_contributions");
+
+                    b.HasIndex("AppId")
+                        .HasDatabaseName("ix_contributions_app_id");
 
                     b.HasIndex("LevelId")
                         .HasDatabaseName("ix_contributions_level_id");
@@ -329,6 +336,11 @@ namespace DataStoringMigrations.Migrations
 
             modelBuilder.Entity("DataClasses.Contribution", b =>
                 {
+                    b.HasOne("DataClasses.App", "App")
+                        .WithMany()
+                        .HasForeignKey("AppId")
+                        .HasConstraintName("fk_contributions_apps_app_id");
+
                     b.HasOne("DataClasses.Level", "Level")
                         .WithMany()
                         .HasForeignKey("LevelId")
@@ -347,6 +359,8 @@ namespace DataStoringMigrations.Migrations
                         .WithMany()
                         .HasForeignKey("UserId")
                         .HasConstraintName("fk_contributions_users_user_id");
+
+                    b.Navigation("App");
 
                     b.Navigation("Level");
 

@@ -16,6 +16,10 @@ public class Contribution
 
     public User? User { get; set; }
 
+    public long? AppId { get; set; }
+
+    public App? App { get; set; }
+
     public ContributionAction Action { get; set; }
 
     public DateTime ContributedOn { get; set; }
