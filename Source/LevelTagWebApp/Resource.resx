@@ -180,4 +180,28 @@
   <data name="Setting_Anonymous_Text" xml:space="preserve">
     <value>Other users will see "{0}" instead of your name on your contributions. Moderators of the site will still be able to see your name.</value>
   </data>
+  <data name="PageTitle_Home" xml:space="preserve">
+    <value>Distags</value>
+  </data>
+  <data name="PageTitle_Error" xml:space="preserve">
+    <value>Error</value>
+  </data>
+  <data name="PageTitle_BrowseLevels" xml:space="preserve">
+    <value>Browse Levels</value>
+  </data>
+  <data name="PageTitle_Level_Loading" xml:space="preserve">
+    <value>Loading Level</value>
+  </data>
+	<data name="PageTitle_Level_Unknown" xml:space="preserve">
+    <value>Unknown Level</value>
+  </data>
+	<data name="PageTitle_Contributions" xml:space="preserve">
+    <value>Contributions</value>
+  </data>
+	<data name="PageTitle_Moderation" xml:space="preserve">
+    <value>Moderation</value>
+  </data>
+	<data name="PageTitle_Settings" xml:space="preserve">
+    <value>Settings</value>
+  </data>
 </root>

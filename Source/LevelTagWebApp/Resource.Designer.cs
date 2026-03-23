@@ -205,6 +205,78 @@ namespace LevelTagWebApp {
         }
         
         /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Browse Levels ähnelt.
+        /// </summary>
+        internal static string PageTitle_BrowseLevels {
+            get {
+                return ResourceManager.GetString("PageTitle_BrowseLevels", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Contributions ähnelt.
+        /// </summary>
+        internal static string PageTitle_Contributions {
+            get {
+                return ResourceManager.GetString("PageTitle_Contributions", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Error ähnelt.
+        /// </summary>
+        internal static string PageTitle_Error {
+            get {
+                return ResourceManager.GetString("PageTitle_Error", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Distags ähnelt.
+        /// </summary>
+        internal static string PageTitle_Home {
+            get {
+                return ResourceManager.GetString("PageTitle_Home", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Loading Level ähnelt.
+        /// </summary>
+        internal static string PageTitle_Level_Loading {
+            get {
+                return ResourceManager.GetString("PageTitle_Level_Loading", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Unknown Level ähnelt.
+        /// </summary>
+        internal static string PageTitle_Level_Unknown {
+            get {
+                return ResourceManager.GetString("PageTitle_Level_Unknown", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Moderation ähnelt.
+        /// </summary>
+        internal static string PageTitle_Moderation {
+            get {
+                return ResourceManager.GetString("PageTitle_Moderation", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Settings ähnelt.
+        /// </summary>
+        internal static string PageTitle_Settings {
+            get {
+                return ResourceManager.GetString("PageTitle_Settings", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Sucht eine lokalisierte Zeichenfolge, die Other users will see &quot;{0}&quot; instead of your name on your contributions. Moderators of the site will still be able to see your name. ähnelt.
         /// </summary>
         internal static string Setting_Anonymous_Text {
