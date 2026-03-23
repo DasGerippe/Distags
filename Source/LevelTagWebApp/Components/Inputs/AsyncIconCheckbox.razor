@@ -17,7 +17,7 @@
 		 </svg>
 	 }
 
-	<span class="form-check-label"
+	<span class="form-check-label @GetLabelClass()"
 	      style="min-width: 0">
 		@Label
 	</span>
@@ -63,6 +63,11 @@
 			_IsInAsyncOperation = false;
 			StateHasChanged();
 		}
+	}
+
+	private string GetLabelClass()
+	{
+		return ReadOnly ? "text-muted" : string.Empty;
 	}
 
 }
