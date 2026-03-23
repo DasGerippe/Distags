@@ -1,4 +1,5 @@
 ﻿using LevelTagApi.Dtos;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
 
@@ -9,14 +10,12 @@ namespace LevelTagApi.Controllers;
 public class UsersController : ControllerBase
 {
     [HttpGet("me")]
+    [Authorize]
     public ActionResult<UserDto> GetMe()
     {
-        if (User.Identity?.IsAuthenticated != true)
-            return Ok(new UserDto());
-
         string? steamIdValue = User.FindFirstValue(Constants.Claims.SteamId);
         if (steamIdValue == null || !long.TryParse(steamIdValue, out long steamId))
-            return Ok(new UserDto());
+            return Unauthorized();
 
         List<string> roles = User.Claims
             .Where(claim => claim.Type == ClaimTypes.Role)

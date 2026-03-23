@@ -2,7 +2,7 @@
 
 public class UserDto
 {
-    public long? SteamId { get; set; }
+    public long SteamId { get; set; }
 
     public List<string> Roles { get; set; } = [];
 }
