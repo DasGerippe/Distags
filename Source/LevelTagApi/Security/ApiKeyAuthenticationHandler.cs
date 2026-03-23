@@ -30,14 +30,14 @@ public class ApiKeyAuthenticationHandler : AuthenticationHandler<AuthenticationS
         if (authHeader?.Scheme != LevelTagApiConstants.AuthorizationHeaderSchemes.ApiKey)
             return AuthenticateResult.NoResult();
 
-        string? apiKeyValue = authHeader.Parameter;
-        if (apiKeyValue == null)
+        string? apiKey = authHeader.Parameter;
+        if (apiKey == null)
             return AuthenticateResult.Fail("Invalid API key.");
 
-        ApiKey? apiKey = await _DbContext.Set<ApiKey>()
-            .FirstOrDefaultAsync(apiKey => apiKey.Value == apiKeyValue);
+        App? app = await _DbContext.Set<App>()
+            .FirstOrDefaultAsync(app => app.ApiKey == apiKey);
 
-        if (apiKey == null)
+        if (app == null)
             return AuthenticateResult.Fail("Invalid API key.");
 
         List<Claim> claims = [new Claim(ClaimTypes.Role, Constants.Roles.AutoTagger)];
