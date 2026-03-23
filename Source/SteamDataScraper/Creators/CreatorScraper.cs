@@ -10,7 +10,7 @@ namespace SteamDataScraper.Creators;
 
 public class CreatorScraper
 {
-    private readonly LevelTagDbContext _LevelTagDbContext;
+    private readonly LevelTagDbContext _DbContext;
     private readonly ISteamUser _SteamUser;
     private readonly ICreatorRefreshCountCalculator _RefreshCountCalculator;
     private readonly ICreatorRefreshDateManager _RefreshDateManager;
@@ -19,14 +19,14 @@ public class CreatorScraper
     private readonly ILogger<CreatorScraper> _Logger;
 
     public CreatorScraper(
-        LevelTagDbContext levelTagDbContext,
+        LevelTagDbContext dbContext,
         ISteamUser steamUser,
         ICreatorRefreshCountCalculator refreshCountCalculator,
         ICreatorRefreshDateManager refreshDateManager,
         SteamWebApiSettings steamWebApiSettings,
         ILogger<CreatorScraper> logger)
     {
-        _LevelTagDbContext = levelTagDbContext;
+        _DbContext = dbContext;
         _SteamUser = steamUser;
         _RefreshCountCalculator = refreshCountCalculator;
         _RefreshDateManager = refreshDateManager;
@@ -39,7 +39,7 @@ public class CreatorScraper
     {
         _Logger.LogDebug("Scraping unknown level creators from Steam web API...");
 
-        List<long> unknownCreatorIds = await _LevelTagDbContext.Set<Level>()
+        List<long> unknownCreatorIds = await _DbContext.Set<Level>()
             .Where(level => level.Creator == null)
             .Select(level => level.CreatorId)
             .Distinct()
@@ -56,11 +56,11 @@ public class CreatorScraper
             creator.Id = long.Parse(playerSummary.SteamId);
             SetCreatorProperties(creator, playerSummary);
 
-            _LevelTagDbContext.Add(creator);
+            _DbContext.Add(creator);
         }
 
         _Logger.LogDebug("Saving scraped level creators.");
-        await _LevelTagDbContext.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+        await _DbContext.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
 
         _Logger.LogDebug("Scraped unknown level creators from Steam web API.");
     }
@@ -76,7 +76,7 @@ public class CreatorScraper
             return;
         }
 
-        List<Creator> creators = await _LevelTagDbContext.Set<Creator>()
+        List<Creator> creators = await _DbContext.Set<Creator>()
             .OrderBy(creator => creator.CachedOn)
             .Take(refreshCount)
             .ToListAsync(cancellationToken).ConfigureAwait(false);
@@ -87,13 +87,13 @@ public class CreatorScraper
         await foreach (PlayerSummary playerSummary in playerSummariesQuery.ConfigureAwait(false))
         {
             long creatorId = long.Parse(playerSummary.SteamId);
-            Creator? creator = await _LevelTagDbContext.FindAsync<Creator>([creatorId], cancellationToken).ConfigureAwait(false);
+            Creator? creator = await _DbContext.FindAsync<Creator>([creatorId], cancellationToken).ConfigureAwait(false);
             if (creator != null)
                 SetCreatorProperties(creator, playerSummary);
         }
 
         _Logger.LogDebug("Saving scraped level creators.");
-        await _LevelTagDbContext.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+        await _DbContext.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
 
         await _RefreshDateManager.SetRefreshDateAsync(DateTime.UtcNow, cancellationToken).ConfigureAwait(false);
 

@@ -15,16 +15,16 @@ namespace LevelTagApi.Controllers;
 [Route("api/[controller]")]
 public class LevelsController : ControllerBase
 {
-    private readonly LevelTagDbContext _LevelTagDbContext;
+    private readonly LevelTagDbContext _DbContext;
     private readonly IQueryableFilterFactory<Level, GetLevelsParameters> _LevelFilterFactory;
     private readonly IQueryableSorterFactory<Level, LevelSortStrategy> _LevelSorterFactory;
 
     public LevelsController(
-        LevelTagDbContext levelTagDbContext,
+        LevelTagDbContext dbContext,
         IQueryableFilterFactory<Level, GetLevelsParameters> levelFilterFactory,
         IQueryableSorterFactory<Level, LevelSortStrategy> levelSorterFactory)
     {
-        _LevelTagDbContext = levelTagDbContext;
+        _DbContext = dbContext;
         _LevelFilterFactory = levelFilterFactory;
         _LevelSorterFactory = levelSorterFactory;
     }
@@ -39,7 +39,7 @@ public class LevelsController : ControllerBase
             PageNumber = parameters.PageNumber,
         };
 
-        IQueryable<Level> levels = _LevelTagDbContext.Set<Level>();
+        IQueryable<Level> levels = _DbContext.Set<Level>();
 
         IQueryableFilter<Level> levelFilter = _LevelFilterFactory.GetQueryableFilter(parameters);
         levels = levelFilter.Filter(levels);
@@ -75,7 +75,7 @@ public class LevelsController : ControllerBase
     [AllowAnonymous]
     public async Task<ActionResult<GetLevelDto>> GetLevel(long levelId)
     {
-        Level? level = await _LevelTagDbContext.Set<Level>()
+        Level? level = await _DbContext.Set<Level>()
             .Include(level => level.Creator)
             .Include(level => level.Tags)
             .FirstOrDefaultAsync(level => level.Id == levelId);
@@ -91,7 +91,7 @@ public class LevelsController : ControllerBase
     [AllowAnonymous]
     public async Task<ActionResult<IEnumerable<string>>> GetLevelTags(long levelId)
     {
-        Level? level = await _LevelTagDbContext.Set<Level>()
+        Level? level = await _DbContext.Set<Level>()
             .Include(level => level.Tags)
             .FirstOrDefaultAsync(level => level.Id == levelId);
 
@@ -106,30 +106,30 @@ public class LevelsController : ControllerBase
     [Authorize(Policy = Constants.Policies.Tagging)]
     public async Task<IActionResult> PostLevelTag(long levelId, string tagName, [FromServices] IHubContext<LevelHub> levelHub)
     {
-        Level? level = await _LevelTagDbContext.Set<Level>().FirstOrDefaultAsync(level => level.Id == levelId);
+        Level? level = await _DbContext.Set<Level>().FirstOrDefaultAsync(level => level.Id == levelId);
         if (level == null)
             return LevelNotFound(levelId);
 
-        Tag? tag = await _LevelTagDbContext.Set<Tag>()
+        Tag? tag = await _DbContext.Set<Tag>()
             .Include(tag => tag.Group)
             .FirstOrDefaultAsync(tag => tag.Name == tagName);
         if (tag == null)
             return BadRequest($"Tag '{tagName}' is not supported.");
 
-        if (await _LevelTagDbContext.Set<LevelTag>().FindAsync(levelId, tag.Id) != null)
+        if (await _DbContext.Set<LevelTag>().FindAsync(levelId, tag.Id) != null)
             return NoContent();
 
         List<LevelTag>? conflictingLevelTags = null;
         if (tag.Exclusivity != null)
         {
-            conflictingLevelTags = await _LevelTagDbContext.Set<LevelTag>()
+            conflictingLevelTags = await _DbContext.Set<LevelTag>()
                 .Include(levelTag => levelTag.Tag)
                 .Where(levelTag => levelTag.Level == level && levelTag.Tag.Exclusivity == tag.Exclusivity)
                 .ToListAsync();
 
             foreach (LevelTag conflictingLevelTag in conflictingLevelTags)
             {
-                _LevelTagDbContext.Remove(conflictingLevelTag);
+                _DbContext.Remove(conflictingLevelTag);
             }
         }
 
@@ -139,8 +139,8 @@ public class LevelsController : ControllerBase
             Tag = tag,
         };
 
-        _LevelTagDbContext.Add(levelTag);
-        await _LevelTagDbContext.SaveChangesAsync();
+        _DbContext.Add(levelTag);
+        await _DbContext.SaveChangesAsync();
 
         if (conflictingLevelTags?.Any() == true)
         {
@@ -158,18 +158,18 @@ public class LevelsController : ControllerBase
     [Authorize(Policy = Constants.Policies.Tagging)]
     public async Task<IActionResult> DeleteLevelTag(long levelId, string tagName, [FromServices] IHubContext<LevelHub> levelHub)
     {
-        Level? level = await _LevelTagDbContext.Set<Level>().FindAsync(levelId);
+        Level? level = await _DbContext.Set<Level>().FindAsync(levelId);
 
         if (level == null)
             return LevelNotFound(levelId);
 
-        LevelTag? levelTag = await _LevelTagDbContext.Set<LevelTag>()
+        LevelTag? levelTag = await _DbContext.Set<LevelTag>()
             .FirstOrDefaultAsync(levelTag => levelTag.LevelId == levelId && levelTag.Tag.Name == tagName);
 
         if (levelTag != null)
         {
-            _LevelTagDbContext.Remove(levelTag);
-            await _LevelTagDbContext.SaveChangesAsync();
+            _DbContext.Remove(levelTag);
+            await _DbContext.SaveChangesAsync();
 
             await levelHub.Clients.Group(levelId.ToString()).SendAsync("TagRemoved", tagName);
         }

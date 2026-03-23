@@ -7,10 +7,10 @@ namespace LevelTagApi.Controllers;
 [Route("api/[controller]")]
 public class StatsController : ControllerBase
 {
-    private readonly LevelTagDbContext _LevelTagDbContext;
+    private readonly LevelTagDbContext _DbContext;
 
-    public StatsController(LevelTagDbContext levelTagDbContext)
+    public StatsController(LevelTagDbContext dbContext)
     {
-        _LevelTagDbContext = levelTagDbContext;
+        _DbContext = dbContext;
     }
 }

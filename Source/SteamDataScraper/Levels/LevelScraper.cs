@@ -12,19 +12,19 @@ public class LevelScraper
 {
     private const int DistanceAppId = 233610;
 
-    private readonly LevelTagDbContext _LevelTagDbContext;
+    private readonly LevelTagDbContext _DbContext;
     private readonly IPublishedFileService _PublishedFileService;
     private readonly string _SteamWebApiKey;
 
     private readonly ILogger<LevelScraper> _Logger;
 
     public LevelScraper(
-        LevelTagDbContext levelTagDbContext,
+        LevelTagDbContext dbContext,
         IPublishedFileService publishedFileService,
         SteamWebApiSettings steamWebApiSettings,
         ILogger<LevelScraper> logger)
     {
-        _LevelTagDbContext = levelTagDbContext;
+        _DbContext = dbContext;
         _PublishedFileService = publishedFileService;
         _SteamWebApiKey = steamWebApiSettings.ApiKey;
 
@@ -43,7 +43,7 @@ public class LevelScraper
             await ScrapeUpdatedLevelsAsync(cutOffDate.Value, cancellationToken).ConfigureAwait(false);
 
         _Logger.LogDebug("Saving scraped levels.");
-        await _LevelTagDbContext.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+        await _DbContext.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
 
         _Logger.LogDebug("Scraped levels from Steam web API.");
     }
@@ -52,15 +52,15 @@ public class LevelScraper
     {
         _Logger.LogDebug("Determining latest create or update date...");
 
-        if (!await _LevelTagDbContext.Set<Level>().AnyAsync(cancellationToken).ConfigureAwait(false))
+        if (!await _DbContext.Set<Level>().AnyAsync(cancellationToken).ConfigureAwait(false))
         {
             _Logger.LogDebug("No levels found in database. Cannot determine latest date.");
             return null;
         }
         
-        DateTime latestCreatedDate = await _LevelTagDbContext.Set<Level>()
+        DateTime latestCreatedDate = await _DbContext.Set<Level>()
             .MaxAsync(level => level.CreatedOn, cancellationToken).ConfigureAwait(false);
-        DateTime latestUpdatedDate = await _LevelTagDbContext.Set<Level>()
+        DateTime latestUpdatedDate = await _DbContext.Set<Level>()
             .MaxAsync(level => level.UpdatedOn, cancellationToken).ConfigureAwait(false);
         DateTime latestDate = latestCreatedDate > latestUpdatedDate ? latestCreatedDate : latestUpdatedDate;
 
@@ -89,7 +89,7 @@ public class LevelScraper
             level.Id = long.Parse(publishedFile.PublishedFileId);
             SetLevelProperties(level, publishedFile);
 
-            _LevelTagDbContext.Add(level);
+            _DbContext.Add(level);
         }
     }
 
@@ -118,7 +118,7 @@ public class LevelScraper
             }
 
             long levelId = long.Parse(publishedFile.PublishedFileId);
-            Level? level = await _LevelTagDbContext.FindAsync<Level>([levelId], cancellationToken).ConfigureAwait(false);
+            Level? level = await _DbContext.FindAsync<Level>([levelId], cancellationToken).ConfigureAwait(false);
             if (level != null)
                 SetLevelProperties(level, publishedFile);
         }
