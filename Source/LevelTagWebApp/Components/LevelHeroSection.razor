@@ -1,0 +1,32 @@
+﻿@using LevelTagApi.Dtos
+
+<div class="bg-light py-3">
+	<div class="container-fluid content">
+		<div class="d-flex flex-column align-items-center text-center">
+
+			<img src="@Level.IconUrl"
+				 alt="@Level.Name Preview Image"
+				 class="img-fluid rounded-4 shadow mb-4"
+				 style="max-width:480px; height:auto;" />
+
+			<div class="d-flex align-items-center w-100 text-truncate justify-content-center">
+				<h1 class="display-6 fw-bold text-truncate">@Level.Name</h1>
+				<a class="ms-2" href="https://steamcommunity.com/sharedfiles/filedetails/?id=@Level.Id">
+					<svg style="color: #1e3050; width: 4em; height: 4em;">
+						<use href="icons.svg#steam-solid" />
+					</svg>
+				</a>
+			</div>
+
+			<p class="lead text-muted">@Level.CreatorName</p>
+
+		</div>
+	</div>
+</div>
+
+@code {
+	
+	[Parameter]
+	public required GetLevelDto Level { get; set; }
+
+}
