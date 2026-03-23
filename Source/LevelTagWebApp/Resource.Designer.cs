@@ -61,6 +61,24 @@ namespace LevelTagWebApp {
         }
         
         /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Please accept the contribution guidelines to add or remove tags. ähnelt.
+        /// </summary>
+        internal static string ContributionPrerequisiteGuidelinesText {
+            get {
+                return ResourceManager.GetString("ContributionPrerequisiteGuidelinesText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Please log in with your Steam account to add or remove tags. ähnelt.
+        /// </summary>
+        internal static string ContributionPrerequisiteLoginText {
+            get {
+                return ResourceManager.GetString("ContributionPrerequisiteLoginText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Sucht eine lokalisierte Zeichenfolge, die Anonymous ähnelt.
         /// </summary>
         internal static string Contributor_AnonymousUserName {

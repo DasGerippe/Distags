@@ -159,4 +159,10 @@
   <data name="DateTimeDaysAgo" xml:space="preserve">
     <value>{0} days ago</value>
   </data>
+  <data name="ContributionPrerequisiteLoginText" xml:space="preserve">
+    <value>Please log in with your Steam account to add or remove tags.</value>
+  </data>
+  <data name="ContributionPrerequisiteGuidelinesText" xml:space="preserve">
+    <value>Please accept the contribution guidelines to add or remove tags.</value>
+  </data>
 </root>
