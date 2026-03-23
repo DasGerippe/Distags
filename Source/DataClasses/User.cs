@@ -10,7 +10,7 @@ public class User
 
     public string? SteamAvatarHash { get; set; }
 
-    public bool IsAnonymous { get; set; } = true;
+    public bool IsAnonymous { get; set; }
 
     public List<string> Roles { get; set; } = [];
 
