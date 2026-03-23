@@ -7,4 +7,6 @@ public class UserSession
     public long UserId { get; set; }
 
     public User User { get; set; }
+
+    public DateTime LastSeenOn { get; set; }
 }

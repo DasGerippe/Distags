@@ -345,6 +345,10 @@ namespace DataStoringMigrations.Migrations
                         .HasColumnType("text")
                         .HasColumnName("token");
 
+                    b.Property<DateTime>("LastSeenOn")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("last_seen_on");
+
                     b.Property<long>("UserId")
                         .HasColumnType("bigint")
                         .HasColumnName("user_id");

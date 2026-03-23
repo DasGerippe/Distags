@@ -4,12 +4,11 @@ namespace LevelTagApi;
 
 public class LevelTagApiSettings
 {
-    [Required]
-    public required string[] DefaultUserRoles { get; init; }
+    public string[] DefaultUserRoles { get; init; } = [];
 
-    [Required]
-    public required TimeSpan TicketExpirationDelay { get; init; }
+    [Range(typeof(TimeSpan), "00:00:10", "01:00:00")]
+    public TimeSpan TicketExpirationDelay { get; init; } = TimeSpan.FromMinutes(1);
 
-    [Required]
-    public required TimeSpan SessionExpirationDelay { get; init; }
+    [Range(typeof(TimeSpan), "01:00:00", "90.00:00:00")]
+    public TimeSpan SessionExpirationDelay { get; init; } = TimeSpan.FromDays(30);
 }

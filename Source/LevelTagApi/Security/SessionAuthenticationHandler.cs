@@ -46,6 +46,9 @@ public class SessionAuthenticationHandler : AuthenticationHandler<Authentication
         if (user.SteamId == null)
             return AuthenticateResult.Fail("Session belongs to unknown Steam user.");
 
+        userSession.LastSeenOn = DateTime.UtcNow;
+        await _DbContext.SaveChangesAsync();
+
         List<Claim> claims =
         [
             new Claim(Constants.Claims.UserId, user.Id.ToString()),

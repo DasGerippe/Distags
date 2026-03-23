@@ -192,8 +192,9 @@ public class AuthenticationController : ControllerBase
     {
         UserSession userSession = new UserSession
         {
-            User = user,
             Token = _TokenGenerator.GenerateToken(32),
+            User = user,
+            LastSeenOn = DateTime.UtcNow,
         };
 
         _DbContext.Add(userSession);
