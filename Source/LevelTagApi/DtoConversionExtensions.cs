@@ -58,12 +58,12 @@ public static class DtoConversionExtensions
         };
     }
 
-    public static ApiKeyDto ToDto(this ApiKey apiKey)
+    public static AppDto ToDto(this App app)
     {
-        return new ApiKeyDto
+        return new AppDto
         {
-            ApiKey = apiKey.Value,
-            Comment = apiKey.Comment,
+            Name = app.Name,
+            ApiKey = app.ApiKey,
         };
     }
 }

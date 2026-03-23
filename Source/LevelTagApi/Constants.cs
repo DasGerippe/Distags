@@ -21,7 +21,7 @@ internal static class Constants
     {
         internal const string Tagger = "Tagger";
         internal const string AutoTagger = "AutoTagger";
-        internal const string ApiKeyManager = "ApiKeyManager";
+        internal const string AppManager = "AppManager";
     }
 
     internal static class Policies
