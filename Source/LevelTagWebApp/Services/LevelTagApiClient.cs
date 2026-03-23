@@ -1,6 +1,7 @@
 ﻿using HttpUtils;
 using LevelTagApi.Dtos;
 using System.Text.Json;
+using System.Threading;
 
 namespace LevelTagWebApp.Services;
 
@@ -37,6 +38,20 @@ public class LevelTagApiClient
         HttpResponseMessage responseMessage = await _HttpClient.GetAsync(requestUri, cancellationToken).ConfigureAwait(false);
         GetLevelDto level = await GetContentAsync<GetLevelDto>(responseMessage, cancellationToken).ConfigureAwait(false);
         return level;
+    }
+
+    public async Task PostLevelTag(long levelId, string tagName, CancellationToken cancellationToken = default)
+    {
+        string requestUri = $"api/levels/{levelId}/tags/{tagName}";
+        HttpResponseMessage responseMessage = await _HttpClient.PostAsync(requestUri, null, cancellationToken).ConfigureAwait(false);
+        responseMessage.EnsureSuccessStatusCode();
+    }
+
+    public async Task DeleteLevelTag(long levelId, string tagName, CancellationToken cancellationToken = default)
+    {
+        string requestUri = $"api/levels/{levelId}/tags/{tagName}";
+        HttpResponseMessage responseMessage = await _HttpClient.DeleteAsync(requestUri, cancellationToken).ConfigureAwait(false);
+        responseMessage.EnsureSuccessStatusCode();
     }
 
     private async Task<TResponseContent> GetContentAsync<TResponseContent>(
