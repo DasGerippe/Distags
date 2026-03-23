@@ -221,7 +221,7 @@ namespace DataStoringMigrations.Migrations
             modelBuilder.Entity("DataClasses.Tag", b =>
                 {
                     b.HasOne("DataClasses.TagGroup", "Group")
-                        .WithMany()
+                        .WithMany("Tags")
                         .HasForeignKey("GroupId")
                         .HasConstraintName("fk_tags_tag_groups_group_id");
 
@@ -231,7 +231,7 @@ namespace DataStoringMigrations.Migrations
             modelBuilder.Entity("DataClasses.TagGroup", b =>
                 {
                     b.HasOne("DataClasses.TagGroup", "ParentGroup")
-                        .WithMany()
+                        .WithMany("SubGroups")
                         .HasForeignKey("ParentGroupId")
                         .HasConstraintName("fk_tag_groups_tag_groups_parent_group_id");
 
@@ -251,6 +251,13 @@ namespace DataStoringMigrations.Migrations
             modelBuilder.Entity("DataClasses.Tag", b =>
                 {
                     b.Navigation("LevelTags");
+                });
+
+            modelBuilder.Entity("DataClasses.TagGroup", b =>
+                {
+                    b.Navigation("SubGroups");
+
+                    b.Navigation("Tags");
                 });
 #pragma warning restore 612, 618
         }
