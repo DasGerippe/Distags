@@ -23,8 +23,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DataStoringMigrations", "Da
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DataStoringMigrator", "DataStoringMigrator\DataStoringMigrator.csproj", "{46FBA830-44A9-4075-AE4E-794D9D4D502E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DataStoring.Contract", "DataStoring.Contract\DataStoring.Contract.csproj", "{2A59D5E6-6594-4709-B3A6-D6931EEB0D02}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LevelTagWebApp", "LevelTagWebApp\LevelTagWebApp.csproj", "{CCFC3169-44F6-4874-AF8F-BC5D102EB375}"
 EndProject
 Global
@@ -73,10 +71,6 @@ Global
 		{46FBA830-44A9-4075-AE4E-794D9D4D502E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{46FBA830-44A9-4075-AE4E-794D9D4D502E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{46FBA830-44A9-4075-AE4E-794D9D4D502E}.Release|Any CPU.Build.0 = Release|Any CPU
-		{2A59D5E6-6594-4709-B3A6-D6931EEB0D02}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{2A59D5E6-6594-4709-B3A6-D6931EEB0D02}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{2A59D5E6-6594-4709-B3A6-D6931EEB0D02}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{2A59D5E6-6594-4709-B3A6-D6931EEB0D02}.Release|Any CPU.Build.0 = Release|Any CPU
 		{CCFC3169-44F6-4874-AF8F-BC5D102EB375}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{CCFC3169-44F6-4874-AF8F-BC5D102EB375}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{CCFC3169-44F6-4874-AF8F-BC5D102EB375}.Release|Any CPU.ActiveCfg = Release|Any CPU
