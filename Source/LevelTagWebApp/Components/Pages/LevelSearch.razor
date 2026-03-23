@@ -4,12 +4,16 @@
 @using LevelTagWebApp.Components.Filters
 @rendermode InteractiveServer
 
-<div class="row">
-	<FilterSection FilesQueried="UpdateResultTable"/>
-</div>
+<div class="container-fluid content">
 
-<div class="row">
-	<ResultSection Levels="_Levels"/>
+	<div class="row">
+		<FilterSection FilesQueried="UpdateResultTable"/>
+	</div>
+
+	<div class="row">
+		<ResultSection Levels="_Levels"/>
+	</div>
+
 </div>
 
 @code {
