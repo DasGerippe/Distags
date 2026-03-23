@@ -94,6 +94,10 @@ public class LevelTagDbContext : DbContext
     {
         modelBuilder.Entity<UserBan>()
             .HasKey(userBan => userBan.SteamId);
+
+        modelBuilder.Entity<UserBan>()
+            .Property(userBan => userBan.SteamId)
+            .ValueGeneratedNever();
     }
 
     private void ConfigureUserSessionEntity(ModelBuilder modelBuilder)

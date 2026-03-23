@@ -318,11 +318,8 @@ namespace DataStoringMigrations.Migrations
             modelBuilder.Entity("DataClasses.UserBan", b =>
                 {
                     b.Property<long>("SteamId")
-                        .ValueGeneratedOnAdd()
                         .HasColumnType("bigint")
                         .HasColumnName("steam_id");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("SteamId"));
 
                     b.Property<DateTime>("BannedOn")
                         .HasColumnType("timestamp with time zone")
