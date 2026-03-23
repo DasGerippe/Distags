@@ -1,0 +1,73 @@
+﻿<nav>
+	<ul class="pagination justify-content-center py-3">
+		<li class="page-item @GetPageItemClass(CurrentPage - 1)">
+			<a href="#" class="page-link" @onclick="() => OnPageLinkClicked(1)">Previous</a>
+		</li>
+		
+		@{
+			bool lowerGapCreated = false;
+			bool upperGapCreated = false;
+			int gapToExtrem = Math.Min(CurrentPage - 1, PageCount - CurrentPage);
+			int maxPageJump = Math.Max(5 - gapToExtrem, 1);
+		}
+		@for (int i = 1; i <= PageCount; i++)
+		{
+			int gapToCurrent = Math.Abs(CurrentPage - i);
+			if (i == 1 || i == PageCount || gapToCurrent < maxPageJump || gapToCurrent == maxPageJump && (i == 2 || i == PageCount - 1))
+			{
+				<li class="page-item @GetPageItemClass(i)">
+					@{
+						int page = i;
+					}
+					<a href="#" class="page-link" @onclick="() => OnPageLinkClicked(page)">@i</a>
+				</li>
+			}
+			else if (i < CurrentPage && !lowerGapCreated || i > CurrentPage && !upperGapCreated)
+			{
+				<li class="page-item"><span class="page-link" style="cursor:default;">...</span></li>
+				@if (i < CurrentPage)
+				{
+					lowerGapCreated = true;
+				}
+				else
+				{
+					upperGapCreated = true;
+				}
+			}
+		}
+
+		<li class="page-item @GetPageItemClass(CurrentPage + 1)">
+			<a href="#" class="page-link" @onclick="() => OnPageLinkClicked(PageCount)">Next</a>
+		</li>
+	</ul>
+</nav>
+
+@code {
+
+	[Parameter]
+	public int PageCount { get; set; } = 1;
+
+	[Parameter]
+	public int CurrentPage { get; set; } = 1;
+
+	[Parameter]
+	public EventCallback<int> CurrentPageChanged { get; set; }
+
+	private string GetPageItemClass(int page)
+	{
+		if (page == CurrentPage)
+			return "active";
+
+		if (page < 1 || page > PageCount)
+			return "disabled";
+
+		return string.Empty;
+	}
+
+	private async Task OnPageLinkClicked(int page)
+	{
+		CurrentPage = page;
+		await CurrentPageChanged.InvokeAsync(page);
+	}
+
+}
