@@ -59,6 +59,10 @@ public class QueryBuilder
             case IEnumerable enumerable:
                 AppendValueList(queryStringBuilder, enumerable);
                 break;
+
+            default:
+                queryStringBuilder.Append(value);
+                break;
         }
     }
 
