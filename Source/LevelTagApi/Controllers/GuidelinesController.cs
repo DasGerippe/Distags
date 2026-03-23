@@ -1,5 +1,6 @@
 ﻿using DataClasses;
 using DataStoring;
+using LevelTagApi.Dtos;
 using LevelTagApi.Management;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -21,9 +22,36 @@ public class GuidelinesController : ControllerBase
     }
 
     [HttpGet("contribution")]
-    public ActionResult<string> GetContributionGuidelines()
+    public ActionResult<GuidelinesDto> GetContributionGuidelines()
     {
-        return Ok("Act in good faith. Do not vandalize.");
+        GuidelinesDto guidelines = new GuidelinesDto
+        {
+            Guidelines =
+            [
+                new GuidelineDto
+                {
+                    Title = "Tag in Good Faith",
+                    Text = "Only add or remove tags when you genuinely believe the change is accurate.",
+                },
+                new GuidelineDto
+                {
+                    Title = "Follow the Official Tag Definitions",
+                    Text = "Please follow our official tag definitions and do not reinterpret tags based on personal opinions or alternate meanings.",
+                },
+                new GuidelineDto
+                {
+                    Title = "No Vandalism or Malicious Editing",
+                    Text = "Knowingly removing correct tags or adding incorrect ones is considered vandalism and is not allowed. Honest mistakes are fine - intentional misuse is not.",
+                },
+                new GuidelineDto
+                {
+                    Title = "Consequences for Violations",
+                    Text = "Serious violations of those guidelines may result in your contribution rights being revoked and/or your account being banned.",
+                },
+            ],
+        };
+
+        return Ok(guidelines);
     }
 
     [HttpPost("contribution/accept")]
