@@ -4,6 +4,7 @@ using LevelTagApi.Dtos;
 using LevelTagApi.Filtering;
 using LevelTagApi.Hubs;
 using LevelTagApi.Sorting;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
@@ -29,6 +30,7 @@ public class LevelsController : ControllerBase
     }
 
     [HttpGet]
+    [AllowAnonymous]
     public async Task<ActionResult<IEnumerable<GetLevelDto>>> GetLevels([FromQuery] GetLevelsParameters parameters)
     {
         GetLevelsResponse response = new GetLevelsResponse
@@ -70,6 +72,7 @@ public class LevelsController : ControllerBase
     }
 
     [HttpGet("{levelId}")]
+    [AllowAnonymous]
     public async Task<ActionResult<GetLevelDto>> GetLevel(long levelId)
     {
         Level? level = await _LevelTagDbContext.Set<Level>()
@@ -85,6 +88,7 @@ public class LevelsController : ControllerBase
     }
 
     [HttpGet("{levelId}/tags")]
+    [AllowAnonymous]
     public async Task<ActionResult<IEnumerable<string>>> GetLevelTags(long levelId)
     {
         Level? level = await _LevelTagDbContext.Set<Level>()
@@ -99,6 +103,8 @@ public class LevelsController : ControllerBase
     }
 
     [HttpPost("{levelId}/tags/{tagName}")]
+    [Authorize(Roles = Constants.Auth.TaggerRole)]
+    [Authorize(Policy = Constants.Auth.PostAutoTagPolicy)]
     public async Task<IActionResult> PostLevelTag(long levelId, string tagName, [FromServices] IHubContext<LevelHub> levelHub)
     {
         Level? level = await _LevelTagDbContext.Set<Level>().FirstOrDefaultAsync(level => level.Id == levelId);
@@ -150,6 +156,8 @@ public class LevelsController : ControllerBase
     }
 
     [HttpDelete("{levelId}/tags/{tagName}")]
+    [Authorize(Roles = Constants.Auth.TaggerRole)]
+    [Authorize(Policy = Constants.Auth.PostAutoTagPolicy)]
     public async Task<IActionResult> DeleteLevelTag(long levelId, string tagName, [FromServices] IHubContext<LevelHub> levelHub)
     {
         Level? level = await _LevelTagDbContext.Set<Level>().FindAsync(levelId);

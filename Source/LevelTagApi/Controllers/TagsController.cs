@@ -1,6 +1,7 @@
 ﻿using DataClasses;
 using DataStoring;
 using LevelTagApi.Dtos;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -18,6 +19,7 @@ public class TagsController : ControllerBase
     }
 
     [HttpGet("tree")]
+    [AllowAnonymous]
     public async Task<ActionResult<IEnumerable<TagGroupDto>>> GetTagTreeAsync()
     {
         List<TagGroupDto> tagGroupTree = await _DbContext.Set<TagGroup>()
