@@ -12,11 +12,11 @@ ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT ALL PRIVILEGES ON TABLES TO dist
 
 CREATE ROLE distance_level_tags_read_levels NOLOGIN;
 GRANT distance_level_tags_user TO distance_level_tags_read_levels;
-GRANT SELECT ON TABLE levels, steam_users TO distance_level_tags_read_levels;
+GRANT SELECT ON TABLE levels, creators TO distance_level_tags_read_levels;
 
 CREATE ROLE distance_level_tags_manage_levels NOLOGIN;
 GRANT distance_level_tags_user TO distance_level_tags_manage_levels;
-GRANT SELECT, INSERT, UPDATE, DELETE ON TABLE levels, steam_users TO distance_level_tags_manage_levels;
+GRANT SELECT, INSERT, UPDATE, DELETE ON TABLE levels, creators TO distance_level_tags_manage_levels;
 
 CREATE ROLE distance_level_tags_manage_tags NOLOGIN;
 GRANT distance_level_tags_user TO distance_level_tags_manage_tags;
@@ -27,6 +27,10 @@ CREATE ROLE distance_level_tags_assign_tags NOLOGIN;
 GRANT distance_level_tags_user TO distance_level_tags_assign_tags;
 GRANT SELECT, INSERT, UPDATE, DELETE ON TABLE level_tags TO distance_level_tags_assign_tags;
 
+CREATE ROLE distance_level_tags_manage_users NOLOGIN;
+GRANT distance_level_tags_user TO distance_level_tags_manage_users;
+GRANT SELECT, INSERT, UPDATE, DELETE ON TABLE users, user_sessions TO distance_level_tags_manage_users;
+
 -- Users --
 
 CREATE ROLE distance_level_tags_migrator WITH LOGIN PASSWORD '';
@@ -36,6 +40,7 @@ CREATE ROLE distance_level_tags_api WITH LOGIN PASSWORD '';
 GRANT distance_level_tags_read_levels TO distance_level_tags_api;
 GRANT distance_level_tags_manage_tags TO distance_level_tags_api;
 GRANT distance_level_tags_assign_tags TO distance_level_tags_api;
+GRANT distance_level_tags_manage_users TO distance_level_tags_api;
 
 CREATE ROLE distance_level_tags_scraper WITH LOGIN PASSWORD '';
 GRANT distance_level_tags_manage_levels TO distance_level_tags_scraper;
