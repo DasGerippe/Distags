@@ -1,0 +1,51 @@
+﻿using DataClasses;
+using DataStoring;
+using LevelTagApi.Management;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+
+namespace LevelTagApi.Controllers;
+
+[ApiController]
+[Route("api/[controller]")]
+public class GuidelinesController : ControllerBase
+{
+    private readonly LevelTagDbContext _DbContext;
+    private readonly IUserManager _UserManager;
+
+    public GuidelinesController(LevelTagDbContext dbContext, IUserManager userManager)
+    {
+        _DbContext = dbContext;
+        _UserManager = userManager;
+    }
+
+    [HttpGet("contribution")]
+    public ActionResult<string> GetContributionGuidelines()
+    {
+        return Ok("Act in good faith. Do not vandalize.");
+    }
+
+    [HttpPost("contribution/accept")]
+    [Authorize]
+    public async Task<IActionResult> AcceptContributionGuidelines()
+    {
+        User? user = await _UserManager.GetCurrentUserAsync();
+        if (user == null)
+            return Unauthorized();
+
+        UserBan? userBan = await _DbContext.Set<UserBan>()
+            .Where(userBan => userBan.SteamId == user.SteamId)
+            .FirstOrDefaultAsync();
+        if (userBan != null)
+            return Unauthorized("You have been banned.");
+
+        if (user.Roles.Contains(Constants.Roles.Tagger))
+            return NoContent();
+
+        user.Roles.Add(Constants.Roles.Tagger);
+        await _DbContext.SaveChangesAsync();
+
+        return NoContent();
+    }
+}
