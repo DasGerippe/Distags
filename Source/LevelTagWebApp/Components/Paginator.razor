@@ -1,11 +1,11 @@
 ﻿<nav>
 	<ul class="pagination pagination-sm justify-content-center py-3">
 		<li class="page-item @GetPageItemClass(CurrentPage - 1)">
-			<a href="#" class="page-link" @onclick="() => OnPageLinkClicked(CurrentPage - 1)">
+			<button class="page-link" @onclick="() => OnPageLinkClicked(CurrentPage - 1)">
 				<svg style="width: 1rem; height: 1rem;">
 					<use href="icons.svg#angle-left"/>
 				</svg>
-			</a>
+			</button>
 		</li>
 
 		@{
@@ -20,7 +20,7 @@
 				int pageNumber = i;
 
 				<li class="page-item @GetPageItemClass(i)">
-					<a href="#" class="page-link" @onclick="() => OnPageLinkClicked(pageNumber)">@i</a>
+					<button class="page-link" @onclick="() => OnPageLinkClicked(pageNumber)">@i</button>
 				</li>
 			}
 			else if (i < CurrentPage && !lowerGapCreated || i > CurrentPage && !upperGapCreated)
@@ -35,11 +35,11 @@
 		}
 
 		<li class="page-item @GetPageItemClass(CurrentPage + 1)">
-			<a href="#" class="page-link" @onclick="() => OnPageLinkClicked(CurrentPage + 1)">
+			<button class="page-link" @onclick="() => OnPageLinkClicked(CurrentPage + 1)">
 				<svg style="width: 1rem; height: 1rem;">
 					<use href="icons.svg#angle-right" />
 				</svg>
-			</a>
+			</button>
 		</li>
 	</ul>
 </nav>
