@@ -36,9 +36,6 @@ public class LevelTagDbContext : DbContext
     private void ConfigureLevelEntity(ModelBuilder modelBuilder)
     {
         modelBuilder.Entity<Level>()
-            .HasKey(level => level.Id);
-
-        modelBuilder.Entity<Level>()
             .Property(level => level.Id)
             .ValueGeneratedNever();
 
@@ -56,22 +53,12 @@ public class LevelTagDbContext : DbContext
     private void ConfigureTagEntity(ModelBuilder modelBuilder)
     {
         modelBuilder.Entity<Tag>()
-            .HasKey(tag => tag.Id);
-
-        modelBuilder.Entity<Tag>()
             .HasIndex(tag => tag.Name)
             .IsUnique();
-
-        modelBuilder.Entity<Tag>()
-            .Property(tag => tag.Name)
-            .HasMaxLength(30);
     }
 
     private void ConfigureCreatorEntity(ModelBuilder modelBuilder)
     {
-        modelBuilder.Entity<Creator>()
-            .HasKey(creator => creator.Id);
-
         modelBuilder.Entity<Creator>()
             .Property(creator => creator.Id)
             .ValueGeneratedNever();

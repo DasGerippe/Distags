@@ -148,8 +148,7 @@ namespace DataStoringMigrations.Migrations
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasMaxLength(30)
-                        .HasColumnType("character varying(30)")
+                        .HasColumnType("text")
                         .HasColumnName("name");
 
                     b.Property<int>("Order")
