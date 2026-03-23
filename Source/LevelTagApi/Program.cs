@@ -63,7 +63,7 @@ public class Program
             builder.Services.AddTransient<ContributionDtoConverter>();
             builder.Services.AddTransient<UserBanDtoConverter>();
 
-            builder.Services.AddTransient<IQueryableFilterFactory<Level, BrowseLevelsParameters>, BrowseLevelsFilterFactory>();
+            builder.Services.AddTransient<IQueryableFilterFactory<Level, LevelFilterParameters>, LevelFilterFactory>();
             builder.Services.AddTransient<IQueryableSorterFactory<Level, LevelSortStrategy>, LevelSorterFactory>();
             builder.Services.AddTransient<IQueryableFilterFactory<Contribution, ContributionFilterParameters>, ContributionFilterFactory>();
 

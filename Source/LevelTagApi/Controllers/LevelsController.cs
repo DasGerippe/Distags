@@ -15,13 +15,13 @@ namespace LevelTagApi.Controllers;
 public class LevelsController : ControllerBase
 {
     private readonly LevelTagDbContext _DbContext;
-    private readonly IQueryableFilterFactory<Level, BrowseLevelsParameters> _LevelFilterFactory;
+    private readonly IQueryableFilterFactory<Level, LevelFilterParameters> _LevelFilterFactory;
     private readonly IQueryableSorterFactory<Level, LevelSortStrategy> _LevelSorterFactory;
     private readonly ILevelTagManager _LevelTagManager;
 
     public LevelsController(
         LevelTagDbContext dbContext,
-        IQueryableFilterFactory<Level, BrowseLevelsParameters> levelFilterFactory,
+        IQueryableFilterFactory<Level, LevelFilterParameters> levelFilterFactory,
         IQueryableSorterFactory<Level, LevelSortStrategy> levelSorterFactory,
         ILevelTagManager levelTagManager)
     {
@@ -43,7 +43,8 @@ public class LevelsController : ControllerBase
 
         IQueryable<Level> levels = _DbContext.Set<Level>();
 
-        IQueryableFilter<Level> levelFilter = _LevelFilterFactory.GetQueryableFilter(parameters);
+        LevelFilterParameters filterParams = GetFilterParameters(parameters);
+        IQueryableFilter<Level> levelFilter = _LevelFilterFactory.GetQueryableFilter(filterParams);
         levels = levelFilter.Filter(levels);
 
         response.TotalLevels = await levels.CountAsync();
@@ -140,6 +141,17 @@ public class LevelsController : ControllerBase
             await _LevelTagManager.RemoveTagFromLevelAsync(levelTag);
 
         return NoContent();
+    }
+
+    private LevelFilterParameters GetFilterParameters(BrowseLevelsParameters parameters)
+    {
+        return new LevelFilterParameters
+        {
+            LevelFilter = parameters.LevelFilter,
+            CreatorFilter = parameters.CreatorFilter,
+            IncludeTags = parameters.IncludeTags,
+            ExcludeTags = parameters.ExcludeTags,
+        };
     }
 
     private NotFoundObjectResult LevelNotFound(long levelId)
