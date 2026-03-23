@@ -1,33 +1,42 @@
 ﻿@using LevelTagApi.Dtos
 
 <div class="d-flex align-items-center">
-	@switch (Contributor)
-	{
-		case ContributorAppDto:
-			<svg style="width: 2rem; height: 2rem;"><use href="icons.svg#microchip-solid" /></svg>
-			break;
-
-		case ContributorUserDto user:
-			if (user.IsAnonymous || user.SteamAvatarHash == null)
-			{
-				<svg style="width: 2rem; height: 2rem;"><use href="icons.svg#user-solid" /></svg>
-			}
-			else
-			{
-				<img class="rounded-5" src="https://avatars.steamstatic.com/@(user.SteamAvatarHash).jpg" alt="Contributor Avatar" />
-			}
-			break;
-
-		default:
-			throw new ArgumentOutOfRangeException();
+	@{
+		ContributorUserDto? user = Contributor as ContributorUserDto;
 	}
-	<span class="ps-2 @GetContributorNameClass()">@GetContributorName()</span>
+
+	@if (user != null)
+	{
+		if (user.IsAnonymous || user.SteamAvatarHash == null)
+		{
+			<svg style="width: 2rem; height: 2rem;"><use href="icons.svg#user-solid" /></svg>
+		}
+		else
+		{
+			<img class="rounded-5" src="https://avatars.steamstatic.com/@(user.SteamAvatarHash).jpg" alt="Contributor Avatar" />
+		}
+	}
+	else if (Contributor is ContributorAppDto)
+	{
+		<svg style="width: 2rem; height: 2rem;"><use href="icons.svg#microchip-solid" /></svg>
+	}
+
+	<div class="d-flex flex-column ps-2">
+		<span class="@GetContributorNameClass()">@GetContributorName()</span>
+		@if (ShowSteamId && user != null)
+		{
+			<span style="font-size: 0.725rem; color: #888">@(user.SteamId?.ToString() ?? "Unknown Steam ID")</span>
+		}
+	</div>
 </div>
 
 @code {
 
 	[Parameter]
 	public required ContributorDto Contributor { get; set; }
+
+	[Parameter]
+	public bool ShowSteamId { get; set; } = false;
 
 	private string GetContributorNameClass()
 	{
