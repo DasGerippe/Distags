@@ -63,6 +63,7 @@ public static class DtoConversionExtensions
         return new ApiKeyDto
         {
             ApiKey = apiKey.Value,
+            Comment = apiKey.Comment,
         };
     }
 }

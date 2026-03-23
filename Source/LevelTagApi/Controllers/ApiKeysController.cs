@@ -31,22 +31,51 @@ public class ApiKeysController : ControllerBase
         return Ok(apiKeys);
     }
 
-    [HttpPost("create")]
+    [HttpGet("{apiKeyValue}")]
     [Authorize(Roles = Constants.Roles.ApiKeyManager)]
-    public async Task<ActionResult<ApiKeyDto>> CreateApiKey()
+    public async Task<ActionResult<ApiKeyDto>> GetApiKey(string apiKeyValue)
+    {
+        ApiKey? apiKey = await _DbContext.Set<ApiKey>().FirstOrDefaultAsync(apiKey => apiKey.Value == apiKeyValue);
+        if (apiKey == null)
+            return NotFound();
+
+        ApiKeyDto apiKeyDto = apiKey.ToDto();
+        return Ok(apiKeyDto);
+    }
+
+    [HttpPost]
+    [Authorize(Roles = Constants.Roles.ApiKeyManager)]
+    public async Task<ActionResult<ApiKeyDto>> CreateApiKey([FromBody] PatchApiKeyParameters? parameters)
     {
         string apiKeyValue = _TokenGenerator.GenerateToken(32);
-        
+
         ApiKey apiKey = new ApiKey
         {
             Value = apiKeyValue,
         };
 
+        if (parameters != null)
+            PatchApiKey(apiKey, parameters);
+
         _DbContext.Add(apiKey);
         await _DbContext.SaveChangesAsync();
 
         ApiKeyDto apiKeyDto = apiKey.ToDto();
-        return Ok(apiKeyDto);
+        return CreatedAtAction(nameof(GetApiKey), new { apiKeyValue }, apiKeyDto);
+    }
+
+    [HttpPatch("{apiKeyValue}")]
+    [Authorize(Roles = Constants.Roles.ApiKeyManager)]
+    public async Task<IActionResult> PatchApiKey(string apiKeyValue, [FromBody] PatchApiKeyParameters parameters)
+    {
+        ApiKey? apiKey = await _DbContext.Set<ApiKey>().FirstOrDefaultAsync(apiKey => apiKey.Value == apiKeyValue);
+        if (apiKey == null)
+            return NotFound();
+
+        PatchApiKey(apiKey, parameters);
+
+        await _DbContext.SaveChangesAsync();
+        return NoContent();
     }
 
     [HttpDelete("{apiKeyValue}")]
@@ -61,5 +90,10 @@ public class ApiKeysController : ControllerBase
         await _DbContext.SaveChangesAsync();
 
         return Ok();
+    }
+
+    private void PatchApiKey(ApiKey apiKey, PatchApiKeyParameters parameters)
+    {
+        apiKey.Comment = parameters.Comment ?? apiKey.Comment;
     }
 }
