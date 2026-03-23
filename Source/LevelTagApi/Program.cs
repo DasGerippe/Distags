@@ -80,7 +80,7 @@ namespace LevelTagApi
                     options.DefaultAuthenticateScheme = Constants.Session.AuthenticationScheme;
                     options.DefaultChallengeScheme = Constants.Session.AuthenticationScheme;
                 })
-                .AddScheme<AuthenticationSchemeOptions, SessionTokenAuthenticationHandler>(
+                .AddScheme<AuthenticationSchemeOptions, SessionAuthenticationHandler>(
                     Constants.Session.AuthenticationScheme,
                     options => {})
                 .AddCookie(Constants.Steam.LoginCookieScheme)

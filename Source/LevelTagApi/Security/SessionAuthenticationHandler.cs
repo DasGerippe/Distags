@@ -9,11 +9,11 @@ using System.Text.Encodings.Web;
 
 namespace LevelTagApi.Security;
 
-public class SessionTokenAuthenticationHandler : AuthenticationHandler<AuthenticationSchemeOptions>
+public class SessionAuthenticationHandler : AuthenticationHandler<AuthenticationSchemeOptions>
 {
     private readonly LevelTagDbContext _DbContext;
 
-    public SessionTokenAuthenticationHandler(
+    public SessionAuthenticationHandler(
         IOptionsMonitor<AuthenticationSchemeOptions> options,
         ILoggerFactory logger,
         UrlEncoder encoder,
@@ -25,7 +25,7 @@ public class SessionTokenAuthenticationHandler : AuthenticationHandler<Authentic
 
     protected override async Task<AuthenticateResult> HandleAuthenticateAsync()
     {
-        if (!Request.Headers.TryGetValue(SessionTokenAuthenticationConstants.Header, out StringValues sessionToken))
+        if (!Request.Headers.TryGetValue(Constants.Session.TokenHeader, out StringValues sessionToken))
             return AuthenticateResult.NoResult();
 
         UserSession? userSession = await _DbContext.Set<UserSession>()

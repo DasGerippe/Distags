@@ -89,7 +89,7 @@ public class AuthenticationController : ControllerBase
 
     [HttpPost("logout")]
     [Authorize(AuthenticationSchemes = Constants.Session.AuthenticationScheme)]
-    public async Task<IActionResult> Logout([FromHeader(Name = Constants.Session.Header)] string sessionToken)
+    public async Task<IActionResult> Logout([FromHeader(Name = Constants.Session.TokenHeader)] string sessionToken)
     {
         UserSession? userSession = await _DbContext.Set<UserSession>()
             .Where(session => session.Token == sessionToken)
