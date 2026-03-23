@@ -9,7 +9,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DataClasses", "DataClasses\
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DataStoring", "DataStoring\DataStoring.csproj", "{4CC01FD4-953E-48D1-93F9-D6DF0314571C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LevelDataPopulator", "LevelDataPopulator\LevelDataPopulator.csproj", "{F762BB94-3F02-45D3-BD3A-ED082157F10F}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SteamDataScraper", "SteamDataScraper\SteamDataScraper.csproj", "{F762BB94-3F02-45D3-BD3A-ED082157F10F}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LevelTagApi.Dtos", "LevelTagApi.Dtos\LevelTagApi.Dtos.csproj", "{E3C74217-2B2F-4804-9F07-FD2327C23B10}"
 EndProject

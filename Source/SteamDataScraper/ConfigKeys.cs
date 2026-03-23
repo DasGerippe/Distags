@@ -1,4 +1,4 @@
-﻿namespace LevelDataPopulator;
+﻿namespace SteamDataScraper;
 
 internal static class ConfigKeys
 {

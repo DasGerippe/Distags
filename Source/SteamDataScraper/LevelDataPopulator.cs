@@ -1,13 +1,13 @@
-﻿using LevelTagApi.Dtos;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Logging;
-using System.Net.Mime;
+﻿using System.Net.Mime;
 using System.Text;
 using System.Text.Json;
+using LevelTagApi.Dtos;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
 using SteamWebApi.ApiInterfaces;
 using SteamWebApi.Dtos.PublishedFileService;
 
-namespace LevelDataPopulator;
+namespace SteamDataScraper;
 
 internal class LevelDataPopulator
 {

@@ -1,11 +1,11 @@
-﻿using Microsoft.Extensions.Configuration;
+﻿using System.Runtime.CompilerServices;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using SteamWebApi;
-using System.Runtime.CompilerServices;
 
-namespace LevelDataPopulator;
+namespace SteamDataScraper;
 
 internal class Program
 {

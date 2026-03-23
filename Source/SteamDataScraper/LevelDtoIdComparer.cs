@@ -1,6 +1,6 @@
 ﻿using LevelTagApi.Dtos;
 
-namespace LevelDataPopulator;
+namespace SteamDataScraper;
 
 public class LevelDtoIdComparer : IEqualityComparer<PutLevelDto>
 {
