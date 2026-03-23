@@ -33,6 +33,8 @@ public class LevelTagManager : ILevelTagManager
     public async Task RemoveTagFromLevelAsync(LevelTag levelTag)
     {
         _DbContext.Remove(levelTag);
+
+        await _ContributionManager.CreateContributionsAsync([], [levelTag]);
         await _DbContext.SaveChangesAsync();
     }
 
