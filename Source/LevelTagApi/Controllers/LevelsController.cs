@@ -97,47 +97,6 @@ public class LevelsController : ControllerBase
         return Ok(levelDto);
     }
 
-    [HttpPut("batch")]
-    public async Task<IActionResult> PutLevels([FromBody] List<PutLevelDto> levelDtos)
-    {
-        foreach (PutLevelDto levelDto in levelDtos)
-        {
-            Level? level = await _LevelTagDbContext.Levels.FindAsync(levelDto.Id);
-
-            if (level == null)
-            {
-                level = new Level();
-                level.Id = levelDto.Id;
-                _LevelTagDbContext.Levels.Add(level);
-            }
-
-            level.Name = levelDto.Name;
-            level.CreatorId = levelDto.CreatorId;
-            level.FileName = levelDto.FileName;
-            level.FileUrl = levelDto.FileUrl;
-            level.IconUrl = levelDto.IconUrl;
-            level.CreatedOn = levelDto.CreatedOn;
-            level.UpdatedOn = levelDto.UpdatedOn;
-        }
-
-        await _LevelTagDbContext.SaveChangesAsync();
-
-        return NoContent();
-    }
-
-    [HttpDelete("{levelId}")]
-    public async Task<IActionResult> DeleteLevel(long levelId)
-    {
-        Level? level = await _LevelTagDbContext.Levels.FindAsync(levelId);
-        if (level == null)
-            return NotFound();
-
-        _LevelTagDbContext.Levels.Remove(level);
-        await _LevelTagDbContext.SaveChangesAsync();
-
-        return NoContent();
-    }
-
     [HttpGet("{levelId}/tags")]
     public async Task<ActionResult<IEnumerable<string>>> GetLevelTags(long levelId)
     {
