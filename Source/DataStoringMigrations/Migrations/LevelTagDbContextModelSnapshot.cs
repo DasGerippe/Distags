@@ -119,6 +119,10 @@ namespace DataStoringMigrations.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
 
+                    b.Property<long?>("GroupId")
+                        .HasColumnType("bigint")
+                        .HasColumnName("group_id");
+
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasMaxLength(30)
@@ -128,11 +132,38 @@ namespace DataStoringMigrations.Migrations
                     b.HasKey("Id")
                         .HasName("pk_tags");
 
+                    b.HasIndex("GroupId")
+                        .HasDatabaseName("ix_tags_group_id");
+
                     b.HasIndex("Name")
                         .IsUnique()
                         .HasDatabaseName("ix_tags_name");
 
                     b.ToTable("tags", (string)null);
+                });
+
+            modelBuilder.Entity("DataClasses.TagGroup", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint")
+                        .HasColumnName("id");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
+
+                    b.Property<int>("Compatibility")
+                        .HasColumnType("integer")
+                        .HasColumnName("compatibility");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("name");
+
+                    b.HasKey("Id")
+                        .HasName("pk_tag_groups");
+
+                    b.ToTable("tag_groups", (string)null);
                 });
 
             modelBuilder.Entity("DataClasses.Level", b =>
@@ -164,6 +195,16 @@ namespace DataStoringMigrations.Migrations
                     b.Navigation("Level");
 
                     b.Navigation("Tag");
+                });
+
+            modelBuilder.Entity("DataClasses.Tag", b =>
+                {
+                    b.HasOne("DataClasses.TagGroup", "Group")
+                        .WithMany()
+                        .HasForeignKey("GroupId")
+                        .HasConstraintName("fk_tags_tag_groups_group_id");
+
+                    b.Navigation("Group");
                 });
 
             modelBuilder.Entity("DataClasses.Level", b =>

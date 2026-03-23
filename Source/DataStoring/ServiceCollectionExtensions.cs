@@ -20,6 +20,7 @@ public static class ServiceCollectionExtensions
             .UseNpgsql(connectionString, dbOptions => dbOptions.MigrationsAssembly("DataStoringMigrations"))
             .UseSnakeCaseNamingConvention());
 
+        services.AddTransient<IRepository<TagGroup>, Repository<TagGroup, LevelTagDbContext>>();
         services.AddTransient<IRepository<Tag>, Repository<Tag, LevelTagDbContext>>();
         services.AddTransient<IRepository<Level>, Repository<Level, LevelTagDbContext>>();
         services.AddTransient<IRepository<LevelTag>, Repository<LevelTag, LevelTagDbContext>>();

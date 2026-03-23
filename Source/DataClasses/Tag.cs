@@ -6,6 +6,10 @@ public class Tag
 
     public string Name { get; set; } = string.Empty;
 
+    public long? GroupId { get; set; }
+
+    public TagGroup? Group { get; set; }
+
     public List<Level> Levels { get; set; } = [];
 
     public List<LevelTag> LevelTags { get; set; } = [];

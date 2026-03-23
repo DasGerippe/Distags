@@ -7,6 +7,8 @@ public class LevelTagDbContext : DbContext
 {
     public DbSet<Level> Levels { get; set; }
 
+    public DbSet<TagGroup> TagGroups { get; set; }
+
     public DbSet<Tag> Tags { get; set; }
 
     public DbSet<LevelTag> LevelTags { get; set; }
