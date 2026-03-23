@@ -1,43 +1,45 @@
 ﻿<nav>
-	<ul class="pagination justify-content-center py-3">
+	<ul class="pagination pagination-sm justify-content-center py-3">
 		<li class="page-item @GetPageItemClass(CurrentPage - 1)">
-			<a href="#" class="page-link" @onclick="() => OnPageLinkClicked(1)">Previous</a>
+			<a href="#" class="page-link" @onclick="() => OnPageLinkClicked(CurrentPage - 1)">
+				<svg style="width: 1rem; height: 1rem;">
+					<use href="icons.svg#angle-left"/>
+				</svg>
+			</a>
 		</li>
-		
+
 		@{
 			bool lowerGapCreated = false;
 			bool upperGapCreated = false;
-			int gapToExtrem = Math.Min(CurrentPage - 1, PageCount - CurrentPage);
-			int maxPageJump = Math.Max(5 - gapToExtrem, 1);
 		}
+
 		@for (int i = 1; i <= PageCount; i++)
 		{
-			int gapToCurrent = Math.Abs(CurrentPage - i);
-			if (i == 1 || i == PageCount || gapToCurrent < maxPageJump || gapToCurrent == maxPageJump && (i == 2 || i == PageCount - 1))
+			if (i == 1 || i == PageCount || Math.Abs(CurrentPage - i) <= 1)
 			{
+				int pageNumber = i;
+
 				<li class="page-item @GetPageItemClass(i)">
-					@{
-						int page = i;
-					}
-					<a href="#" class="page-link" @onclick="() => OnPageLinkClicked(page)">@i</a>
+					<a href="#" class="page-link" @onclick="() => OnPageLinkClicked(pageNumber)">@i</a>
 				</li>
 			}
 			else if (i < CurrentPage && !lowerGapCreated || i > CurrentPage && !upperGapCreated)
 			{
 				<li class="page-item"><span class="page-link" style="cursor:default;">...</span></li>
+
 				@if (i < CurrentPage)
-				{
 					lowerGapCreated = true;
-				}
 				else
-				{
 					upperGapCreated = true;
-				}
 			}
 		}
 
 		<li class="page-item @GetPageItemClass(CurrentPage + 1)">
-			<a href="#" class="page-link" @onclick="() => OnPageLinkClicked(PageCount)">Next</a>
+			<a href="#" class="page-link" @onclick="() => OnPageLinkClicked(CurrentPage + 1)">
+				<svg style="width: 1rem; height: 1rem;">
+					<use href="icons.svg#angle-right" />
+				</svg>
+			</a>
 		</li>
 	</ul>
 </nav>
