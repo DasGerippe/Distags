@@ -26,13 +26,6 @@ namespace LevelTagApi
 
             var app = builder.Build();
 
-            //using (IServiceScope scope = app.Services.CreateScope())
-            //{
-            //    LevelTagDbContext levelTagDb = scope.ServiceProvider.GetRequiredService<LevelTagDbContext>();
-            //    levelTagDb.Database.EnsureDeleted();
-            //    levelTagDb.Database.EnsureCreated();
-            //}
-
             // Configure the HTTP request pipeline.
             if (app.Environment.IsDevelopment())
             {
