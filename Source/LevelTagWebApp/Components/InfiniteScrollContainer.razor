@@ -1,0 +1,76 @@
+﻿@implements IAsyncDisposable
+
+@inject IJSRuntime JsRuntime
+
+<div @attributes="AdditionalAttributes">
+	@ChildContent
+	<div @ref="_ContainerEndElement"></div>
+</div>
+
+@code {
+
+	private DotNetObjectReference<InfiniteScrollContainer>? _ComponentReference;
+	private ElementReference _ContainerEndElement;
+	private IJSObjectReference? _JsInfiniteScrollModule;
+	private IJSObjectReference? _JsScrollObserver;
+
+	private bool _Disposed;
+
+	[Parameter]
+	public required RenderFragment ChildContent { get; set; }
+
+	[Parameter]
+	public required EventCallback OnScrolledToEnd { get; set; }
+
+	[Parameter(CaptureUnmatchedValues = true)]
+	public Dictionary<string, object>? AdditionalAttributes { get; set; }
+
+	protected override async Task OnAfterRenderAsync(bool firstRender)
+	{
+		if (firstRender)
+		{
+			_ComponentReference = DotNetObjectReference.Create(this);
+			_JsInfiniteScrollModule = await JsRuntime.InvokeAsync<IJSObjectReference>("import", "./js/infinite-scroll.js");
+			_JsScrollObserver = await _JsInfiniteScrollModule.InvokeAsync<IJSObjectReference>(
+				"initialize", _ContainerEndElement, _ComponentReference);
+		}
+
+		await base.OnAfterRenderAsync(firstRender);
+	}
+
+	[JSInvokable]
+	public Task ScrolledToEnd()
+	{
+		return OnScrolledToEnd.InvokeAsync();
+	}
+
+	public async ValueTask DisposeAsync()
+	{
+		if (_Disposed)
+			return;
+
+		if (_JsScrollObserver != null)
+		{
+			try
+			{
+				await _JsScrollObserver.InvokeVoidAsync("dispose");
+				await _JsScrollObserver.DisposeAsync();
+			}
+			catch (JSDisconnectedException) { }
+		}
+
+		if (_JsInfiniteScrollModule != null)
+		{
+			try
+			{
+				await _JsInfiniteScrollModule.DisposeAsync();
+			}
+			catch (JSDisconnectedException) { }
+		}
+
+		_ComponentReference?.Dispose();
+
+		_Disposed = true;
+	}
+
+}
