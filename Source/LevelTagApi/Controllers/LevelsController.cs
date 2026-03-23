@@ -1,6 +1,7 @@
 ﻿using DataClasses;
 using DataStoring;
 using LevelTagApi.Dtos;
+using LevelTagApi.Filtering;
 using LevelTagApi.Hubs;
 using LevelTagApi.Sorting;
 using Microsoft.AspNetCore.Mvc;
@@ -14,13 +15,16 @@ namespace LevelTagApi.Controllers;
 public class LevelsController : ControllerBase
 {
     private readonly LevelTagDbContext _LevelTagDbContext;
+    private readonly IQueryableFilterFactory<Level, GetLevelsParameters> _LevelFilterFactory;
     private readonly IQueryableSorterFactory<Level, LevelSortStrategy> _LevelSorterFactory;
 
     public LevelsController(
         LevelTagDbContext levelTagDbContext,
+        IQueryableFilterFactory<Level, GetLevelsParameters> levelFilterFactory,
         IQueryableSorterFactory<Level, LevelSortStrategy> levelSorterFactory)
     {
         _LevelTagDbContext = levelTagDbContext;
+        _LevelFilterFactory = levelFilterFactory;
         _LevelSorterFactory = levelSorterFactory;
     }
 
@@ -29,19 +33,12 @@ public class LevelsController : ControllerBase
     {
         IQueryable<Level> levels = _LevelTagDbContext.Set<Level>();
 
-        if (!string.IsNullOrEmpty(parameters.IncludeTags))
-        {
-            IEnumerable<string> includeTagNames = GetNormalizedTagNames(parameters.IncludeTags);
-            levels = levels.Where(level => includeTagNames.All(tagName => level.Tags.Any(tag => tag.Name == tagName)));
-        }
-
-        if (!string.IsNullOrEmpty(parameters.ExcludeTags))
-        {
-            IEnumerable<string> excludeTagNames = GetNormalizedTagNames(parameters.ExcludeTags);
-            levels = levels.Where(level => !excludeTagNames.Any(tagName => level.Tags.Any(tag => tag.Name == tagName)));
-        }
+        IQueryableFilter<Level> levelFilter = _LevelFilterFactory.GetQueryableFilter(parameters);
+        levels = levelFilter.Filter(levels);
 
         int totalLevelCount = await levels.CountAsync();
+        if (totalLevelCount == 0)
+            return Ok(new GetLevelsResponse());
 
         IQueryableSorter<Level> levelSorter = _LevelSorterFactory.GetQueryableSorter(parameters.SortStrategy);
         levels = levelSorter.Sort(levels);
@@ -67,13 +64,6 @@ public class LevelsController : ControllerBase
         };
 
         return Ok(response);
-    }
-
-    private IEnumerable<string> GetNormalizedTagNames(string commaSeparatedTags)
-    {
-        string[] tagNames = commaSeparatedTags.Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
-        IEnumerable<string> normalizedTagNames = tagNames.Select(tag => tag.ToLowerInvariant());
-        return normalizedTagNames;
     }
 
     [HttpGet("{levelId}")]

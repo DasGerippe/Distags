@@ -1,6 +1,7 @@
 using DataClasses;
 using DataStoring;
 using LevelTagApi.Dtos;
+using LevelTagApi.Filtering;
 using LevelTagApi.Hubs;
 using LevelTagApi.Sorting;
 
@@ -23,6 +24,7 @@ namespace LevelTagApi
 
             builder.Services.AddSignalR();
 
+            builder.Services.AddTransient<IQueryableFilterFactory<Level, GetLevelsParameters>, BrowseLevelsFilterFactory>();
             builder.Services.AddTransient<IQueryableSorterFactory<Level, LevelSortStrategy>, LevelSorterFactory>();
 
             var app = builder.Build();

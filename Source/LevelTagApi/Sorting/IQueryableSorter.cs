@@ -1,6 +1,6 @@
 ﻿namespace LevelTagApi.Sorting;
 
-public interface IQueryableSorter<T>
+public interface IQueryableSorter<TEntity>
 {
-    public IOrderedQueryable<T> Sort(IQueryable<T> source);
+    public IOrderedQueryable<TEntity> Sort(IQueryable<TEntity> source);
 }
