@@ -8,17 +8,25 @@ namespace LevelTagApi.Management;
 public class LevelTagManager : ILevelTagManager
 {
     private readonly LevelTagDbContext _DbContext;
+    private readonly IContributionManager _ContributionManager;
     private readonly ILevelHubServer _LevelHubServer;
 
-    public LevelTagManager(LevelTagDbContext dbContext, ILevelHubServer levelHubServer)
+    public LevelTagManager(
+        LevelTagDbContext dbContext,
+        IContributionManager contributionManager,
+        ILevelHubServer levelHubServer)
     {
         _DbContext = dbContext;
+        _ContributionManager = contributionManager;
         _LevelHubServer = levelHubServer;
     }
 
     public async Task AddTagToLevelAsync(Level level, Tag tag)
     {
-        List<string> removedTags = await RemoveConflictingTagsAsync(level, tag);
+        List<Tag> removedTags = await RemoveConflictingTagsAsync(level, tag);
+
+        IEnumerable<long> removedConflictingTagIds = removedTags.Select(removedTag => removedTag.Id);
+        await _ContributionManager.CreateAddTagContributionAsync(level.Id, tag.Id, removedConflictingTagIds);
 
         _DbContext.Add(new LevelTag
         {
@@ -27,15 +35,17 @@ public class LevelTagManager : ILevelTagManager
         });
         await _DbContext.SaveChangesAsync();
 
-        foreach (string removedTag in removedTags)
+        foreach (Tag removedTag in removedTags)
         {
-            await _LevelHubServer.SendTagRemovedMessageAsync(level.Id, removedTag);
+            await _LevelHubServer.SendTagRemovedMessageAsync(level.Id, removedTag.Name);
         }
         await _LevelHubServer.SendTagAddedMessageAsync(level.Id, tag.Name);
     }
 
     public async Task RemoveTagFromLevelAsync(LevelTag levelTag)
     {
+        await _ContributionManager.CreateRemoveTagContributionAsync(levelTag.LevelId, levelTag.TagId);
+
         _DbContext.Remove(levelTag);
         await _DbContext.SaveChangesAsync();
 
@@ -44,7 +54,7 @@ public class LevelTagManager : ILevelTagManager
         await _LevelHubServer.SendTagRemovedMessageAsync(levelTag.LevelId, levelTag.Tag.Name);
     }
 
-    private async Task<List<string>> RemoveConflictingTagsAsync(Level level, Tag tag)
+    private async Task<List<Tag>> RemoveConflictingTagsAsync(Level level, Tag tag)
     {
         if (tag.Exclusivity == null)
             return [];
@@ -59,6 +69,6 @@ public class LevelTagManager : ILevelTagManager
             _DbContext.Remove(conflictingLevelTag);
         }
 
-        return conflictingLevelTags.Select(levelTag => levelTag.Tag.Name).ToList();
+        return conflictingLevelTags.Select(levelTag => levelTag.Tag).ToList();
     }
 }

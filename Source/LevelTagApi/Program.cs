@@ -54,6 +54,8 @@ public class Program
             builder.Services.AddTransient<IQueryableSorterFactory<Level, LevelSortStrategy>, LevelSorterFactory>();
 
             builder.Services.AddTransient<ILevelTagManager, LevelTagManager>();
+            builder.Services.AddTransient<IContributionManager, ContributionManager>();
+
             builder.Services.AddTransient<ILevelHubServer, LevelHubServer>();
 
             builder.Services.AddSingleton<ITicketStore<long>, ConcurrentTicketStore<long>>();
