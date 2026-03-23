@@ -1,4 +1,5 @@
 using LevelTagWebApp.Components;
+using LevelTagWebApp.Services;
 
 namespace LevelTagWebApp
 {
@@ -6,13 +7,19 @@ namespace LevelTagWebApp
     {
         public static void Main(string[] args)
         {
-            var builder = WebApplication.CreateBuilder(args);
+            WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
             // Add services to the container.
             builder.Services.AddRazorComponents()
                 .AddInteractiveServerComponents();
 
-            var app = builder.Build();
+            builder.Services.AddHttpClient<LevelTagApiClient>(httpClient =>
+            {
+                string levelTagApiUri = builder.Configuration[$"{nameof(LevelTagWebApp)}:LevelTagApiUri"]!;
+                httpClient.BaseAddress = new Uri(levelTagApiUri);
+            });
+
+            WebApplication app = builder.Build();
 
             // Configure the HTTP request pipeline.
             if (!app.Environment.IsDevelopment())
