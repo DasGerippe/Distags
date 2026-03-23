@@ -1,70 +1,53 @@
 ﻿@using LevelTagApi.Dtos
 @using LevelTagWebApp.Services
 
-@implements IAsyncDisposable
+@inherits DialogBase
 
-@inject IJSRuntime JsRuntime
 @inject LevelTagApiClient LevelTagApi
 
-<div class="modal fade" id="@ModalId" tabindex="-1" aria-hidden="true">
-	<div class="modal-dialog modal-dialog-centered">
-		<div class="modal-content">
-			<div class="modal-header">
-				<h5 class="modal-title">Revert Contributions</h5>
-				<button class="btn-close" data-bs-dismiss="modal"></button>
-			</div>
-			<div class="modal-body">
-				<form>
-					<label for="revertSteamIdInput" class="col-form-label">User Steam ID:</label>
-					<input id="revertSteamIdInput" class="form-control" value="@_RevertUserSteamId" disabled readonly />
+<Dialog Id="@ModalId">
+	<Header>
+		<h5 class="modal-title">Revert Contributions</h5>
+		<button class="btn-close" data-bs-dismiss="modal"></button>
+	</Header>
+	<Body>
+		<form>
+			<label for="revertSteamIdInput" class="col-form-label">User Steam ID:</label>
+			<input id="revertSteamIdInput" class="form-control" value="@_RevertUserSteamId" disabled readonly />
 
-					<label for="revertSteamNameInput" class="col-form-label">User Steam Name:</label>
-					<input id="revertSteamNameInput" class="form-control" value="@_RevertUserSteamName" disabled readonly />
-					
-					<label class="col-form-label">Reversal mode:</label>
-					<InputRadioGroup @bind-Value="_RevertAllUserContributions">
-						<div class="form-check">
-							<InputRadio Value="false" class="form-check-input"/>
-							<label class="form-check-label">Revert since @(_RevertDateTime?.ToString("G"))</label>
-						</div>
-						<div class="form-check">
-							<InputRadio Value="true" class="form-check-input" />
-							<label class="form-check-label">Revert all</label>
-						</div>
-					</InputRadioGroup>
-				</form>
-			</div>
-			<div class="modal-footer">
-				<button class="btn btn-primary" @onclick="RevertContributions">Revert</button>
-			</div>
-		</div>
-	</div>
-</div>
+			<label for="revertSteamNameInput" class="col-form-label">User Steam Name:</label>
+			<input id="revertSteamNameInput" class="form-control" value="@_RevertUserSteamName" disabled readonly />
+
+			<label class="col-form-label">Reversal mode:</label>
+			<InputRadioGroup @bind-Value="_RevertAllUserContributions">
+				<div class="form-check">
+					<InputRadio Value="false" class="form-check-input" />
+					<label class="form-check-label">Revert since @(_RevertDateTime?.ToString("G"))</label>
+				</div>
+				<div class="form-check">
+					<InputRadio Value="true" class="form-check-input" />
+					<label class="form-check-label">Revert all</label>
+				</div>
+			</InputRadioGroup>
+		</form>
+	</Body>
+	<Footer>
+		<button class="btn btn-primary" @onclick="RevertContributions">Revert</button>
+	</Footer>
+</Dialog>
 
 @code {
-
-	private const string ModalId = "revertContributionsModal";
-
-	private IJSObjectReference? _BootstrapModalModule;
 
 	private long? _RevertUserSteamId;
 	private string? _RevertUserSteamName;
 	private DateTime? _RevertDateTime;
 	private bool _RevertAllUserContributions;
 
-	private bool _Disposed;
+	protected override string ModalId => "revertContributionsModal";
 
 	public event EventHandler<RevertContributionsResponse>? ContributionsReverted;
 
-	protected override async Task OnAfterRenderAsync(bool firstRender)
-	{
-		if (firstRender)
-		{
-			_BootstrapModalModule = await JsRuntime.InvokeAsync<IJSObjectReference>("import", "./js/bootstrap-modal.js");
-		}
-	}
-
-	public async Task ShowAsync(ContributionDto contribution)
+	public async ValueTask ShowAsync(ContributionDto contribution)
 	{
 		ContributorUserDto? user = contribution.Contributor as ContributorUserDto;
 		_RevertUserSteamId = user?.SteamId;
@@ -72,12 +55,12 @@
 		_RevertDateTime = contribution.ContributedOn;
 		StateHasChanged();
 
-		await _BootstrapModalModule!.InvokeVoidAsync("showModal", $"#{ModalId}");
+		await ShowAsync();
 	}
 
-	public async Task CloseAsync()
+	public new ValueTask HideAsync()
 	{
-		await _BootstrapModalModule!.InvokeVoidAsync("hideModal", $"#{ModalId}");
+		return base.HideAsync();
 	}
 
 	private async Task RevertContributions()
@@ -92,26 +75,9 @@
 		};
 		RevertContributionsResponse response = await LevelTagApi.RevertContributionsAsync(parameters);
 
-		await CloseAsync();
+		await HideAsync();
 
 		ContributionsReverted?.Invoke(this, response);
-	}
-
-	public async ValueTask DisposeAsync()
-	{
-		if (_Disposed)
-			return;
-
-		if (_BootstrapModalModule != null)
-		{
-			try
-			{
-				await _BootstrapModalModule.DisposeAsync();
-			}
-			catch (JSDisconnectedException) { }
-		}
-
-		_Disposed = true;
 	}
 
 }

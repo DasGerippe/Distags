@@ -1,69 +1,52 @@
 ﻿@using LevelTagApi.Dtos
 @using LevelTagWebApp.Services
 
-@implements IAsyncDisposable
+@inherits DialogBase
 
-@inject IJSRuntime JsRuntime
 @inject LevelTagApiClient LevelTagApi
 
-<div class="modal fade" id="@ModalId" tabindex="-1" aria-hidden="true">
-	<div class="modal-dialog modal-dialog-centered">
-		<div class="modal-content">
-			<div class="modal-header">
-				<h5 class="modal-title">Ban User</h5>
-				<button class="btn-close" data-bs-dismiss="modal"></button>
-			</div>
-			<div class="modal-body">
-				<form>
-					<label for="banUserSteamIdInput" class="col-form-label">User Steam ID:</label>
-					<input id="banUserSteamIdInput" class="form-control" value="@_SteamId" disabled readonly />
+<Dialog Id="@ModalId">
+	<Header>
+		<h5 class="modal-title">Ban User</h5>
+		<button class="btn-close" data-bs-dismiss="modal"></button>
+	</Header>
+	<Body>
+	<form>
+		<label for="banUserSteamIdInput" class="col-form-label">User Steam ID:</label>
+		<input id="banUserSteamIdInput" class="form-control" value="@_SteamId" disabled readonly />
 
-					<label for="banUserSteamNameInput" class="col-form-label">User Steam Name:</label>
-					<input id="banUserSteamNameInput" class="form-control" value="@_SteamName" disabled readonly />
+		<label for="banUserSteamNameInput" class="col-form-label">User Steam Name:</label>
+		<input id="banUserSteamNameInput" class="form-control" value="@_SteamName" disabled readonly />
 
-					<label for="banUserReasonInput" class="col-form-label">Ban Reason:</label>
-					<textarea id="banUserReasonInput" class="form-control" @bind="_Reason"></textarea>
-				</form>
-			</div>
-			<div class="modal-footer">
-				<button class="btn btn-primary" @onclick="SubmitUserBan">Submit Ban</button>
-			</div>
-		</div>
-	</div>
-</div>
+		<label for="banUserReasonInput" class="col-form-label">Ban Reason:</label>
+		<textarea id="banUserReasonInput" class="form-control" @bind="_Reason"></textarea>
+	</form>
+	</Body>
+	<Footer>
+		<button class="btn btn-primary" @onclick="SubmitUserBan">Submit Ban</button>
+	</Footer>
+</Dialog>
 
 @code {
-
-	private const string ModalId = "banUserModal";
-
-	private IJSObjectReference? _BootstrapModalModule;
 
 	private long? _SteamId;
 	private string? _SteamName;
 	private string? _Reason;
 
-	private bool _Disposed;
+	protected override string ModalId => "banUserModal";
 
-	protected override async Task OnAfterRenderAsync(bool firstRender)
-	{
-		if (firstRender)
-		{
-			_BootstrapModalModule = await JsRuntime.InvokeAsync<IJSObjectReference>("import", "./js/bootstrap-modal.js");
-		}
-	}
-
-	public async Task ShowAsync(long steamId, string? steamName)
+	public async ValueTask ShowAsync(long steamId, string? steamName)
 	{
 		_SteamId = steamId;
 		_SteamName = steamName;
 		StateHasChanged();
 
-		await _BootstrapModalModule!.InvokeVoidAsync("showModal", $"#{ModalId}");
+		await ShowAsync();
 	}
 
-	public async Task HideAsync()
+	public new ValueTask HideAsync()
 	{
-		await _BootstrapModalModule!.InvokeVoidAsync("hideModal", $"#{ModalId}");
+		return base.HideAsync();
 	}
 
 	private async Task SubmitUserBan()
@@ -79,23 +62,6 @@
 		await LevelTagApi.PostUserBan(createUserBanDto);
 
 		await HideAsync();
-	}
-
-	public async ValueTask DisposeAsync()
-	{
-		if (_Disposed)
-			return;
-
-		if (_BootstrapModalModule != null)
-		{
-			try
-			{
-				await _BootstrapModalModule.DisposeAsync();
-			}
-			catch (JSDisconnectedException) { }
-		}
-
-		_Disposed = true;
 	}
 
 }

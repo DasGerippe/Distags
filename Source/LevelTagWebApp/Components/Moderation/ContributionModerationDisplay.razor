@@ -1,6 +1,9 @@
 ﻿@using LevelTagApi.Dtos
 @using LevelTagWebApp.Components.Dialogs
 @using LevelTagWebApp.Components.Level
+@using LevelTagWebApp.Services
+
+@inject IDialogService DialogService
 
 <div class="row border border-1 border-opacity-25 rounded-3 shadow mx-0 py-2 @GetContainerClass()">
 	<!-- Level -->
@@ -37,12 +40,6 @@
 	[Parameter]
 	public required ContributionDto Contribution { get; set; }
 
-	[CascadingParameter]
-	public required BanUserDialog BanUserDialog { get; set; }
-
-	[CascadingParameter]
-	public required RevertContributionsDialog RevertContributionsDialog { get; set; }
-
 	private string GetContainerClass()
 	{
 		return Contribution.Action switch
@@ -75,12 +72,18 @@
 	private async Task OnBanUserButtonClicked()
 	{
 		if (Contribution.Contributor is ContributorUserDto { SteamId: not null } user)
-			await BanUserDialog.ShowAsync(user.SteamId.Value, user.SteamName);
+		{
+			BanUserDialog? banUserDialog = DialogService.Get<BanUserDialog>();
+			if (banUserDialog != null)
+				await banUserDialog.ShowAsync(user.SteamId.Value, user.SteamName);
+		}
 	}
 
 	private async Task OnRevertContributionClicked()
 	{
-		await RevertContributionsDialog.ShowAsync(Contribution);
+		RevertContributionsDialog? revertContributionsDialog = DialogService.Get<RevertContributionsDialog>();
+		if (revertContributionsDialog != null)
+			await revertContributionsDialog.ShowAsync(Contribution);
 	}
 
 }
