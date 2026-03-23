@@ -26,7 +26,7 @@
 		<button class="btn" @onclick="OnBanUserButtonClicked">
 			<svg style="width:1.5rem; height:1.5rem; color: @GetBanUserIconColor();"><use href="icons.svg#ban-solid" /></svg>
 		</button>
-		<ContributorDisplay Contributor="Contribution.Contributor" ShowSteamId="true" />
+		<ContributorDisplay Contributor="Contribution.Contributor" ShowSteamId="true" IgnoreAnonymity="true" />
 	</div>
 
 	<!-- Contribution Date -->

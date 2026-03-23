@@ -36,7 +36,10 @@
 	public required ContributorDto Contributor { get; set; }
 
 	[Parameter]
-	public bool ShowSteamId { get; set; } = false;
+	public bool ShowSteamId { get; set; }
+
+	[Parameter]
+	public bool IgnoreAnonymity { get; set; }
 
 	private string GetContributorNameClass()
 	{
@@ -53,7 +56,7 @@
 		return Contributor switch
 		{
 			ContributorAppDto app => app.Name,
-			ContributorUserDto user => user.IsAnonymous
+			ContributorUserDto user => user.IsAnonymous && !IgnoreAnonymity
 				? Resource.Contributor_AnonymousUserName
 				: user.SteamName ?? Resource.Contributor_UnknownUserName,
 			_ => throw new ArgumentOutOfRangeException(),
