@@ -85,6 +85,13 @@ public class AuthenticationController : ControllerBase
         return Ok(sessionResponse);
     }
 
+    [HttpGet("validate-session")]
+    [Authorize(AuthenticationSchemes = Constants.Session.AuthenticationScheme)]
+    public IActionResult ValidateSession()
+    {
+        return Ok();
+    }
+
     [HttpPost("logout")]
     [Authorize(AuthenticationSchemes = Constants.Session.AuthenticationScheme)]
     public async Task<IActionResult> Logout([FromHeader(Name = LevelTagApiConstants.SessionTokenHeader)] string sessionToken)
