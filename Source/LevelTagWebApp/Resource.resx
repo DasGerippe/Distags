@@ -142,7 +142,7 @@
     <value>Creator (Z → A)</value>
   </data>
   <data name="Contributor_AnonymousUserName" xml:space="preserve">
-    <value>Anonymous</value>
+    <value>Anonymous User</value>
   </data>
   <data name="Contributor_UnknownUserName" xml:space="preserve">
     <value>Unknown User</value>
@@ -164,5 +164,20 @@
   </data>
   <data name="ContributionPrerequisiteGuidelinesText" xml:space="preserve">
     <value>Please accept the contribution guidelines to add or remove tags.</value>
+  </data>
+  <data name="Setting_ContributionGuidelines_Title" xml:space="preserve">
+    <value>Contribution Guidelines</value>
+  </data>
+  <data name="Setting_ContributionGuidelines_Accept" xml:space="preserve">
+    <value>Accept Contribution Guidelines</value>
+  </data>
+  <data name="Setting_ContributionGuidelines_Accepted" xml:space="preserve">
+    <value>You already agreed to our contribution guidelines.</value>
+  </data>
+  <data name="Setting_Anonymous_Title" xml:space="preserve">
+    <value>Anonymous Contributions</value>
+  </data>
+  <data name="Setting_Anonymous_Text" xml:space="preserve">
+    <value>Other users will see "{0}" instead of your name on your contributions. Moderators of the site will still be able to see your name.</value>
   </data>
 </root>

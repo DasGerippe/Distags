@@ -79,7 +79,7 @@ namespace LevelTagWebApp {
         }
         
         /// <summary>
-        ///   Sucht eine lokalisierte Zeichenfolge, die Anonymous ähnelt.
+        ///   Sucht eine lokalisierte Zeichenfolge, die Anonymous User ähnelt.
         /// </summary>
         internal static string Contributor_AnonymousUserName {
             get {
@@ -201,6 +201,51 @@ namespace LevelTagWebApp {
         internal static string Enum_LevelSortStrategy_UpdatedDesc {
             get {
                 return ResourceManager.GetString("Enum_LevelSortStrategy_UpdatedDesc", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Other users will see &quot;{0}&quot; instead of your name on your contributions. Moderators of the site will still be able to see your name. ähnelt.
+        /// </summary>
+        internal static string Setting_Anonymous_Text {
+            get {
+                return ResourceManager.GetString("Setting_Anonymous_Text", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Anonymous Contributions ähnelt.
+        /// </summary>
+        internal static string Setting_Anonymous_Title {
+            get {
+                return ResourceManager.GetString("Setting_Anonymous_Title", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Accept Contribution Guidelines ähnelt.
+        /// </summary>
+        internal static string Setting_ContributionGuidelines_Accept {
+            get {
+                return ResourceManager.GetString("Setting_ContributionGuidelines_Accept", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die You already agreed to our contribution guidelines. ähnelt.
+        /// </summary>
+        internal static string Setting_ContributionGuidelines_Accepted {
+            get {
+                return ResourceManager.GetString("Setting_ContributionGuidelines_Accepted", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Contribution Guidelines ähnelt.
+        /// </summary>
+        internal static string Setting_ContributionGuidelines_Title {
+            get {
+                return ResourceManager.GetString("Setting_ContributionGuidelines_Title", resourceCulture);
             }
         }
     }

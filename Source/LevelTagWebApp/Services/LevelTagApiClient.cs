@@ -137,6 +137,14 @@ public class LevelTagApiClient : IDisposable
         return user;
     }
 
+    public async Task PatchUserSettings(PatchSettingsParameters parameters, CancellationToken cancellationToken = default)
+    {
+        string requestUri = "api/users/me/settings";
+        HttpResponseMessage responseMessage =
+            await _HttpClient.PatchAsJsonAsync(requestUri, parameters, cancellationToken).ConfigureAwait(false);
+        responseMessage.EnsureSuccessStatusCode();
+    }
+
     public async Task<GetContributionsResponse> GetContributionsAsync(
         GetContributionsParameters parameters, CancellationToken cancellationToken = default)
     {
@@ -166,6 +174,21 @@ public class LevelTagApiClient : IDisposable
             await GetContentAsync<RevertContributionsResponse>(responseMessage, cancellationToken);
 
         return response;
+    }
+
+    public async Task<GuidelinesDto> GetContributionGuidelinesAsync(CancellationToken cancellationToken = default)
+    {
+        string requestUri = "api/guidelines/contribution";
+        HttpResponseMessage responseMessage = await _HttpClient.GetAsync(requestUri, cancellationToken).ConfigureAwait(false);
+        GuidelinesDto response = await GetContentAsync<GuidelinesDto>(responseMessage, cancellationToken).ConfigureAwait(false);
+        return response;
+    }
+
+    public async Task AcceptContributionGuidelinesAsync(CancellationToken cancellationToken = default)
+    {
+        string requestUri = "api/guidelines/contribution/accept";
+        HttpResponseMessage responseMessage = await _HttpClient.PostAsync(requestUri, null, cancellationToken).ConfigureAwait(false);
+        responseMessage.EnsureSuccessStatusCode();
     }
 
     private async Task<TResponseContent> GetContentAsync<TResponseContent>(

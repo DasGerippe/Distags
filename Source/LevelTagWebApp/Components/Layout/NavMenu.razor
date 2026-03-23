@@ -69,10 +69,10 @@
 							{
 								<img src="https://avatars.steamstatic.com/@(_UserInfo.SteamAvatarHash).jpg" alt="User Avatar" />
 							}
-							<span class="ps-2">@(_UserInfo.SteamName ?? "Profile")</span>
+							<span class="ps-2">@(string.IsNullOrEmpty(_UserInfo.SteamName) ? "Profile" : _UserInfo.SteamName)</span>
 						</a>
 						<ul class="dropdown-menu dropdown-menu-end shadow" aria-labelledby="userDropdown">
-							<li><a class="dropdown-item" href="profile">Profile</a></li>
+							<li><a class="dropdown-item" href="settings">Settings</a></li>
 							<li><hr class="dropdown-divider" /></li>
 							<li><button class="dropdown-item" @onclick="_ => Logout(false)">Logout</button></li>
 							<li><button class="dropdown-item" @onclick="_ => Logout(true)">Logout everywhere</button></li>
