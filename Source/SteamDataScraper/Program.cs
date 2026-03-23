@@ -5,11 +5,11 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Serilog;
+using SerilogUtils;
 using SteamDataScraper.Creators;
 using SteamDataScraper.Levels;
 using SteamWebApi;
 using System.Runtime.CompilerServices;
-using SerilogUtils;
 
 namespace SteamDataScraper;
 

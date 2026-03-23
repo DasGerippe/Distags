@@ -8,11 +8,13 @@
 
   <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.SignalR.Client" Version="9.0.8" />
+    <PackageReference Include="Serilog.AspNetCore" Version="9.0.0" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\HttpUtils\HttpUtils.csproj" />
     <ProjectReference Include="..\LevelTagApi.Dtos\LevelTagApi.Dtos.csproj" />
+    <ProjectReference Include="..\SerilogUtils\SerilogUtils.csproj" />
   </ItemGroup>
 
   <ItemGroup>

@@ -2,14 +2,26 @@ using LevelTagWebApp.Components;
 using LevelTagWebApp.Security;
 using LevelTagWebApp.Services;
 using Microsoft.AspNetCore.Components.Server.Circuits;
+using Serilog;
+using SerilogUtils;
 
-namespace LevelTagWebApp
+namespace LevelTagWebApp;
+
+public class Program
 {
-    public class Program
+    public static void Main(string[] args)
     {
-        public static void Main(string[] args)
+        Log.Logger = new LoggerConfiguration()
+            .ConfigureConsoleAndFileSinks(nameof(LevelTagWebApp))
+            .CreateBootstrapLogger();
+
+        try
         {
             WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
+
+            builder.Services.AddSerilog(loggerConfig => loggerConfig
+                .ReadFrom.Configuration(builder.Configuration)
+                .ConfigureConsoleAndFileSinks(nameof(LevelTagWebApp)));
 
             // Add services to the container.
             builder.Services.AddRazorComponents()
@@ -53,6 +65,14 @@ namespace LevelTagWebApp
                 .AddInteractiveServerRenderMode();
 
             app.Run();
+        }
+        catch (Exception ex)
+        {
+            Log.Fatal(ex, "An unexpected error occurred causing the Host to terminate.");
+        }
+        finally
+        {
+            Log.CloseAndFlush();
         }
     }
 }

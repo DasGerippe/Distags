@@ -8,6 +8,8 @@ using LevelTagApi.Sorting;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.Extensions.Options;
+using Serilog;
+using SerilogUtils;
 using SteamWebApi;
 
 namespace LevelTagApi
@@ -16,51 +18,70 @@ namespace LevelTagApi
     {
         public static void Main(string[] args)
         {
-            WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
+            Log.Logger = new LoggerConfiguration()
+                .ConfigureConsoleAndFileSinks(nameof(LevelTagApi))
+                .CreateBootstrapLogger();
 
-            AddAuthentication(builder);
-            AddAuthorization(builder);
-
-            builder.Services.AddControllers();
-            builder.Services.AddHttpContextAccessor();
-            // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
-            builder.Services.AddOpenApi();
-
-            string levelTagsDbConnectionString = builder.Configuration.GetConnectionString("LevelTagsDatabase") ??
-                                                 throw new InvalidOperationException("Connection string not configured.");
-            builder.Services.AddPostgreSqlLevelTagDbContext(levelTagsDbConnectionString);
-
-            builder.Services.AddSignalR();
-
-            builder.Services.AddSteamWebApi("SteamWebApi");
-
-            AddValidatedConfigOptions<LevelTagApiSettings>(builder, "LevelTagApiSettings");
-
-            builder.Services.AddTransient<IQueryableFilterFactory<Level, BrowseLevelsParameters>, BrowseLevelsFilterFactory>();
-            builder.Services.AddTransient<IQueryableSorterFactory<Level, LevelSortStrategy>, LevelSorterFactory>();
-
-            builder.Services.AddSingleton<ITicketStore<long>, ConcurrentTicketStore<long>>();
-            builder.Services.AddTransient<ITokenGenerator, RandomBase64UrlTokenGenerator>();
-
-            builder.Services.AddTransient<RoleProvider>();
-
-            WebApplication app = builder.Build();
-
-            // Configure the HTTP request pipeline.
-            if (app.Environment.IsDevelopment())
+            try
             {
-                app.MapOpenApi();
+                WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
+
+                builder.Services.AddSerilog(loggerConfig => loggerConfig
+                    .ReadFrom.Configuration(builder.Configuration)
+                    .ConfigureConsoleAndFileSinks(nameof(LevelTagApi)));
+
+                AddAuthentication(builder);
+                AddAuthorization(builder);
+
+                builder.Services.AddControllers();
+                builder.Services.AddHttpContextAccessor();
+                // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
+                builder.Services.AddOpenApi();
+
+                string levelTagsDbConnectionString = builder.Configuration.GetConnectionString("LevelTagsDatabase") ??
+                                                     throw new InvalidOperationException("Connection string not configured.");
+                builder.Services.AddPostgreSqlLevelTagDbContext(levelTagsDbConnectionString);
+
+                builder.Services.AddSignalR();
+
+                builder.Services.AddSteamWebApi("SteamWebApi");
+
+                AddValidatedConfigOptions<LevelTagApiSettings>(builder, "LevelTagApiSettings");
+
+                builder.Services.AddTransient<IQueryableFilterFactory<Level, BrowseLevelsParameters>, BrowseLevelsFilterFactory>();
+                builder.Services.AddTransient<IQueryableSorterFactory<Level, LevelSortStrategy>, LevelSorterFactory>();
+
+                builder.Services.AddSingleton<ITicketStore<long>, ConcurrentTicketStore<long>>();
+                builder.Services.AddTransient<ITokenGenerator, RandomBase64UrlTokenGenerator>();
+
+                builder.Services.AddTransient<RoleProvider>();
+
+                WebApplication app = builder.Build();
+
+                // Configure the HTTP request pipeline.
+                if (app.Environment.IsDevelopment())
+                {
+                    app.MapOpenApi();
+                }
+
+                app.UseHttpsRedirection();
+
+                app.UseAuthorization();
+
+                app.MapControllers();
+
+                app.MapHub<LevelHub>("/levelHub");
+
+                app.Run();
             }
-
-            app.UseHttpsRedirection();
-
-            app.UseAuthorization();
-
-            app.MapControllers();
-
-            app.MapHub<LevelHub>("/levelHub");
-
-            app.Run();
+            catch (Exception ex)
+            {
+                Log.Fatal(ex, "An unexpected error occurred causing the Host to terminate.");
+            }
+            finally
+            {
+                Log.CloseAndFlush();
+            }
         }
 
         private static void AddValidatedConfigOptions<TOptions>(WebApplicationBuilder builder, string configSectionPath)
