@@ -20,11 +20,11 @@ public static class ServiceCollectionExtensions
             .UseNpgsql(connectionString, dbOptions => dbOptions.MigrationsAssembly("DataStoringMigrations"))
             .UseSnakeCaseNamingConvention());
 
-        services.AddTransient<IRepository<TagGroup>, Repository<TagGroup, LevelTagDbContext>>();
-        services.AddTransient<IRepository<Tag>, Repository<Tag, LevelTagDbContext>>();
-        services.AddTransient<IRepository<Level>, Repository<Level, LevelTagDbContext>>();
-        services.AddTransient<IRepository<LevelTag>, Repository<LevelTag, LevelTagDbContext>>();
-        services.AddTransient<IRepository<SteamUser>, Repository<SteamUser, LevelTagDbContext>>();
+        services.AddScoped<IRepository<TagGroup>, Repository<TagGroup, LevelTagDbContext>>();
+        services.AddScoped<IRepository<Tag>, Repository<Tag, LevelTagDbContext>>();
+        services.AddScoped<IRepository<Level>, Repository<Level, LevelTagDbContext>>();
+        services.AddScoped<IRepository<LevelTag>, Repository<LevelTag, LevelTagDbContext>>();
+        services.AddScoped<IRepository<SteamUser>, Repository<SteamUser, LevelTagDbContext>>();
 
         return services;
     }
