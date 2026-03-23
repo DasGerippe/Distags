@@ -7,4 +7,6 @@ public class User
     public long? SteamId { get; set; }
 
     public List<string> Roles { get; set; } = [];
+
+    public List<UserSession> Sessions { get; set; } = [];
 }
