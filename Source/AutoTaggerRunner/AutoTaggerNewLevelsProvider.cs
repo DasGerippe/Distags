@@ -20,6 +20,7 @@ public class AutoTaggerNewLevelsProvider : IAutoTaggerLevelProvider
         await using ConfiguredAsyncDisposable _ = dbContext.ConfigureAwait(false);
 
         return await dbContext.Set<Level>()
+            .Include(level => level.Tags)
             .Where(level => level.CreatedOn > state.LastAutoTagging)
             .OrderBy(level => level.CreatedOn)
             .ToListAsync().ConfigureAwait(false);
