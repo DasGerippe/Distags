@@ -3,6 +3,9 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
+using SteamDataScraper.Creators;
+using SteamDataScraper.Levels;
 using SteamWebApi;
 using System.Runtime.CompilerServices;
 
@@ -31,18 +34,23 @@ internal class Program
         {
             services.AddSteamWebApi("SteamWebApi");
 
-            services.AddOptions<SteamDataScraperSettings>()
-                .BindConfiguration("SteamDataScraper")
+            services.AddOptions<CreatorRefreshSettings>()
+                .BindConfiguration($"{nameof(SteamDataScraper)}:{nameof(CreatorRefreshSettings)}")
                 .ValidateDataAnnotations()
                 .ValidateOnStart();
+            services.AddTransient<CreatorRefreshSettings>(services =>
+                services.GetRequiredService<IOptions<CreatorRefreshSettings>>().Value);
 
             string levelTagsDbConnectionString = context.Configuration.GetConnectionString("LevelTagsDatabase") ??
                                                  throw new InvalidOperationException("Connection string not configured.");
             services.AddPostgreSqlLevelTagDbContext(levelTagsDbConnectionString);
 
+
             services.AddTransient<Program>();
             services.AddTransient<LevelScraper>();
-            services.AddTransient<LevelCreatorScraper>();
+            services.AddTransient<CreatorScraper>();
+            services.AddTransient<ICreatorRefreshDateManager, CreatorRefreshDateFileManager>();
+            services.AddTransient<ICreatorRefreshCountCalculator, CreatorRefreshCountCalculator>();
         });
 
         hostBuilder.ConfigureLogging(loggingBuilder =>
@@ -64,10 +72,10 @@ internal class Program
     }
 
     private readonly LevelScraper _LevelScraper;
-    private readonly LevelCreatorScraper _CreatorScraper;
+    private readonly CreatorScraper _CreatorScraper;
     private readonly ILogger<Program> _Logger;
 
-    public Program(LevelScraper levelScraper, LevelCreatorScraper creatorScraper, ILogger<Program> logger)
+    public Program(LevelScraper levelScraper, CreatorScraper creatorScraper, ILogger<Program> logger)
     {
         _LevelScraper = levelScraper;
         _CreatorScraper = creatorScraper;
@@ -82,8 +90,8 @@ internal class Program
         {
             await _LevelScraper.ScrapeLevelsAsync().ConfigureAwait(false);
 
-            await _CreatorScraper.ScrapeOutdatedLevelCreatorsAsync().ConfigureAwait(false);
             await _CreatorScraper.ScrapeUnknownLevelCreatorsAsync().ConfigureAwait(false);
+            await _CreatorScraper.ScrapeOutdatedLevelCreatorsAsync().ConfigureAwait(false);
         }
         catch (Exception ex)
         {

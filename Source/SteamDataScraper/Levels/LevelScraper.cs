@@ -1,12 +1,12 @@
 ﻿using DataClasses;
 using DataStoring;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using SteamWebApi;
 using SteamWebApi.ApiInterfaces;
 using SteamWebApi.Dtos.PublishedFileService;
 
-namespace SteamDataScraper;
+namespace SteamDataScraper.Levels;
 
 public class LevelScraper
 {
@@ -21,12 +21,12 @@ public class LevelScraper
     public LevelScraper(
         LevelTagDbContext levelTagDbContext,
         IPublishedFileService publishedFileService,
-        [FromKeyedServices("SteamWebApiKey")] string steamWebApiKey,
+        SteamWebApiSettings steamWebApiSettings,
         ILogger<LevelScraper> logger)
     {
         _LevelTagDbContext = levelTagDbContext;
         _PublishedFileService = publishedFileService;
-        _SteamWebApiKey = steamWebApiKey;
+        _SteamWebApiKey = steamWebApiSettings.ApiKey;
 
         _Logger = logger;
     }

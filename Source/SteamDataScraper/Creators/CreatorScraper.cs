@@ -1,34 +1,36 @@
 ﻿using DataClasses;
 using DataStoring;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
+using SteamWebApi;
 using SteamWebApi.ApiInterfaces;
 using SteamWebApi.Dtos.SteamUser;
 
-namespace SteamDataScraper;
+namespace SteamDataScraper.Creators;
 
-public class LevelCreatorScraper
+public class CreatorScraper
 {
     private readonly LevelTagDbContext _LevelTagDbContext;
     private readonly ISteamUser _SteamUser;
+    private readonly ICreatorRefreshCountCalculator _RefreshCountCalculator;
+    private readonly ICreatorRefreshDateManager _RefreshDateManager;
     private readonly string _SteamWebApiKey;
-    private readonly SteamDataScraperSettings _Settings;
 
-    private readonly ILogger<LevelCreatorScraper> _Logger;
+    private readonly ILogger<CreatorScraper> _Logger;
 
-    public LevelCreatorScraper(
+    public CreatorScraper(
         LevelTagDbContext levelTagDbContext,
         ISteamUser steamUser,
-        [FromKeyedServices("SteamWebApiKey")] string steamWebApiKey,
-        IOptions<SteamDataScraperSettings> settings,
-        ILogger<LevelCreatorScraper> logger)
+        ICreatorRefreshCountCalculator refreshCountCalculator,
+        ICreatorRefreshDateManager refreshDateManager,
+        SteamWebApiSettings steamWebApiSettings,
+        ILogger<CreatorScraper> logger)
     {
         _LevelTagDbContext = levelTagDbContext;
         _SteamUser = steamUser;
-        _SteamWebApiKey = steamWebApiKey;
-        _Settings = settings.Value;
+        _RefreshCountCalculator = refreshCountCalculator;
+        _RefreshDateManager = refreshDateManager;
+        _SteamWebApiKey = steamWebApiSettings.ApiKey;
 
         _Logger = logger;
     }
@@ -41,8 +43,7 @@ public class LevelCreatorScraper
             .Where(level => level.Creator == null)
             .Select(level => level.CreatorId)
             .Distinct()
-            .ToListAsync(cancellationToken)
-            .ConfigureAwait(false);
+            .ToListAsync(cancellationToken).ConfigureAwait(false);
 
         _Logger.LogDebug("Found {count} unknown level creators.", unknownCreatorIds.Count);
 
@@ -68,13 +69,16 @@ public class LevelCreatorScraper
     {
         _Logger.LogDebug("Scraping outdated level creators from Steam web API...");
 
-        int creatorRefreshCount = await CalculateCreatorRefreshCount(cancellationToken).ConfigureAwait(false);
-        if (creatorRefreshCount == 0)
+        int refreshCount = await _RefreshCountCalculator.CalculateCreatorRefreshCountAsync(cancellationToken).ConfigureAwait(false);
+        if (refreshCount == 0)
+        {
+            _Logger.LogDebug("Cancelling scraping of outdated level creators.");
             return;
+        }
 
         List<Creator> creators = await _LevelTagDbContext.Set<Creator>()
             .OrderBy(creator => creator.CachedOn)
-            .Take(creatorRefreshCount)
+            .Take(refreshCount)
             .ToListAsync(cancellationToken).ConfigureAwait(false);
 
         GetPlayerSummariesParameters parameters = CreateParameters(creators.Select(creator => creator.Id));
@@ -91,35 +95,9 @@ public class LevelCreatorScraper
         _Logger.LogDebug("Saving scraped level creators.");
         await _LevelTagDbContext.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
 
+        await _RefreshDateManager.SetRefreshDateAsync(DateTime.UtcNow, cancellationToken).ConfigureAwait(false);
+
         _Logger.LogDebug("Scraped outdated level creators from Steam web API.");
-    }
-
-    private async Task<int> CalculateCreatorRefreshCount(CancellationToken cancellationToken = default)
-    {
-        _Logger.LogDebug("Calculating creator refresh count...");
-
-        int creatorCount = await _LevelTagDbContext.Set<Creator>().CountAsync(cancellationToken).ConfigureAwait(false);
-        if (creatorCount == 0)
-        {
-            _Logger.LogDebug("No creators exist. Cannot calculate refresh count.");
-            return 0;
-        }
-
-        DateTime latestCacheDate = await _LevelTagDbContext.Set<Creator>()
-            .MaxAsync(creator => creator.CachedOn, cancellationToken)
-            .ConfigureAwait(false);
-
-        double refreshPercentage = (DateTime.UtcNow - latestCacheDate).TotalDays / _Settings.CreatorRefreshCycleDays;
-        int refreshCount = (int)Math.Round(refreshPercentage * creatorCount);
-
-        if (refreshCount > 0 && refreshCount < _Settings.MinCreatorRefreshCount)
-        {
-            _Logger.LogDebug("Calculated refresh count is {refreshCount}. Not worth it. Return 0 instead.", refreshCount);
-            return 0;
-        }
-
-        _Logger.LogDebug("Calculated refresh count is {refreshCount}.", refreshCount);
-        return refreshCount;
     }
 
     private GetPlayerSummariesParameters CreateParameters(IEnumerable<long> creatorIds)
