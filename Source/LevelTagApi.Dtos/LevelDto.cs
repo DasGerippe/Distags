@@ -1,6 +1,6 @@
 ﻿namespace LevelTagApi.Dtos;
 
-public class GetLevelDto
+public class LevelDto
 {
     public long Id { get; set; }
 

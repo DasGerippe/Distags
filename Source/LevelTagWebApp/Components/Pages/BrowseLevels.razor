@@ -85,7 +85,7 @@
 	private readonly IGenericDropdownItemProvider<int> _PageSizeItemsProvider = new IntDropdownItemProvider(10, 25, 50, 100);
 	private IGenericDropdownItemProvider<LevelSortStrategy>? _SortStrategyItemsProvider;
 
-	private List<GetLevelDto> _Levels = [];
+	private List<LevelDto> _Levels = [];
 	private int _PageCount;
 
 	private string LevelFilter { get; set; } = string.Empty;

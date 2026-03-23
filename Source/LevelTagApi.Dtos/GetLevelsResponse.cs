@@ -10,5 +10,5 @@ public class GetLevelsResponse
 
     public int TotalPages { get; set; }
 
-    public List<GetLevelDto> Levels { get; set; } = [];
+    public List<LevelDto> Levels { get; set; } = [];
 }

@@ -5,9 +5,9 @@ namespace LevelTagApi;
 
 public static class DtoConversionExtensions
 {
-    public static GetLevelDto ToDto(this Level level)
+    public static LevelDto ToDto(this Level level)
     {
-        return new GetLevelDto
+        return new LevelDto
         {
             Id = level.Id,
             Name = level.Name,

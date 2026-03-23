@@ -31,7 +31,7 @@ public class LevelsController : ControllerBase
 
     [HttpGet]
     [AllowAnonymous]
-    public async Task<ActionResult<IEnumerable<GetLevelDto>>> GetLevels([FromQuery] GetLevelsParameters parameters)
+    public async Task<ActionResult<IEnumerable<LevelDto>>> GetLevels([FromQuery] GetLevelsParameters parameters)
     {
         GetLevelsResponse response = new GetLevelsResponse
         {
@@ -61,7 +61,7 @@ public class LevelsController : ControllerBase
         if (response.TotalLevels > parameters.PageSize)
             levels = levels.Take(parameters.PageSize);
 
-        List<GetLevelDto> levelDtos = await levels
+        List<LevelDto> levelDtos = await levels
             .Include(level => level.Creator)
             .Include(level => level.Tags)
             .Select(level => level.ToDto())
@@ -73,7 +73,7 @@ public class LevelsController : ControllerBase
 
     [HttpGet("{levelId}")]
     [AllowAnonymous]
-    public async Task<ActionResult<GetLevelDto>> GetLevel(long levelId)
+    public async Task<ActionResult<LevelDto>> GetLevel(long levelId)
     {
         Level? level = await _DbContext.Set<Level>()
             .Include(level => level.Creator)
@@ -83,7 +83,7 @@ public class LevelsController : ControllerBase
         if (level == null)
             return NotFound();
 
-        GetLevelDto levelDto = level.ToDto();
+        LevelDto levelDto = level.ToDto();
         return Ok(levelDto);
     }
 

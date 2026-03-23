@@ -54,11 +54,11 @@ public class LevelTagApiClient : IDisposable
         return levelsResponse;
     }
 
-    public async Task<GetLevelDto?> GetLevelAsync(long levelId, CancellationToken cancellationToken = default)
+    public async Task<LevelDto?> GetLevelAsync(long levelId, CancellationToken cancellationToken = default)
     {
         string requestUri = $"api/levels/{levelId}";
         HttpResponseMessage responseMessage = await _HttpClient.GetAsync(requestUri, cancellationToken).ConfigureAwait(false);
-        GetLevelDto level = await GetContentAsync<GetLevelDto>(responseMessage, cancellationToken).ConfigureAwait(false);
+        LevelDto level = await GetContentAsync<LevelDto>(responseMessage, cancellationToken).ConfigureAwait(false);
         return level;
     }
 

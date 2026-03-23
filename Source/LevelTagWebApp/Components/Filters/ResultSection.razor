@@ -15,7 +15,7 @@
 			</tr>
 		</thead>
 		<tbody>
-			@foreach (GetLevelDto level in PagedItems)
+			@foreach (LevelDto level in PagedItems)
 			{
 				<tr>
 					<td style="text-align:center;"><img src="@level.IconUrl" alt="Icon" style="max-height:40px;" /></td>
@@ -60,7 +60,7 @@
 @code {
 
 	[Parameter]
-	public IEnumerable<GetLevelDto> Levels { get; set; } = [];
+	public IEnumerable<LevelDto> Levels { get; set; } = [];
 
 	[Parameter]
 	public bool EnablePaging { get; set; } = false;
@@ -70,7 +70,7 @@
 
 	private int CurrentPage { get; set; } = 1;
 
-	private IEnumerable<GetLevelDto> PagedItems => EnablePaging
+	private IEnumerable<LevelDto> PagedItems => EnablePaging
 		? (Levels ?? []).Skip((CurrentPage - 1) * PageSize).Take(PageSize)
 		: (Levels ?? []);
 
