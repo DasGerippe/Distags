@@ -38,7 +38,8 @@ public class UsersController : ControllerBase
             return Unauthorized();
 
         user.IsAnonymous = parameters.IsAnonymous ?? user.IsAnonymous;
-
-        return Ok();
+        
+        await _DbContext.SaveChangesAsync();
+        return NoContent();
     }
 }
