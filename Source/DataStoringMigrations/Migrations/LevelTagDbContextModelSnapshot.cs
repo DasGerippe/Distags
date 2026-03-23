@@ -195,20 +195,27 @@ namespace DataStoringMigrations.Migrations
             modelBuilder.Entity("DataClasses.User", b =>
                 {
                     b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("bigint")
                         .HasColumnName("id");
 
-                    b.Property<string>("Name")
-                        .HasColumnType("text")
-                        .HasColumnName("name");
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
 
                     b.PrimitiveCollection<List<string>>("Roles")
                         .IsRequired()
                         .HasColumnType("text[]")
                         .HasColumnName("roles");
 
+                    b.Property<long?>("SteamId")
+                        .HasColumnType("bigint")
+                        .HasColumnName("steam_id");
+
                     b.HasKey("Id")
                         .HasName("pk_users");
+
+                    b.HasIndex("SteamId")
+                        .IsUnique()
+                        .HasDatabaseName("ix_users_steam_id");
 
                     b.ToTable("users", (string)null);
                 });

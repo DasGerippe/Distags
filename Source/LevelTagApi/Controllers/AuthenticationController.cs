@@ -116,12 +116,12 @@ public class AuthenticationController : ControllerBase
 
     private User GetOrCreateUser(long steamId)
     {
-        User? user = _DbContext.Set<User>().FirstOrDefault(user => user.Id == steamId);
+        User? user = _DbContext.Set<User>().FirstOrDefault(user => user.SteamId == steamId);
         if (user == null)
         {
             user = new User
             {
-                Id = steamId,
+                SteamId = steamId,
                 Roles = _Settings.DefaultUserRoles.ToList(),
             };
             _DbContext.Add(user);

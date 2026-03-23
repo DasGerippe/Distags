@@ -67,8 +67,8 @@ public class LevelTagDbContext : DbContext
     private void ConfigureUserEntity(ModelBuilder modelBuilder)
     {
         modelBuilder.Entity<User>()
-            .Property(user => user.Id)
-            .ValueGeneratedNever();
+            .HasIndex(user => user.SteamId)
+            .IsUnique(); // Most database engines allow multiple NULL values in a column with a unique constraint.
     }
 
     private void ConfigureUserSessionEntity(ModelBuilder modelBuilder)
