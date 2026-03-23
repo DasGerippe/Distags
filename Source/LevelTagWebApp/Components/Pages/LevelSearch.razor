@@ -1,0 +1,24 @@
+﻿@page "/"
+@page "/search"
+@using LevelTagApi.Dtos
+@using LevelTagWebApp.Components.Filters
+@rendermode InteractiveServer
+
+<div class="row">
+	<FilterSection FilesQueried="UpdateResultTable"/>
+</div>
+
+<div class="row">
+	<ResultSection Levels="_Levels"/>
+</div>
+
+@code {
+
+	private List<GetLevelDto> _Levels = [];
+
+	private void UpdateResultTable(List<GetLevelDto> levels)
+	{
+		_Levels = levels;
+	}
+
+}

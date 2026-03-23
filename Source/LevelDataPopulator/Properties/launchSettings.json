@@ -1,0 +1,10 @@
+{
+  "profiles": {
+    "LevelDataPopulator": {
+      "commandName": "Project",
+      "environmentVariables": {
+        "DOTNET_ENVIRONMENT": "Development"
+      }
+    }
+  }
+}

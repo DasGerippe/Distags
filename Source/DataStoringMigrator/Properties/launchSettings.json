@@ -1,0 +1,10 @@
+{
+  "profiles": {
+    "DataStoringMigrator": {
+      "commandName": "Project",
+      "environmentVariables": {
+        "DOTNET_ENVIRONMENT": "Development"
+      }
+    }
+  }
+}
