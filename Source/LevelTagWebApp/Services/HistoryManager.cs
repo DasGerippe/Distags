@@ -2,11 +2,11 @@
 
 namespace LevelTagWebApp.Services;
 
-public class HistoryService
+public class HistoryManager
 {
     private readonly IJSRuntime _JsRuntime;
 
-    public HistoryService(IJSRuntime jsRuntime)
+    public HistoryManager(IJSRuntime jsRuntime)
     {
         _JsRuntime = jsRuntime;
     }

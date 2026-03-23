@@ -21,7 +21,7 @@ namespace LevelTagWebApp
 
             builder.Services.AddLocalization();
 
-            builder.Services.AddScoped<HistoryService>();
+            builder.Services.AddTransient<HistoryManager>();
 
             WebApplication app = builder.Build();
 
