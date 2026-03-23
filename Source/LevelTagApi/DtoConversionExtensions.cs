@@ -45,4 +45,15 @@ public static class DtoConversionExtensions
             IsAutoTag = tag.IsAutoTag,
         };
     }
+
+    public static UserDto ToDto(this User user)
+    {
+        return new UserDto
+        {
+            SteamId = user.SteamId ?? throw new InvalidOperationException("Cannot convert user without Steam ID to DTO."),
+            SteamName = user.SteamName,
+            SteamAvatarHash = user.SteamAvatarHash,
+            Roles = user.Roles,
+        };
+    }
 }

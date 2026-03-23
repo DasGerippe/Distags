@@ -1,7 +1,9 @@
-﻿using LevelTagApi.Dtos;
+﻿using DataClasses;
+using DataStoring;
+using LevelTagApi.Dtos;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using System.Security.Claims;
+using Microsoft.EntityFrameworkCore;
 
 namespace LevelTagApi.Controllers;
 
@@ -9,25 +11,25 @@ namespace LevelTagApi.Controllers;
 [Route("api/[controller]")]
 public class UsersController : ControllerBase
 {
+    private readonly LevelTagDbContext _DbContext;
+
+    public UsersController(LevelTagDbContext dbContext)
+    {
+        _DbContext = dbContext;
+    }
+
     [HttpGet("me")]
     [Authorize]
-    public ActionResult<UserDto> GetMe()
+    public async Task<ActionResult<UserDto>> GetMe([FromHeader(Name = LevelTagApiConstants.SessionTokenHeader)] string sessionToken)
     {
-        string? steamIdValue = User.FindFirstValue(Constants.Claims.SteamId);
-        if (steamIdValue == null || !long.TryParse(steamIdValue, out long steamId))
+        UserSession? userSession = await _DbContext.Set<UserSession>()
+            .Include(session => session.User)
+            .FirstOrDefaultAsync(session => session.Token == sessionToken);
+
+        if (userSession?.User.SteamId == null)
             return Unauthorized();
 
-        List<string> roles = User.Claims
-            .Where(claim => claim.Type == ClaimTypes.Role)
-            .Select(claim => claim.Value)
-            .ToList();
-
-        UserDto userDto = new UserDto
-        {
-            SteamId = steamId,
-            Roles = roles,
-        };
-
+        UserDto userDto = userSession.User.ToDto();
         return Ok(userDto);
     }
 }
