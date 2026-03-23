@@ -41,6 +41,10 @@ GRANT distance_level_tags_user TO distance_level_tags_manage_contributions;
 GRANT SELECT, INSERT, UPDATE, DELETE ON TABLE contributions TO distance_level_tags_manage_contributions;
 GRANT USAGE, SELECT, UPDATE ON SEQUENCE contributions_id_seq TO distance_level_tags_manage_contributions;
 
+CREATE ROLE distance_level_tags_manage_user_bans NOLOGIN;
+GRANT distance_level_tags_user TO distance_level_tags_manage_user_bans;
+GRANT SELECT, INSERT, UPDATE, DELETE ON TABLE user_bans TO distance_level_tags_manage_user_bans;
+
 -- Users --
 
 CREATE ROLE distance_level_tags_migrator WITH LOGIN PASSWORD '';
@@ -53,6 +57,7 @@ GRANT distance_level_tags_assign_tags TO distance_level_tags_api;
 GRANT distance_level_tags_manage_users TO distance_level_tags_api;
 GRANT distance_level_tags_manage_apps TO distance_level_tags_api;
 GRANT distance_level_tags_manage_contributions TO distance_level_tags_api;
+GRANT distance_level_tags_manage_user_bans TO distance_level_tags_api;
 
 CREATE ROLE distance_level_tags_scraper WITH LOGIN PASSWORD '';
 GRANT distance_level_tags_manage_levels TO distance_level_tags_scraper;
