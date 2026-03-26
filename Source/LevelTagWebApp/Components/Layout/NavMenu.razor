@@ -28,24 +28,24 @@
 			<!-- Navigation Links -->
 			<ul class="navbar-nav mx-auto mb-2 mb-md-0">
 				<li class="nav-item">
-					<NavLink class="nav-link" href="browse">Browse Levels</NavLink>
+					<NavLink class="nav-link" href="browse">@Resource.NavLink_BrowseLevels</NavLink>
 				</li>
 				<li class="nav-item">
-					<NavLink class="nav-link" href="tags">Tag Glossary</NavLink>
+					<NavLink class="nav-link" href="tags">@Resource.NavLink_TagGlossary</NavLink>
 				</li>
 				<li class="nav-item">
-					<NavLink class="nav-link" href="contributions">Contributions</NavLink>
+					<NavLink class="nav-link" href="contributions">@Resource.NavLink_Contributions</NavLink>
 				</li>
                 @if (_UserInfo?.Roles.Contains("Moderator") == true)
                 {
                     <li class="nav-item">
-                        <NavLink class="nav-link" href="moderation">Moderation</NavLink>
+						<NavLink class="nav-link" href="moderation">@Resource.NavLink_Moderation</NavLink>
                     </li>
                 }
                 @if (_UserInfo?.Roles.Contains("Administrator") == true)
                 {
                     <li class="nav-item">
-                        <NavLink class="nav-link" href="admin">Administration</NavLink>
+						<NavLink class="nav-link" href="admin">@Resource.NavLink_Administration</NavLink>
                     </li>
                 }
 			</ul>
@@ -75,13 +75,17 @@
 							{
 								<img src="https://avatars.steamstatic.com/@(_UserInfo.SteamAvatarHash).jpg" alt="User Avatar" />
 							}
-							<span class="ps-2">@(string.IsNullOrEmpty(_UserInfo.SteamName) ? "Profile" : _UserInfo.SteamName)</span>
+                            <span class="ps-2">
+                                @(string.IsNullOrEmpty(_UserInfo.SteamName)
+                                    ? Resource.ProfileDropdown_FallbackText
+                                    : _UserInfo.SteamName)
+                            </span>
 						</a>
 						<ul class="dropdown-menu dropdown-menu-end shadow" aria-labelledby="userDropdown">
-							<li><a class="dropdown-item" href="settings">Settings</a></li>
+							<li><a class="dropdown-item" href="settings">@Resource.ProfileDropdown_Settings</a></li>
 							<li><hr class="dropdown-divider" /></li>
-							<li><button class="dropdown-item" @onclick="_ => Logout(false)">Logout</button></li>
-							<li><button class="dropdown-item" @onclick="_ => Logout(true)">Logout everywhere</button></li>
+							<li><button class="dropdown-item" @onclick="_ => Logout(false)">@Resource.ProfileDropdown_Logout</button></li>
+							<li><button class="dropdown-item" @onclick="_ => Logout(true)">@Resource.ProfileDropdown_LogoutEverywhere</button></li>
 						</ul>
 					</li>
 				}

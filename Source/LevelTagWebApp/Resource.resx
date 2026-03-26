@@ -219,4 +219,31 @@
   <data name="PageTitle_Administration" xml:space="preserve">
     <value>Administration</value>
   </data>
+  <data name="NavLink_BrowseLevels" xml:space="preserve">
+    <value>Browse Levels</value>
+  </data>
+  <data name="NavLink_TagGlossary" xml:space="preserve">
+    <value>Tag Glossary</value>
+  </data>
+  <data name="NavLink_Contributions" xml:space="preserve">
+    <value>Contributions</value>
+  </data>
+  <data name="NavLink_Moderation" xml:space="preserve">
+    <value>Moderation</value>
+  </data>
+  <data name="NavLink_Administration" xml:space="preserve">
+    <value>Administration</value>
+  </data>
+  <data name="ProfileDropdown_Settings" xml:space="preserve">
+    <value>Settings</value>
+  </data>
+  <data name="ProfileDropdown_LogoutEverywhere" xml:space="preserve">
+    <value>Logout everywhere</value>
+  </data>
+  <data name="ProfileDropdown_FallbackText" xml:space="preserve">
+    <value>Profile</value>
+  </data>
+  <data name="ProfileDropdown_Logout" xml:space="preserve">
+    <value>Logout</value>
+  </data>
 </root>

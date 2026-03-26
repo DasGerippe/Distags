@@ -243,6 +243,51 @@ namespace LevelTagWebApp {
         /// <summary>
         ///   Sucht eine lokalisierte Zeichenfolge, die Administration ähnelt.
         /// </summary>
+        internal static string NavLink_Administration {
+            get {
+                return ResourceManager.GetString("NavLink_Administration", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Browse Levels ähnelt.
+        /// </summary>
+        internal static string NavLink_BrowseLevels {
+            get {
+                return ResourceManager.GetString("NavLink_BrowseLevels", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Contributions ähnelt.
+        /// </summary>
+        internal static string NavLink_Contributions {
+            get {
+                return ResourceManager.GetString("NavLink_Contributions", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Moderation ähnelt.
+        /// </summary>
+        internal static string NavLink_Moderation {
+            get {
+                return ResourceManager.GetString("NavLink_Moderation", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Tag Glossary ähnelt.
+        /// </summary>
+        internal static string NavLink_TagGlossary {
+            get {
+                return ResourceManager.GetString("NavLink_TagGlossary", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Administration ähnelt.
+        /// </summary>
         internal static string PageTitle_Administration {
             get {
                 return ResourceManager.GetString("PageTitle_Administration", resourceCulture);
@@ -318,6 +363,42 @@ namespace LevelTagWebApp {
         internal static string PageTitle_Settings {
             get {
                 return ResourceManager.GetString("PageTitle_Settings", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Profile ähnelt.
+        /// </summary>
+        internal static string ProfileDropdown_FallbackText {
+            get {
+                return ResourceManager.GetString("ProfileDropdown_FallbackText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Logout ähnelt.
+        /// </summary>
+        internal static string ProfileDropdown_Logout {
+            get {
+                return ResourceManager.GetString("ProfileDropdown_Logout", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Logout everywhere ähnelt.
+        /// </summary>
+        internal static string ProfileDropdown_LogoutEverywhere {
+            get {
+                return ResourceManager.GetString("ProfileDropdown_LogoutEverywhere", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Settings ähnelt.
+        /// </summary>
+        internal static string ProfileDropdown_Settings {
+            get {
+                return ResourceManager.GetString("ProfileDropdown_Settings", resourceCulture);
             }
         }
         
