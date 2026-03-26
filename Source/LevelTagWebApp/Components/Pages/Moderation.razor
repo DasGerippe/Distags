@@ -7,12 +7,7 @@
 @using LevelTagWebApp.Security
 
 @inject IUserInfoProvider UserInfoProvider
-
-@if (_User?.Roles.Contains("Moderator") != true)
-{
-	<div class="text-center my-3">Never Gonna Give You Up</div>
-	return;
-}
+@inject NavigationManager NavigationManager
 
 <PageTitle>@Resource.PageTitle_Moderation</PageTitle>
 
@@ -31,6 +26,11 @@
 	protected override async Task OnInitializedAsync()
 	{
 		_User = await UserInfoProvider.GetUserInfoAsync();
+        if (_User?.Roles.Contains("Moderator") != true)
+        {
+			NavigationManager.NotFound();
+            return;
+        }
 	}
 
 }
