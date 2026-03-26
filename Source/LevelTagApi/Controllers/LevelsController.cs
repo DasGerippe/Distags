@@ -1,5 +1,6 @@
 ﻿using DataClasses;
 using DataStoring;
+using LevelTagApi.ApiState;
 using LevelTagApi.Dtos;
 using LevelTagApi.Filtering;
 using LevelTagApi.Management;
@@ -106,6 +107,7 @@ public class LevelsController : ControllerBase
 
     [HttpPost("{levelId:long}/tags/{tagName}")]
     [Authorize(Policy = Constants.Policies.Tagging)]
+    [TypeFilter<MaintenanceFilter>(IsReusable = true)]
     public async Task<IActionResult> PostLevelTag(long levelId, string tagName)
     {
         Level? level = await _DbContext.Set<Level>().FirstOrDefaultAsync(level => level.Id == levelId);
@@ -128,6 +130,7 @@ public class LevelsController : ControllerBase
 
     [HttpDelete("{levelId:long}/tags/{tagName}")]
     [Authorize(Policy = Constants.Policies.Tagging)]
+    [TypeFilter<MaintenanceFilter>(IsReusable = true)]
     public async Task<IActionResult> DeleteLevelTag(long levelId, string tagName)
     {
         Level? level = await _DbContext.Set<Level>().FindAsync(levelId);

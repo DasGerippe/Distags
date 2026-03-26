@@ -192,16 +192,31 @@
   <data name="PageTitle_Level_Loading" xml:space="preserve">
     <value>Loading Level</value>
   </data>
-	<data name="PageTitle_Level_Unknown" xml:space="preserve">
+  <data name="PageTitle_Level_Unknown" xml:space="preserve">
     <value>Unknown Level</value>
   </data>
-	<data name="PageTitle_Contributions" xml:space="preserve">
+  <data name="PageTitle_Contributions" xml:space="preserve">
     <value>Contributions</value>
   </data>
-	<data name="PageTitle_Moderation" xml:space="preserve">
+  <data name="PageTitle_Moderation" xml:space="preserve">
     <value>Moderation</value>
   </data>
-	<data name="PageTitle_Settings" xml:space="preserve">
+  <data name="PageTitle_Settings" xml:space="preserve">
     <value>Settings</value>
+  </data>
+  <data name="AdminSetting_GlobalSettings_Title" xml:space="preserve">
+    <value>Global Settings</value>
+  </data>
+  <data name="AdminSetting_MaintenanceActive_Title" xml:space="preserve">
+    <value>Maintenance Active</value>
+  </data>
+  <data name="AdminSetting_MaintenanceInactive_Title" xml:space="preserve">
+    <value>Maintenance Inactive</value>
+  </data>
+  <data name="AdminSetting_Maintenance_Text" xml:space="preserve">
+    <value>When maintenance mode is active, users won't be able to contribute.</value>
+  </data>
+  <data name="PageTitle_Administration" xml:space="preserve">
+    <value>Administration</value>
   </data>
 </root>

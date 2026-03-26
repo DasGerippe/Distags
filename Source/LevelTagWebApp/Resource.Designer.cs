@@ -61,6 +61,42 @@ namespace LevelTagWebApp {
         }
         
         /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Global Settings ähnelt.
+        /// </summary>
+        internal static string AdminSetting_GlobalSettings_Title {
+            get {
+                return ResourceManager.GetString("AdminSetting_GlobalSettings_Title", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die When maintenance mode is active, users won&apos;t be able to contribute. ähnelt.
+        /// </summary>
+        internal static string AdminSetting_Maintenance_Text {
+            get {
+                return ResourceManager.GetString("AdminSetting_Maintenance_Text", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Maintenance Active ähnelt.
+        /// </summary>
+        internal static string AdminSetting_MaintenanceActive_Title {
+            get {
+                return ResourceManager.GetString("AdminSetting_MaintenanceActive_Title", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Maintenance Inactive ähnelt.
+        /// </summary>
+        internal static string AdminSetting_MaintenanceInactive_Title {
+            get {
+                return ResourceManager.GetString("AdminSetting_MaintenanceInactive_Title", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Sucht eine lokalisierte Zeichenfolge, die Please accept the contribution guidelines to add or remove tags. ähnelt.
         /// </summary>
         internal static string ContributionPrerequisiteGuidelinesText {
@@ -201,6 +237,15 @@ namespace LevelTagWebApp {
         internal static string Enum_LevelSortStrategy_UpdatedDesc {
             get {
                 return ResourceManager.GetString("Enum_LevelSortStrategy_UpdatedDesc", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Administration ähnelt.
+        /// </summary>
+        internal static string PageTitle_Administration {
+            get {
+                return ResourceManager.GetString("PageTitle_Administration", resourceCulture);
             }
         }
         

@@ -3,12 +3,14 @@ using LevelTagApi.Dtos;
 using LevelTagWebApp.Security;
 using System.Net.Http.Headers;
 using System.Text.Json;
+using System.Text.Json.Serialization;
 
 namespace LevelTagWebApp.Services;
 
 public class LevelTagApiClient : IDisposable
 {
     private readonly HttpClient _HttpClient;
+    private readonly JsonSerializerOptions _JsonOptions;
     private readonly ISessionTokenProvider _SessionTokenProvider;
 
     public Uri LevelHubEndpoint { get; }
@@ -19,6 +21,10 @@ public class LevelTagApiClient : IDisposable
     {
         _HttpClient = httpClient;
         _SessionTokenProvider = sessionTokenProvider;
+
+        _JsonOptions = new JsonSerializerOptions(JsonSerializerOptions.Web);
+        _JsonOptions.Converters.Add(new PatchValueConverterFactory());
+        _JsonOptions.DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull;
 
         if (_HttpClient.BaseAddress == null)
             throw new ArgumentException("BaseAddress of HttpClient not set.", nameof(httpClient));
@@ -141,7 +147,7 @@ public class LevelTagApiClient : IDisposable
     {
         string requestUri = "users/me/settings";
         HttpResponseMessage responseMessage =
-            await _HttpClient.PatchAsJsonAsync(requestUri, parameters, cancellationToken).ConfigureAwait(false);
+            await _HttpClient.PatchAsJsonAsync(requestUri, parameters, _JsonOptions, cancellationToken).ConfigureAwait(false);
         responseMessage.EnsureSuccessStatusCode();
     }
 
@@ -160,7 +166,7 @@ public class LevelTagApiClient : IDisposable
     public async Task<HttpResponseMessage> PostUserBan(
         CreateUserBanDto createUserBanDto, CancellationToken cancellationToken = default)
     {
-        return await _HttpClient.PostAsJsonAsync("userbans", createUserBanDto, cancellationToken).ConfigureAwait(false);
+        return await _HttpClient.PostAsJsonAsync("userbans", createUserBanDto, _JsonOptions, cancellationToken).ConfigureAwait(false);
     }
 
     public async Task<RevertContributionsResponse> RevertContributionsAsync(
@@ -169,7 +175,7 @@ public class LevelTagApiClient : IDisposable
         string requestUri = "contributions/revert";
 
         HttpResponseMessage responseMessage =
-            await _HttpClient.PostAsJsonAsync(requestUri, parameters, cancellationToken).ConfigureAwait(false);
+            await _HttpClient.PostAsJsonAsync(requestUri, parameters, _JsonOptions, cancellationToken).ConfigureAwait(false);
         RevertContributionsResponse response =
             await GetContentAsync<RevertContributionsResponse>(responseMessage, cancellationToken);
 
@@ -188,6 +194,22 @@ public class LevelTagApiClient : IDisposable
     {
         string requestUri = "guidelines/contribution/accept";
         HttpResponseMessage responseMessage = await _HttpClient.PostAsync(requestUri, null, cancellationToken).ConfigureAwait(false);
+        responseMessage.EnsureSuccessStatusCode();
+    }
+
+    public async Task<ApiStateDto> GetApiStateAsync(CancellationToken cancellationToken = default)
+    {
+        string requestUri = "api/state";
+        HttpResponseMessage responseMessage = await _HttpClient.GetAsync(requestUri, cancellationToken).ConfigureAwait(false);
+        ApiStateDto response = await GetContentAsync<ApiStateDto>(responseMessage, cancellationToken).ConfigureAwait(false);
+        return response;
+    }
+
+    public async Task PatchApiStateAsync(PatchApiStateParameters parameters, CancellationToken cancellationToken = default)
+    {
+        string requestUri = "api/state";
+        HttpResponseMessage responseMessage =
+            await _HttpClient.PatchAsJsonAsync(requestUri, parameters, _JsonOptions, cancellationToken).ConfigureAwait(false);
         responseMessage.EnsureSuccessStatusCode();
     }
 

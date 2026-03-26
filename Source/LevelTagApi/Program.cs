@@ -1,5 +1,6 @@
 using DataClasses;
 using DataStoring;
+using LevelTagApi.ApiState;
 using LevelTagApi.Conversion;
 using LevelTagApi.Dtos;
 using LevelTagApi.Filtering;
@@ -37,7 +38,8 @@ public class Program
             AddAuthentication(builder);
             AddAuthorization(builder);
 
-            builder.Services.AddControllers();
+            builder.Services.AddControllers()
+                .AddJsonOptions(options => options.JsonSerializerOptions.Converters.Add(new PatchValueConverterFactory()));
             builder.Services.AddHttpContextAccessor();
             // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
             builder.Services.AddOpenApi();
@@ -49,8 +51,10 @@ public class Program
                 options.AddInterceptors(sp.GetRequiredService<LevelTagBroadcastingInterceptor>());
                 options.AddInterceptors(sp.GetRequiredService<ContributionBroadcastingInterceptor>());
             });
+
             builder.Services.AddSingleton<LevelTagBroadcastingInterceptor>();
             builder.Services.AddSingleton<ContributionBroadcastingInterceptor>();
+            builder.Services.AddSingleton<IApiStateService, ApiStateService>();
 
             builder.Services.AddSignalR();
             builder.Services.AddTransient<ILevelTagBroadcaster, LevelTagBroadcaster>();

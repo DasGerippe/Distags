@@ -36,12 +36,18 @@
 				<li class="nav-item">
 					<NavLink class="nav-link" href="contributions">Contributions</NavLink>
 				</li>
-				@if (_UserInfo?.Roles.Contains("Moderator") == true)
-				{
-					<li class="nav-item">
-						<NavLink class="nav-link" href="moderation">Moderation</NavLink>
-					</li>
-				}
+                @if (_UserInfo?.Roles.Contains("Moderator") == true)
+                {
+                    <li class="nav-item">
+                        <NavLink class="nav-link" href="moderation">Moderation</NavLink>
+                    </li>
+                }
+                @if (_UserInfo?.Roles.Contains("Administrator") == true)
+                {
+                    <li class="nav-item">
+                        <NavLink class="nav-link" href="admin">Administration</NavLink>
+                    </li>
+                }
 			</ul>
 
 			<!-- Profile Section -->

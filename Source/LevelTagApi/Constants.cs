@@ -23,6 +23,7 @@ internal static class Constants
         internal const string AutoTagger = "AutoTagger";
         internal const string AppManager = "AppManager";
         internal const string Moderator = "Moderator";
+        internal const string Administrator = "Administrator";
     }
 
     internal static class Policies
