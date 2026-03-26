@@ -43,7 +43,8 @@ public class CreatorRefreshCountCalculator : ICreatorRefreshCountCalculator
             return 0;
         }
 
-        double refreshPercentage = (DateTime.UtcNow - lastRefreshDate.Value).TotalDays / _Settings.RefreshCycleDays;
+        double daysSinceLastRefresh = (DateTime.UtcNow - lastRefreshDate.Value).TotalDays;
+        double refreshPercentage = Math.Min(daysSinceLastRefresh / _Settings.RefreshCycleDays, 1.0);
         int refreshCount = (int)Math.Round(refreshPercentage * creatorCount);
 
         if (refreshCount > 0 && refreshCount < _Settings.MinRefreshCount)
