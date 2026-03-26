@@ -106,7 +106,7 @@ public class AuthenticationController : ControllerBase
     [Authorize(AuthenticationSchemes = Constants.Authentication.SessionTokenScheme.Name)]
     public IActionResult ValidateSession()
     {
-        return Ok();
+        return NoContent();
     }
 
     [HttpPost("logout")]
