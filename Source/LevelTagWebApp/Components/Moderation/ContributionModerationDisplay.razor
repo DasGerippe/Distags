@@ -30,9 +30,9 @@
 	</div>
 
 	<!-- Contribution Date -->
-	<div class="col-6 col-md-2 d-flex align-items-center justify-content-end justify-content-md-start">
-		<ElapsedTimeDisplay class="text-muted" Timestamp="Contribution.ContributedOn" />
-	</div>
+    <div class="col-6 col-md-2 d-flex align-items-center justify-content-end justify-content-md-start">
+		<span class="text-muted">@Contribution.ContributedOn.ToString("G")</span>
+    </div>
 </div>
 
 @code {

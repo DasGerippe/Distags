@@ -1,0 +1,37 @@
+﻿@inherits DialogBase
+
+<Dialog Id="@ModalId">
+    <Header>
+        <h5 class="modal-title">@_HeaderText</h5>
+        <button class="btn-close" data-bs-dismiss="modal"></button>
+    </Header>
+    <Body>
+        <p>@_BodyText</p>
+    </Body>
+    <Footer>
+        <button class="btn btn-primary" data-bs-dismiss="modal">Close</button>
+    </Footer>
+</Dialog>
+
+@code {
+
+    protected override string ModalId => "infoModal";
+
+    private string _HeaderText = string.Empty;
+    private string _BodyText = string.Empty;
+
+    public async ValueTask ShowAsync(string headerText, string bodyText)
+    {
+        _HeaderText = headerText;
+        _BodyText = bodyText;
+        StateHasChanged();
+
+        await ShowAsync();
+    }
+
+    public new ValueTask HideAsync()
+    {
+        return base.HideAsync();
+    }
+
+}

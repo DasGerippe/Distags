@@ -35,6 +35,8 @@
 
 	protected override string ModalId => "banUserModal";
 
+    public event EventHandler<HttpResponseMessage>? UserBanPosted;
+
 	public async ValueTask ShowAsync(long steamId, string? steamName)
 	{
 		_SteamId = steamId;
@@ -59,9 +61,11 @@
 			SteamId = _SteamId!.Value,
 			Reason = _Reason,
 		};
-		await LevelTagApi.PostUserBan(createUserBanDto);
+        HttpResponseMessage responseMessage = await LevelTagApi.PostUserBan(createUserBanDto);
 
-		await HideAsync();
+        await HideAsync();
+
+        UserBanPosted?.Invoke(this, responseMessage);
 	}
 
 }

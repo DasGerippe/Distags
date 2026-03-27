@@ -2,6 +2,7 @@
 @using LevelTagWebApp.Components.Dialogs
 @using LevelTagWebApp.Security
 @using LevelTagWebApp.Services
+@using Microsoft.AspNetCore.Mvc
 @using Microsoft.AspNetCore.SignalR.Client
 @using Microsoft.Net.Http.Headers
 
@@ -16,7 +17,7 @@
 	}
 </InfiniteScrollContainer>
 
-@code {
+	@code {
 
 	private bool _IsLoadingNextBatch;
 	private string? _NextCursor;
@@ -51,13 +52,38 @@
 			await SetUpHubConnection();
 			await LoadNextContributionBatch();
 
+			BanUserDialog? banUserDialog = DialogService.Get<BanUserDialog>();
+			if (banUserDialog != null)
+				banUserDialog.UserBanPosted += OnUserBanPosted;
+
 			RevertContributionsDialog? revertContributionsDialog = DialogService.Get<RevertContributionsDialog>();
 			if (revertContributionsDialog != null)
 				revertContributionsDialog.ContributionsReverted += OnContributionsReverted;
 		}
 	}
 
-	private async void OnContributionsReverted(object? sender, RevertContributionsResponse revertResult)
+	private async void OnUserBanPosted(object? sender, HttpResponseMessage response)
+    {
+        try
+        {
+            if (response.IsSuccessStatusCode)
+                return;
+
+            InfoDialog? infoDialog = DialogService.Get<InfoDialog>();
+            if (infoDialog == null)
+                return;
+
+            ProblemDetails? problem = await response.Content.ReadFromJsonAsync<ProblemDetails>();
+            string message = problem?.Detail ?? "The user could not be banned.";
+            await infoDialog.ShowAsync("Could not ban user", message);
+        }
+        catch
+        {
+            // ignored
+        }
+    }
+
+    private async void OnContributionsReverted(object? sender, RevertContributionsResponse revertResult)
 	{
 		try
 		{
@@ -107,7 +133,7 @@
 
 		GetContributionsParameters parameters = new GetContributionsParameters
 		{
-			Limit = 25,
+			Limit = 100,
 			Cursor = _NextCursor,
 		};
 		GetContributionsResponse response = await LevelTagApi.GetContributionsAsync(parameters);
