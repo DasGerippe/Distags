@@ -75,6 +75,7 @@ public class Program
             builder.Services.AddTransient<IUserManager, UserManager>();
             builder.Services.AddTransient<ILevelTagManager, LevelTagManager>();
             builder.Services.AddTransient<IContributionManager, ContributionManager>();
+            builder.Services.AddTransient<IUserBanPermissionChecker, UserBanPermissionChecker>();
 
             builder.Services.AddSingleton<ITicketStore<long>, ConcurrentTicketStore<long>>();
             builder.Services.AddTransient<ITokenGenerator, RandomBase64UrlTokenGenerator>();

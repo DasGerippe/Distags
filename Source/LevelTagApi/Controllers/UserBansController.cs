@@ -15,12 +15,18 @@ public class UserBansController : ControllerBase
 {
     private readonly LevelTagDbContext _DbContext;
     private readonly IUserManager _UserManager;
+    private readonly IUserBanPermissionChecker _PermissionChecker;
     private readonly UserBanDtoConverter _DtoConverter;
 
-    public UserBansController(LevelTagDbContext dbContext, IUserManager userManager, UserBanDtoConverter dtoConverter)
+    public UserBansController(
+        LevelTagDbContext dbContext,
+        IUserManager userManager,
+        IUserBanPermissionChecker permissionChecker,
+        UserBanDtoConverter dtoConverter)
     {
         _DbContext = dbContext;
         _UserManager = userManager;
+        _PermissionChecker = permissionChecker;
         _DtoConverter = dtoConverter;
     }
 
@@ -52,9 +58,14 @@ public class UserBansController : ControllerBase
     [Authorize(Roles = Constants.Roles.Moderator)]
     public async Task<IActionResult> PostUserBan([FromBody] CreateUserBanDto userBanDto)
     {
-        User? banner = await _UserManager.GetCurrentUserAsync();
-        if (banner == null)
+        User? banningUser = await _UserManager.GetCurrentUserAsync();
+        if (banningUser == null)
             return Unauthorized();
+
+        if (banningUser.SteamId == userBanDto.SteamId)
+            return Problem(
+                statusCode: StatusCodes.Status403Forbidden,
+                detail: "You don't have permission to ban yourself.");
 
         UserBan? userBan = await _DbContext.Set<UserBan>()
             .Where(userBan => userBan.SteamId == userBanDto.SteamId)
@@ -68,13 +79,20 @@ public class UserBansController : ControllerBase
             .FirstOrDefaultAsync();
 
         if (bannedUser != null)
+        {
+            if (!_PermissionChecker.CanBan(banningUser, bannedUser))
+                return Problem(
+                    statusCode: StatusCodes.Status403Forbidden,
+                    detail: "You don't have permission to ban that Steam ID.");
+
             bannedUser.Roles = [];
+        }
 
         userBan = new UserBan
         {
             SteamId = userBanDto.SteamId,
             BannedOn = DateTime.UtcNow,
-            Banner = banner,
+            Banner = banningUser,
             Reason = userBanDto.Reason,
         };
         _DbContext.Add(userBan);
