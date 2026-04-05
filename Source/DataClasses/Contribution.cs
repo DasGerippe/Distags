@@ -20,9 +20,11 @@ public class Contribution
 
     public App? App { get; set; }
 
-    public ContributionAction Action { get; set; }
+    public ChangeAction Action { get; set; }
 
     public DateTimeOffset ContributedOn { get; set; }
+
+    public List<ContributionChange> Changes { get; set; }
 
     public bool IsReverted { get; set; }
 }

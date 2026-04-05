@@ -92,6 +92,20 @@ namespace DataStoringMigrations.Migrations
                         .HasColumnType("bigint")
                         .HasColumnName("user_id");
 
+                    b.ComplexCollection(typeof(List<Dictionary<string, object>>), "Changes", "DataClasses.Contribution.Changes#ContributionChange", b1 =>
+                        {
+                            b1.IsRequired();
+
+                            b1.Property<int>("Action");
+
+                            b1.Property<string>("TagName")
+                                .IsRequired();
+
+                            b1
+                                .ToJson("changes")
+                                .HasColumnType("jsonb");
+                        });
+
                     b.HasKey("Id")
                         .HasName("pk_contributions");
 

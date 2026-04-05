@@ -2,7 +2,6 @@
 using DataStoring;
 using LevelTagApi.Dtos;
 using Microsoft.EntityFrameworkCore;
-using ContributionAction = DataClasses.ContributionAction;
 
 namespace LevelTagApi.Management;
 
@@ -31,7 +30,7 @@ public class ContributionManager : IContributionManager
             TagId = levelTag.TagId,
             User = user,
             App = app,
-            Action = ContributionAction.TagRemoved,
+            Action = ChangeAction.RemoveTag,
             ContributedOn = utcNow,
         }));
 
@@ -41,7 +40,7 @@ public class ContributionManager : IContributionManager
             TagId = levelTag.TagId,
             User = user,
             App = app,
-            Action = ContributionAction.TagAdded,
+            Action = ChangeAction.AddTag,
             ContributedOn = utcNow,
         }));
     }
@@ -124,11 +123,11 @@ public class ContributionManager : IContributionManager
                     revertNextContribution = true;
                     response.ContributionsReverted++;
 
-                    levelTagShouldExist = contribution.Action == ContributionAction.TagRemoved;
+                    levelTagShouldExist = contribution.Action == ChangeAction.RemoveTag;
                 }
                 else
                 {
-                    levelTagShouldExist = contribution.Action == ContributionAction.TagAdded;
+                    levelTagShouldExist = contribution.Action == ChangeAction.AddTag;
                 }
             }
 

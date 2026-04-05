@@ -35,6 +35,7 @@ public class LevelTagDbContext : DbContext
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         ConfigureAppEntity(modelBuilder);
+        ConfigureContributionEntity(modelBuilder);
         ConfigureCreatorEntity(modelBuilder);
         ConfigureLevelEntity(modelBuilder);
         ConfigureSettingEntity(modelBuilder);
@@ -53,6 +54,12 @@ public class LevelTagDbContext : DbContext
         modelBuilder.Entity<App>()
             .HasIndex(app => app.ApiKey)
             .IsUnique();
+    }
+
+    private void ConfigureContributionEntity(ModelBuilder modelBuilder)
+    {
+        modelBuilder.Entity<Contribution>()
+            .ComplexCollection(contribution => contribution.Changes, changes => changes.ToJson());
     }
 
     private void ConfigureCreatorEntity(ModelBuilder modelBuilder)
