@@ -4,8 +4,8 @@ public class AutoTaggerState
 {
     public static AutoTaggerState New => new AutoTaggerState
     {
-        LastAutoTagging = DateTime.MinValue,
+        LastAutoTagging = DateTimeOffset.MinValue,
     };
 
-    public DateTime LastAutoTagging { get; set; }
+    public DateTimeOffset LastAutoTagging { get; set; }
 }

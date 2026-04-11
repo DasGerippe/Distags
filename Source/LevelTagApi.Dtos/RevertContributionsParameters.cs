@@ -4,5 +4,5 @@ public class RevertContributionsParameters
 {
     public long SteamId { get; set; }
 
-    public DateTime? RevertStartDate { get; set; }
+    public DateTimeOffset? RevertStartDate { get; set; }
 }

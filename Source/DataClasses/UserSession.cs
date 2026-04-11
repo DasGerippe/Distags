@@ -8,5 +8,5 @@ public class UserSession
 
     public User User { get; set; }
 
-    public DateTime LastSeenOn { get; set; }
+    public DateTimeOffset LastSeenOn { get; set; }
 }

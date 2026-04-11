@@ -2,7 +2,7 @@
 
 public interface ICreatorRefreshDateManager
 {
-    Task<DateTime?> GetRefreshDateAsync(CancellationToken cancellationToken = default);
+    Task<DateTimeOffset?> GetRefreshDateAsync(CancellationToken cancellationToken = default);
 
-    Task SetRefreshDateAsync(DateTime refreshDate, CancellationToken cancellationToken = default);
+    Task SetRefreshDateAsync(DateTimeOffset refreshDate, CancellationToken cancellationToken = default);
 }

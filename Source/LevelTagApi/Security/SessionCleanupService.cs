@@ -50,7 +50,7 @@ public class SessionCleanupService : BackgroundService
         using IServiceScope scope = _ScopeFactory.CreateScope();
         LevelTagDbContext dbContext = scope.ServiceProvider.GetRequiredService<LevelTagDbContext>();
 
-        DateTime cutOffDate = DateTime.UtcNow - _SessionExpirationDelay;
+        DateTimeOffset cutOffDate = DateTimeOffset.UtcNow - _SessionExpirationDelay;
 
         List<UserSession> deprecatedSessions = await dbContext.Set<UserSession>()
             .Where(session => session.LastSeenOn < cutOffDate)

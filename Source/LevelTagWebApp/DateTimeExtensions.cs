@@ -2,9 +2,9 @@
 
 public static class DateTimeExtensions
 {
-    public static string ToElapsedString(this DateTime dateTime)
+    public static string ToElapsedString(this DateTimeOffset dateTime)
     {
-        TimeSpan ago = DateTime.UtcNow - dateTime;
+        TimeSpan ago = DateTimeOffset.UtcNow - dateTime;
 
         if (ago.TotalSeconds < 60)
             return Resource.DateTimeSecondsAgo;

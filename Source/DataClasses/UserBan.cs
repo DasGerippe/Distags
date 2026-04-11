@@ -4,7 +4,7 @@ public class UserBan
 {
     public long SteamId { get; set; }
 
-    public DateTime BannedOn { get; set; }
+    public DateTimeOffset BannedOn { get; set; }
 
     public long BannerId { get; set; }
 

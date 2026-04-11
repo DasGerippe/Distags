@@ -35,15 +35,15 @@ public class CreatorRefreshCountCalculator : ICreatorRefreshCountCalculator
             return 0;
         }
 
-        DateTime? lastRefreshDate = await _RefreshDateManager.GetRefreshDateAsync(cancellationToken);
+        DateTimeOffset? lastRefreshDate = await _RefreshDateManager.GetRefreshDateAsync(cancellationToken);
         if (lastRefreshDate == null)
         {
             _Logger.LogDebug("Previous refresh date does not exist. Setting initial refresh date and returning 0.");
-            await _RefreshDateManager.SetRefreshDateAsync(DateTime.UtcNow, cancellationToken);
+            await _RefreshDateManager.SetRefreshDateAsync(DateTimeOffset.UtcNow, cancellationToken);
             return 0;
         }
 
-        double daysSinceLastRefresh = (DateTime.UtcNow - lastRefreshDate.Value).TotalDays;
+        double daysSinceLastRefresh = (DateTimeOffset.UtcNow - lastRefreshDate.Value).TotalDays;
         double refreshPercentage = Math.Min(daysSinceLastRefresh / _Settings.RefreshCycleDays, 1.0);
         int refreshCount = (int)Math.Round(refreshPercentage * creatorCount);
 

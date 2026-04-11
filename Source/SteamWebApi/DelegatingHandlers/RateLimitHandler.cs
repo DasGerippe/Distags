@@ -8,7 +8,7 @@ public class RateLimitHandler : DelegatingHandler
 
     private readonly RateLimitSettings _Settings;
     private readonly SemaphoreSlim _Semaphore = new SemaphoreSlim(1, 1);
-    private DateTime _LastRequestTime = DateTime.MinValue;
+    private DateTimeOffset _LastRequestTime = DateTimeOffset.MinValue;
 
     public RateLimitHandler(RateLimitSettings settings, ILogger<RateLimitHandler>? logger)
     {
@@ -22,7 +22,7 @@ public class RateLimitHandler : DelegatingHandler
 
         try
         {
-            DateTime utcNow = DateTime.UtcNow;
+            DateTimeOffset utcNow = DateTimeOffset.UtcNow;
             int timeSinceLastRequestMs = (int)(utcNow -  _LastRequestTime).TotalMilliseconds;
 
             if (timeSinceLastRequestMs < _Settings.RequestDelayMs)

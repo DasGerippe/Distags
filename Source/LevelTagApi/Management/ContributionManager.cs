@@ -23,7 +23,7 @@ public class ContributionManager : IContributionManager
     {
         User? user = await _UserManager.GetCurrentUserAsync();
         App? app = await _AppManager.GetCurrentAppAsync();
-        DateTime utcNow = DateTime.UtcNow;
+        DateTimeOffset utcNow = DateTimeOffset.UtcNow;
 
         _DbContext.AddRange(removedLevelTags.Select(levelTag => new Contribution
         {
@@ -46,7 +46,7 @@ public class ContributionManager : IContributionManager
         }));
     }
 
-    public async Task<RevertContributionsResponse> RevertContributionsAsync(long steamId, DateTime revertStartDate)
+    public async Task<RevertContributionsResponse> RevertContributionsAsync(long steamId, DateTimeOffset revertStartDate)
     {
         List<LevelTagContributionGroup> levelTagContributionsGroups =
             await GetContributionsGroupToRevertAsync(steamId, revertStartDate);
@@ -57,7 +57,7 @@ public class ContributionManager : IContributionManager
         return response;
     }
 
-    private async Task<List<LevelTagContributionGroup>> GetContributionsGroupToRevertAsync(long steamId, DateTime revertStartDate)
+    private async Task<List<LevelTagContributionGroup>> GetContributionsGroupToRevertAsync(long steamId, DateTimeOffset revertStartDate)
     {
         return await _DbContext.Set<Contribution>()
             // Get all Contributions since revertStartDate, grouped by level and tag, where at least one Contribution is from steamId.

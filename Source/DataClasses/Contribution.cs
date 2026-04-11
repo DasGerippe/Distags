@@ -22,7 +22,7 @@ public class Contribution
 
     public ContributionAction Action { get; set; }
 
-    public DateTime ContributedOn { get; set; }
+    public DateTimeOffset ContributedOn { get; set; }
 
     public bool IsReverted { get; set; }
 }

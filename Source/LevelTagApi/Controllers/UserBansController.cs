@@ -91,7 +91,7 @@ public class UserBansController : ControllerBase
         userBan = new UserBan
         {
             SteamId = userBanDto.SteamId,
-            BannedOn = DateTime.UtcNow,
+            BannedOn = DateTimeOffset.UtcNow,
             Banner = banningUser,
             Reason = userBanDto.Reason,
         };

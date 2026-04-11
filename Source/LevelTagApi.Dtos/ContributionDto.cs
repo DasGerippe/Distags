@@ -12,5 +12,5 @@ public class ContributionDto
 
     public required ContributionAction Action { get; set; }
 
-    public required DateTime ContributedOn { get; set; }
+    public required DateTimeOffset ContributedOn { get; set; }
 }

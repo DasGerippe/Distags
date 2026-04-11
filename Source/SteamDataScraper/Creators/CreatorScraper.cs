@@ -100,7 +100,7 @@ public class CreatorScraper
         _Logger.LogDebug("Saving scraped level creators.");
         await _DbContext.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
 
-        await _RefreshDateManager.SetRefreshDateAsync(DateTime.UtcNow, cancellationToken).ConfigureAwait(false);
+        await _RefreshDateManager.SetRefreshDateAsync(DateTimeOffset.UtcNow, cancellationToken).ConfigureAwait(false);
 
         _Logger.LogDebug("Scraped outdated level creators from Steam web API.");
     }
@@ -118,6 +118,6 @@ public class CreatorScraper
     {
         creator.Name = playerSummary.PersonaName;
         creator.AvatarHash = playerSummary.AvatarHash;
-        creator.CachedOn = DateTime.UtcNow;
+        creator.CachedOn = DateTimeOffset.UtcNow;
     }
 }

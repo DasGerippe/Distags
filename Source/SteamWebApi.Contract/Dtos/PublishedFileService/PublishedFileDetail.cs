@@ -55,11 +55,11 @@ public class PublishedFileDetail
     
     [JsonPropertyName("time_created")]
     [JsonConverter(typeof(UnixDateTimeConverter))]
-    public required DateTime TimeCreated { get; set; }
+    public required DateTimeOffset TimeCreated { get; set; }
     
     [JsonPropertyName("time_updated")]
     [JsonConverter(typeof(UnixDateTimeConverter))]
-    public required DateTime TimeUpdated { get; set; }
+    public required DateTimeOffset TimeUpdated { get; set; }
     
     //[JsonPropertyName("visibility")]
     //public required int Visibility { get; set; }

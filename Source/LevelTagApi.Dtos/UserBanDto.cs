@@ -8,7 +8,7 @@ public class UserBanDto
 
     public required string? SteamAvatarHash { get; set; }
 
-    public required DateTime BannedOn { get; set; }
+    public required DateTimeOffset BannedOn { get; set; }
 
     public required UserDisplayDto Banner { get; set; }
 

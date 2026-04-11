@@ -35,7 +35,7 @@ public class LevelScraper
     {
         _Logger.LogDebug("Scraping levels from Steam web API...");
 
-        DateTime? cutOffDate = await GetLatestLevelDate(cancellationToken).ConfigureAwait(false);
+        DateTimeOffset? cutOffDate = await GetLatestLevelDate(cancellationToken).ConfigureAwait(false);
 
         await ScrapeNewLevelsAsync(cutOffDate, cancellationToken).ConfigureAwait(false);
 
@@ -48,7 +48,7 @@ public class LevelScraper
         _Logger.LogDebug("Scraped levels from Steam web API.");
     }
 
-    private async Task<DateTime?> GetLatestLevelDate(CancellationToken cancellationToken = default)
+    private async Task<DateTimeOffset?> GetLatestLevelDate(CancellationToken cancellationToken = default)
     {
         _Logger.LogDebug("Determining latest create or update date...");
 
@@ -57,18 +57,18 @@ public class LevelScraper
             _Logger.LogDebug("No levels found in database. Cannot determine latest date.");
             return null;
         }
-        
-        DateTime latestCreatedDate = await _DbContext.Set<Level>()
+
+        DateTimeOffset latestCreatedDate = await _DbContext.Set<Level>()
             .MaxAsync(level => level.CreatedOn, cancellationToken).ConfigureAwait(false);
-        DateTime latestUpdatedDate = await _DbContext.Set<Level>()
+        DateTimeOffset latestUpdatedDate = await _DbContext.Set<Level>()
             .MaxAsync(level => level.UpdatedOn, cancellationToken).ConfigureAwait(false);
-        DateTime latestDate = latestCreatedDate > latestUpdatedDate ? latestCreatedDate : latestUpdatedDate;
+        DateTimeOffset latestDate = latestCreatedDate > latestUpdatedDate ? latestCreatedDate : latestUpdatedDate;
 
         _Logger.LogDebug("Latest date is {latestDate}.", latestDate);
         return latestDate;
     }
 
-    private async Task ScrapeNewLevelsAsync(DateTime? cutOffDate, CancellationToken cancellationToken = default)
+    private async Task ScrapeNewLevelsAsync(DateTimeOffset? cutOffDate, CancellationToken cancellationToken = default)
     {
         int itemsPerPage = GetItemsPerPage(cutOffDate);
         QueryFileParameters queryParams = CreateQueryFileParameters(QueryType.RankedByPublicationDate, itemsPerPage);
@@ -95,7 +95,7 @@ public class LevelScraper
         }
     }
 
-    private async Task ScrapeUpdatedLevelsAsync(DateTime cutOffDate, CancellationToken cancellationToken = default)
+    private async Task ScrapeUpdatedLevelsAsync(DateTimeOffset cutOffDate, CancellationToken cancellationToken = default)
     {
         int itemsPerPage = GetItemsPerPage(cutOffDate);
         QueryFileParameters queryParams = CreateQueryFileParameters(QueryType.RankedByLastUpdatedDate, itemsPerPage);
@@ -129,12 +129,12 @@ public class LevelScraper
         }
     }
 
-    private static int GetItemsPerPage(DateTime? previousScrapeDate)
+    private static int GetItemsPerPage(DateTimeOffset? previousScrapeDate)
     {
         if (previousScrapeDate == null)
             return 100;
 
-        TimeSpan? elapsed = DateTime.UtcNow - previousScrapeDate;
+        TimeSpan? elapsed = DateTimeOffset.UtcNow - previousScrapeDate;
 
         if (elapsed < TimeSpan.FromDays(1))
             return 5;

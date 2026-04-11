@@ -9,7 +9,7 @@
 @code {
 
 	[Parameter]
-	public required DateTime Timestamp { get; set; }
+	public required DateTimeOffset Timestamp { get; set; }
 
 	[Parameter(CaptureUnmatchedValues = true)]
 	public IDictionary<string, object>? AdditionalAttributes { get; set; }

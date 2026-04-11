@@ -14,7 +14,7 @@ public class CreatorRefreshDateFileManager : ICreatorRefreshDateManager
         _Logger = logger;
     }
 
-    public async Task<DateTime?> GetRefreshDateAsync(CancellationToken cancellationToken = default)
+    public async Task<DateTimeOffset?> GetRefreshDateAsync(CancellationToken cancellationToken = default)
     {
         _Logger.LogDebug("Getting refresh date...");
 
@@ -25,7 +25,7 @@ public class CreatorRefreshDateFileManager : ICreatorRefreshDateManager
         }
 
         string refreshDateString = await File.ReadAllTextAsync(FileName, cancellationToken);
-        if (!DateTime.TryParse(refreshDateString, null, DateTimeStyles.RoundtripKind, out DateTime refreshDate))
+        if (!DateTimeOffset.TryParse(refreshDateString, out DateTimeOffset refreshDate))
         {
             _Logger.LogWarning("Could not parse refresh date from file {refreshFile}.", refreshDate);
             return null;
@@ -35,7 +35,7 @@ public class CreatorRefreshDateFileManager : ICreatorRefreshDateManager
         return refreshDate;
     }
 
-    public async Task SetRefreshDateAsync(DateTime refreshDate, CancellationToken cancellationToken = default)
+    public async Task SetRefreshDateAsync(DateTimeOffset refreshDate, CancellationToken cancellationToken = default)
     {
         _Logger.LogDebug("Setting refresh date to {refreshDate:O}...", refreshDate);
         await File.WriteAllTextAsync(FileName, refreshDate.ToString("O"), cancellationToken);

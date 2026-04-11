@@ -70,7 +70,7 @@ public class ContributionsController : ControllerBase
     public async Task<IActionResult> RevertContributions([FromBody] RevertContributionsParameters parameters)
     {
         long steamId = parameters.SteamId;
-        DateTime revertStartDate = DateTime.SpecifyKind(parameters.RevertStartDate ?? DateTime.MinValue, DateTimeKind.Utc);
+        DateTimeOffset revertStartDate = parameters.RevertStartDate ?? DateTimeOffset.MinValue;
 
         RevertContributionsResponse response = await _ContributionManager.RevertContributionsAsync(steamId, revertStartDate);
         return Ok(response);

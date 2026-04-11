@@ -3,17 +3,17 @@ using System.Text.Json.Serialization;
 
 namespace SteamWebApi.Converter;
 
-public class UnixDateTimeConverter : JsonConverter<DateTime>
+public class UnixDateTimeConverter : JsonConverter<DateTimeOffset>
 {
-    public override DateTime Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
+    public override DateTimeOffset Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
     {
         long unixTimestamp = reader.GetInt64();
-        return DateTimeOffset.FromUnixTimeSeconds(unixTimestamp).UtcDateTime;
+        return DateTimeOffset.FromUnixTimeSeconds(unixTimestamp);
     }
 
-    public override void Write(Utf8JsonWriter writer, DateTime value, JsonSerializerOptions options)
+    public override void Write(Utf8JsonWriter writer, DateTimeOffset value, JsonSerializerOptions options)
     {
-        long unixTimestamp = ((DateTimeOffset)value).ToUnixTimeSeconds();
+        long unixTimestamp = value.ToUnixTimeSeconds();
         writer.WriteNumberValue(unixTimestamp);
     }
 }

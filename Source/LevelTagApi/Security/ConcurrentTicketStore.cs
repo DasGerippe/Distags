@@ -18,7 +18,7 @@ public class ConcurrentTicketStore<TTicketData> : ITicketStore<TTicketData>
 
         _Tickets[ticket] = new TicketData
         {
-            Expiration = DateTime.UtcNow + _TicketExpirationDelay,
+            Expiration = DateTimeOffset.UtcNow + _TicketExpirationDelay,
             Data = data,
         };
     }
@@ -28,7 +28,7 @@ public class ConcurrentTicketStore<TTicketData> : ITicketStore<TTicketData>
         if (!_Tickets.TryRemove(ticket, out TicketData? ticketData))
             return default;
 
-        if (ticketData.Expiration < DateTime.UtcNow)
+        if (ticketData.Expiration < DateTimeOffset.UtcNow)
             return default;
 
         return ticketData.Data;
@@ -36,7 +36,7 @@ public class ConcurrentTicketStore<TTicketData> : ITicketStore<TTicketData>
 
     public void RemoveExpiredTickets()
     {
-        DateTime utcNow = DateTime.UtcNow;
+        DateTimeOffset utcNow = DateTimeOffset.UtcNow;
 
         List<KeyValuePair<string, TicketData>> expiredTickets = _Tickets
             .Where(kvp => kvp.Value.Expiration < utcNow)
@@ -50,7 +50,7 @@ public class ConcurrentTicketStore<TTicketData> : ITicketStore<TTicketData>
 
     private class TicketData
     {
-        public required DateTime Expiration { get; init; }
+        public required DateTimeOffset Expiration { get; init; }
 
         public required TTicketData Data { get; init; }
     }

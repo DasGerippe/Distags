@@ -18,9 +18,9 @@ public class LevelDto
 
     public string IconUrl { get; set; } = string.Empty;
 
-    public DateTime CreatedOn { get; set; }
+    public DateTimeOffset CreatedOn { get; set; }
 
-    public DateTime UpdatedOn { get; set; }
+    public DateTimeOffset UpdatedOn { get; set; }
 
     public List<string> Tags { get; set; } = [];
 }

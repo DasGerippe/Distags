@@ -78,7 +78,7 @@ public class RetryHandler : DelegatingHandler
                 return retryAfterHeader.Delta.Value;
 
             if (retryAfterHeader.Date != null)
-                return retryAfterHeader.Date.Value - DateTime.UtcNow;
+                return retryAfterHeader.Date.Value - DateTimeOffset.UtcNow;
         }
 
         return _RetrySettings.RetryDelay;

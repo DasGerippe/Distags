@@ -8,7 +8,7 @@ public class Creator
 
     public string AvatarHash { get; set; } = string.Empty;
 
-    public DateTime CachedOn { get; set; }
+    public DateTimeOffset CachedOn { get; set; }
 
     public List<Level> CreatedLevels { get; set; } = [];
 }

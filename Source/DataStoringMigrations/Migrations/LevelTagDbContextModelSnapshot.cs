@@ -72,7 +72,7 @@ namespace DataStoringMigrations.Migrations
                         .HasColumnType("bigint")
                         .HasColumnName("app_id");
 
-                    b.Property<DateTime>("ContributedOn")
+                    b.Property<DateTimeOffset>("ContributedOn")
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("contributed_on");
 
@@ -121,7 +121,7 @@ namespace DataStoringMigrations.Migrations
                         .HasColumnType("text")
                         .HasColumnName("avatar_hash");
 
-                    b.Property<DateTime>("CachedOn")
+                    b.Property<DateTimeOffset>("CachedOn")
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("cached_on");
 
@@ -142,7 +142,7 @@ namespace DataStoringMigrations.Migrations
                         .HasColumnType("bigint")
                         .HasColumnName("id");
 
-                    b.Property<DateTime>("CreatedOn")
+                    b.Property<DateTimeOffset>("CreatedOn")
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("created_on");
 
@@ -170,7 +170,7 @@ namespace DataStoringMigrations.Migrations
                         .HasColumnType("text")
                         .HasColumnName("name");
 
-                    b.Property<DateTime>("UpdatedOn")
+                    b.Property<DateTimeOffset>("UpdatedOn")
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("updated_on");
 
@@ -355,7 +355,7 @@ namespace DataStoringMigrations.Migrations
                         .HasColumnType("bigint")
                         .HasColumnName("steam_id");
 
-                    b.Property<DateTime>("BannedOn")
+                    b.Property<DateTimeOffset>("BannedOn")
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("banned_on");
 
@@ -382,7 +382,7 @@ namespace DataStoringMigrations.Migrations
                         .HasColumnType("text")
                         .HasColumnName("token");
 
-                    b.Property<DateTime>("LastSeenOn")
+                    b.Property<DateTimeOffset>("LastSeenOn")
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("last_seen_on");
 
