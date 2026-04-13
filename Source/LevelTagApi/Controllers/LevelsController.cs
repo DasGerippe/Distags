@@ -2,6 +2,7 @@
 using DataStoring;
 using LevelTagApi.ApiState;
 using LevelTagApi.Dtos;
+using LevelTagApi.Exceptions;
 using LevelTagApi.Filtering;
 using LevelTagApi.Management;
 using LevelTagApi.Sorting;
@@ -16,25 +17,18 @@ namespace LevelTagApi.Controllers;
 public class LevelsController : ControllerBase
 {
     private readonly LevelTagDbContext _DbContext;
-    private readonly IQueryableFilterFactory<Level, LevelFilterParameters> _LevelFilterFactory;
-    private readonly IQueryableSorterFactory<Level, LevelSortStrategy> _LevelSorterFactory;
-    private readonly ILevelTagManager _LevelTagManager;
 
-    public LevelsController(
-        LevelTagDbContext dbContext,
-        IQueryableFilterFactory<Level, LevelFilterParameters> levelFilterFactory,
-        IQueryableSorterFactory<Level, LevelSortStrategy> levelSorterFactory,
-        ILevelTagManager levelTagManager)
+    public LevelsController(LevelTagDbContext dbContext)
     {
         _DbContext = dbContext;
-        _LevelFilterFactory = levelFilterFactory;
-        _LevelSorterFactory = levelSorterFactory;
-        _LevelTagManager = levelTagManager;
     }
 
     [HttpGet]
     [AllowAnonymous]
-    public async Task<ActionResult<IEnumerable<LevelDto>>> BrowseLevels([FromQuery] BrowseLevelsParameters parameters)
+    public async Task<ActionResult<IEnumerable<LevelDto>>> BrowseLevels(
+        [FromQuery] BrowseLevelsParameters parameters,
+        [FromServices] IQueryableFilterFactory<Level, LevelFilterParameters> levelFilterFactory,
+        [FromServices] IQueryableSorterFactory<Level, LevelSortStrategy> levelSorterFactory)
     {
         BrowseLevelsResponse response = new BrowseLevelsResponse
         {
@@ -45,7 +39,7 @@ public class LevelsController : ControllerBase
         IQueryable<Level> levels = _DbContext.Set<Level>();
 
         LevelFilterParameters filterParams = GetFilterParameters(parameters);
-        IQueryableFilter<Level> levelFilter = _LevelFilterFactory.GetQueryableFilter(filterParams);
+        IQueryableFilter<Level> levelFilter = levelFilterFactory.GetQueryableFilter(filterParams);
         levels = levelFilter.Filter(levels);
 
         response.TotalLevels = await levels.CountAsync();
@@ -56,7 +50,7 @@ public class LevelsController : ControllerBase
         if (parameters.PageNumber > response.TotalPages)
             return Ok(response);
 
-        IQueryableSorter<Level> levelSorter = _LevelSorterFactory.GetQueryableSorter(parameters.SortStrategy);
+        IQueryableSorter<Level> levelSorter = levelSorterFactory.GetQueryableSorter(parameters.SortStrategy);
         levels = levelSorter.Sort(levels);
 
         if (parameters.PageNumber > 1)
@@ -105,45 +99,54 @@ public class LevelsController : ControllerBase
         return level.Tags.Select(tag => tag.Name).ToList();
     }
 
-    [HttpPost("{levelId:long}/tags/{tagName}")]
+    [HttpPut("{levelId:long}/tags/{tagName}")]
     [Authorize(Policy = Constants.Policies.Tagging)]
     [TypeFilter<MaintenanceFilter>(IsReusable = true)]
-    public async Task<IActionResult> PostLevelTag(long levelId, string tagName)
+    public async Task<IActionResult> PutLevelTag(long levelId, string tagName,
+        [FromServices] ILevelTagManager levelTagManager)
     {
-        Level? level = await _DbContext.Set<Level>().FirstOrDefaultAsync(level => level.Id == levelId);
-        if (level == null)
-            return LevelNotFound(levelId);
-
-        Tag? tag = await _DbContext.Set<Tag>()
-            .Include(tag => tag.Group)
-            .FirstOrDefaultAsync(tag => tag.Name == tagName);
-        if (tag == null)
-            return BadRequest($"Tag '{tagName}' is not supported.");
-
-        if (await _DbContext.Set<LevelTag>().FindAsync(levelId, tag.Id) != null)
+        try
+        {
+            await levelTagManager.AddTagToLevelAsync(levelId, tagName);
+            return Created();
+        }
+        catch (UnknownLevelException ex)
+        {
+            return LevelNotFound(ex.LevelId);
+        }
+        catch (UnknownTagException ex)
+        {
+            return TagNotSupported(ex.TagName);
+        }
+        catch (LevelTagExistsException)
+        {
             return NoContent();
-
-        await _LevelTagManager.AddTagToLevelAsync(level, tag);
-
-        return Created();
+        }
     }
 
     [HttpDelete("{levelId:long}/tags/{tagName}")]
     [Authorize(Policy = Constants.Policies.Tagging)]
     [TypeFilter<MaintenanceFilter>(IsReusable = true)]
-    public async Task<IActionResult> DeleteLevelTag(long levelId, string tagName)
+    public async Task<IActionResult> DeleteLevelTag(long levelId, string tagName,
+        [FromServices] ILevelTagManager levelTagManager)
     {
-        Level? level = await _DbContext.Set<Level>().FindAsync(levelId);
-        if (level == null)
-            return LevelNotFound(levelId);
-
-        LevelTag? levelTag = await _DbContext.Set<LevelTag>()
-            .FirstOrDefaultAsync(levelTag => levelTag.LevelId == levelId && levelTag.Tag.Name == tagName);
-
-        if (levelTag != null)
-            await _LevelTagManager.RemoveTagFromLevelAsync(levelTag);
-
-        return NoContent();
+        try
+        {
+            await levelTagManager.RemoveTagFromLevelAsync(levelId, tagName);
+            return NoContent();
+        }
+        catch (UnknownLevelException ex)
+        {
+            return LevelNotFound(ex.LevelId);
+        }
+        catch (UnknownTagException ex)
+        {
+            return TagNotSupported(ex.TagName);
+        }
+        catch (LevelTagNotFoundException)
+        {
+            return NotFound();
+        }
     }
 
     private LevelFilterParameters GetFilterParameters(BrowseLevelsParameters parameters)
@@ -159,6 +162,19 @@ public class LevelsController : ControllerBase
 
     private NotFoundObjectResult LevelNotFound(long levelId)
     {
-        return NotFound($"Could not find level with ID {levelId}.");
+        return NotFound(new ProblemDetails
+        {
+            Title = "Unknown level",
+            Detail = $"Could not find level with ID {levelId}.",
+        });
+    }
+
+    private BadRequestObjectResult TagNotSupported(string tagName)
+    {
+        return BadRequest(new ProblemDetails
+        {
+            Title = "Unsupported tag",
+            Detail = $"The tag '{tagName}' is not supported.",
+        });
     }
 }

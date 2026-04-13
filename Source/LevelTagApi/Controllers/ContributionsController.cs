@@ -67,13 +67,15 @@ public class ContributionsController : ControllerBase
 
     [HttpPost("revert")]
     [Authorize(Roles = Constants.Roles.Moderator)]
-    public async Task<IActionResult> RevertContributions([FromBody] RevertContributionsParameters parameters)
+    public async Task<IActionResult> RevertContributions(
+        [FromBody] RevertContributionsParameters parameters,
+        [FromServices] IContributionReverter contributionReverter)
     {
         long steamId = parameters.SteamId;
         DateTimeOffset revertStartDate = parameters.RevertStartDate ?? DateTimeOffset.MinValue;
 
-        RevertContributionsResponse response = await _ContributionManager.RevertContributionsAsync(steamId, revertStartDate);
-        return Ok(response);
+        await contributionReverter.RevertContributionsAsync(steamId, revertStartDate);
+        return NoContent();
     }
 
     private ContributionFilterParameters GetFilterParameters(GetContributionsParameters parameters, bool respectAnonymity)

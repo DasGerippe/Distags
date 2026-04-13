@@ -75,6 +75,9 @@ public class Program
             builder.Services.AddTransient<IUserManager, UserManager>();
             builder.Services.AddTransient<ILevelTagManager, LevelTagManager>();
             builder.Services.AddTransient<IContributionManager, ContributionManager>();
+            builder.Services.AddTransient<IContributionChangeCreator, ContributionChangeCreator>();
+            builder.Services.AddTransient<IContributionReverter, ContributionReverter>();
+            builder.Services.AddTransient<IContributionReplayEngine, ContributionReplayEngine>();
             builder.Services.AddTransient<IUserBanPermissionChecker, UserBanPermissionChecker>();
 
             builder.Services.AddSingleton<ITicketStore<long>, ConcurrentTicketStore<long>>();

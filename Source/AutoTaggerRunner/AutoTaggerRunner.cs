@@ -139,7 +139,7 @@ public class AutoTaggerRunner
 
         foreach (string tagToAdd in tagDelta.AddTags)
         {
-            Task postLevelTagTask = _LevelTagApi.PostLevelTagAsync(levelId, tagToAdd);
+            Task postLevelTagTask = _LevelTagApi.PutLevelTagAsync(levelId, tagToAdd);
             tagChangeTasks.Add(postLevelTagTask);
         }
 

@@ -9,10 +9,10 @@ public class LevelTagApiClient
         _HttpClient = httpClient;
     }
 
-    public async Task PostLevelTagAsync(long levelId, string tagName, CancellationToken cancellationToken = default)
+    public async Task PutLevelTagAsync(long levelId, string tagName, CancellationToken cancellationToken = default)
     {
         string requestUri = $"levels/{levelId}/tags/{tagName}";
-        HttpResponseMessage responseMessage = await _HttpClient.PostAsync(requestUri, null, cancellationToken).ConfigureAwait(false);
+        HttpResponseMessage responseMessage = await _HttpClient.PutAsync(requestUri, null, cancellationToken).ConfigureAwait(false);
         responseMessage.EnsureSuccessStatusCode();
     }
 

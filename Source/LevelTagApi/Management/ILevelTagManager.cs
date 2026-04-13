@@ -1,10 +1,8 @@
-﻿using DataClasses;
-
-namespace LevelTagApi.Management;
+﻿namespace LevelTagApi.Management;
 
 public interface ILevelTagManager
 {
-    Task AddTagToLevelAsync(Level level, Tag tag);
+    Task AddTagToLevelAsync(long levelId, string tagName);
 
-    Task RemoveTagFromLevelAsync(LevelTag levelTag);
+    Task RemoveTagFromLevelAsync(long levelId, string tagName);
 }
