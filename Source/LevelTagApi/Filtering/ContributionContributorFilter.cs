@@ -5,17 +5,17 @@ namespace LevelTagApi.Filtering;
 public class ContributionContributorFilter : IQueryableFilter<Contribution>
 {
     private readonly long _SteamId;
-    private readonly bool _RespectAnonymity;
+    private readonly bool _IgnoreAnonymity;
 
-    public ContributionContributorFilter(long steamId, bool respectAnonymity)
+    public ContributionContributorFilter(long steamId, bool ignoreAnonymity)
     {
         _SteamId = steamId;
-        _RespectAnonymity = respectAnonymity;
+        _IgnoreAnonymity = ignoreAnonymity;
     }
 
     public IQueryable<Contribution> Filter(IQueryable<Contribution> source)
     {
         return source.Where(contribution =>
-            contribution.User!.SteamId == _SteamId && (!contribution.User!.IsAnonymous || !_RespectAnonymity));
+            (_IgnoreAnonymity || !contribution.User!.IsAnonymous) && contribution.User!.SteamId == _SteamId);
     }
 }

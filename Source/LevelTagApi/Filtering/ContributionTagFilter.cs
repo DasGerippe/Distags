@@ -13,6 +13,6 @@ public class ContributionTagFilter : IQueryableFilter<Contribution>
 
     public IQueryable<Contribution> Filter(IQueryable<Contribution> source)
     {
-        return source.Where(contribution => contribution.Tag.Name == _TagName);
+        return source.Where(contribution => contribution.Changes.Any(change => change.TagName == _TagName));
     }
 }

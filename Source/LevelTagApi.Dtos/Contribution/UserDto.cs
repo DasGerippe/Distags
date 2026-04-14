@@ -1,8 +1,8 @@
-﻿namespace LevelTagApi.Dtos;
+﻿namespace LevelTagApi.Dtos.Contribution;
 
-public class ContributorUserDto : ContributorDto
+public class UserDto
 {
-    public bool IsAnonymous { get; set; }
+    public required bool IsAnonymous { get; set; }
 
     public long? SteamId { get; set; }
 

@@ -1,4 +1,4 @@
-﻿using LevelTagApi.Dtos;
+﻿using LevelTagApi.Dtos.Contribution;
 
 namespace LevelTagApi.Hubs;
 

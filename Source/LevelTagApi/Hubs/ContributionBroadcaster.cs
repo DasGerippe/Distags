@@ -1,7 +1,7 @@
 ﻿using DataClasses;
 using DataStoring;
 using LevelTagApi.Conversion;
-using LevelTagApi.Dtos;
+using LevelTagApi.Dtos.Contribution;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
 
@@ -11,27 +11,31 @@ public class ContributionBroadcaster : IContributionBroadcaster
 {
     private readonly IHubContext<ContributionHub, IContributionHubClient> _HubContext;
     private readonly LevelTagDbContext _DbContext;
-    private readonly ContributionDtoConverter _DtoConverter;
+    private readonly IDtoConverter<Contribution, ContributionDto> _DtoConverterForUsers;
+    private readonly IDtoConverter<Contribution, ContributionDto> _DtoConverterForModerators;
 
     public ContributionBroadcaster(
         IHubContext<ContributionHub, IContributionHubClient> hubContext,
         LevelTagDbContext dbContext,
-        ContributionDtoConverter dtoConverter)
+        IDtoConverterFactory<Contribution, ContributionDto, ContributionConversionParameters> dtoConverterFactory)
     {
         _HubContext = hubContext;
         _DbContext = dbContext;
-        _DtoConverter = dtoConverter;
+        _DtoConverterForUsers = dtoConverterFactory.GetDtoConverter(GetConversionParameters(false));
+        _DtoConverterForModerators = dtoConverterFactory.GetDtoConverter(GetConversionParameters(true));
     }
 
     public async Task BroadcastNewContributionAsync(Contribution contribution)
     {
         IQueryable<Contribution> contributionQuery = _DbContext.Set<Contribution>()
-            .Where(dbContribution => dbContribution == contribution);
+            .Where(dbContribution => dbContribution.Id == contribution.Id)
+            .IncludeForDto(_DtoConverterForUsers)
+            .IncludeForDto(_DtoConverterForModerators);
 
-        Contribution reloadedContribution = await _DtoConverter.IncludeRequiredNavigations(contributionQuery).FirstAsync();
+        Contribution reloadedContribution = await contributionQuery.FirstAsync();
 
-        ContributionDto dtoForUsers = _DtoConverter.ToDto(reloadedContribution, respectAnonymity: true);
-        ContributionDto dtoForModerators = _DtoConverter.ToDto(reloadedContribution, respectAnonymity: false);
+        ContributionDto dtoForUsers = _DtoConverterForUsers.ToDto(reloadedContribution);
+        ContributionDto dtoForModerators = _DtoConverterForModerators.ToDto(reloadedContribution);
 
         Task userBroadcastTask = _HubContext.Clients.Group(ContributionHub.UsersGroupName).NewContribution(dtoForUsers);
         Task moderatorBroadcastTask = _HubContext.Clients.Group(ContributionHub.ModeratorsGroupName).NewContribution(dtoForModerators);
@@ -54,12 +58,12 @@ public class ContributionBroadcaster : IContributionBroadcaster
             .Where(contribution => contributionIds.Contains(contribution.Id))
             .OrderBy(contribution => contribution.Id);
 
-        List<ContributionDto> dtosForUsers = await _DtoConverter
-            .SelectDto(contributionQuery, respectAnonymity: true)
+        List<ContributionDto> dtosForUsers = await contributionQuery
+            .SelectDto(_DtoConverterForUsers)
             .ToListAsync();
 
-        List<ContributionDto> dtosForModerators = await _DtoConverter
-            .SelectDto(contributionQuery, respectAnonymity: true)
+        List<ContributionDto> dtosForModerators = await contributionQuery
+            .SelectDto(_DtoConverterForModerators)
             .ToListAsync();
 
         List<Task> broadcastTasks = [];
@@ -70,5 +74,15 @@ public class ContributionBroadcaster : IContributionBroadcaster
             _HubContext.Clients.Group(ContributionHub.ModeratorsGroupName).NewContribution(contributionDto)));
 
         await Task.WhenAll(broadcastTasks);
+    }
+
+    private ContributionConversionParameters GetConversionParameters(bool ignoreAnonymity)
+    {
+        return new ContributionConversionParameters
+        {
+            IgnoreAnonymity = ignoreAnonymity,
+            IncludeLevel = true,
+            IncludeContributor = true,
+        };
     }
 }

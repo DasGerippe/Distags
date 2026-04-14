@@ -1,7 +1,7 @@
 ﻿using DataClasses;
 using DataStoring;
 using LevelTagApi.Conversion;
-using LevelTagApi.Dtos;
+using LevelTagApi.Dtos.Contribution;
 using LevelTagApi.Filtering;
 using LevelTagApi.Management;
 using Microsoft.AspNetCore.Authorization;
@@ -15,32 +15,24 @@ namespace LevelTagApi.Controllers;
 public class ContributionsController : ControllerBase
 {
     private readonly LevelTagDbContext _DbContext;
-    private readonly IQueryableFilterFactory<Contribution, ContributionFilterParameters> _ContributionFilterFactory;
-    private readonly IContributionManager _ContributionManager;
-    private readonly ContributionDtoConverter _DtoConverter;
 
-    public ContributionsController(
-        LevelTagDbContext dbContext,
-        IQueryableFilterFactory<Contribution, ContributionFilterParameters> contributionFilterFactory,
-        IContributionManager contributionManager,
-        ContributionDtoConverter dtoConverter)
+    public ContributionsController(LevelTagDbContext dbContext)
     {
         _DbContext = dbContext;
-        _ContributionFilterFactory = contributionFilterFactory;
-        _ContributionManager = contributionManager;
-        _DtoConverter = dtoConverter;
     }
 
     [HttpGet]
-    public async Task<ActionResult<GetContributionsResponse>> GetContributions([FromQuery] GetContributionsParameters parameters)
+    public async Task<ActionResult<GetContributionsResponse>> GetContributions([FromQuery] GetContributionsParameters parameters,
+        [FromServices] IQueryableFilterFactory<Contribution, ContributionFilterParameters> contributionFilterFactory,
+        [FromServices] IDtoConverterFactory<Contribution, ContributionDto, ContributionConversionParameters> dtoConverterFactory)
     {
-        bool respectAnonymity = !User.IsInRole(Constants.Roles.Moderator);
+        bool ignoreAnonymity = User.IsInRole(Constants.Roles.Moderator);
 
         IQueryable<Contribution> contributions = _DbContext.Set<Contribution>()
-            .Where(contribution => !contribution.IsReverted);
+            .Where(contribution => !contribution.IsReverted && contribution.Changes.Any());
 
-        ContributionFilterParameters filterParams = GetFilterParameters(parameters, respectAnonymity);
-        IQueryableFilter<Contribution> contributionFilter = _ContributionFilterFactory.GetQueryableFilter(filterParams);
+        ContributionFilterParameters filterParams = GetFilterParameters(parameters, ignoreAnonymity);
+        IQueryableFilter<Contribution> contributionFilter = contributionFilterFactory.GetQueryableFilter(filterParams);
         contributions = contributionFilter.Filter(contributions);
 
         if (!string.IsNullOrEmpty(parameters.Cursor))
@@ -54,7 +46,9 @@ public class ContributionsController : ControllerBase
             .OrderByDescending(contribution => contribution.Id)
             .Take(parameters.Limit);
 
-        List<ContributionDto> contributionDtos = await _DtoConverter.SelectDto(contributions, respectAnonymity).ToListAsync();
+        ContributionConversionParameters conversionParameters = GetConversionParameters(parameters, ignoreAnonymity);
+        IDtoConverter<Contribution, ContributionDto> dtoConverter = dtoConverterFactory.GetDtoConverter(conversionParameters);
+        List<ContributionDto> contributionDtos = await dtoConverter.SelectDto(contributions).ToListAsync();
 
         GetContributionsResponse response = new GetContributionsResponse
         {
@@ -78,14 +72,24 @@ public class ContributionsController : ControllerBase
         return NoContent();
     }
 
-    private ContributionFilterParameters GetFilterParameters(GetContributionsParameters parameters, bool respectAnonymity)
+    private ContributionFilterParameters GetFilterParameters(GetContributionsParameters parameters, bool ignoreAnonymity)
     {
         return new ContributionFilterParameters
         {
             UserSteamId = parameters.UserSteamId,
             LevelId = parameters.LevelId,
-            TagName = parameters.Tag,
-            RespectAnonymity = respectAnonymity,
+            TagName = parameters.TagName,
+            IgnoreAnonymity = ignoreAnonymity,
+        };
+    }
+
+    private ContributionConversionParameters GetConversionParameters(GetContributionsParameters parameters, bool ignoreAnonymity)
+    {
+        return new ContributionConversionParameters
+        {
+            IgnoreAnonymity = ignoreAnonymity,
+            IncludeLevel = parameters.LevelId == null,
+            IncludeContributor = parameters.UserSteamId == null,
         };
     }
 }

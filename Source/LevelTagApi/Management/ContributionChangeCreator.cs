@@ -17,8 +17,8 @@ public class ContributionChangeCreator : IContributionChangeCreator
     {
         return
         [
-            ..removedTags.Select(removedTag => CreateChange(ChangeAction.RemoveTag, removedTag)),
             CreateChange(ChangeAction.AddTag, addedTag),
+            ..removedTags.Select(removedTag => CreateChange(ChangeAction.RemoveTag, removedTag)),
         ];
     }
 }

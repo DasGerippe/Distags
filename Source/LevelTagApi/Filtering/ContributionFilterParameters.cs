@@ -8,5 +8,5 @@ public class ContributionFilterParameters
 
     public string? TagName { get; set; }
 
-    public bool RespectAnonymity { get; set; } = true;
+    public bool IgnoreAnonymity { get; set; }
 }

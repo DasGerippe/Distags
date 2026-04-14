@@ -3,6 +3,7 @@ using DataStoring;
 using LevelTagApi.ApiState;
 using LevelTagApi.Conversion;
 using LevelTagApi.Dtos;
+using LevelTagApi.Dtos.Contribution;
 using LevelTagApi.Filtering;
 using LevelTagApi.Hubs;
 using LevelTagApi.Interceptors;
@@ -64,12 +65,12 @@ public class Program
 
             AddValidatedConfigOptions<LevelTagApiSettings>(builder, "LevelTagApiSettings");
 
-            builder.Services.AddTransient<ContributionDtoConverter>();
-            builder.Services.AddTransient<UserBanDtoConverter>();
 
             builder.Services.AddTransient<IQueryableFilterFactory<Level, LevelFilterParameters>, LevelFilterFactory>();
             builder.Services.AddTransient<IQueryableSorterFactory<Level, LevelSortStrategy>, LevelSorterFactory>();
             builder.Services.AddTransient<IQueryableFilterFactory<Contribution, ContributionFilterParameters>, ContributionFilterFactory>();
+            builder.Services.AddTransient<IDtoConverterFactory<Contribution, ContributionDto, ContributionConversionParameters>, ContributionDtoConverterFactory>();
+            builder.Services.AddTransient<UserBanDtoConverter>();
 
             builder.Services.AddTransient<IAppManager, AppManager>();
             builder.Services.AddTransient<IUserManager, UserManager>();

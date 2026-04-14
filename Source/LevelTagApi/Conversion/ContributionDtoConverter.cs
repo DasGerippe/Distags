@@ -1,72 +1,73 @@
 ﻿using DataClasses;
 using LevelTagApi.Dtos;
+using LevelTagApi.Dtos.Contribution;
 using Microsoft.EntityFrameworkCore;
-using ContributionAction = LevelTagApi.Dtos.ContributionAction;
+using System.Linq.Expressions;
+using AppDto = LevelTagApi.Dtos.Contribution.AppDto;
+using LevelDto = LevelTagApi.Dtos.Contribution.LevelDto;
+using UserDto = LevelTagApi.Dtos.Contribution.UserDto;
 
 namespace LevelTagApi.Conversion;
 
-public class ContributionDtoConverter
+public sealed class ContributionDtoConverter : ExpressionBasedDtoConverter<Contribution, ContributionDto>
 {
-    public IQueryable<Contribution> IncludeRequiredNavigations(IQueryable<Contribution> contributions)
+    private readonly ContributionConversionParameters _ConversionParameters;
+
+    public ContributionDtoConverter(ContributionConversionParameters conversionParameters)
     {
-        return contributions
-            .Include(contribution => contribution.Level.Creator)
-            .Include(contribution => contribution.Tag)
-            .Include(contribution => contribution.User)
-            .Include(contribution => contribution.App);
+        _ConversionParameters = conversionParameters;
     }
 
-    public IQueryable<ContributionDto> SelectDto(IQueryable<Contribution> contributions, bool respectAnonymity)
+    public override IQueryable<Contribution> IncludeRequiredNavigations(IQueryable<Contribution> contributions)
     {
-        return IncludeRequiredNavigations(contributions)
-            .Select(contribution => new ContributionDto
-            {
-                Id = contribution.Id,
-                Level = contribution.Level.ToDto(),
-                Tag = contribution.Tag.ToDto(),
-                Contributor = GetContributorDto(contribution, respectAnonymity),
-                Action = (ContributionAction)contribution.Action,
-                ContributedOn = contribution.ContributedOn,
-            });
+        if (_ConversionParameters.IncludeLevel)
+            contributions = contributions
+                .Include(contribution => contribution.Level.Creator);
+
+        if (_ConversionParameters.IncludeContributor)
+            contributions = contributions
+                .Include(contribution => contribution.User)
+                .Include(contribution => contribution.App);
+
+        return contributions;
     }
 
-    public ContributionDto ToDto(Contribution contribution, bool respectAnonymity)
+    protected override Expression<Func<Contribution, ContributionDto>> CreateConversionExpression()
     {
-        return new ContributionDto
+        bool ignoreAnonymity = _ConversionParameters.IgnoreAnonymity;
+        bool includeLevel = _ConversionParameters.IncludeLevel;
+        bool includeContributor = _ConversionParameters.IncludeContributor;
+
+        return contribution => new ContributionDto
         {
             Id = contribution.Id,
-            Level = contribution.Level.ToDto(),
-            Tag = contribution.Tag.ToDto(),
-            Contributor = GetContributorDto(contribution, respectAnonymity),
-            Action = (ContributionAction)contribution.Action,
+            Level = !includeLevel ? null : new LevelDto
+            {
+                Id = contribution.Level.Id,
+                Name = contribution.Level.Name,
+                CreatorName = contribution.Level.Creator!.Name,
+                CreatorAvatarHash = contribution.Level.Creator!.AvatarHash,
+                ImageUrl = contribution.Level.IconUrl,
+            },
+            Changes = contribution.Changes
+                .Select(change => new ChangeDto
+                {
+                    Action = (TagAction)change.Action,
+                    TagName = change.TagName,
+                })
+                .ToList(),
+            User = !includeContributor || contribution.User == null ? null : new UserDto
+            {
+                IsAnonymous = contribution.User!.IsAnonymous,
+                SteamId = ignoreAnonymity || !contribution.User!.IsAnonymous ? contribution.User!.SteamId : null,
+                SteamName = ignoreAnonymity || !contribution.User!.IsAnonymous ? contribution.User!.SteamName : null,
+                SteamAvatarHash = ignoreAnonymity || !contribution.User!.IsAnonymous ? contribution.User!.SteamAvatarHash : null,
+            },
+            App = !includeContributor || contribution.App == null ? null : new AppDto
+            {
+                Name = contribution.App!.Name,
+            },
             ContributedOn = contribution.ContributedOn,
         };
-    }
-
-    private static ContributorDto GetContributorDto(Contribution contribution, bool respectAnonymity)
-    {
-        if (contribution.User != null)
-        {
-            return new ContributorUserDto
-            {
-                IsAnonymous = contribution.User.IsAnonymous,
-                SteamId = respectAnonymity && contribution.User.IsAnonymous ? null : contribution.User.SteamId,
-                SteamName = respectAnonymity && contribution.User.IsAnonymous ? null : contribution.User.SteamName,
-                SteamAvatarHash = respectAnonymity && contribution.User.IsAnonymous ? null : contribution.User.SteamAvatarHash,
-            };
-        }
-        else if (contribution.App != null)
-        {
-            return new ContributorAppDto
-            {
-                Name = contribution.App.Name,
-            };
-        }
-        else
-        {
-            throw new ArgumentException(
-                $"{nameof(Contribution)} has neither {nameof(Contribution.User)} nor {nameof(Contribution.App)}.",
-                nameof(contribution));
-        }
     }
 }

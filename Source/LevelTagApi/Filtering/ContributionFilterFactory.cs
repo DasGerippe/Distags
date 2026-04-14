@@ -9,7 +9,7 @@ public class ContributionFilterFactory : IQueryableFilterFactory<Contribution, C
         FilterGroup<Contribution> filterGroup = new FilterGroup<Contribution>();
 
         if (filterParams.UserSteamId != null)
-            filterGroup.AddFilter(new ContributionContributorFilter(filterParams.UserSteamId.Value, filterParams.RespectAnonymity));
+            filterGroup.AddFilter(new ContributionContributorFilter(filterParams.UserSteamId.Value, filterParams.IgnoreAnonymity));
 
         if (filterParams.LevelId != null)
             filterGroup.AddFilter(new ContributionLevelFilter(filterParams.LevelId.Value));
