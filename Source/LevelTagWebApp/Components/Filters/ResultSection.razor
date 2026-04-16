@@ -17,7 +17,7 @@
 		<tbody>
 			@foreach (LevelDto level in PagedItems)
 			{
-				<tr>
+				<tr @key="level.Id">
 					<td style="text-align:center;"><img src="@level.IconUrl" alt="Icon" style="max-height:40px;" /></td>
 					<td>@level.Name</td>
 					<td>@level.CreatorName</td>
