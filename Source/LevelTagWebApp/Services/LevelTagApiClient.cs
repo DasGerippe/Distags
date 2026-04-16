@@ -1,9 +1,12 @@
 ﻿using HttpUtils;
 using LevelTagApi.Dtos;
+using LevelTagApi.Dtos.Contribution;
 using LevelTagWebApp.Security;
 using System.Net.Http.Headers;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using LevelDto = LevelTagApi.Dtos.LevelDto;
+using UserDto = LevelTagApi.Dtos.UserDto;
 
 namespace LevelTagWebApp.Services;
 
@@ -169,17 +172,15 @@ public class LevelTagApiClient : IDisposable
         return await _HttpClient.PostAsJsonAsync("userbans", createUserBanDto, _JsonOptions, cancellationToken).ConfigureAwait(false);
     }
 
-    public async Task<RevertContributionsResponse> RevertContributionsAsync(
+    public async Task<HttpResponseMessage> RevertContributionsAsync(
         RevertContributionsParameters parameters, CancellationToken cancellationToken = default)
     {
         string requestUri = "contributions/revert";
 
         HttpResponseMessage responseMessage =
             await _HttpClient.PostAsJsonAsync(requestUri, parameters, _JsonOptions, cancellationToken).ConfigureAwait(false);
-        RevertContributionsResponse response =
-            await GetContentAsync<RevertContributionsResponse>(responseMessage, cancellationToken);
 
-        return response;
+        return responseMessage;
     }
 
     public async Task<GuidelinesDto> GetContributionGuidelinesAsync(CancellationToken cancellationToken = default)

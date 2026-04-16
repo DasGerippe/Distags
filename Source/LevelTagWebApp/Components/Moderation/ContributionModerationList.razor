@@ -1,4 +1,5 @@
 ﻿@using LevelTagApi.Dtos
+@using LevelTagApi.Dtos.Contribution
 @using LevelTagWebApp.Components.Dialogs
 @using LevelTagWebApp.Security
 @using LevelTagWebApp.Services
@@ -13,7 +14,10 @@
 <InfiniteScrollContainer OnScrolledToEnd="OnScrolledToEnd" class="d-flex flex-column gap-3 gap-md-2">
 	@foreach (ContributionDto contribution in Contributions)
 	{
-		<ContributionModerationDisplay Contribution="contribution" @key="contribution.Id"/>
+        <ContributionDisplay Contribution="contribution"
+                             ShowBanUserButton="true"
+                             ShowRevertContributionButton="true"
+                             @key="contribution.Id"/>
 	}
 </InfiniteScrollContainer>
 
@@ -83,13 +87,13 @@
         }
     }
 
-    private async void OnContributionsReverted(object? sender, RevertContributionsResponse revertResult)
+    private async void OnContributionsReverted(object? sender, HttpResponseMessage responseMessage)
 	{
 		try
 		{
 			RevertContributionsResultDialog? revertContributionsResultDialog = DialogService.Get<RevertContributionsResultDialog>();
 			if (revertContributionsResultDialog != null)
-				await revertContributionsResultDialog.ShowAsync(revertResult);
+				await revertContributionsResultDialog.ShowAsync(responseMessage);
 		}
 		catch
 		{
@@ -109,7 +113,7 @@
 			.WithAutomaticReconnect()
 			.Build();
 
-		_ContributionsHubConnection.On<ContributionDto>("NewContribution", ProcessNewContribution);
+            _ContributionsHubConnection.On<ContributionDto>("NewContribution", ProcessNewContribution);
 
 		await _ContributionsHubConnection.StartAsync();
 	}

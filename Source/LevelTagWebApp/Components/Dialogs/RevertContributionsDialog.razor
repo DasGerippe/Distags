@@ -1,4 +1,4 @@
-﻿@using LevelTagApi.Dtos
+﻿@using LevelTagApi.Dtos.Contribution
 @using LevelTagWebApp.Services
 
 @inherits DialogBase
@@ -22,7 +22,7 @@
 			<InputRadioGroup @bind-Value="_RevertAllUserContributions">
 				<div class="form-check">
 					<InputRadio Value="false" class="form-check-input" />
-					<label class="form-check-label">Revert since @(_RevertDateTime?.ToString("G"))</label>
+					<label class="form-check-label">Revert since @(_RevertDateTime?.ToString("G")) UTC</label>
 				</div>
 				<div class="form-check">
 					<InputRadio Value="true" class="form-check-input" />
@@ -45,11 +45,11 @@
 
 	protected override string ModalId => "revertContributionsModal";
 
-	public event EventHandler<RevertContributionsResponse>? ContributionsReverted;
+	public event EventHandler<HttpResponseMessage>? ContributionsReverted;
 
 	public async ValueTask ShowAsync(ContributionDto contribution)
 	{
-		ContributorUserDto? user = contribution.Contributor as ContributorUserDto;
+		UserDto? user = contribution.User;
 		_RevertUserSteamId = user?.SteamId;
 		_RevertUserSteamName = user?.SteamName;
 		_RevertDateTime = contribution.ContributedOn;
@@ -73,11 +73,11 @@
 			SteamId = _RevertUserSteamId.Value,
 			RevertStartDate = _RevertAllUserContributions ? null : _RevertDateTime,
 		};
-		RevertContributionsResponse response = await LevelTagApi.RevertContributionsAsync(parameters);
+        HttpResponseMessage responseMessage = await LevelTagApi.RevertContributionsAsync(parameters);
 
 		await HideAsync();
 
-		ContributionsReverted?.Invoke(this, response);
+		ContributionsReverted?.Invoke(this, responseMessage);
 	}
 
 }

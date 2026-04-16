@@ -1,66 +1,60 @@
-﻿@using LevelTagApi.Dtos
+﻿@using LevelTagApi.Dtos.Contribution
 
-<div class="d-flex align-items-center">
-	@{
-		ContributorUserDto? user = Contributor as ContributorUserDto;
-	}
-
-	@if (user != null)
-	{
-		if (user.IsAnonymous || user.SteamAvatarHash == null)
-		{
-			<svg style="width: 2rem; height: 2rem;"><use href="icons.svg#user-solid" /></svg>
-		}
-		else
-		{
-			<img class="rounded-5" src="https://avatars.steamstatic.com/@(user.SteamAvatarHash).jpg" alt="Contributor Avatar" />
-		}
-	}
-	else if (Contributor is ContributorAppDto)
-	{
-		<svg style="width: 2rem; height: 2rem;"><use href="icons.svg#microchip-solid" /></svg>
-	}
-
-	<div class="d-flex flex-column ps-2">
-		<span class="@GetContributorNameClass()">@GetContributorName()</span>
-		@if (ShowSteamId && user != null)
-		{
-			<span style="font-size: 0.725rem; color: #888">@(user.SteamId?.ToString() ?? "Unknown Steam ID")</span>
-		}
-	</div>
+<div class="d-flex column-gap-2 align-items-center overflow-hidden">
+    @if (User is { IsAnonymous: false, SteamAvatarHash: not null })
+    {
+        <img class="rounded-5" src="https://avatars.steamstatic.com/@(User.SteamAvatarHash).jpg" alt="Contributor Avatar" />
+    }
+    else if (User != null || App == null)
+    {
+        <svg style="width: 2rem; height: 2rem;"><use href="icons.svg#user-solid" /></svg>
+    }
+    else
+    {
+        <svg style="width: 2rem; height: 2rem;"><use href="icons.svg#microchip-solid" /></svg>
+    }
+    
+    <span class="text-truncate @GetContributorNameClass()">@GetContributorName()</span>
 </div>
 
 @code {
 
-	[Parameter]
-	public required ContributorDto Contributor { get; set; }
+    [Parameter]
+    public required UserDto? User { get; set; }
 
-	[Parameter]
-	public bool ShowSteamId { get; set; }
+    [Parameter]
+    public required AppDto? App { get; set; }
 
-	[Parameter]
-	public bool IgnoreAnonymity { get; set; }
+    [Parameter]
+    public bool ShowSteamId { get; set; }
 
-	private string GetContributorNameClass()
-	{
-		return Contributor switch
-		{
-			ContributorUserDto user when user.IsAnonymous || user.SteamName == null => "fst-italic text-muted",
-			ContributorAppDto => "fst-italic",
-			_ => string.Empty,
-		};
-	}
+    [Parameter]
+    public bool IgnoreAnonymity { get; set; }
 
-	private string GetContributorName()
-	{
-		return Contributor switch
-		{
-			ContributorAppDto app => app.Name,
-			ContributorUserDto user => user.IsAnonymous && !IgnoreAnonymity
-				? Resource.Contributor_AnonymousUserName
-				: user.SteamName ?? Resource.Contributor_UnknownUserName,
-			_ => throw new ArgumentOutOfRangeException(),
-		};
-	}
+    private string GetContributorNameClass()
+    {
+        if (User != null && (User.IsAnonymous || User.SteamName == null))
+            return "fst-italic text-muted";
+
+        if (App != null)
+            return "fst-italic";
+
+        return string.Empty;
+    }
+
+    private string GetContributorName()
+    {
+        if (User != null)
+        {
+            return !IgnoreAnonymity && User.IsAnonymous
+                ? Resource.Contributor_AnonymousUserName
+                : User.SteamName ?? Resource.Contributor_UnknownUserName;
+        }
+
+        if (App != null)
+            return App.Name;
+
+        return Resource.Contributor_UnknownUserName;
+    }
 
 }

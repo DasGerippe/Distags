@@ -4,19 +4,19 @@ public static class DateTimeExtensions
 {
     public static string ToElapsedString(this DateTimeOffset dateTime)
     {
-        TimeSpan ago = DateTimeOffset.UtcNow - dateTime;
+        TimeSpan elapsed = DateTimeOffset.UtcNow - dateTime;
 
-        if (ago.TotalSeconds < 60)
+        if (elapsed.TotalSeconds < 60)
             return Resource.DateTimeSecondsAgo;
 
-        if (ago.TotalMinutes < 60)
-            return string.Format(Resource.DateTimeMinutesAgo, ago.Minutes);
+        if (elapsed.TotalMinutes < 60)
+            return string.Format(Resource.DateTimeMinutesAgo, elapsed.Minutes);
 
-        if (ago.TotalHours < 24)
-            return string.Format(Resource.DateTimeHoursAgo, ago.TotalHours.ToString("F1"));
+        if (elapsed.TotalHours < 24)
+            return string.Format(Resource.DateTimeHoursAgo, elapsed.TotalHours.ToString("F1"));
 
-        if (ago.TotalDays < 30)
-            return string.Format(Resource.DateTimeDaysAgo, ago.Days);
+        if (elapsed.TotalDays < 30)
+            return string.Format(Resource.DateTimeDaysAgo, elapsed.Days);
 
         return dateTime.ToString("d");
     }

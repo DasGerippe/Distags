@@ -1,53 +1,57 @@
 ﻿@using LevelTagApi.Dtos
+@using LevelTagApi.Dtos.Contribution
+@using LevelTagWebApp.Components.Inputs
 @using LevelTagWebApp.Components.Level
 
-<div class="row border border-1 border-opacity-25 rounded-3 shadow mx-0 py-2 @GetContainerClass(Contribution.Action)">
-	<!-- Level -->
-	<div class="col-12 col-md-4">
-		<LevelDisplay Level="Contribution.Level" />
-	</div>
+<div class="row align-items-center border border-1 rounded-3 shadow mx-0 py-2 row-gap-2 @GetContainerClass()">
+    <!-- Level -->
+    <div class="col-12 col-sm-7 col-md-4">
+        <LevelDisplay Level="Contribution.Level!" />
+    </div>
 
-	<!-- Tag -->
-	<div class="col-12 col-md-3 d-flex align-items-center">
-		<svg class="flex-shrink-0" style="width:1.5rem; height:1.5rem;"><use href="icons.svg#@GetActionIconId(Contribution.Action)" /></svg>
-		<svg class="flex-shrink-0" style="width:1.5rem; height:1.5rem;"><use href="icons.svg#tag-solid" /></svg>
-		<span class="ps-1">@Contribution.Tag.DisplayName</span>
-	</div>
+    <!-- Changes -->
+    <div class="col-12 col-sm-5 col-md-3 d-flex">
+        @if (ShowRevertContributionButton)
+        {
+            <RevertContributionButton Contribution="Contribution"/>
+        }
+        <TagChangesDisplay Changes="Contribution.Changes"/>
+    </div>
 
-	<!-- Contributor -->
-	<div class="col-8 col-md-3 d-flex align-items-center">
-		<ContributorDisplay Contributor="Contribution.Contributor" />
-	</div>
+    <!-- Contributor -->
+    <div class="col col-sm-7 col-md-3 d-flex">
+        @if (ShowBanUserButton)
+        {
+            <BanUserButton UserSteamId="Contribution.User?.SteamId" UserSteamName="@Contribution.User?.SteamName" />
+        }
+        <ContributorDisplay User="Contribution.User" App="Contribution.App"/>
+    </div>
 
-	<!-- Contribution Date -->
-	<div class="col-4 col-md-2 d-flex align-items-center justify-content-end justify-content-md-start">
-		<ElapsedTimeDisplay class="text-muted" Timestamp="Contribution.ContributedOn" />
-	</div>
+    <!-- Contribution Date -->
+    <div class="col-auto col-sm-5 col-md-2 d-flex justify-content-end justify-content-sm-start">
+        <ElapsedTimeDisplay class="text-muted text-truncate" Timestamp="Contribution.ContributedOn" />
+    </div>
 </div>
 
 @code {
 
-	[Parameter]
-	public required ContributionDto Contribution { get; set; }
+    [Parameter]
+    public required ContributionDto Contribution { get; set; }
 
-	private string GetContainerClass(ContributionAction action)
-	{
-		return action switch
-		{
-			ContributionAction.TagAdded => "bg-success-subtle border-success",
-			ContributionAction.TagRemoved => "bg-danger-subtle border-danger",
-			_ => throw new ArgumentOutOfRangeException(nameof(action), action, null),
-		};
-	}
+    [Parameter]
+    public bool ShowBanUserButton { get; set; }
 
-	private string GetActionIconId(ContributionAction action)
-	{
-		return action switch
-		{
-			ContributionAction.TagAdded => "plus-solid",
-			ContributionAction.TagRemoved => "minus-solid",
-			_ => throw new ArgumentOutOfRangeException(nameof(action), action, null),
-		};
-	}
+    [Parameter]
+    public bool ShowRevertContributionButton { get; set; }
+
+    private string GetContainerClass()
+    {
+        if (Contribution.Changes.Count == 1)
+            return Contribution.Changes[0].Action == TagAction.Add
+                ? "bg-success-subtle border-success-subtle"
+                : "bg-danger-subtle border-danger-subtle";
+        else
+            return "bg-warning-subtle border-warning border-opacity-50";
+    }
 
 }
