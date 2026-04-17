@@ -49,7 +49,7 @@ public class SessionAuthenticationHandler : AuthenticationHandler<Authentication
         userSession.LastSeenOn = DateTimeOffset.UtcNow;
         await _DbContext.SaveChangesAsync();
 
-        bool userCanTag = !user.IsBanned && user.AcceptedContributionGuidelines;
+        bool userCanTag = !user.IsBanned && user.AcceptsGuidelines;
 
         List<Claim> claims =
         [

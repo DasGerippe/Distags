@@ -105,7 +105,7 @@
 		}
 
 		UserDto? user = await UserInfoProvider.GetUserInfoAsync();
-		_IsReadOnly = user?.AcceptedContributionGuidelines != true || !user.Roles.Contains("Tagger");
+		_IsReadOnly = user?.AcceptsGuidelines != true;
 
 		_TagTree = await LevelTagApi.GetTagTreeAsync();
 		InitializeTagStates();

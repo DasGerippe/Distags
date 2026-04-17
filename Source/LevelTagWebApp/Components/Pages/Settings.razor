@@ -26,9 +26,9 @@
 				<p>@guideline.Text</p>
 			}
 
-			@if (!_User.AcceptedContributionGuidelines)
+			@if (!_User.AcceptsGuidelines)
 			{
-				<button class="btn btn-success" @onclick="AcceptContributionGuidelines">
+				<button class="btn btn-success" @onclick="AcceptContributionGuidelinesAsync">
 					@Resource.Setting_ContributionGuidelines_Accept
 				</button>
 			}
@@ -47,7 +47,7 @@
 		<h2 class="mb-2">Contribution Settings</h2>
 		<div class="form-check form-switch">
 			<input type="checkbox" role="switch" id="anonymousCheckbox" class="form-check-input" checked="@_IsAnonymous"
-			       @onchange="OnAnonymousChanged"/>
+			       @onchange="OnAnonymousChangedAsync"/>
 			<div>
 				<label for="anonymousCheckbox" class="form-check-label fw-bold">@Resource.Setting_Anonymous_Title</label>
 				<p class="small fw-lighter my-0">
@@ -74,13 +74,14 @@
 		_Guidelines = await LevelTagApi.GetContributionGuidelinesAsync();
 	}
 
-	private async Task AcceptContributionGuidelines()
+	private async Task AcceptContributionGuidelinesAsync()
 	{
-		await LevelTagApi.AcceptContributionGuidelinesAsync();
-		_User!.AcceptedContributionGuidelines = true;
+        PatchSettingsParameters parameters = new PatchSettingsParameters { AcceptsGuidelines = true };
+        await LevelTagApi.PatchUserSettingsAsync(parameters);
+		_User!.AcceptsGuidelines = true;
 	}
 
-	private async Task OnAnonymousChanged(ChangeEventArgs args)
+	private async Task OnAnonymousChangedAsync(ChangeEventArgs args)
 	{
 		if (args.Value is not bool isAnonymous)
 			return;
@@ -89,7 +90,7 @@
 		{
 			IsAnonymous = isAnonymous,
 		};
-		await LevelTagApi.PatchUserSettings(parameters);
+		await LevelTagApi.PatchUserSettingsAsync(parameters);
 
 		_IsAnonymous = isAnonymous;
 	}

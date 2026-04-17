@@ -40,6 +40,7 @@ public class UsersController : ControllerBase
         if (user == null)
             return Unauthorized();
 
+        user.AcceptsGuidelines = parameters.AcceptsGuidelines ?? user.AcceptsGuidelines;
         user.IsAnonymous = parameters.IsAnonymous ?? user.IsAnonymous;
         
         await _DbContext.SaveChangesAsync();

@@ -53,7 +53,7 @@ public static class DtoConversionExtensions
             SteamId = user.SteamId ?? throw new InvalidOperationException("Cannot convert user without Steam ID to DTO."),
             SteamName = user.SteamName ?? string.Empty,
             SteamAvatarHash = user.SteamAvatarHash ?? string.Empty,
-            AcceptedContributionGuidelines = user.AcceptedContributionGuidelines,
+            AcceptsGuidelines = user.AcceptsGuidelines,
             IsAnonymous = user.IsAnonymous,
             IsBanned = user.IsBanned,
             Roles = user.Roles,

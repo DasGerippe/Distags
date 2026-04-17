@@ -1,8 +1,4 @@
-﻿using DataClasses;
-using DataStoring;
-using LevelTagApi.Dtos;
-using LevelTagApi.Management;
-using Microsoft.AspNetCore.Authorization;
+﻿using LevelTagApi.Dtos;
 using Microsoft.AspNetCore.Mvc;
 using System.Text.Json;
 
@@ -12,40 +8,11 @@ namespace LevelTagApi.Controllers;
 [Route("[controller]")]
 public class GuidelinesController : ControllerBase
 {
-    private readonly LevelTagDbContext _DbContext;
-    private readonly IUserManager _UserManager;
-
-    public GuidelinesController(LevelTagDbContext dbContext, IUserManager userManager)
-    {
-        _DbContext = dbContext;
-        _UserManager = userManager;
-    }
-
-    [HttpGet("contribution")]
+    [HttpGet]
     public async Task<ActionResult<GuidelinesDto?>> GetContributionGuidelines()
     {
         await using Stream fileStream = new FileStream("contribution-guidelines.json", FileMode.Open, FileAccess.Read);
         GuidelinesDto? guidelinesDto = await JsonSerializer.DeserializeAsync<GuidelinesDto>(fileStream);
         return Ok(guidelinesDto);
-    }
-
-    [HttpPost("contribution/accept")]
-    [Authorize]
-    public async Task<IActionResult> AcceptContributionGuidelines()
-    {
-        User? user = await _UserManager.GetCurrentUserAsync();
-        if (user == null)
-            return Unauthorized();
-
-        if (user.IsBanned)
-            return Unauthorized("You have been banned.");
-
-        if (!user.AcceptedContributionGuidelines)
-        {
-            user.AcceptedContributionGuidelines = true;
-            await _DbContext.SaveChangesAsync();
-        }
-
-        return NoContent();
     }
 }

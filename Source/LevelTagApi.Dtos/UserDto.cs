@@ -8,7 +8,7 @@ public class UserDto
 
     public required string SteamAvatarHash { get; set; }
 
-    public required bool AcceptedContributionGuidelines { get; set; }
+    public required bool AcceptsGuidelines { get; set; }
 
     public required bool IsAnonymous { get; set; }
 

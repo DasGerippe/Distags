@@ -12,7 +12,7 @@ public class User
 
     public bool IsBanned { get; set; }
 
-    public bool AcceptedContributionGuidelines { get; set; }
+    public bool AcceptsGuidelines { get; set; }
 
     public bool IsAnonymous { get; set; }
 

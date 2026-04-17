@@ -146,7 +146,7 @@ public class LevelTagApiClient : IDisposable
         return user;
     }
 
-    public async Task PatchUserSettings(PatchSettingsParameters parameters, CancellationToken cancellationToken = default)
+    public async Task PatchUserSettingsAsync(PatchSettingsParameters parameters, CancellationToken cancellationToken = default)
     {
         string requestUri = "users/me/settings";
         HttpResponseMessage responseMessage =
@@ -189,13 +189,6 @@ public class LevelTagApiClient : IDisposable
         HttpResponseMessage responseMessage = await _HttpClient.GetAsync(requestUri, cancellationToken).ConfigureAwait(false);
         GuidelinesDto response = await GetContentAsync<GuidelinesDto>(responseMessage, cancellationToken).ConfigureAwait(false);
         return response;
-    }
-
-    public async Task AcceptContributionGuidelinesAsync(CancellationToken cancellationToken = default)
-    {
-        string requestUri = "guidelines/contribution/accept";
-        HttpResponseMessage responseMessage = await _HttpClient.PostAsync(requestUri, null, cancellationToken).ConfigureAwait(false);
-        responseMessage.EnsureSuccessStatusCode();
     }
 
     public async Task<ApiStateDto> GetApiStateAsync(CancellationToken cancellationToken = default)
