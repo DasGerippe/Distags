@@ -19,7 +19,6 @@ namespace LevelTagApi.Controllers;
 [Route("[controller]")]
 public class AuthenticationController : ControllerBase
 {
-    private readonly LevelTagApiSettings _Settings;
     private readonly LevelTagDbContext _DbContext;
     private readonly ITicketStore<long> _TicketStore;
     private readonly ITokenGenerator _TokenGenerator;
@@ -30,7 +29,6 @@ public class AuthenticationController : ControllerBase
     private readonly string _SteamWebApiKey;
 
     public AuthenticationController(
-        LevelTagApiSettings settings,
         LevelTagDbContext dbContext,
         ITicketStore<long> ticketStore,
         ITokenGenerator tokenGenerator,
@@ -39,7 +37,6 @@ public class AuthenticationController : ControllerBase
         SteamWebApiSettings steamWebApiSettings,
         ILogger<AuthenticationController> logger)
     {
-        _Settings = settings;
         _DbContext = dbContext;
         _TicketStore = ticketStore;
         _TokenGenerator = tokenGenerator;
