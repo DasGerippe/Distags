@@ -1,0 +1,22 @@
+info:
+  name: Revert Contributions
+  type: http
+  seq: 5
+
+http:
+  method: POST
+  url: "{{url}}/contributions/revert"
+  body:
+    type: json
+    data: |-
+      {
+        "steamId": 76561198139613473,
+        "revertStartDate": "2026-04-16T23:00:00.000000Z"
+      }
+  auth: inherit
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

@@ -1,0 +1,21 @@
+info:
+  name: Patch API State
+  type: http
+  seq: 2
+
+http:
+  method: PATCH
+  url: "{{url}}/api/state"
+  body:
+    type: json
+    data: |-
+      {
+        "maintenanceActive": false
+      }
+  auth: inherit
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

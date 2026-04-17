@@ -1,0 +1,7 @@
+name: Development
+color: "#2E8A54"
+variables:
+  - name: url
+    value: https://localhost:7159
+  - secret: true
+    name: sessionToken

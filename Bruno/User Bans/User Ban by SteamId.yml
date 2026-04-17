@@ -1,0 +1,19 @@
+info:
+  name: User Ban by SteamId
+  type: http
+  seq: 2
+
+http:
+  method: GET
+  url: "{{url}}/userbans/:steamId"
+  params:
+    - name: steamId
+      value: "1"
+      type: path
+  auth: inherit
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

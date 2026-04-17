@@ -1,0 +1,19 @@
+info:
+  name: Delete App
+  type: http
+  seq: 4
+
+http:
+  method: DELETE
+  url: "{{url}}/apps/:appName"
+  params:
+    - name: appName
+      value: TestApp
+      type: path
+  auth: inherit
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

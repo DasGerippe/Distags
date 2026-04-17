@@ -1,0 +1,22 @@
+info:
+  name: Remove Level Tag
+  type: http
+  seq: 8
+
+http:
+  method: DELETE
+  url: "{{url}}/levels/:levelId/tags/:tagName"
+  params:
+    - name: levelId
+      value: "3541661304"
+      type: path
+    - name: tagName
+      value: laps
+      type: path
+  auth: inherit
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

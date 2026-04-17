@@ -1,0 +1,19 @@
+info:
+  name: Level by ID
+  type: http
+  seq: 2
+
+http:
+  method: GET
+  url: "{{url}}/levels/:levelId"
+  params:
+    - name: levelId
+      value: "2969488495"
+      type: path
+  auth: inherit
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

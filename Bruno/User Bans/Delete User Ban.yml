@@ -1,0 +1,19 @@
+info:
+  name: Delete User Ban
+  type: http
+  seq: 4
+
+http:
+  method: DELETE
+  url: "{{url}}/userbans/:steamId"
+  params:
+    - name: steamId
+      value: "1"
+      type: path
+  auth: inherit
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

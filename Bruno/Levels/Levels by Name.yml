@@ -1,0 +1,19 @@
+info:
+  name: Levels by Name
+  type: http
+  seq: 5
+
+http:
+  method: GET
+  url: "{{url}}/levels?levelFilter=Broken Symmetry"
+  params:
+    - name: levelFilter
+      value: Broken Symmetry
+      type: query
+  auth: inherit
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
