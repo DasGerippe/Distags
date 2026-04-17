@@ -49,11 +49,14 @@ public class SessionAuthenticationHandler : AuthenticationHandler<Authentication
         userSession.LastSeenOn = DateTimeOffset.UtcNow;
         await _DbContext.SaveChangesAsync();
 
+        bool userCanTag = !user.IsBanned && user.AcceptedContributionGuidelines;
+
         List<Claim> claims =
         [
             new Claim(Constants.Claims.UserId, user.Id.ToString()),
             new Claim(Constants.Claims.SteamId, user.SteamId.Value.ToString()),
             new Claim(Constants.Claims.SessionToken, userSession.Token),
+            new Claim(Constants.Claims.CanTag, userCanTag.ToString()),
             .. user.Roles.Select(role => new Claim(ClaimTypes.Role, role)),
         ];
 

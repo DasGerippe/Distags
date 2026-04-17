@@ -19,8 +19,6 @@ internal static class Constants
 
     internal static class Roles
     {
-        internal const string Tagger = "Tagger";
-        internal const string AutoTagger = "AutoTagger";
         internal const string AppManager = "AppManager";
         internal const string Moderator = "Moderator";
         internal const string Administrator = "Administrator";
@@ -37,5 +35,7 @@ internal static class Constants
         internal const string UserId = "User ID";
         internal const string SteamId = "Steam ID";
         internal const string SessionToken = "Session";
+        internal const string CanTag = "CanTag";
+        internal const string CanAutoTag = "CanAutoTag";
     }
 }

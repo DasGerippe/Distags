@@ -4,7 +4,6 @@ using LevelTagApi.Dtos;
 using LevelTagApi.Management;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using System.Text.Json;
 
 namespace LevelTagApi.Controllers;
@@ -44,9 +43,6 @@ public class GuidelinesController : ControllerBase
         if (!user.AcceptedContributionGuidelines)
         {
             user.AcceptedContributionGuidelines = true;
-            if (!user.Roles.Contains(Constants.Roles.Tagger))
-                user.Roles.Add(Constants.Roles.Tagger);
-
             await _DbContext.SaveChangesAsync();
         }
 

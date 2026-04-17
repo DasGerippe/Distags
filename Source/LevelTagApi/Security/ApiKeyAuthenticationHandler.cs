@@ -43,7 +43,8 @@ public class ApiKeyAuthenticationHandler : AuthenticationHandler<AuthenticationS
         List<Claim> claims =
         [
             new Claim(Constants.Claims.AppId, app.Id.ToString()),
-            new Claim(ClaimTypes.Role, Constants.Roles.AutoTagger),
+            new Claim(Constants.Claims.CanTag, true.ToString()),
+            new Claim(Constants.Claims.CanAutoTag, true.ToString()),
         ];
         ClaimsIdentity identity = new ClaimsIdentity(claims, Scheme.Name);
         ClaimsPrincipal principal = new ClaimsPrincipal(identity);

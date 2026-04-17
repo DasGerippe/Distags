@@ -35,8 +35,8 @@ public class TaggingAuthorizationHandler : AuthorizationHandler<TaggingAuthoriza
         ClaimsPrincipal user = context.User;
 
         bool canModifyLevelTag =
-            !tag.IsAutoTag && user.IsInRole(Constants.Roles.Tagger) ||
-            tag.IsAutoTag && user.IsInRole(Constants.Roles.AutoTagger);
+            !tag.IsAutoTag && user.HasClaim(Constants.Claims.CanTag, true.ToString()) ||
+            tag.IsAutoTag && user.HasClaim(Constants.Claims.CanAutoTag, true.ToString());
 
         if (canModifyLevelTag)
             context.Succeed(requirement);
