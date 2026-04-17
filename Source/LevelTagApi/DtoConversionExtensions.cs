@@ -55,6 +55,7 @@ public static class DtoConversionExtensions
             SteamAvatarHash = user.SteamAvatarHash ?? string.Empty,
             AcceptedContributionGuidelines = user.AcceptedContributionGuidelines,
             IsAnonymous = user.IsAnonymous,
+            IsBanned = user.IsBanned,
             Roles = user.Roles,
         };
     }

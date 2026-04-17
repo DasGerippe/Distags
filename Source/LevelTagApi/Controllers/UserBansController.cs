@@ -85,6 +85,7 @@ public class UserBansController : ControllerBase
                     statusCode: StatusCodes.Status403Forbidden,
                     detail: "You don't have permission to ban that Steam ID.");
 
+            bannedUser.IsBanned = true;
             bannedUser.Roles = [];
         }
 
@@ -111,6 +112,11 @@ public class UserBansController : ControllerBase
 
         if (userBan == null)
             return NotFound("The Steam ID is not banned.");
+
+        User? user = await _DbContext.Set<User>()
+            .Where(user => user.SteamId == steamId)
+            .FirstOrDefaultAsync();
+        user?.IsBanned = false;
 
         _DbContext.Remove(userBan);
         await _DbContext.SaveChangesAsync();

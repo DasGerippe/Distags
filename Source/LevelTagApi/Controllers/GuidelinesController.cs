@@ -38,10 +38,7 @@ public class GuidelinesController : ControllerBase
         if (user == null)
             return Unauthorized();
 
-        UserBan? userBan = await _DbContext.Set<UserBan>()
-            .Where(userBan => userBan.SteamId == user.SteamId)
-            .FirstOrDefaultAsync();
-        if (userBan != null)
+        if (user.IsBanned)
             return Unauthorized("You have been banned.");
 
         if (!user.AcceptedContributionGuidelines)

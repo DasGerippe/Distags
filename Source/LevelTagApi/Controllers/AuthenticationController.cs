@@ -155,6 +155,7 @@ public class AuthenticationController : ControllerBase
             user = new User
             {
                 SteamId = steamId,
+                IsBanned = _DbContext.Set<UserBan>().Any(userBan => userBan.SteamId == steamId),
             };
             _DbContext.Add(user);
         }

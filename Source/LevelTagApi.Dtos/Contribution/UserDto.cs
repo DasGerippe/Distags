@@ -9,4 +9,6 @@ public class UserDto
     public string? SteamName { get; set; }
 
     public string? SteamAvatarHash { get; set; }
+
+    public bool IsBanned { get; set; }
 }

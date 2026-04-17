@@ -62,6 +62,7 @@ public sealed class ContributionDtoConverter : ExpressionBasedDtoConverter<Contr
                 SteamId = ignoreAnonymity || !contribution.User!.IsAnonymous ? contribution.User!.SteamId : null,
                 SteamName = ignoreAnonymity || !contribution.User!.IsAnonymous ? contribution.User!.SteamName : null,
                 SteamAvatarHash = ignoreAnonymity || !contribution.User!.IsAnonymous ? contribution.User!.SteamAvatarHash : null,
+                IsBanned = contribution.User!.IsBanned,
             },
             App = !includeContributor || contribution.App == null ? null : new AppDto
             {

@@ -336,6 +336,10 @@ namespace DataStoringMigrations.Migrations
                         .HasColumnType("boolean")
                         .HasColumnName("is_anonymous");
 
+                    b.Property<bool>("IsBanned")
+                        .HasColumnType("boolean")
+                        .HasColumnName("is_banned");
+
                     b.PrimitiveCollection<List<string>>("Roles")
                         .IsRequired()
                         .HasColumnType("text[]")

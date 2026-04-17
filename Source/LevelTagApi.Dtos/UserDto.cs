@@ -12,5 +12,7 @@ public class UserDto
 
     public required bool IsAnonymous { get; set; }
 
+    public required bool IsBanned { get; set; }
+
     public List<string> Roles { get; set; } = [];
 }
