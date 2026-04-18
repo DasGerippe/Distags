@@ -246,4 +246,7 @@
   <data name="ProfileDropdown_Logout" xml:space="preserve">
     <value>Logout</value>
   </data>
+  <data name="PageTitle_Level" xml:space="preserve">
+    <value>Level: {0}</value>
+  </data>
 </root>

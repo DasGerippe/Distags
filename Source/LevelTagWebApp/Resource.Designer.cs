@@ -331,6 +331,15 @@ namespace LevelTagWebApp {
         }
         
         /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Level: {0} ähnelt.
+        /// </summary>
+        internal static string PageTitle_Level {
+            get {
+                return ResourceManager.GetString("PageTitle_Level", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Sucht eine lokalisierte Zeichenfolge, die Loading Level ähnelt.
         /// </summary>
         internal static string PageTitle_Level_Loading {
