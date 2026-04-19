@@ -1,4 +1,6 @@
-﻿namespace SteamWebApi.Dtos.PublishedFileService;
+﻿using HttpUtils;
+
+namespace SteamWebApi.Dtos.PublishedFileService;
 
 public class QueryFileParameters
 {

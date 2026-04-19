@@ -4,15 +4,20 @@ using System.Text;
 
 namespace HttpUtils;
 
-public class QueryBuilder
+public static class QueryBuilder
 {
-    public static string BuildQueryString(object parameters, Func<string, string?>? keySelector = null)
+    public static string BuildQueryString(object parameters)
+    {
+        return BuildQueryString(parameters, new PropertyNameKeySelector());
+    }
+
+    public static string BuildQueryString(object parameters, IPropertyKeySelector propertyKeySelector)
     {
         StringBuilder queryStringBuilder = new StringBuilder();
 
         foreach (PropertyInfo property in parameters.GetType().GetProperties())
         {
-            string? key = keySelector != null ? keySelector.Invoke(property.Name) : property.Name;
+            string? key = propertyKeySelector.GetKey(property);
             if (key == null)
                 continue;
 

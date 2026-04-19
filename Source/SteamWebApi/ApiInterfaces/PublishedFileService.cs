@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.Logging;
+﻿using HttpUtils;
+using Microsoft.Extensions.Logging;
 using SteamWebApi.Dtos.PublishedFileService;
 using System.Runtime.CompilerServices;
 
@@ -21,11 +22,10 @@ internal class PublishedFileService : IPublishedFileService
         QueryFileParameters queryParameters, [EnumeratorCancellation] CancellationToken cancellationToken = default)
     {
         string? initialCursor = queryParameters.Cursor;
-        QueryBuilder queryBuilder = new QueryBuilder();
 
         while (true)
         {
-            string query = queryBuilder.BuildQueryString(queryParameters);
+            string query = QueryBuilder.BuildQueryString(queryParameters, new PropertyAttributeKeySelector());
             string relativeRequestUri = $"{QueryFilesEndpoint}?{query}";
 
             _Logger.LogDebug("Querying file batch with cursor \"{cursor}\".", queryParameters.Cursor);

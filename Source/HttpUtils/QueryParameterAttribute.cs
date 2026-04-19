@@ -1,4 +1,4 @@
-﻿namespace SteamWebApi.Dtos;
+﻿namespace HttpUtils;
 
 [AttributeUsage(AttributeTargets.Property)]
 public class QueryParameterAttribute : Attribute

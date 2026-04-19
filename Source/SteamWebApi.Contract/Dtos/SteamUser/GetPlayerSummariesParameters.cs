@@ -1,4 +1,6 @@
-﻿namespace SteamWebApi.Dtos.SteamUser;
+﻿using HttpUtils;
+
+namespace SteamWebApi.Dtos.SteamUser;
 
 public class GetPlayerSummariesParameters
 {

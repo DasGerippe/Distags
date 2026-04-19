@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.Logging;
+﻿using HttpUtils;
+using Microsoft.Extensions.Logging;
 using SteamWebApi.Dtos.SteamUser;
 using System.Runtime.CompilerServices;
 
@@ -22,7 +23,6 @@ public class SteamUser : ISteamUser
         GetPlayerSummariesParameters parameters, [EnumeratorCancellation] CancellationToken cancellationToken = default)
     {
         IEnumerable<long[]> steamUserIdChunks = parameters.SteamIds.Chunk(MaxSteamUserIdCount);
-        QueryBuilder queryBuilder = new QueryBuilder();
 
         GetPlayerSummariesParameters chunkParameters = new GetPlayerSummariesParameters()
         {
@@ -36,7 +36,7 @@ public class SteamUser : ISteamUser
 
             chunkParameters.SteamIds = steamUserIdChunk;
 
-            string query = queryBuilder.BuildQueryString(chunkParameters);
+            string query = QueryBuilder.BuildQueryString(chunkParameters, new PropertyAttributeKeySelector());
             string relativeRequestUri = $"{GetPlayerSummariesEndpoint}?{query}";
 
             _Logger.LogDebug("Getting next batch of player summaries.");
