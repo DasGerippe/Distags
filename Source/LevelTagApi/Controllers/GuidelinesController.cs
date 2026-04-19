@@ -1,4 +1,4 @@
-﻿using LevelTagApi.Dtos;
+﻿using LevelTagApi.Dtos.Guidelines;
 using Microsoft.AspNetCore.Mvc;
 using System.Text.Json;
 

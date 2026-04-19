@@ -1,4 +1,4 @@
-﻿using LevelTagApi.Dtos;
+﻿using LevelTagApi.Dtos.Users;
 
 namespace LevelTagWebApp.Security;
 

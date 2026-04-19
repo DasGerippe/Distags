@@ -1,6 +1,6 @@
-﻿namespace LevelTagApi.Dtos;
+﻿namespace LevelTagApi.Dtos.Users;
 
-public class PatchSettingsParameters
+public class PatchUserSettingsParameters
 {
     public PatchValue<bool>? AcceptsGuidelines { get; set; }
 

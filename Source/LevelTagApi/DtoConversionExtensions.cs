@@ -1,5 +1,9 @@
 ﻿using DataClasses;
-using LevelTagApi.Dtos;
+using LevelTagApi.Dtos.Apps;
+using LevelTagApi.Dtos.Levels;
+using LevelTagApi.Dtos.Tags;
+using LevelTagApi.Dtos.UserBans;
+using LevelTagApi.Dtos.Users;
 
 namespace LevelTagApi;
 

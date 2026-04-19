@@ -4,6 +4,7 @@ using LevelTagApi.ApiState;
 using LevelTagApi.Conversion;
 using LevelTagApi.Dtos;
 using LevelTagApi.Dtos.Contributions;
+using LevelTagApi.Dtos.Levels;
 using LevelTagApi.Filtering;
 using LevelTagApi.Hubs;
 using LevelTagApi.Interceptors;

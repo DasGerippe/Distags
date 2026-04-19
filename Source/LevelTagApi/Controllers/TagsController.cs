@@ -1,6 +1,6 @@
 ﻿using DataClasses;
 using DataStoring;
-using LevelTagApi.Dtos;
+using LevelTagApi.Dtos.Tags;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;

@@ -1,4 +1,4 @@
-﻿namespace LevelTagApi.Dtos;
+﻿namespace LevelTagApi.Dtos.UserBans;
 
 public class UserDisplayDto
 {

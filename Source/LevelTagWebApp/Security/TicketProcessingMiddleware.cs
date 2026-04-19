@@ -1,4 +1,5 @@
 ﻿using LevelTagApi.Dtos;
+using LevelTagApi.Dtos.Authentication;
 using LevelTagWebApp.Services;
 using Microsoft.Extensions.Primitives;
 

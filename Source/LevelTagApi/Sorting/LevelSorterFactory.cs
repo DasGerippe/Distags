@@ -1,5 +1,5 @@
 ﻿using DataClasses;
-using LevelTagApi.Dtos;
+using LevelTagApi.Dtos.Levels;
 
 namespace LevelTagApi.Sorting;
 

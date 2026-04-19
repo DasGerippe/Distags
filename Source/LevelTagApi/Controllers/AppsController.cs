@@ -1,6 +1,6 @@
 ﻿using DataClasses;
 using DataStoring;
-using LevelTagApi.Dtos;
+using LevelTagApi.Dtos.Apps;
 using LevelTagApi.Security;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;

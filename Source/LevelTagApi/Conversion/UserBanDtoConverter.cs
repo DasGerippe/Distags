@@ -1,6 +1,6 @@
 ﻿using DataClasses;
 using DataStoring;
-using LevelTagApi.Dtos;
+using LevelTagApi.Dtos.UserBans;
 using Microsoft.EntityFrameworkCore;
 
 namespace LevelTagApi.Conversion;

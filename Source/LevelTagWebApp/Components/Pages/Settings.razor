@@ -1,7 +1,8 @@
 ﻿@page "/settings"
 @rendermode InteractiveServer
 
-@using LevelTagApi.Dtos
+@using LevelTagApi.Dtos.Guidelines
+@using LevelTagApi.Dtos.Users
 @using LevelTagWebApp.Security
 @using LevelTagWebApp.Services
 
@@ -76,7 +77,7 @@
 
 	private async Task AcceptContributionGuidelinesAsync()
 	{
-        PatchSettingsParameters parameters = new PatchSettingsParameters { AcceptsGuidelines = true };
+        PatchUserSettingsParameters parameters = new PatchUserSettingsParameters { AcceptsGuidelines = true };
         await LevelTagApi.PatchUserSettingsAsync(parameters);
 		_User!.AcceptsGuidelines = true;
 	}
@@ -86,7 +87,7 @@
 		if (args.Value is not bool isAnonymous)
 			return;
 
-		PatchSettingsParameters parameters = new PatchSettingsParameters
+		PatchUserSettingsParameters parameters = new PatchUserSettingsParameters
 		{
 			IsAnonymous = isAnonymous,
 		};

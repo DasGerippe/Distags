@@ -1,4 +1,4 @@
-﻿using LevelTagApi.Dtos;
+﻿using LevelTagApi.Dtos.Users;
 using LevelTagWebApp.Services;
 using System.Net;
 

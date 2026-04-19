@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace LevelTagApi.Dtos;
+namespace LevelTagApi.Dtos.Levels;
 
 public class BrowseLevelsParameters
 {

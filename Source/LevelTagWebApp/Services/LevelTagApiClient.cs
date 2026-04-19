@@ -1,12 +1,19 @@
 ﻿using HttpUtils;
 using LevelTagApi.Dtos;
+using LevelTagApi.Dtos.ApiState;
+using LevelTagApi.Dtos.Authentication;
 using LevelTagApi.Dtos.Contributions;
+using LevelTagApi.Dtos.Guidelines;
+using LevelTagApi.Dtos.Levels;
+using LevelTagApi.Dtos.Tags;
+using LevelTagApi.Dtos.UserBans;
+using LevelTagApi.Dtos.Users;
 using LevelTagWebApp.Security;
 using System.Net.Http.Headers;
 using System.Text.Json;
 using System.Text.Json.Serialization;
-using LevelDto = LevelTagApi.Dtos.LevelDto;
-using UserDto = LevelTagApi.Dtos.UserDto;
+using LevelDto = LevelTagApi.Dtos.Levels.LevelDto;
+using UserDto = LevelTagApi.Dtos.Users.UserDto;
 
 namespace LevelTagWebApp.Services;
 
@@ -146,7 +153,7 @@ public class LevelTagApiClient : IDisposable
         return user;
     }
 
-    public async Task PatchUserSettingsAsync(PatchSettingsParameters parameters, CancellationToken cancellationToken = default)
+    public async Task PatchUserSettingsAsync(PatchUserSettingsParameters parameters, CancellationToken cancellationToken = default)
     {
         string requestUri = "users/me/settings";
         HttpResponseMessage responseMessage =

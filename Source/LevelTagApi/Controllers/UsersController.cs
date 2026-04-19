@@ -1,6 +1,6 @@
 ﻿using DataClasses;
 using DataStoring;
-using LevelTagApi.Dtos;
+using LevelTagApi.Dtos.Users;
 using LevelTagApi.Management;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -34,7 +34,7 @@ public class UsersController : ControllerBase
 
     [HttpPatch("me/settings")]
     [Authorize]
-    public async Task<IActionResult> PatchSettings([FromBody] PatchSettingsParameters parameters)
+    public async Task<IActionResult> PatchSettings([FromBody] PatchUserSettingsParameters parameters)
     {
         User? user = await _UserManager.GetCurrentUserAsync();
         if (user == null)

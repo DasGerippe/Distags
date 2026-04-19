@@ -1,7 +1,7 @@
 ﻿using DataClasses;
 using DataStoring;
 using LevelTagApi.ApiState;
-using LevelTagApi.Dtos;
+using LevelTagApi.Dtos.Levels;
 using LevelTagApi.Exceptions;
 using LevelTagApi.Filtering;
 using LevelTagApi.Management;

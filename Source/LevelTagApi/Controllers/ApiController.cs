@@ -1,5 +1,5 @@
 ﻿using LevelTagApi.ApiState;
-using LevelTagApi.Dtos;
+using LevelTagApi.Dtos.ApiState;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
