@@ -39,6 +39,7 @@ public class SessionCleanupService : BackgroundService
             catch (Exception ex)
             {
                 _Logger.LogError(ex, "An error occurred during session cleanup.");
+                await Task.Delay(TimeSpan.FromMinutes(5), stoppingToken);
             }
         }
     }
