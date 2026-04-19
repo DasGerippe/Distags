@@ -1,7 +1,7 @@
 ﻿using DataClasses;
 using DataStoring;
 using LevelTagApi.Conversion;
-using LevelTagApi.Dtos.Contribution;
+using LevelTagApi.Dtos.Contributions;
 using LevelTagApi.Filtering;
 using LevelTagApi.Management;
 using Microsoft.AspNetCore.Authorization;

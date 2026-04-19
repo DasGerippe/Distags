@@ -1,6 +1,6 @@
 ﻿using HttpUtils;
 using LevelTagApi.Dtos;
-using LevelTagApi.Dtos.Contribution;
+using LevelTagApi.Dtos.Contributions;
 using LevelTagWebApp.Security;
 using System.Net.Http.Headers;
 using System.Text.Json;

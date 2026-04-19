@@ -3,7 +3,7 @@ using DataStoring;
 using LevelTagApi.ApiState;
 using LevelTagApi.Conversion;
 using LevelTagApi.Dtos;
-using LevelTagApi.Dtos.Contribution;
+using LevelTagApi.Dtos.Contributions;
 using LevelTagApi.Filtering;
 using LevelTagApi.Hubs;
 using LevelTagApi.Interceptors;

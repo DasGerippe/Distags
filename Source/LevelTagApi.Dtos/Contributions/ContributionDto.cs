@@ -1,4 +1,4 @@
-﻿namespace LevelTagApi.Dtos.Contribution;
+﻿namespace LevelTagApi.Dtos.Contributions;
 
 public class ContributionDto
 {

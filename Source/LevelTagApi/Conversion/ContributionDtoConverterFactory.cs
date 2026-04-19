@@ -1,5 +1,5 @@
 ﻿using DataClasses;
-using LevelTagApi.Dtos.Contribution;
+using LevelTagApi.Dtos.Contributions;
 
 namespace LevelTagApi.Conversion;
 

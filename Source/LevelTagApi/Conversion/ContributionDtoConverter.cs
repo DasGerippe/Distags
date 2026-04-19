@@ -1,11 +1,11 @@
 ﻿using DataClasses;
 using LevelTagApi.Dtos;
-using LevelTagApi.Dtos.Contribution;
+using LevelTagApi.Dtos.Contributions;
 using Microsoft.EntityFrameworkCore;
 using System.Linq.Expressions;
-using AppDto = LevelTagApi.Dtos.Contribution.AppDto;
-using LevelDto = LevelTagApi.Dtos.Contribution.LevelDto;
-using UserDto = LevelTagApi.Dtos.Contribution.UserDto;
+using AppDto = LevelTagApi.Dtos.Contributions.AppDto;
+using LevelDto = LevelTagApi.Dtos.Contributions.LevelDto;
+using UserDto = LevelTagApi.Dtos.Contributions.UserDto;
 
 namespace LevelTagApi.Conversion;
 
