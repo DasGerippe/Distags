@@ -5,33 +5,14 @@ namespace DataStoring;
 
 public class LevelTagDbContext : DbContext
 {
-    public DbSet<App> Apps { get; set; }
-
-    public DbSet<Contribution> Contributions { get; set; }
-
-    public DbSet<Creator> Creators { get; set; }
-
-    public DbSet<Level> Levels { get; set; }
-
-    public DbSet<LevelLock> LevelLocks { get; set; }
-
-    public DbSet<LevelTag> LevelTags { get; set; }
-
-    public DbSet<Setting> Settings { get; set; }
-
-    public DbSet<Tag> Tags { get; set; }
-
-    public DbSet<TagGroup> TagGroups { get; set; }
-
-    public DbSet<User> Users { get; set; }
-
-    public DbSet<UserBan> UserBans { get; set; }
-
-    public DbSet<UserSession> UserSessions { get; set; }
-
     public LevelTagDbContext(DbContextOptions<LevelTagDbContext> options)
         : base(options)
     {
+    }
+
+    protected override void ConfigureConventions(ModelConfigurationBuilder configurationBuilder)
+    {
+        configurationBuilder.Conventions.Add(_ => new TablePluralizationConvention());
     }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
