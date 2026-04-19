@@ -89,7 +89,11 @@ public class LevelScraper
             level.Id = long.Parse(publishedFile.PublishedFileId);
             SetLevelProperties(level, publishedFile);
 
+            LevelLock levelLock = new LevelLock();
+            levelLock.LevelId = level.Id;
+
             _DbContext.Add(level);
+            _DbContext.Add(levelLock);
 
             _Logger.LogDebug("Added level {id}.", level.Id);
         }

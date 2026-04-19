@@ -2,6 +2,7 @@
 using DataStoring;
 using LevelTagApi.Exceptions;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Storage;
 
 namespace LevelTagApi.Management;
 
@@ -25,8 +26,11 @@ public class LevelTagManager : ILevelTagManager
     {
         Level level = await GetLevelByIdAsync(levelId);
         Tag tag = await GetTagByNameAsync(tagName);
-        LevelTag? levelTag = await _DbContext.FindAsync<LevelTag>(levelId, tag.Id);
 
+        await using IDbContextTransaction transaction = await _DbContext.Database.BeginTransactionAsync();
+        await _DbContext.LockLevelAsync(levelId);
+        
+        LevelTag? levelTag = await _DbContext.FindAsync<LevelTag>(levelId, tag.Id);
         if (levelTag != null)
             throw new LevelTagExistsException(levelId, tagName);
 
@@ -44,15 +48,20 @@ public class LevelTagManager : ILevelTagManager
         _DbContext.RemoveRange(conflictingLevelTags);
         _DbContext.Add(addedLevelTag);
         _DbContext.Add(contribution);
+
         await _DbContext.SaveChangesAsync();
+        await transaction.CommitAsync();
     }
 
     public async Task RemoveTagFromLevelAsync(long levelId, string tagName)
     {
         Level level = await GetLevelByIdAsync(levelId);
         Tag tag = await GetTagByNameAsync(tagName);
-        LevelTag? levelTag = await _DbContext.FindAsync<LevelTag>(levelId, tag.Id);
 
+        await using IDbContextTransaction transaction = await _DbContext.Database.BeginTransactionAsync();
+        await _DbContext.LockLevelAsync(levelId);
+
+        LevelTag? levelTag = await _DbContext.FindAsync<LevelTag>(levelId, tag.Id);
         if (levelTag == null)
             throw new LevelTagNotFoundException(levelId, tagName);
 
@@ -61,7 +70,9 @@ public class LevelTagManager : ILevelTagManager
 
         _DbContext.Remove(levelTag);
         _DbContext.Add(contribution);
+
         await _DbContext.SaveChangesAsync();
+        await transaction.CommitAsync();
     }
 
     private async Task<Level> GetLevelByIdAsync(long levelId)

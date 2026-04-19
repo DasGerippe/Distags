@@ -202,6 +202,18 @@ namespace DataStoringMigrations.Migrations
                     b.ToTable("levels", (string)null);
                 });
 
+            modelBuilder.Entity("DataClasses.LevelLock", b =>
+                {
+                    b.Property<long>("LevelId")
+                        .HasColumnType("bigint")
+                        .HasColumnName("level_id");
+
+                    b.HasKey("LevelId")
+                        .HasName("pk_level_locks");
+
+                    b.ToTable("level_locks", (string)null);
+                });
+
             modelBuilder.Entity("DataClasses.LevelTag", b =>
                 {
                     b.Property<long>("LevelId")

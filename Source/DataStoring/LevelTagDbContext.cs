@@ -13,6 +13,8 @@ public class LevelTagDbContext : DbContext
 
     public DbSet<Level> Levels { get; set; }
 
+    public DbSet<LevelLock> LevelLocks { get; set; }
+
     public DbSet<LevelTag> LevelTags { get; set; }
 
     public DbSet<Setting> Settings { get; set; }
@@ -38,6 +40,7 @@ public class LevelTagDbContext : DbContext
         ConfigureContributionEntity(modelBuilder);
         ConfigureCreatorEntity(modelBuilder);
         ConfigureLevelEntity(modelBuilder);
+        ConfigureLevelLockEntity(modelBuilder);
         ConfigureSettingEntity(modelBuilder);
         ConfigureTagEntity(modelBuilder);
         ConfigureUserEntity(modelBuilder);
@@ -84,6 +87,16 @@ public class LevelTagDbContext : DbContext
             .HasOne(level => level.Creator)
             .WithMany(user => user.CreatedLevels)
             .IsRequired(false);
+    }
+
+    private void ConfigureLevelLockEntity(ModelBuilder modelBuilder)
+    {
+        modelBuilder.Entity<LevelLock>()
+            .HasKey(levelLock => levelLock.LevelId);
+
+        modelBuilder.Entity<LevelLock>()
+            .Property(levelLock => levelLock.LevelId)
+            .ValueGeneratedNever();
     }
 
     private void ConfigureSettingEntity(ModelBuilder modelBuilder)

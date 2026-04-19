@@ -1,6 +1,7 @@
 ﻿using DataClasses;
 using DataStoring;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Storage;
 
 namespace LevelTagApi.Management;
 
@@ -17,8 +18,14 @@ public class ContributionReplayEngine : IContributionReplayEngine
 
     public async Task ReplayContributionsAsync(long levelId)
     {
+        await using IDbContextTransaction transaction = await _DbContext.Database.BeginTransactionAsync();
+        await _DbContext.LockLevelAsync(levelId);
+
         List<Contribution> contributions = await QueryAllContributionsForLevel(levelId).ToListAsync();
         await ReplayContributionsAsync(levelId, contributions);
+
+        await _DbContext.SaveChangesAsync();
+        await transaction.CommitAsync();
     }
 
     private IQueryable<Contribution> QueryAllContributionsForLevel(long levelId)
@@ -62,6 +69,5 @@ public class ContributionReplayEngine : IContributionReplayEngine
 
         _DbContext.RemoveRange(removeLevelTags);
         _DbContext.AddRange(addLevelTags);
-        await _DbContext.SaveChangesAsync();
     }
 }
