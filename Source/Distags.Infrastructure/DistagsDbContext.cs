@@ -8,6 +8,7 @@ public class DistagsDbContext : DbContext
     public DistagsDbContext(DbContextOptions<DistagsDbContext> options)
         : base(options)
     {
+        SavingChanges += DistagsDbContext_SavingChanges;
     }
 
     protected override void ConfigureConventions(ModelConfigurationBuilder configurationBuilder)
@@ -114,5 +115,15 @@ public class DistagsDbContext : DbContext
     {
         modelBuilder.Entity<UserSession>()
             .HasKey(session => session.Token);
+    }
+
+    private void DistagsDbContext_SavingChanges(object? sender, SavingChangesEventArgs e)
+    {
+        List<LevelLock> newLevelLocks = ChangeTracker.Entries<Level>()
+            .Where(entry => entry.State == EntityState.Added)
+            .Select(entry => new LevelLock { LevelId = entry.Entity.Id })
+            .ToList();
+
+        AddRange(newLevelLocks);
     }
 }

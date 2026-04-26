@@ -26,9 +26,6 @@ public class ImportLevelsCommandHandler : ICommandHandler<ImportLevelsCommand>
             {
                 level = new Level { Id = scrapedLevel.Id };
                 _DbContext.Add(level);
-
-                LevelLock levelLock = new LevelLock { LevelId = level.Id };
-                _DbContext.Add(levelLock);
             }
             SetLevelProperties(level, scrapedLevel);
         }
