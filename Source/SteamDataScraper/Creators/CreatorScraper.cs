@@ -1,6 +1,8 @@
-﻿using DataClasses;
-using DataStoring;
-using Microsoft.EntityFrameworkCore;
+﻿using Distags.Core.Commands;
+using Distags.Core.Commands.ImportCreators;
+using Distags.Core.Queries;
+using Distags.Core.Queries.StalestCreators;
+using Distags.Core.Queries.UnknownCreators;
 using Microsoft.Extensions.Logging;
 using SteamWebApi;
 using SteamWebApi.ApiInterfaces;
@@ -10,23 +12,30 @@ namespace SteamDataScraper.Creators;
 
 public class CreatorScraper
 {
-    private readonly LevelTagDbContext _DbContext;
+    private readonly IQueryHandler<UnknownCreatorsQuery, List<long>> _UnknownCreatorsQueryHandler;
+    private readonly IQueryHandler<StalestCreatorsQuery, List<long>> _StalestCreatorsQueryHandler;
+    private readonly ICommandHandler<ImportCreatorsCommand> _ImportCreatorsCommandHandler;
     private readonly ISteamUser _SteamUser;
     private readonly ICreatorRefreshCountCalculator _RefreshCountCalculator;
     private readonly ICreatorRefreshDateManager _RefreshDateManager;
+
     private readonly string _SteamWebApiKey;
 
     private readonly ILogger<CreatorScraper> _Logger;
 
     public CreatorScraper(
-        LevelTagDbContext dbContext,
+        IQueryHandler<UnknownCreatorsQuery, List<long>> unknownCreatorsQueryHandler,
+        IQueryHandler<StalestCreatorsQuery, List<long>> stalestCreatorsQueryHandler,
+        ICommandHandler<ImportCreatorsCommand> importCreatorsCommandHandler,
         ISteamUser steamUser,
         ICreatorRefreshCountCalculator refreshCountCalculator,
         ICreatorRefreshDateManager refreshDateManager,
         SteamWebApiSettings steamWebApiSettings,
         ILogger<CreatorScraper> logger)
     {
-        _DbContext = dbContext;
+        _UnknownCreatorsQueryHandler = unknownCreatorsQueryHandler;
+        _StalestCreatorsQueryHandler = stalestCreatorsQueryHandler;
+        _ImportCreatorsCommandHandler = importCreatorsCommandHandler;
         _SteamUser = steamUser;
         _RefreshCountCalculator = refreshCountCalculator;
         _RefreshDateManager = refreshDateManager;
@@ -35,74 +44,56 @@ public class CreatorScraper
         _Logger = logger;
     }
 
-    public async Task ScrapeUnknownLevelCreatorsAsync(CancellationToken cancellationToken = default)
+    public async Task ScrapeLevelCreatorsAsync(CancellationToken cancellationToken = default)
     {
-        _Logger.LogDebug("Scraping unknown level creators from Steam web API...");
+        _Logger.LogDebug("Scraping level creators from Steam web API...");
 
-        List<long> unknownCreatorIds = await _DbContext.Set<Level>()
-            .Where(level => level.Creator == null)
-            .Select(level => level.CreatorId)
-            .Distinct()
-            .ToListAsync(cancellationToken).ConfigureAwait(false);
+        List<long> creatorIds = await GetCreatorIdsForScrapingAsync(cancellationToken).ConfigureAwait(false);
+        List<ScrapedCreator> scrapedCreators = await ScrapeLevelCreatorsAsync(creatorIds, cancellationToken).ConfigureAwait(false);
 
-        _Logger.LogDebug("Found {count} unknown level creators.", unknownCreatorIds.Count);
-
-        GetPlayerSummariesParameters parameters = CreateParameters(unknownCreatorIds);
-        IAsyncEnumerable<PlayerSummary> playerSummariesQuery = _SteamUser.GetPlayerSummariesAsync(parameters, cancellationToken);
-
-        await foreach (PlayerSummary playerSummary in playerSummariesQuery.ConfigureAwait(false))
-        {
-            Creator creator = new Creator();
-            creator.Id = long.Parse(playerSummary.SteamId);
-            SetCreatorProperties(creator, playerSummary);
-
-            _DbContext.Add(creator);
-
-            _Logger.LogDebug("Added creator {id}.", creator.Id);
-        }
-
-        _Logger.LogDebug("Saving scraped level creators.");
-        await _DbContext.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
-
-        _Logger.LogDebug("Scraped unknown level creators from Steam web API.");
-    }
-
-    public async Task ScrapeOutdatedLevelCreatorsAsync(CancellationToken cancellationToken = default)
-    {
-        _Logger.LogDebug("Scraping outdated level creators from Steam web API...");
-
-        int refreshCount = await _RefreshCountCalculator.CalculateCreatorRefreshCountAsync(cancellationToken).ConfigureAwait(false);
-        if (refreshCount == 0)
-        {
-            _Logger.LogDebug("Cancelling scraping of outdated level creators.");
-            return;
-        }
-
-        List<Creator> creators = await _DbContext.Set<Creator>()
-            .OrderBy(creator => creator.CachedOn)
-            .Take(refreshCount)
-            .ToListAsync(cancellationToken).ConfigureAwait(false);
-
-        GetPlayerSummariesParameters parameters = CreateParameters(creators.Select(creator => creator.Id));
-        IAsyncEnumerable<PlayerSummary> playerSummariesQuery = _SteamUser.GetPlayerSummariesAsync(parameters, cancellationToken);
-
-        await foreach (PlayerSummary playerSummary in playerSummariesQuery.ConfigureAwait(false))
-        {
-            long creatorId = long.Parse(playerSummary.SteamId);
-            Creator? creator = await _DbContext.FindAsync<Creator>([creatorId], cancellationToken).ConfigureAwait(false);
-            if (creator != null)
-            {
-                SetCreatorProperties(creator, playerSummary);
-                _Logger.LogDebug("Updated creator {id}.", creator.Id);
-            }
-        }
-
-        _Logger.LogDebug("Saving scraped level creators.");
-        await _DbContext.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+        ImportCreatorsCommand importCreatorsCommand = new ImportCreatorsCommand { ScrapedCreators = scrapedCreators };
+        await _ImportCreatorsCommandHandler.HandleAsync(importCreatorsCommand).ConfigureAwait(false);
 
         await _RefreshDateManager.SetRefreshDateAsync(DateTimeOffset.UtcNow, cancellationToken).ConfigureAwait(false);
 
-        _Logger.LogDebug("Scraped outdated level creators from Steam web API.");
+        _Logger.LogDebug("Scraped level creators from Steam web API.");
+    }
+
+    private async Task<List<long>> GetCreatorIdsForScrapingAsync(CancellationToken cancellationToken)
+    {
+        _Logger.LogDebug("Determining IDs of creators to be scraped...");
+
+        List<long> creatorIds = await _UnknownCreatorsQueryHandler.HandleAsync(new UnknownCreatorsQuery()).ConfigureAwait(false);
+
+        int refreshCount = await _RefreshCountCalculator.CalculateCreatorRefreshCountAsync(cancellationToken).ConfigureAwait(false);
+        if (refreshCount > 0)
+        {
+            StalestCreatorsQuery stalestCreatorsQuery = new StalestCreatorsQuery { Limit = refreshCount };
+            List<long> stalestCreatorIds = await _StalestCreatorsQueryHandler.HandleAsync(stalestCreatorsQuery).ConfigureAwait(false);
+            creatorIds.AddRange(stalestCreatorIds);
+        }
+
+        _Logger.LogDebug("Got {count} creator IDs for scraping.", creatorIds.Count);
+
+        return creatorIds;
+    }
+
+    private async Task<List<ScrapedCreator>> ScrapeLevelCreatorsAsync(
+        IEnumerable<long> creatorIds, CancellationToken cancellationToken = default)
+    {
+        GetPlayerSummariesParameters parameters = CreateParameters(creatorIds);
+        IAsyncEnumerable<PlayerSummary> playerSummariesQuery = _SteamUser.GetPlayerSummariesAsync(parameters, cancellationToken);
+
+        List<ScrapedCreator> scrapedCreators = [];
+
+        await foreach (PlayerSummary playerSummary in playerSummariesQuery.ConfigureAwait(false))
+        {
+            scrapedCreators.AddRange(ToScrapedCreator(playerSummary));
+
+            _Logger.LogDebug("Added scraped creator {id} to result.", playerSummary.SteamId);
+        }
+
+        return scrapedCreators;
     }
 
     private GetPlayerSummariesParameters CreateParameters(IEnumerable<long> creatorIds)
@@ -114,10 +105,13 @@ public class CreatorScraper
         };
     }
 
-    private void SetCreatorProperties(Creator creator, PlayerSummary playerSummary)
+    private ScrapedCreator ToScrapedCreator(PlayerSummary playerSummary)
     {
-        creator.Name = playerSummary.PersonaName;
-        creator.AvatarHash = playerSummary.AvatarHash;
-        creator.CachedOn = DateTimeOffset.UtcNow;
+        return new ScrapedCreator
+        {
+            Id = long.Parse(playerSummary.SteamId),
+            Name = playerSummary.PersonaName,
+            AvatarHash = playerSummary.AvatarHash,
+        };
     }
 }

@@ -16,7 +16,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\DataStoring\DataStoring.csproj" />
+    <ProjectReference Include="..\Distags.Core\Distags.Core.csproj" />
+    <ProjectReference Include="..\Distags.Infrastructure\Distags.Infrastructure.csproj" />
     <ProjectReference Include="..\SerilogUtils\SerilogUtils.csproj" />
     <ProjectReference Include="..\SteamWebApi.Contract\SteamWebApi.Contract.csproj" />
     <ProjectReference Include="..\SteamWebApi\SteamWebApi.csproj" />

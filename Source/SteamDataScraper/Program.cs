@@ -1,4 +1,4 @@
-﻿using DataStoring;
+﻿using Distags.Infrastructure;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -10,6 +10,7 @@ using SteamDataScraper.Creators;
 using SteamDataScraper.Levels;
 using SteamWebApi;
 using System.Runtime.CompilerServices;
+using Distags.Core;
 
 namespace SteamDataScraper;
 
@@ -55,9 +56,10 @@ internal class Program
                 services.AddTransient<CreatorRefreshSettings>(services =>
                     services.GetRequiredService<IOptions<CreatorRefreshSettings>>().Value);
 
-                string levelTagsDbConnectionString = context.Configuration.GetConnectionString("LevelTagsDatabase") ??
-                                                     throw new InvalidOperationException("Connection string not configured.");
-                services.AddNpgsqlLevelTagDbContext(levelTagsDbConnectionString);
+                string distagsDbConnectionString = context.Configuration.GetConnectionString("DistagsDatabase") ??
+                                                   throw new InvalidOperationException("Connection string not configured.");
+                services.AddDistagsInfrastructure(distagsDbConnectionString);
+                services.AddDistagsCore();
 
                 services.AddTransient<Program>();
                 services.AddTransient<LevelScraper>();
@@ -104,9 +106,7 @@ internal class Program
         try
         {
             await _LevelScraper.ScrapeLevelsAsync().ConfigureAwait(false);
-
-            await _CreatorScraper.ScrapeUnknownLevelCreatorsAsync().ConfigureAwait(false);
-            await _CreatorScraper.ScrapeOutdatedLevelCreatorsAsync().ConfigureAwait(false);
+            await _CreatorScraper.ScrapeLevelCreatorsAsync().ConfigureAwait(false);
         }
         catch (Exception ex)
         {

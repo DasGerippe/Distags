@@ -1,6 +1,7 @@
-﻿using DataClasses;
-using DataStoring;
-using Microsoft.EntityFrameworkCore;
+﻿using Distags.Core.Commands;
+using Distags.Core.Commands.ImportLevels;
+using Distags.Core.Queries;
+using Distags.Core.Queries.LatestLevelDate;
 using Microsoft.Extensions.Logging;
 using SteamWebApi;
 using SteamWebApi.ApiInterfaces;
@@ -12,19 +13,23 @@ public class LevelScraper
 {
     private const int DistanceAppId = 233610;
 
-    private readonly LevelTagDbContext _DbContext;
+    private readonly IQueryHandler<LatestLevelDateQuery, DateTimeOffset?> _LatestLevelDateQueryHandler;
+    private readonly ICommandHandler<ImportLevelsCommand> _ImportLevelsCommandHandler;
     private readonly IPublishedFileService _PublishedFileService;
+
     private readonly string _SteamWebApiKey;
 
     private readonly ILogger<LevelScraper> _Logger;
 
     public LevelScraper(
-        LevelTagDbContext dbContext,
+        IQueryHandler<LatestLevelDateQuery, DateTimeOffset?> latestLevelDateQueryHandler,
+        ICommandHandler<ImportLevelsCommand> importLevelsCommandHandler,
         IPublishedFileService publishedFileService,
         SteamWebApiSettings steamWebApiSettings,
         ILogger<LevelScraper> logger)
     {
-        _DbContext = dbContext;
+        _LatestLevelDateQueryHandler = latestLevelDateQueryHandler;
+        _ImportLevelsCommandHandler = importLevelsCommandHandler;
         _PublishedFileService = publishedFileService;
         _SteamWebApiKey = steamWebApiSettings.ApiKey;
 
@@ -35,43 +40,24 @@ public class LevelScraper
     {
         _Logger.LogDebug("Scraping levels from Steam web API...");
 
-        DateTimeOffset? cutOffDate = await GetLatestLevelDate(cancellationToken).ConfigureAwait(false);
+        DateTimeOffset? cutOffDate = await _LatestLevelDateQueryHandler.HandleAsync(new LatestLevelDateQuery()).ConfigureAwait(false);
 
-        await ScrapeNewLevelsAsync(cutOffDate, cancellationToken).ConfigureAwait(false);
+        List<ScrapedLevel> scrapedLevels = await ScrapeNewLevelsAsync(cutOffDate, cancellationToken).ConfigureAwait(false);
 
         if (cutOffDate != null)
-            await ScrapeUpdatedLevelsAsync(cutOffDate.Value, cancellationToken).ConfigureAwait(false);
+            scrapedLevels.AddRange(await ScrapeUpdatedLevelsAsync(cutOffDate.Value, cancellationToken).ConfigureAwait(false));
 
-        _Logger.LogDebug("Saving scraped levels.");
-        await _DbContext.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+        ImportLevelsCommand importLevelsCommand = new ImportLevelsCommand { ScrapedLevels = scrapedLevels };
+        await _ImportLevelsCommandHandler.HandleAsync(importLevelsCommand).ConfigureAwait(false);
 
         _Logger.LogDebug("Scraped levels from Steam web API.");
     }
 
-    private async Task<DateTimeOffset?> GetLatestLevelDate(CancellationToken cancellationToken = default)
-    {
-        _Logger.LogDebug("Determining latest create or update date...");
-
-        if (!await _DbContext.Set<Level>().AnyAsync(cancellationToken).ConfigureAwait(false))
-        {
-            _Logger.LogDebug("No levels found in database. Cannot determine latest date.");
-            return null;
-        }
-
-        DateTimeOffset latestCreatedDate = await _DbContext.Set<Level>()
-            .MaxAsync(level => level.CreatedOn, cancellationToken).ConfigureAwait(false);
-        DateTimeOffset latestUpdatedDate = await _DbContext.Set<Level>()
-            .MaxAsync(level => level.UpdatedOn, cancellationToken).ConfigureAwait(false);
-        DateTimeOffset latestDate = latestCreatedDate > latestUpdatedDate ? latestCreatedDate : latestUpdatedDate;
-
-        _Logger.LogDebug("Latest date is {latestDate}.", latestDate);
-        return latestDate;
-    }
-
-    private async Task ScrapeNewLevelsAsync(DateTimeOffset? cutOffDate, CancellationToken cancellationToken = default)
+    private async Task<List<ScrapedLevel>> ScrapeNewLevelsAsync(DateTimeOffset? cutOffDate, CancellationToken cancellationToken = default)
     {
         int itemsPerPage = GetItemsPerPage(cutOffDate);
         QueryFileParameters queryParams = CreateQueryFileParameters(QueryType.RankedByPublicationDate, itemsPerPage);
+        List<ScrapedLevel> scrapedLevels = [];
 
         _Logger.LogDebug("Scraping new levels...");
 
@@ -85,24 +71,19 @@ public class LevelScraper
                 break;
             }
 
-            Level level = new Level();
-            level.Id = long.Parse(publishedFile.PublishedFileId);
-            SetLevelProperties(level, publishedFile);
+            scrapedLevels.Add(ToScrapedLevel(publishedFile));
 
-            LevelLock levelLock = new LevelLock();
-            levelLock.LevelId = level.Id;
-
-            _DbContext.Add(level);
-            _DbContext.Add(levelLock);
-
-            _Logger.LogDebug("Added level {id}.", level.Id);
+            _Logger.LogDebug("Added scraped level {id} to result.", publishedFile.PublishedFileId);
         }
+
+        return scrapedLevels;
     }
 
-    private async Task ScrapeUpdatedLevelsAsync(DateTimeOffset cutOffDate, CancellationToken cancellationToken = default)
+    private async Task<List<ScrapedLevel>> ScrapeUpdatedLevelsAsync(DateTimeOffset cutOffDate, CancellationToken cancellationToken = default)
     {
         int itemsPerPage = GetItemsPerPage(cutOffDate);
         QueryFileParameters queryParams = CreateQueryFileParameters(QueryType.RankedByLastUpdatedDate, itemsPerPage);
+        List<ScrapedLevel> scrapedLevels = [];
 
         _Logger.LogDebug("Scraping updated levels...");
 
@@ -122,15 +103,13 @@ public class LevelScraper
                     publishedFile.PublishedFileId);
                 continue;
             }
+            
+            scrapedLevels.Add(ToScrapedLevel(publishedFile));
 
-            long levelId = long.Parse(publishedFile.PublishedFileId);
-            Level? level = await _DbContext.FindAsync<Level>([levelId], cancellationToken).ConfigureAwait(false);
-            if (level != null)
-            {
-                SetLevelProperties(level, publishedFile);
-                _Logger.LogDebug("Updated level {id}.", level.Id);
-            }
+            _Logger.LogDebug("Added scraped level {id} to result.", publishedFile.PublishedFileId);
         }
+
+        return scrapedLevels;
     }
 
     private static int GetItemsPerPage(DateTimeOffset? previousScrapeDate)
@@ -149,7 +128,7 @@ public class LevelScraper
         if (elapsed < TimeSpan.FromDays(30))
             return 25;
 
-        if (elapsed < TimeSpan.FromDays(180))
+        if (elapsed < TimeSpan.FromDays(90))
             return 50;
 
         return 100;
@@ -167,15 +146,19 @@ public class LevelScraper
         };
     }
 
-    private void SetLevelProperties(Level level, PublishedFileDetail publishedFile)
+    private ScrapedLevel ToScrapedLevel(PublishedFileDetail publishedFile)
     {
-        level.Name = publishedFile.Title;
-        level.CreatorId = long.Parse(publishedFile.CreatorId);
-        level.FileName = publishedFile.Filename;
-        level.FileUrl = publishedFile.FileUrl;
-        level.IconUrl = publishedFile.PreviewUrl;
-        level.CreatedOn = publishedFile.TimeCreated;
-        level.UpdatedOn = publishedFile.TimeUpdated;
-        level.WorkshopTags = publishedFile.Tags.Select(tag => tag.Name).ToArray();
+        return new ScrapedLevel
+        {
+            Id = long.Parse(publishedFile.PublishedFileId),
+            Name = publishedFile.Title,
+            CreatorId = long.Parse(publishedFile.CreatorId),
+            FileName = publishedFile.Filename,
+            FileUrl = publishedFile.FileUrl,
+            ImageUrl = publishedFile.PreviewUrl,
+            CreatedOn = publishedFile.TimeCreated,
+            UpdatedOn = publishedFile.TimeUpdated,
+            WorkshopTags = publishedFile.Tags.Select(tag => tag.Name).ToList(),
+        };
     }
 }
