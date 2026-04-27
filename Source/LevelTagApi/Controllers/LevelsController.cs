@@ -1,14 +1,17 @@
-﻿using DataClasses;
-using DataStoring;
+﻿using Distags.Core.Commands.LevelAddTag;
+using Distags.Core.Commands.LevelRemoveTag;
+using Distags.Core.Filtering.Levels;
+using Distags.Core.Queries;
+using Distags.Core.Queries.BrowseLevels;
+using Distags.Core.Queries.LevelById;
+using Distags.Core.Queries.LevelTags;
 using LevelTagApi.ApiState;
 using LevelTagApi.Dtos.Levels;
 using LevelTagApi.Exceptions;
-using LevelTagApi.Filtering;
-using LevelTagApi.Management;
-using LevelTagApi.Sorting;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
+using LevelDto = Distags.Core.Dtos.LevelDto;
+using LevelSortStrategy = Distags.Core.Sorting.Levels.LevelSortStrategy;
 
 namespace LevelTagApi.Controllers;
 
@@ -16,98 +19,86 @@ namespace LevelTagApi.Controllers;
 [Route("[controller]")]
 public class LevelsController : ControllerBase
 {
-    private readonly LevelTagDbContext _DbContext;
-
-    public LevelsController(LevelTagDbContext dbContext)
-    {
-        _DbContext = dbContext;
-    }
-
     [HttpGet]
     [AllowAnonymous]
     public async Task<ActionResult<IEnumerable<LevelDto>>> BrowseLevels(
         [FromQuery] BrowseLevelsParameters parameters,
-        [FromServices] IQueryableFilterFactory<Level, LevelFilterParameters> levelFilterFactory,
-        [FromServices] IQueryableSorterFactory<Level, LevelSortStrategy> levelSorterFactory)
+        [FromServices] IQueryHandler<BrowseLevelsQuery, LevelsPage> browseLevelsQueryHandler)
     {
-        BrowseLevelsResponse response = new BrowseLevelsResponse
+        BrowseLevelsQuery query = new BrowseLevelsQuery
         {
-            PageSize = parameters.PageSize,
+            FilterParameters = new LevelFilterParameters
+            {
+                LevelFilter = parameters.LevelFilter,
+                CreatorFilter = parameters.CreatorFilter,
+                IncludeTags = GetNormalizedTagNames(parameters.IncludeTags),
+                ExcludeTags = GetNormalizedTagNames(parameters.ExcludeTags),
+            },
+            SortStrategy = (LevelSortStrategy)parameters.SortStrategy,
             PageNumber = parameters.PageNumber,
+            PageSize = parameters.PageSize,
         };
 
-        IQueryable<Level> levels = _DbContext.Set<Level>();
+        LevelsPage levelsPage = await browseLevelsQueryHandler.HandleAsync(query);
+        return Ok(levelsPage);
+    }
 
-        LevelFilterParameters filterParams = GetFilterParameters(parameters);
-        IQueryableFilter<Level> levelFilter = levelFilterFactory.GetQueryableFilter(filterParams);
-        levels = levelFilter.Filter(levels);
+    private List<string> GetNormalizedTagNames(string? commaSeparatedTags)
+    {
+        if (string.IsNullOrEmpty(commaSeparatedTags))
+            return [];
 
-        response.TotalLevels = await levels.CountAsync();
-        if (response.TotalLevels == 0)
-            return Ok(response);
-
-        response.TotalPages = (int)Math.Ceiling((double)response.TotalLevels / parameters.PageSize);
-        if (parameters.PageNumber > response.TotalPages)
-            return Ok(response);
-
-        IQueryableSorter<Level> levelSorter = levelSorterFactory.GetQueryableSorter(parameters.SortStrategy);
-        levels = levelSorter.Sort(levels);
-
-        if (parameters.PageNumber > 1)
-            levels = levels.Skip((parameters.PageNumber - 1) * parameters.PageSize);
-
-        if (response.TotalLevels > parameters.PageSize)
-            levels = levels.Take(parameters.PageSize);
-
-        List<LevelDto> levelDtos = await levels
-            .Include(level => level.Creator)
-            .Include(level => level.Tags)
-            .Select(level => level.ToDto())
-            .ToListAsync();
-
-        response.Levels = levelDtos;
-        return Ok(response);
+        string[] tagNames = commaSeparatedTags.Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+        List<string> normalizedTagNames = tagNames.Select(tag => tag.ToLowerInvariant()).ToList();
+        return normalizedTagNames;
     }
 
     [HttpGet("{levelId:long}")]
     [AllowAnonymous]
-    public async Task<ActionResult<LevelDto>> GetLevel(long levelId)
+    public async Task<ActionResult<LevelDto>> GetLevel(long levelId,
+        [FromServices] IQueryHandler<LevelByIdQuery, LevelDto> levelByIdQueryHandler)
     {
-        Level? level = await _DbContext.Set<Level>()
-            .Include(level => level.Creator)
-            .Include(level => level.Tags)
-            .FirstOrDefaultAsync(level => level.Id == levelId);
-
-        if (level == null)
-            return NotFound();
-
-        LevelDto levelDto = level.ToDto();
-        return Ok(levelDto);
+        try
+        {
+            LevelDto levelDto = await levelByIdQueryHandler.HandleAsync(new LevelByIdQuery { LevelId = levelId });
+            return Ok(levelDto);
+        }
+        catch (UnknownLevelException ex)
+        {
+            return LevelNotFound(ex.LevelId);
+        }
     }
 
     [HttpGet("{levelId:long}/tags")]
     [AllowAnonymous]
-    public async Task<ActionResult<IEnumerable<string>>> GetLevelTags(long levelId)
+    public async Task<ActionResult<IEnumerable<string>>> GetLevelTags(long levelId,
+        [FromServices] IQueryHandler<LevelTagsQuery, List<string>> levelTagsQueryHandler)
     {
-        Level? level = await _DbContext.Set<Level>()
-            .Include(level => level.Tags)
-            .FirstOrDefaultAsync(level => level.Id == levelId);
-
-        if (level == null)
-            return LevelNotFound(levelId);
-
-        return level.Tags.Select(tag => tag.Name).ToList();
+        try
+        {
+            List<string> tags = await levelTagsQueryHandler.HandleAsync(new LevelTagsQuery { LevelId = levelId });
+            return Ok(tags);
+        }
+        catch (UnknownLevelException ex)
+        {
+            return LevelNotFound(ex.LevelId);
+        }
     }
 
     [HttpPut("{levelId:long}/tags/{tagName}")]
     [Authorize(Policy = Constants.Policies.Tagging)]
     [TypeFilter<MaintenanceFilter>(IsReusable = true)]
     public async Task<IActionResult> PutLevelTag(long levelId, string tagName,
-        [FromServices] ILevelTagManager levelTagManager)
+        [FromServices] LevelAddTagCommandHandler levelAddTagCommandHandler)
     {
         try
         {
-            await levelTagManager.AddTagToLevelAsync(levelId, tagName);
+            LevelAddTagCommand command = new LevelAddTagCommand
+            {
+                LevelId = levelId,
+                TagName = tagName,
+            };
+            await levelAddTagCommandHandler.HandleAsync(command);
             return Created();
         }
         catch (UnknownLevelException ex)
@@ -128,11 +119,16 @@ public class LevelsController : ControllerBase
     [Authorize(Policy = Constants.Policies.Tagging)]
     [TypeFilter<MaintenanceFilter>(IsReusable = true)]
     public async Task<IActionResult> DeleteLevelTag(long levelId, string tagName,
-        [FromServices] ILevelTagManager levelTagManager)
+        [FromServices] LevelRemoveTagCommandHandler levelRemoveTagCommandHandler)
     {
         try
         {
-            await levelTagManager.RemoveTagFromLevelAsync(levelId, tagName);
+            LevelRemoveTagCommand command = new LevelRemoveTagCommand
+            {
+                LevelId = levelId,
+                TagName = tagName,
+            };
+            await levelRemoveTagCommandHandler.HandleAsync(command);
             return NoContent();
         }
         catch (UnknownLevelException ex)
@@ -147,17 +143,6 @@ public class LevelsController : ControllerBase
         {
             return NotFound();
         }
-    }
-
-    private LevelFilterParameters GetFilterParameters(BrowseLevelsParameters parameters)
-    {
-        return new LevelFilterParameters
-        {
-            LevelFilter = parameters.LevelFilter,
-            CreatorFilter = parameters.CreatorFilter,
-            IncludeTags = parameters.IncludeTags,
-            ExcludeTags = parameters.ExcludeTags,
-        };
     }
 
     private NotFoundObjectResult LevelNotFound(long levelId)
