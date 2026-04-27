@@ -19,6 +19,8 @@
 
   <ItemGroup>
     <ProjectReference Include="..\DataStoring\DataStoring.csproj" />
+    <ProjectReference Include="..\Distags.Core\Distags.Core.csproj" />
+    <ProjectReference Include="..\Distags.Infrastructure\Distags.Infrastructure.csproj" />
     <ProjectReference Include="..\LevelTagApi.Dtos\LevelTagApi.Dtos.csproj" />
     <ProjectReference Include="..\SerilogUtils\SerilogUtils.csproj" />
     <ProjectReference Include="..\SteamWebApi\SteamWebApi.csproj" />

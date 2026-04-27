@@ -1,5 +1,7 @@
 using DataClasses;
 using DataStoring;
+using Distags.Core;
+using Distags.Infrastructure;
 using LevelTagApi.ApiState;
 using LevelTagApi.Conversion;
 using LevelTagApi.Dtos;
@@ -46,13 +48,10 @@ public class Program
             // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
             builder.Services.AddOpenApi();
 
-            string levelTagsDbConnectionString = builder.Configuration.GetConnectionString("LevelTagsDatabase") ??
-                                                 throw new InvalidOperationException("Connection string not configured.");
-            builder.Services.AddNpgsqlLevelTagDbContext(levelTagsDbConnectionString, (sp, options) =>
-            {
-                options.AddInterceptors(sp.GetRequiredService<LevelTagBroadcastingInterceptor>());
-                options.AddInterceptors(sp.GetRequiredService<ContributionBroadcastingInterceptor>());
-            });
+            string distagsDbConnectionString = builder.Configuration.GetConnectionString("DistagsDatabase") ??
+                                               throw new InvalidOperationException("Connection string not configured.");
+            builder.Services.AddDistagsInfrastructure(distagsDbConnectionString);
+            builder.Services.AddDistagsCore();
 
             builder.Services.AddSingleton<LevelTagBroadcastingInterceptor>();
             builder.Services.AddSingleton<ContributionBroadcastingInterceptor>();
