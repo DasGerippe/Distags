@@ -1,4 +1,6 @@
-﻿using Distags.Core.Interfaces;
+﻿using Distags.Core.Filtering;
+using Distags.Core.Interfaces;
+using Distags.Infrastructure.Filtering;
 using Distags.Infrastructure.Implementations;
 using Distags.Infrastructure.Seeding;
 using Microsoft.EntityFrameworkCore;
@@ -15,6 +17,8 @@ public static class ServiceCollectionExtensions
         serviceCollection.AddScoped<DbContext, DistagsDbContext>();
 
         serviceCollection.AddTransient<ISequentialLevelActionExecutor, SequentialLevelActionExecutor>();
+
+        serviceCollection.AddTransient<IStringContainsFilterFactory, StringContainsFilterFactory>();
 
         return serviceCollection;
     }
