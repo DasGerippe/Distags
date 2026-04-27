@@ -1,4 +1,4 @@
-﻿namespace Distags.Core.Queries.BrowseLevels;
+﻿namespace Distags.Core.Dtos;
 
 public class LevelDto
 {

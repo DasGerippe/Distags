@@ -1,8 +1,8 @@
 ﻿using DataClasses;
-using Distags.Core.Projection;
+using Distags.Core.Dtos;
 using System.Linq.Expressions;
 
-namespace Distags.Core.Queries.BrowseLevels;
+namespace Distags.Core.Projection;
 
 public class LevelProjector : IEntityProjector<Level, LevelDto>
 {

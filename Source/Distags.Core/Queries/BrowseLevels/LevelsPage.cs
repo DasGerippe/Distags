@@ -1,4 +1,6 @@
-﻿namespace Distags.Core.Queries.BrowseLevels;
+﻿using Distags.Core.Dtos;
+
+namespace Distags.Core.Queries.BrowseLevels;
 
 public class LevelsPage
 {

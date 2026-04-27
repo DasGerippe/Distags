@@ -1,6 +1,8 @@
 ﻿using DataClasses;
+using Distags.Core.Dtos;
 using Distags.Core.Filtering;
 using Distags.Core.Filtering.Levels;
+using Distags.Core.Projection;
 using Distags.Core.Sorting;
 using Distags.Core.Sorting.Levels;
 using Microsoft.EntityFrameworkCore;
