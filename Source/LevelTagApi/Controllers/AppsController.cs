@@ -1,10 +1,14 @@
-﻿using DataClasses;
-using DataStoring;
+﻿using Distags.Core.Commands;
+using Distags.Core.Commands.CreateApp;
+using Distags.Core.Commands.DeleteApp;
+using Distags.Core.Exceptions;
+using Distags.Core.Queries;
+using Distags.Core.Queries.AppByName;
+using Distags.Core.Queries.Apps;
 using LevelTagApi.Dtos.Apps;
-using LevelTagApi.Security;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
+using AppDto = Distags.Core.Dtos.AppDto;
 
 namespace LevelTagApi.Controllers;
 
@@ -12,70 +16,63 @@ namespace LevelTagApi.Controllers;
 [Route("[controller]")]
 public class AppsController : ControllerBase
 {
-    private readonly LevelTagDbContext _DbContext;
-    private readonly ITokenGenerator _TokenGenerator;
-
-    public AppsController(LevelTagDbContext dbContext, ITokenGenerator tokenGenerator)
-    {
-        _DbContext = dbContext;
-        _TokenGenerator = tokenGenerator;
-    }
-
     [HttpGet]
     [Authorize(Roles = Constants.Roles.AppManager)]
-    public async Task<ActionResult<List<AppDto>>> GetApps()
+    public async Task<ActionResult<List<AppDto>>> GetApps(
+        [FromServices] IQueryHandler<AppsQuery, List<AppDto>> appsQueryHandler)
     {
-        List<AppDto> apps = await _DbContext.Set<App>()
-            .Select(app => app.ToDto())
-            .ToListAsync();
-
-        return Ok(apps);
+        List<AppDto> appDtos = await appsQueryHandler.HandleAsync(new AppsQuery());
+        return Ok(appDtos);
     }
 
     [HttpGet("{appName}")]
     [Authorize(Roles = Constants.Roles.AppManager)]
-    public async Task<ActionResult<List<AppDto>>> GetApp(string appName)
+    public async Task<ActionResult<List<AppDto>>> GetApp(string appName,
+        [FromServices] IQueryHandler<AppByNameQuery, AppDto> appByNameQueryHandler)
     {
-        App? app = await _DbContext.Set<App>().FirstOrDefaultAsync(app => app.Name == appName);
-
-        return app == null
-            ? NotFound()
-            : Ok(app.ToDto());
+        try
+        {
+            AppByNameQuery query = new AppByNameQuery { AppName = appName };
+            AppDto appDto = await appByNameQueryHandler.HandleAsync(query);
+            return Ok(appDto);
+        }
+        catch (UnknownAppNameException ex)
+        {
+            return NotFound();
+        }
     }
 
     [HttpPost]
     [Authorize(Roles = Constants.Roles.AppManager)]
-    public async Task<ActionResult<AppDto>> CreateApp([FromBody] CreateAppDto createAppDto)
+    public async Task<ActionResult<AppDto>> CreateApp([FromBody] CreateAppDto createAppDto,
+        [FromServices] ICommandHandler<CreateAppCommand> createAppCommandHandler)
     {
-        string appName = createAppDto.Name;
-        App? app = await _DbContext.Set<App>().FirstOrDefaultAsync(app => app.Name == appName);
-        if (app != null)
-            return Conflict($"{nameof(App)} with name {appName} already exists.");
-
-        app = new App
+        try
         {
-            Name = appName,
-            ApiKey = _TokenGenerator.GenerateToken(32),
-        };
-
-        _DbContext.Add(app);
-        await _DbContext.SaveChangesAsync();
-
-        AppDto appDto = app.ToDto();
-        return CreatedAtAction(nameof(GetApp), new { appName = appName }, appDto);
+            CreateAppCommand command = new CreateAppCommand { AppName = createAppDto.Name };
+            await createAppCommandHandler.HandleAsync(command);
+            return CreatedAtAction(nameof(GetApp), new { appName = createAppDto.Name }, null);
+        }
+        catch (AppNameTakenException ex)
+        {
+            return Conflict();
+        }
     }
 
     [HttpDelete("{appName}")]
     [Authorize(Roles = Constants.Roles.AppManager)]
-    public async Task<IActionResult> DeleteApiKey(string appName)
+    public async Task<IActionResult> DeleteApiKey(string appName,
+        [FromServices] ICommandHandler<DeleteAppCommand> deleteAppCommandHandler)
     {
-        App? apiKey = await _DbContext.Set<App>().FirstOrDefaultAsync(app => app.Name == appName);
-        if (apiKey == null)
+        try
+        {
+            DeleteAppCommand command = new DeleteAppCommand { AppName = appName };
+            await deleteAppCommandHandler.HandleAsync(command);
+            return NoContent();
+        }
+        catch (UnknownAppNameException ex)
+        {
             return NotFound();
-
-        _DbContext.Remove(apiKey);
-        await _DbContext.SaveChangesAsync();
-
-        return NoContent();
+        }
     }
 }
