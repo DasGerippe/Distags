@@ -1,6 +1,7 @@
 ﻿using Distags.Core.Commands;
 using Distags.Core.Management;
 using Distags.Core.Queries;
+using Distags.Core.Security;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Distags.Core;
@@ -9,6 +10,8 @@ public static class ServiceCollectionExtensions
 {
     public static IServiceCollection AddDistagsCore(this IServiceCollection serviceCollection)
     {
+        serviceCollection.AddTransient<TokenGenerator>();
+
         serviceCollection.AddGenericServiceImplementations(typeof(IQueryHandler<,>));
         serviceCollection.AddGenericServiceImplementations(typeof(ICommandHandler<>));
 
