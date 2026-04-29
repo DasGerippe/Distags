@@ -1,9 +1,8 @@
-﻿using DataClasses;
-using DataStoring;
-using LevelTagApi.Dtos.Tags;
+﻿using Distags.Core.Dtos;
+using Distags.Core.Queries;
+using Distags.Core.Queries.TagTree;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 
 namespace LevelTagApi.Controllers;
 
@@ -11,23 +10,12 @@ namespace LevelTagApi.Controllers;
 [Route("[controller]")]
 public class TagsController : ControllerBase
 {
-    private readonly LevelTagDbContext _DbContext;
-
-    public TagsController(LevelTagDbContext dbContext)
-    {
-        _DbContext = dbContext;
-    }
-
     [HttpGet("tree")]
     [AllowAnonymous]
-    public async Task<ActionResult<IEnumerable<TagGroupDto>>> GetTagTreeAsync()
+    public async Task<ActionResult<IEnumerable<TagGroupDto>>> GetTagTreeAsync(
+        [FromServices] IQueryHandler<TagTreeQuery, List<TagGroupDto>> tagTreeQueryHandler)
     {
-        List<TagGroupDto> tagGroupTree = await _DbContext.Set<TagGroup>()
-            .Include(tagGroup => tagGroup.Tags)
-            .OrderBy(tagGroup => tagGroup.Position)
-            .Select(tagGroup => tagGroup.ToDto())
-            .ToListAsync();
-
-        return Ok(tagGroupTree);
+        List<TagGroupDto> tagGroupDtos = await tagTreeQueryHandler.HandleAsync(new TagTreeQuery());
+        return Ok(tagGroupDtos);
     }
 }
