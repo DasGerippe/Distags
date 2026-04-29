@@ -1,11 +1,15 @@
-﻿using DataClasses;
-using DataStoring;
-using LevelTagApi.Conversion;
+﻿using Distags.Core.Commands;
+using Distags.Core.Commands.BanSteamId;
+using Distags.Core.Commands.UnbanSteamId;
+using Distags.Core.Exceptions;
+using Distags.Core.Queries;
+using Distags.Core.Queries.UserBanBySteamId;
+using Distags.Core.Queries.UserBans;
 using LevelTagApi.Dtos.UserBans;
-using LevelTagApi.Management;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
+using System.Security.Claims;
+using UserBanDto = Distags.Core.Dtos.UserBanDto;
 
 namespace LevelTagApi.Controllers;
 
@@ -13,41 +17,22 @@ namespace LevelTagApi.Controllers;
 [Route("[controller]")]
 public class UserBansController : ControllerBase
 {
-    private readonly LevelTagDbContext _DbContext;
-    private readonly IUserManager _UserManager;
-    private readonly IUserBanPermissionChecker _PermissionChecker;
-    private readonly UserBanDtoConverter _DtoConverter;
-
-    public UserBansController(
-        LevelTagDbContext dbContext,
-        IUserManager userManager,
-        IUserBanPermissionChecker permissionChecker,
-        UserBanDtoConverter dtoConverter)
-    {
-        _DbContext = dbContext;
-        _UserManager = userManager;
-        _PermissionChecker = permissionChecker;
-        _DtoConverter = dtoConverter;
-    }
-
     [HttpGet]
     [Authorize(Roles = Constants.Roles.Moderator)]
-    public async Task<ActionResult<List<UserBanDto>>> GetUserBans()
+    public async Task<ActionResult<List<UserBanDto>>> GetUserBans(
+        [FromServices] IQueryHandler<UserBansQuery, List<UserBanDto>> userBansQueryHandler)
     {
-        List<UserBanDto> userBanDtos = await _DtoConverter.SelectDto(_DbContext.Set<UserBan>()).ToListAsync();
-
+        List<UserBanDto> userBanDtos = await userBansQueryHandler.HandleAsync(new UserBansQuery());
         return Ok(userBanDtos);
     }
 
     [HttpGet("{steamId:long}")]
     [Authorize(Roles = Constants.Roles.Moderator)]
-    public async Task<ActionResult<UserBanDto>> GetUserBan(long steamId)
+    public async Task<ActionResult<UserBanDto>> GetUserBan(long steamId,
+        [FromServices] UserBanBySteamIdQueryHandler userBanBySteamIdQueryHandler)
     {
-        IQueryable<UserBan> userBanQuery = _DbContext.Set<UserBan>()
-            .Include(userBan => userBan.Banner)
-            .Where(userBan => userBan.SteamId == steamId);
-
-        UserBanDto? userBanDto = await _DtoConverter.SelectDto(userBanQuery).FirstOrDefaultAsync();
+        UserBanBySteamIdQuery query = new UserBanBySteamIdQuery { SteamId = steamId };
+        UserBanDto? userBanDto = await userBanBySteamIdQueryHandler.HandleAsync(query);
 
         return userBanDto != null
             ? Ok(userBanDto)
@@ -56,71 +41,62 @@ public class UserBansController : ControllerBase
 
     [HttpPost]
     [Authorize(Roles = Constants.Roles.Moderator)]
-    public async Task<IActionResult> PostUserBan([FromBody] CreateUserBanDto userBanDto)
+    public async Task<IActionResult> PostUserBan([FromBody] CreateUserBanDto userBanDto,
+        [FromServices] ICommandHandler<BanSteamIdCommand> banSteamIdCommandHandler)
     {
-        User? banningUser = await _UserManager.GetCurrentUserAsync();
-        if (banningUser == null)
-            return Unauthorized();
+        try
+        {
+            Claim? steamIdClaim = User.FindFirst(Constants.Claims.SteamId);
+            if (steamIdClaim == null || !long.TryParse(steamIdClaim.Value, out long bannerSteamId))
+                return Unauthorized();
 
-        if (banningUser.SteamId == userBanDto.SteamId)
+            BanSteamIdCommand command = new BanSteamIdCommand
+            {
+                SteamId = userBanDto.SteamId,
+                BannerSteamId = bannerSteamId,
+                Reason = userBanDto.Reason,
+            };
+            await banSteamIdCommandHandler.HandleAsync(command);
+
+            return CreatedAtAction(nameof(GetUserBan), new { steamId = userBanDto.SteamId }, null);
+        }
+        catch (UnknownUserException)
+        {
+            return Unauthorized();
+        }
+        catch (CannotBanSelfException)
+        {
             return Problem(
                 statusCode: StatusCodes.Status403Forbidden,
                 detail: "You don't have permission to ban yourself.");
-
-        UserBan? userBan = await _DbContext.Set<UserBan>()
-            .Where(userBan => userBan.SteamId == userBanDto.SteamId)
-            .FirstOrDefaultAsync();
-
-        if (userBan != null)
-            return Conflict("The Steam ID is already banned.");
-
-        User? bannedUser = await _DbContext.Set<User>()
-            .Where(user => user.SteamId == userBanDto.SteamId)
-            .FirstOrDefaultAsync();
-
-        if (bannedUser != null)
-        {
-            if (!_PermissionChecker.CanBan(banningUser, bannedUser))
-                return Problem(
-                    statusCode: StatusCodes.Status403Forbidden,
-                    detail: "You don't have permission to ban that Steam ID.");
-
-            bannedUser.IsBanned = true;
-            bannedUser.Roles = [];
         }
-
-        userBan = new UserBan
+        catch (CannotBanOtherUserException)
         {
-            SteamId = userBanDto.SteamId,
-            BannedOn = DateTimeOffset.UtcNow,
-            Banner = banningUser,
-            Reason = userBanDto.Reason,
-        };
-        _DbContext.Add(userBan);
-        await _DbContext.SaveChangesAsync();
-
-        return CreatedAtAction(nameof(GetUserBan), new { steamId = userBan.SteamId }, null);
+            return Problem(
+                statusCode: StatusCodes.Status403Forbidden,
+                detail: "You don't have permission to ban that Steam ID.");
+        }
+        catch (SteamIdAlreadyBannedException)
+        {
+            return Conflict("The Steam ID is already banned.");
+        }
     }
 
     [HttpDelete("{steamId:long}")]
     [Authorize(Roles = Constants.Roles.Moderator)]
-    public async Task<IActionResult> DeleteUserBan(long steamId)
+    public async Task<IActionResult> DeleteUserBan(long steamId,
+        [FromServices] ICommandHandler<UnbanSteamIdCommand> unbanSteamIdCommandHandler)
     {
-        UserBan? userBan = await _DbContext.Set<UserBan>()
-            .Where(userBan => userBan.SteamId == steamId)
-            .FirstOrDefaultAsync();
+        try
+        {
+            UnbanSteamIdCommand command = new UnbanSteamIdCommand { SteamId = steamId };
+            await unbanSteamIdCommandHandler.HandleAsync(command);
 
-        if (userBan == null)
+            return NoContent();
+        }
+        catch (SteamIdNotBannedException)
+        {
             return NotFound("The Steam ID is not banned.");
-
-        User? user = await _DbContext.Set<User>()
-            .Where(user => user.SteamId == steamId)
-            .FirstOrDefaultAsync();
-        user?.IsBanned = false;
-
-        _DbContext.Remove(userBan);
-        await _DbContext.SaveChangesAsync();
-
-        return NoContent();
+        }
     }
 }
