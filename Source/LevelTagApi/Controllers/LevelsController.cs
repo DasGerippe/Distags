@@ -1,13 +1,12 @@
 ﻿using Distags.Core.Commands;
 using Distags.Core.Commands.ChangeLevelTag;
+using Distags.Core.Exceptions;
 using Distags.Core.Filtering.Levels;
 using Distags.Core.Queries;
 using Distags.Core.Queries.BrowseLevels;
 using Distags.Core.Queries.LevelById;
 using Distags.Core.Queries.LevelTags;
-using LevelTagApi.ApiState;
 using LevelTagApi.Dtos.Levels;
-using LevelTagApi.Exceptions;
 using LevelTagApi.Security;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -22,7 +21,7 @@ public class LevelsController : ControllerBase
 {
     [HttpGet]
     [AllowAnonymous]
-    public async Task<ActionResult<IEnumerable<LevelDto>>> BrowseLevels(
+    public async Task<ActionResult<LevelsPage>> BrowseLevels(
         [FromQuery] BrowseLevelsParameters parameters,
         [FromServices] IQueryHandler<BrowseLevelsQuery, LevelsPage> browseLevelsQueryHandler)
     {
@@ -88,7 +87,6 @@ public class LevelsController : ControllerBase
 
     [HttpPut("{levelId:long}/tags/{tagName}")]
     [Authorize(Policy = Constants.Policies.Tagging)]
-    [TypeFilter<MaintenanceFilter>(IsReusable = true)]
     public async Task<IActionResult> PutLevelTag(long levelId, string tagName,
         [FromServices] ICommandHandler<ChangeLevelTagCommand> changeLevelTagCommandHandler)
     {
@@ -104,6 +102,10 @@ public class LevelsController : ControllerBase
             };
             await changeLevelTagCommandHandler.HandleAsync(command);
             return Created();
+        }
+        catch (MaintenanceActiveException)
+        {
+            return MaintenanceResult();
         }
         catch (UnknownLevelException ex)
         {
@@ -121,7 +123,6 @@ public class LevelsController : ControllerBase
 
     [HttpDelete("{levelId:long}/tags/{tagName}")]
     [Authorize(Policy = Constants.Policies.Tagging)]
-    [TypeFilter<MaintenanceFilter>(IsReusable = true)]
     public async Task<IActionResult> DeleteLevelTag(long levelId, string tagName,
         [FromServices] ICommandHandler<ChangeLevelTagCommand> changeLevelTagCommandHandler)
     {
@@ -138,6 +139,10 @@ public class LevelsController : ControllerBase
             await changeLevelTagCommandHandler.HandleAsync(command);
             return NoContent();
         }
+        catch (MaintenanceActiveException)
+        {
+            return MaintenanceResult();
+        }
         catch (UnknownLevelException ex)
         {
             return LevelNotFound(ex.LevelId);
@@ -150,6 +155,15 @@ public class LevelsController : ControllerBase
         {
             return NotFound();
         }
+    }
+
+    private IActionResult MaintenanceResult()
+    {
+        return StatusCode(StatusCodes.Status503ServiceUnavailable, new ProblemDetails
+        {
+            Title = "Maintenance Active",
+            Detail = "This operation is temporarily unavailable due to maintenance.",
+        });
     }
 
     private NotFoundObjectResult LevelNotFound(long levelId)
