@@ -1,8 +1,10 @@
-﻿using DataClasses;
-using DataStoring;
+﻿using Distags.Core.Commands;
+using Distags.Core.Commands.UpdateUserSessionLastSeen;
+using Distags.Core.Dtos;
+using Distags.Core.Queries;
+using Distags.Core.Queries.UserBySessionToken;
 using LevelTagApi.Dtos;
 using Microsoft.AspNetCore.Authentication;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using System.Net.Http.Headers;
 using System.Security.Claims;
@@ -12,16 +14,19 @@ namespace LevelTagApi.Security;
 
 public class SessionAuthenticationHandler : AuthenticationHandler<AuthenticationSchemeOptions>
 {
-    private readonly LevelTagDbContext _DbContext;
+    private readonly IQueryHandler<UserBySessionTokenQuery, UserDto?> _UserBySessionTokenQueryHandler;
+    private readonly ICommandHandler<UpdateUserSessionLastSeenCommand> _UpdateUserSessionLastSeenCommandHandler;
 
     public SessionAuthenticationHandler(
         IOptionsMonitor<AuthenticationSchemeOptions> options,
         ILoggerFactory logger,
         UrlEncoder encoder,
-        LevelTagDbContext dbContext)
+        IQueryHandler<UserBySessionTokenQuery, UserDto?> userBySessionTokenQueryHandler,
+        ICommandHandler<UpdateUserSessionLastSeenCommand> updateUserSessionLastSeenCommandHandler)
         : base(options, logger, encoder)
     {
-        _DbContext = dbContext;
+        _UserBySessionTokenQueryHandler = userBySessionTokenQueryHandler;
+        _UpdateUserSessionLastSeenCommandHandler = updateUserSessionLastSeenCommandHandler;
     }
 
     protected override async Task<AuthenticateResult> HandleAuthenticateAsync()
@@ -31,31 +36,24 @@ public class SessionAuthenticationHandler : AuthenticationHandler<Authentication
             return AuthenticateResult.NoResult();
 
         string? sessionToken = authHeader.Parameter;
-        if (sessionToken == null)
+        if (string.IsNullOrEmpty(sessionToken))
             return AuthenticateResult.Fail("Invalid session token.");
 
-        UserSession? userSession = await _DbContext.Set<UserSession>()
-            .Include(session => session.User)
-            .Where(session => session.Token == sessionToken)
-            .FirstOrDefaultAsync();
+        UserBySessionTokenQuery query = new UserBySessionTokenQuery { SessionToken = sessionToken };
+        UserDto? user = await _UserBySessionTokenQueryHandler.HandleAsync(query);
 
-        if (userSession == null)
+        if (user == null)
             return AuthenticateResult.Fail("Invalid session token.");
 
-        User user = userSession.User;
-        if (user.SteamId == null)
-            return AuthenticateResult.Fail("Session belongs to unknown Steam user.");
+        UpdateUserSessionLastSeenCommand command = new UpdateUserSessionLastSeenCommand { SessionToken = sessionToken };
+        await _UpdateUserSessionLastSeenCommandHandler.HandleAsync(command);
 
-        userSession.LastSeenOn = DateTimeOffset.UtcNow;
-        await _DbContext.SaveChangesAsync();
-
-        bool userCanTag = !user.IsBanned && user.AcceptsGuidelines;
+        bool userCanTag = user.AcceptsGuidelines && !user.IsBanned;
 
         List<Claim> claims =
         [
-            new Claim(Constants.Claims.UserId, user.Id.ToString()),
-            new Claim(Constants.Claims.SteamId, user.SteamId.Value.ToString()),
-            new Claim(Constants.Claims.SessionToken, userSession.Token),
+            new Claim(Constants.Claims.SteamId, user.SteamId.ToString()),
+            new Claim(Constants.Claims.SessionToken, sessionToken),
             new Claim(Constants.Claims.CanTag, userCanTag.ToString()),
             .. user.Roles.Select(role => new Claim(ClaimTypes.Role, role)),
         ];
