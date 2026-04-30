@@ -1,0 +1,24 @@
+﻿using DataClasses;
+
+namespace Distags.Core.Management;
+
+public class ContributionChangeManager
+{
+    public ContributionChange CreateChange(ChangeAction action, Tag tag)
+    {
+        return new ContributionChange
+        {
+            Action = action,
+            TagName = tag.Name,
+        };
+    }
+
+    public List<ContributionChange> CreateChanges(Tag addedTag, IEnumerable<Tag> removedTags)
+    {
+        return
+        [
+            CreateChange(ChangeAction.AddTag, addedTag),
+            ..removedTags.Select(removedTag => CreateChange(ChangeAction.RemoveTag, removedTag)),
+        ];
+    }
+}

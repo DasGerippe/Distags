@@ -1,5 +1,5 @@
-﻿using Distags.Core.Commands.LevelAddTag;
-using Distags.Core.Commands.LevelRemoveTag;
+﻿using Distags.Core.Commands;
+using Distags.Core.Commands.ChangeLevelTag;
 using Distags.Core.Filtering.Levels;
 using Distags.Core.Queries;
 using Distags.Core.Queries.BrowseLevels;
@@ -8,6 +8,7 @@ using Distags.Core.Queries.LevelTags;
 using LevelTagApi.ApiState;
 using LevelTagApi.Dtos.Levels;
 using LevelTagApi.Exceptions;
+using LevelTagApi.Security;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using LevelDto = Distags.Core.Dtos.LevelDto;
@@ -89,16 +90,19 @@ public class LevelsController : ControllerBase
     [Authorize(Policy = Constants.Policies.Tagging)]
     [TypeFilter<MaintenanceFilter>(IsReusable = true)]
     public async Task<IActionResult> PutLevelTag(long levelId, string tagName,
-        [FromServices] LevelAddTagCommandHandler levelAddTagCommandHandler)
+        [FromServices] ICommandHandler<ChangeLevelTagCommand> changeLevelTagCommandHandler)
     {
         try
         {
-            LevelAddTagCommand command = new LevelAddTagCommand
+            ChangeLevelTagCommand command = new ChangeLevelTagCommand
             {
                 LevelId = levelId,
                 TagName = tagName,
+                UserSteamId = User.GetSteamId(),
+                AppName = User.GetAppName(),
+                ChangeAction = ChangeAction.AddTag,
             };
-            await levelAddTagCommandHandler.HandleAsync(command);
+            await changeLevelTagCommandHandler.HandleAsync(command);
             return Created();
         }
         catch (UnknownLevelException ex)
@@ -119,16 +123,19 @@ public class LevelsController : ControllerBase
     [Authorize(Policy = Constants.Policies.Tagging)]
     [TypeFilter<MaintenanceFilter>(IsReusable = true)]
     public async Task<IActionResult> DeleteLevelTag(long levelId, string tagName,
-        [FromServices] LevelRemoveTagCommandHandler levelRemoveTagCommandHandler)
+        [FromServices] ICommandHandler<ChangeLevelTagCommand> changeLevelTagCommandHandler)
     {
         try
         {
-            LevelRemoveTagCommand command = new LevelRemoveTagCommand
+            ChangeLevelTagCommand command = new ChangeLevelTagCommand
             {
                 LevelId = levelId,
                 TagName = tagName,
+                UserSteamId = User.GetSteamId(),
+                AppName = User.GetAppName(),
+                ChangeAction = ChangeAction.RemoveTag,
             };
-            await levelRemoveTagCommandHandler.HandleAsync(command);
+            await changeLevelTagCommandHandler.HandleAsync(command);
             return NoContent();
         }
         catch (UnknownLevelException ex)

@@ -12,6 +12,9 @@ public static class ServiceCollectionExtensions
     {
         serviceCollection.AddTransient<TokenGenerator>();
 
+        serviceCollection.AddTransient<ContributionManager>();
+        serviceCollection.AddTransient<ContributionChangeManager>();
+
         serviceCollection.AddGenericServiceImplementations(typeof(IQueryHandler<,>));
         serviceCollection.AddGenericServiceImplementations(typeof(ICommandHandler<>));
 
