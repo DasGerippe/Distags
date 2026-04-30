@@ -11,17 +11,20 @@ namespace Distags.Core.Commands.ChangeLevelTag;
 public class ChangeLevelTagCommandHandler : ICommandHandler<ChangeLevelTagCommand>
 {
     private readonly DbContext _DbContext;
+    private readonly MaintenanceManager _MaintenanceManager;
     private readonly ISequentialLevelActionExecutor _SequentialLevelActionExecutor;
     private readonly ContributionManager _ContributionManager;
     private readonly ContributionChangeManager _ContributionChangeManager;
 
     public ChangeLevelTagCommandHandler(
         DbContext dbContext,
+        MaintenanceManager maintenanceManager,
         ISequentialLevelActionExecutor sequentialLevelActionExecutor,
         ContributionManager contributionManager,
         ContributionChangeManager contributionChangeManager)
     {
         _DbContext = dbContext;
+        _MaintenanceManager = maintenanceManager;
         _SequentialLevelActionExecutor = sequentialLevelActionExecutor;
         _ContributionManager = contributionManager;
         _ContributionChangeManager = contributionChangeManager;
@@ -29,9 +32,16 @@ public class ChangeLevelTagCommandHandler : ICommandHandler<ChangeLevelTagComman
 
     public async Task HandleAsync(ChangeLevelTagCommand command)
     {
+        User? user = await GetUserAsync(command.UserSteamId).ConfigureAwait(false);
+        if (user != null && !user.Roles.Contains("Administrator") && !user.Roles.Contains("Moderator"))
+        {
+            bool isMaintenanceActive = await _MaintenanceManager.GetSettingValue().ConfigureAwait(false);
+            if (isMaintenanceActive)
+                throw new MaintenanceActiveException();
+        }
+
         Level level = await GetLevelAsync(command.LevelId).ConfigureAwait(false);
         Tag tag = await GetTagAsync(command.TagName).ConfigureAwait(false);
-        User? user = await GetUserAsync(command.UserSteamId).ConfigureAwait(false);
         App? app = await GetAppAsync(command.AppName).ConfigureAwait(false);
 
         Func<Task> changeFunc = command.ChangeAction == CommandChangeAction.AddTag
