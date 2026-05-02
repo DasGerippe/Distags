@@ -1,4 +1,6 @@
-﻿namespace Distags.Core.Commands.ChangeLevelTag;
+﻿using Distags.Core.Dtos;
+
+namespace Distags.Core.Commands.ChangeLevelTag;
 
 public class ChangeLevelTagCommand : ICommand
 {
@@ -10,5 +12,5 @@ public class ChangeLevelTagCommand : ICommand
 
     public string? AppName { get; set; }
 
-    public ChangeAction ChangeAction { get; set; }
+    public ChangeActionDto ChangeAction { get; set; }
 }

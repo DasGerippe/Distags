@@ -1,5 +1,6 @@
 ﻿using Distags.Core.Commands;
 using Distags.Core.Management;
+using Distags.Core.Management.History;
 using Distags.Core.Queries;
 using Distags.Core.Security;
 using Microsoft.Extensions.DependencyInjection;
@@ -14,6 +15,7 @@ public static class ServiceCollectionExtensions
 
         serviceCollection.AddTransient<ContributionManager>();
         serviceCollection.AddTransient<ContributionChangeManager>();
+        serviceCollection.AddTransient<ContributionReplayEngine>();
 
         serviceCollection.AddGenericServiceImplementations(typeof(IQueryHandler<,>));
         serviceCollection.AddGenericServiceImplementations(typeof(ICommandHandler<>));

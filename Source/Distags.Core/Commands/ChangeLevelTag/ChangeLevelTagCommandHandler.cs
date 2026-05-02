@@ -1,10 +1,9 @@
 ﻿using DataClasses;
+using Distags.Core.Dtos;
 using Distags.Core.Exceptions;
 using Distags.Core.Interfaces;
 using Distags.Core.Management;
 using Microsoft.EntityFrameworkCore;
-using CommandChangeAction = Distags.Core.Commands.ChangeLevelTag.ChangeAction;
-using EntityChangeAction = DataClasses.ChangeAction;
 
 namespace Distags.Core.Commands.ChangeLevelTag;
 
@@ -44,7 +43,7 @@ public class ChangeLevelTagCommandHandler : ICommandHandler<ChangeLevelTagComman
         Tag tag = await GetTagAsync(command.TagName).ConfigureAwait(false);
         App? app = await GetAppAsync(command.AppName).ConfigureAwait(false);
 
-        Func<Task> changeFunc = command.ChangeAction == CommandChangeAction.AddTag
+        Func<Task> changeFunc = command.ChangeAction == ChangeActionDto.AddTag
             ? () => AddTagToLevel(level, tag, user, app)
             : () => RemoveTagFromLevel(level, tag, user, app);
 
@@ -107,7 +106,7 @@ public class ChangeLevelTagCommandHandler : ICommandHandler<ChangeLevelTagComman
         List<ContributionChange> changes = _ContributionChangeManager
             .CreateChanges(tag, conflictingLevelTags.Select(removedLevelTag => removedLevelTag.Tag));
         Contribution contribution = _ContributionManager
-            .CreateContribution(level, tag, user, app, EntityChangeAction.AddTag, changes);
+            .CreateContribution(level, tag, user, app, ChangeAction.AddTag, changes);
 
         _DbContext.RemoveRange(conflictingLevelTags);
         _DbContext.Add(addedLevelTag);
@@ -139,9 +138,9 @@ public class ChangeLevelTagCommandHandler : ICommandHandler<ChangeLevelTagComman
         if (levelTag == null)
             throw new LevelTagNotFoundException(level.Id, tag.Name);
 
-        ContributionChange change = _ContributionChangeManager.CreateChange(EntityChangeAction.RemoveTag, tag);
+        ContributionChange change = _ContributionChangeManager.CreateChange(ChangeAction.RemoveTag, tag);
         Contribution contribution = _ContributionManager
-            .CreateContribution(level, tag, user, app, EntityChangeAction.RemoveTag, [change]);
+            .CreateContribution(level, tag, user, app, ChangeAction.RemoveTag, [change]);
 
         _DbContext.Remove(levelTag);
         _DbContext.Add(contribution);

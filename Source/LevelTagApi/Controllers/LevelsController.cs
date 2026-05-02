@@ -1,5 +1,6 @@
 ﻿using Distags.Core.Commands;
 using Distags.Core.Commands.ChangeLevelTag;
+using Distags.Core.Dtos;
 using Distags.Core.Exceptions;
 using Distags.Core.Filtering.Levels;
 using Distags.Core.Queries;
@@ -98,7 +99,7 @@ public class LevelsController : ControllerBase
                 TagName = tagName,
                 UserSteamId = User.GetSteamId(),
                 AppName = User.GetAppName(),
-                ChangeAction = ChangeAction.AddTag,
+                ChangeAction = ChangeActionDto.AddTag,
             };
             await changeLevelTagCommandHandler.HandleAsync(command);
             return Created();
@@ -134,7 +135,7 @@ public class LevelsController : ControllerBase
                 TagName = tagName,
                 UserSteamId = User.GetSteamId(),
                 AppName = User.GetAppName(),
-                ChangeAction = ChangeAction.RemoveTag,
+                ChangeAction = ChangeActionDto.RemoveTag,
             };
             await changeLevelTagCommandHandler.HandleAsync(command);
             return NoContent();
