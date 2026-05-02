@@ -1,7 +1,7 @@
 ﻿@page "/admin"
 @rendermode InteractiveServer
 
-@using LevelTagApi.Dtos.ApiState
+@using LevelTagApi.Dtos.Configuration
 @using LevelTagApi.Dtos.Users
 @using LevelTagWebApp.Security
 @using LevelTagWebApp.Services
@@ -46,8 +46,8 @@
             return;
         }
 
-        ApiStateDto apiState = await LevelTagApi.GetApiStateAsync();
-        _MaintenanceActive = apiState.MaintenanceActive;
+        ConfigurationDto configuration = await LevelTagApi.GetApiStateAsync();
+        _MaintenanceActive = configuration.MaintenanceActive;
     }
 
     private async Task OnMaintenanceChanged(ChangeEventArgs args)
@@ -55,11 +55,11 @@
         if (args.Value is not bool maintenanceActive)
             return;
 
-        PatchApiStateParameters parameters = new PatchApiStateParameters
+        PatchConfigurationParameters parameters = new PatchConfigurationParameters
         {
             MaintenanceActive = maintenanceActive,
         };
-        await LevelTagApi.PatchApiStateAsync(parameters);
+        await LevelTagApi.PatchConfigurationAsync(parameters);
         _MaintenanceActive = maintenanceActive;
     }
 

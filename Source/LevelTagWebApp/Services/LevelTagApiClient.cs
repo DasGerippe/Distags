@@ -1,7 +1,7 @@
 ﻿using HttpUtils;
 using LevelTagApi.Dtos;
-using LevelTagApi.Dtos.ApiState;
 using LevelTagApi.Dtos.Authentication;
+using LevelTagApi.Dtos.Configuration;
 using LevelTagApi.Dtos.Contributions;
 using LevelTagApi.Dtos.Guidelines;
 using LevelTagApi.Dtos.Levels;
@@ -198,17 +198,17 @@ public class LevelTagApiClient : IDisposable
         return response;
     }
 
-    public async Task<ApiStateDto> GetApiStateAsync(CancellationToken cancellationToken = default)
+    public async Task<ConfigurationDto> GetApiStateAsync(CancellationToken cancellationToken = default)
     {
-        string requestUri = "api/state";
+        string requestUri = "configuration";
         HttpResponseMessage responseMessage = await _HttpClient.GetAsync(requestUri, cancellationToken).ConfigureAwait(false);
-        ApiStateDto response = await GetContentAsync<ApiStateDto>(responseMessage, cancellationToken).ConfigureAwait(false);
+        ConfigurationDto response = await GetContentAsync<ConfigurationDto>(responseMessage, cancellationToken).ConfigureAwait(false);
         return response;
     }
 
-    public async Task PatchApiStateAsync(PatchApiStateParameters parameters, CancellationToken cancellationToken = default)
+    public async Task PatchConfigurationAsync(PatchConfigurationParameters parameters, CancellationToken cancellationToken = default)
     {
-        string requestUri = "api/state";
+        string requestUri = "configuration";
         HttpResponseMessage responseMessage =
             await _HttpClient.PatchAsJsonAsync(requestUri, parameters, _JsonOptions, cancellationToken).ConfigureAwait(false);
         responseMessage.EnsureSuccessStatusCode();

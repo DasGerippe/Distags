@@ -1,8 +1,6 @@
 using DataClasses;
-using DataStoring;
 using Distags.Core;
 using Distags.Infrastructure;
-using LevelTagApi.ApiState;
 using LevelTagApi.Conversion;
 using LevelTagApi.Dtos;
 using LevelTagApi.Dtos.Contributions;
@@ -55,7 +53,6 @@ public class Program
 
             builder.Services.AddSingleton<LevelTagBroadcastingInterceptor>();
             builder.Services.AddSingleton<ContributionBroadcastingInterceptor>();
-            builder.Services.AddSingleton<IApiStateService, ApiStateService>();
 
             builder.Services.AddSignalR();
             builder.Services.AddTransient<ILevelTagBroadcaster, LevelTagBroadcaster>();
