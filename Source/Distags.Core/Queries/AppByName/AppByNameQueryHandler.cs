@@ -8,10 +8,10 @@ namespace Distags.Core.Queries.AppByName;
 
 public class AppByNameQueryHandler : IQueryHandler<AppByNameQuery, AppDto>
 {
-    private readonly DbContext _DbContext;
+    private readonly DistagsDbContext _DbContext;
     private readonly IEntityProjector<App, AppDto> _AppProjector;
 
-    public AppByNameQueryHandler(DbContext dbContext, IEntityProjector<App, AppDto> appProjector)
+    public AppByNameQueryHandler(DistagsDbContext dbContext, IEntityProjector<App, AppDto> appProjector)
     {
         _DbContext = dbContext;
         _AppProjector = appProjector;

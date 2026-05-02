@@ -5,9 +5,9 @@ namespace Distags.Core.Commands.UpdateUserSessionLastSeen;
 
 public class UpdateUserSessionLastSeenCommandHandler : ICommandHandler<UpdateUserSessionLastSeenCommand>
 {
-    private readonly DbContext _DbContext;
+    private readonly DistagsDbContext _DbContext;
 
-    public UpdateUserSessionLastSeenCommandHandler(DbContext dbContext)
+    public UpdateUserSessionLastSeenCommandHandler(DistagsDbContext dbContext)
     {
         _DbContext = dbContext;
     }

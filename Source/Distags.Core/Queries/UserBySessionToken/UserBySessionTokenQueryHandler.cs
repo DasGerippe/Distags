@@ -7,10 +7,10 @@ namespace Distags.Core.Queries.UserBySessionToken;
 
 public class UserBySessionTokenQueryHandler : IQueryHandler<UserBySessionTokenQuery, UserDto?>
 {
-    private readonly DbContext _DbContext;
+    private readonly DistagsDbContext _DbContext;
     private readonly IEntityProjector<User, UserDto> _UserProjector;
 
-    public UserBySessionTokenQueryHandler(DbContext dbContext, IEntityProjector<User, UserDto> userProjector)
+    public UserBySessionTokenQueryHandler(DistagsDbContext dbContext, IEntityProjector<User, UserDto> userProjector)
     {
         _DbContext = dbContext;
         _UserProjector = userProjector;

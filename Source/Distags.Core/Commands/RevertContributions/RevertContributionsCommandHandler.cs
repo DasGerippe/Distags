@@ -6,10 +6,10 @@ namespace Distags.Core.Commands.RevertContributions;
 
 public class RevertContributionsCommandHandler : ICommandHandler<RevertContributionsCommand>
 {
-    private readonly DbContext _DbContext;
+    private readonly DistagsDbContext _DbContext;
     private readonly ContributionReplayEngine _ContributionReplayEngine;
 
-    public RevertContributionsCommandHandler(DbContext dbContext, ContributionReplayEngine contributionReplayEngine)
+    public RevertContributionsCommandHandler(DistagsDbContext dbContext, ContributionReplayEngine contributionReplayEngine)
     {
         _DbContext = dbContext;
         _ContributionReplayEngine = contributionReplayEngine;

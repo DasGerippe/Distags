@@ -6,9 +6,9 @@ namespace Distags.Core.Queries.LevelTags;
 
 public class LevelTagsQueryHandler : IQueryHandler<LevelTagsQuery, List<string>>
 {
-    private readonly DbContext _DbContext;
+    private readonly DistagsDbContext _DbContext;
 
-    public LevelTagsQueryHandler(DbContext dbContext)
+    public LevelTagsQueryHandler(DistagsDbContext dbContext)
     {
         _DbContext = dbContext;
     }

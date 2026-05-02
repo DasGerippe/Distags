@@ -5,9 +5,9 @@ namespace Distags.Core.Commands.ImportCreators;
 
 public class ImportCreatorsCommandHandler : ICommandHandler<ImportCreatorsCommand>
 {
-    private readonly DbContext _DbContext;
+    private readonly DistagsDbContext _DbContext;
 
-    public ImportCreatorsCommandHandler(DbContext dbContext)
+    public ImportCreatorsCommandHandler(DistagsDbContext dbContext)
     {
         _DbContext = dbContext;
     }

@@ -7,10 +7,10 @@ namespace Distags.Core.Queries.Apps;
 
 public class AppsQueryHandler : IQueryHandler<AppsQuery, List<AppDto>>
 {
-    private readonly DbContext _DbContext;
+    private readonly DistagsDbContext _DbContext;
     private readonly IEntityProjector<App, AppDto> _AppProjector;
 
-    public AppsQueryHandler(DbContext dbContext, IEntityProjector<App, AppDto> appProjector)
+    public AppsQueryHandler(DistagsDbContext dbContext, IEntityProjector<App, AppDto> appProjector)
     {
         _DbContext = dbContext;
         _AppProjector = appProjector;

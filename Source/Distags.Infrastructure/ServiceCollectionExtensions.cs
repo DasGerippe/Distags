@@ -13,8 +13,7 @@ public static class ServiceCollectionExtensions
 {
     public static IServiceCollection AddDistagsInfrastructure(this IServiceCollection serviceCollection, string dbConnectionString)
     {
-        serviceCollection.AddDbContext<DistagsDbContext>(ConfigureOptions(dbConnectionString));
-        serviceCollection.AddScoped<DbContext, DistagsDbContext>();
+        serviceCollection.AddDbContext<Core.DistagsDbContext, DistagsDbContext>(ConfigureOptions(dbConnectionString));
 
         serviceCollection.AddTransient<ISequentialLevelActionExecutor, SequentialLevelActionExecutor>();
 

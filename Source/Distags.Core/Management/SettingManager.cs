@@ -7,13 +7,13 @@ namespace Distags.Core.Management;
 public abstract class SettingManager<TValue>
     where TValue : struct, IParsable<TValue>
 {
-    private readonly DbContext _DbContext;
+    private readonly DistagsDbContext _DbContext;
 
     protected abstract string SettingKey { get; }
 
     protected abstract TValue DefaultValue { get; }
 
-    protected SettingManager(DbContext dbContext)
+    protected SettingManager(DistagsDbContext dbContext)
     {
         _DbContext = dbContext;
     }

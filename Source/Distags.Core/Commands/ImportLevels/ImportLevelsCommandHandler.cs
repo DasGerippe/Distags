@@ -5,9 +5,9 @@ namespace Distags.Core.Commands.ImportLevels;
 
 public class ImportLevelsCommandHandler : ICommandHandler<ImportLevelsCommand>
 {
-    private readonly DbContext _DbContext;
+    private readonly DistagsDbContext _DbContext;
 
-    public ImportLevelsCommandHandler(DbContext dbContext)
+    public ImportLevelsCommandHandler(DistagsDbContext dbContext)
     {
         _DbContext = dbContext;
     }

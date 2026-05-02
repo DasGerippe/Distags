@@ -6,9 +6,9 @@ namespace Distags.Core.Commands.DeleteApp;
 
 public class DeleteAppCommandHandler : ICommandHandler<DeleteAppCommand>
 {
-    private readonly DbContext _DbContext;
+    private readonly DistagsDbContext _DbContext;
 
-    public DeleteAppCommandHandler(DbContext dbContext)
+    public DeleteAppCommandHandler(DistagsDbContext dbContext)
     {
         _DbContext = dbContext;
     }

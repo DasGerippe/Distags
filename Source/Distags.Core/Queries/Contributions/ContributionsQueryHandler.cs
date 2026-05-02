@@ -9,11 +9,11 @@ namespace Distags.Core.Queries.Contributions;
 
 public class ContributionsQueryHandler : IQueryHandler<ContributionsQuery, ContributionsPage>
 {
-    private readonly DbContext _DbContext;
+    private readonly DistagsDbContext _DbContext;
     private readonly IQueryableFilterFactory<Contribution, ContributionFilterParameters> _ContributionFilterFactory;
 
     public ContributionsQueryHandler(
-        DbContext dbContext,
+        DistagsDbContext dbContext,
         IQueryableFilterFactory<Contribution, ContributionFilterParameters> contributionFilterFactory)
     {
         _DbContext = dbContext;

@@ -11,12 +11,12 @@ namespace Distags.Core.Queries.BrowseLevels;
 
 public class BrowseLevelsQueryHandler : IQueryHandler<BrowseLevelsQuery, LevelsPage>
 {
-    private readonly DbContext _DbContext;
+    private readonly DistagsDbContext _DbContext;
     private readonly IQueryableFilterFactory<Level, LevelFilterParameters> _LevelFilterFactory;
     private readonly IQueryableSorterFactory<Level, LevelSortStrategy> _LevelSorterFactory;
 
     public BrowseLevelsQueryHandler(
-        DbContext dbContext,
+        DistagsDbContext dbContext,
         IQueryableFilterFactory<Level, LevelFilterParameters> levelFilterFactory,
         IQueryableSorterFactory<Level, LevelSortStrategy> levelSorterFactory)
     {

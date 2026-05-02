@@ -8,9 +8,9 @@ namespace Distags.Core.Queries.LevelById;
 
 public class LevelByIdQueryHandler : IQueryHandler<LevelByIdQuery, LevelDto>
 {
-    private readonly DbContext _DbContext;
+    private readonly DistagsDbContext _DbContext;
 
-    public LevelByIdQueryHandler(DbContext dbContext)
+    public LevelByIdQueryHandler(DistagsDbContext dbContext)
     {
         _DbContext = dbContext;
     }

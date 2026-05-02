@@ -7,10 +7,10 @@ namespace Distags.Core.Commands.CreateApp;
 
 public class CreateAppCommandHandler : ICommandHandler<CreateAppCommand>
 {
-    private readonly DbContext _DbContext;
+    private readonly DistagsDbContext _DbContext;
     private readonly TokenGenerator _TokenGenerator;
 
-    public CreateAppCommandHandler(DbContext dbContext, TokenGenerator tokenGenerator)
+    public CreateAppCommandHandler(DistagsDbContext dbContext, TokenGenerator tokenGenerator)
     {
         _DbContext = dbContext;
         _TokenGenerator = tokenGenerator;

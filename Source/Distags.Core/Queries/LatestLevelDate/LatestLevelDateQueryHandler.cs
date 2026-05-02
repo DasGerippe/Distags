@@ -5,9 +5,9 @@ namespace Distags.Core.Queries.LatestLevelDate;
 
 public class LatestLevelDateQueryHandler : IQueryHandler<LatestLevelDateQuery, DateTimeOffset?>
 {
-    private readonly DbContext _DbContext;
+    private readonly DistagsDbContext _DbContext;
 
-    public LatestLevelDateQueryHandler(DbContext dbContext)
+    public LatestLevelDateQueryHandler(DistagsDbContext dbContext)
     {
         _DbContext = dbContext;
     }

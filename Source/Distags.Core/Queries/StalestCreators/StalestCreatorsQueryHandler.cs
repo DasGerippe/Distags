@@ -5,9 +5,9 @@ namespace Distags.Core.Queries.StalestCreators;
 
 public class StalestCreatorsQueryHandler : IQueryHandler<StalestCreatorsQuery, List<long>>
 {
-    private readonly DbContext _DbContext;
+    private readonly DistagsDbContext _DbContext;
 
-    public StalestCreatorsQueryHandler(DbContext dbContext)
+    public StalestCreatorsQueryHandler(DistagsDbContext dbContext)
     {
         _DbContext = dbContext;
     }

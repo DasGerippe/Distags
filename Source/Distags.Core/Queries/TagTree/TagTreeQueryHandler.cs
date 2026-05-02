@@ -7,10 +7,10 @@ namespace Distags.Core.Queries.TagTree;
 
 public class TagTreeQueryHandler : IQueryHandler<TagTreeQuery, List<TagGroupDto>>
 {
-    private readonly DbContext _DbContext;
+    private readonly DistagsDbContext _DbContext;
     private readonly IEntityProjector<TagGroup, TagGroupDto> _TagGroupProjector;
 
-    public TagTreeQueryHandler(DbContext dbContext, IEntityProjector<TagGroup, TagGroupDto> tagGroupProjector)
+    public TagTreeQueryHandler(DistagsDbContext dbContext, IEntityProjector<TagGroup, TagGroupDto> tagGroupProjector)
     {
         _DbContext = dbContext;
         _TagGroupProjector = tagGroupProjector;

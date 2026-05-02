@@ -6,9 +6,9 @@ namespace Distags.Core.Commands.UpdateUserSettings;
 
 public class UpdateUserSettingsCommandHandler : ICommandHandler<UpdateUserSettingsCommand>
 {
-    private readonly DbContext _DbContext;
+    private readonly DistagsDbContext _DbContext;
 
-    public UpdateUserSettingsCommandHandler(DbContext dbContext)
+    public UpdateUserSettingsCommandHandler(DistagsDbContext dbContext)
     {
         _DbContext = dbContext;
     }

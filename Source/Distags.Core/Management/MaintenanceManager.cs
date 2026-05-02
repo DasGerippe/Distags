@@ -1,6 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
-
-namespace Distags.Core.Management;
+﻿namespace Distags.Core.Management;
 
 public class MaintenanceManager : SettingManager<bool>
 {
@@ -8,7 +6,7 @@ public class MaintenanceManager : SettingManager<bool>
 
     protected override bool DefaultValue => false;
 
-    public MaintenanceManager(DbContext dbContext) : base(dbContext)
+    public MaintenanceManager(DistagsDbContext dbContext) : base(dbContext)
     {
     }
 }

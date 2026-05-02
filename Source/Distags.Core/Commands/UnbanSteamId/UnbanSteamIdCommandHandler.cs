@@ -6,9 +6,9 @@ namespace Distags.Core.Commands.UnbanSteamId;
 
 public class UnbanSteamIdCommandHandler : ICommandHandler<UnbanSteamIdCommand>
 {
-    private readonly DbContext _DbContext;
+    private readonly DistagsDbContext _DbContext;
 
-    public UnbanSteamIdCommandHandler(DbContext dbContext)
+    public UnbanSteamIdCommandHandler(DistagsDbContext dbContext)
     {
         _DbContext = dbContext;
     }

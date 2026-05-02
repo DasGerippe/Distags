@@ -9,14 +9,14 @@ namespace Distags.Core.Commands.ChangeLevelTag;
 
 public class ChangeLevelTagCommandHandler : ICommandHandler<ChangeLevelTagCommand>
 {
-    private readonly DbContext _DbContext;
+    private readonly DistagsDbContext _DbContext;
     private readonly MaintenanceManager _MaintenanceManager;
     private readonly ISequentialLevelActionExecutor _SequentialLevelActionExecutor;
     private readonly ContributionManager _ContributionManager;
     private readonly ContributionChangeManager _ContributionChangeManager;
 
     public ChangeLevelTagCommandHandler(
-        DbContext dbContext,
+        DistagsDbContext dbContext,
         MaintenanceManager maintenanceManager,
         ISequentialLevelActionExecutor sequentialLevelActionExecutor,
         ContributionManager contributionManager,

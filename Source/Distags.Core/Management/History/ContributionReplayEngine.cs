@@ -6,12 +6,12 @@ namespace Distags.Core.Management.History;
 
 public class ContributionReplayEngine
 {
-    private readonly DbContext _DbContext;
+    private readonly DistagsDbContext _DbContext;
     private readonly ContributionChangeManager _ContributionChangeManager;
     private readonly ISequentialLevelActionExecutor _SequentialLevelActionExecutor;
 
     public ContributionReplayEngine(
-        DbContext dbContext,
+        DistagsDbContext dbContext,
         ContributionChangeManager contributionChangeManager,
         ISequentialLevelActionExecutor sequentialLevelActionExecutor)
     {

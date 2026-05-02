@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Distags.Infrastructure;
 
-public class DistagsDbContext : DbContext
+public class DistagsDbContext : Distags.Core.DistagsDbContext
 {
     public DistagsDbContext(DbContextOptions<DistagsDbContext> options)
         : base(options)

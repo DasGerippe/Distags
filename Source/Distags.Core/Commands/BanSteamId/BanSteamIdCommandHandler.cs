@@ -7,10 +7,10 @@ namespace Distags.Core.Commands.BanSteamId;
 
 public class BanSteamIdCommandHandler : ICommandHandler<BanSteamIdCommand>
 {
-    private readonly DbContext _DbContext;
+    private readonly DistagsDbContext _DbContext;
     private readonly UserBanPermissionChecker _PermissionChecker;
 
-    public BanSteamIdCommandHandler(DbContext dbContext, UserBanPermissionChecker permissionChecker)
+    public BanSteamIdCommandHandler(DistagsDbContext dbContext, UserBanPermissionChecker permissionChecker)
     {
         _DbContext = dbContext;
         _PermissionChecker = permissionChecker;

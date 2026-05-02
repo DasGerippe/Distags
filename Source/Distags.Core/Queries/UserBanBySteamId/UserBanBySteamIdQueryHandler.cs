@@ -7,10 +7,10 @@ namespace Distags.Core.Queries.UserBanBySteamId;
 
 public class UserBanBySteamIdQueryHandler : IQueryHandler<UserBanBySteamIdQuery, UserBanDto?>
 {
-    private readonly DbContext _DbContext;
+    private readonly DistagsDbContext _DbContext;
     private readonly IEntityProjector<UserBan, UserBanDto> _UserBanProjector;
 
-    public UserBanBySteamIdQueryHandler(DbContext dbContext, IEntityProjector<UserBan, UserBanDto> userBanProjector)
+    public UserBanBySteamIdQueryHandler(DistagsDbContext dbContext, IEntityProjector<UserBan, UserBanDto> userBanProjector)
     {
         _DbContext = dbContext;
         _UserBanProjector = userBanProjector;

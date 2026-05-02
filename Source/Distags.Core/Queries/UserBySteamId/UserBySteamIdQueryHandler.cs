@@ -7,10 +7,10 @@ namespace Distags.Core.Queries.UserBySteamId;
 
 public class UserBySteamIdQueryHandler : IQueryHandler<UserBySteamIdQuery, UserDto?>
 {
-    private readonly DbContext _DbContext;
+    private readonly DistagsDbContext _DbContext;
     private readonly IEntityProjector<User, UserDto> _UserProjector;
 
-    public UserBySteamIdQueryHandler(DbContext dbContext, IEntityProjector<User, UserDto> userProjector)
+    public UserBySteamIdQueryHandler(DistagsDbContext dbContext, IEntityProjector<User, UserDto> userProjector)
     {
         _DbContext = dbContext;
         _UserProjector = userProjector;

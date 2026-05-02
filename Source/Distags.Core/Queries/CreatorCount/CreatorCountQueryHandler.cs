@@ -5,9 +5,9 @@ namespace Distags.Core.Queries.CreatorCount;
 
 public class CreatorCountQueryHandler : IQueryHandler<CreatorCountQuery, long>
 {
-    private readonly DbContext _DbContext;
+    private readonly DistagsDbContext _DbContext;
 
-    public CreatorCountQueryHandler(DbContext dbContext)
+    public CreatorCountQueryHandler(DistagsDbContext dbContext)
     {
         _DbContext = dbContext;
     }

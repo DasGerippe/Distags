@@ -5,9 +5,9 @@ namespace Distags.Core.Queries.UnknownCreators;
 
 public class UnknownCreatorsQueryHandler : IQueryHandler<UnknownCreatorsQuery, List<long>>
 {
-    private readonly DbContext _DbContext;
+    private readonly DistagsDbContext _DbContext;
 
-    public UnknownCreatorsQueryHandler(DbContext dbContext)
+    public UnknownCreatorsQueryHandler(DistagsDbContext dbContext)
     {
         _DbContext = dbContext;
     }
