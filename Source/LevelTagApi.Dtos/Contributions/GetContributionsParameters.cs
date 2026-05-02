@@ -6,6 +6,8 @@ public class GetContributionsParameters
 {
     public long? UserSteamId { get; set; }
 
+    public string? AppName { get; set; }
+
     public long? LevelId { get; set; }
 
     public string? TagName { get; set; }
