@@ -28,17 +28,20 @@ public class SessionCleanupService : BackgroundService
         {
             try
             {
-                await DeleteDeprecatedSessionsAsync();
+                try
+                {
+                    await DeleteDeprecatedSessionsAsync();
+                }
+                catch (Exception ex) when (ex is not TaskCanceledException)
+                {
+                    _Logger.LogError(ex, "An error occurred during session cleanup.");
+                }
+
                 await Task.Delay(TimeSpan.FromMinutes(5), stoppingToken);
             }
             catch (TaskCanceledException)
             {
                 _Logger.LogDebug($"Execution of {nameof(SessionCleanupService)} was cancelled.");
-            }
-            catch (Exception ex)
-            {
-                _Logger.LogError(ex, "An error occurred during session cleanup.");
-                await Task.Delay(TimeSpan.FromMinutes(5), stoppingToken);
             }
         }
     }
