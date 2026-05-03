@@ -18,6 +18,14 @@ CREATE ROLE distags_manage_levels NOLOGIN;
 GRANT distags_user TO distags_manage_levels;
 GRANT SELECT, INSERT, UPDATE, DELETE ON TABLE levels, creators TO distags_manage_levels;
 
+CREATE ROLE distags_use_level_locks NOLOGIN;
+GRANT distags_user TO distags_use_level_locks;
+GRANT SELECT, UPDATE ON TABLE level_locks TO distags_use_level_locks;
+
+CREATE ROLE distags_manage_level_locks NOLOGIN;
+GRANT distags_user TO distags_manage_level_locks;
+GRANT SELECT, INSERT, UPDATE, DELETE ON TABLE level_locks TO distags_manage_level_locks;
+
 CREATE ROLE distags_manage_tags NOLOGIN;
 GRANT distags_user TO distags_manage_tags;
 GRANT SELECT, INSERT, UPDATE, DELETE ON TABLE tag_groups, tags TO distags_manage_tags;
@@ -56,6 +64,7 @@ GRANT distags_admin TO distags_migrator;
 
 CREATE ROLE distags_api WITH LOGIN PASSWORD '';
 GRANT distags_read_levels TO distags_api;
+GRANT distags_use_level_locks TO distags_api;
 GRANT distags_manage_tags TO distags_api;
 GRANT distags_assign_tags TO distags_api;
 GRANT distags_manage_users TO distags_api;
@@ -66,6 +75,7 @@ GRANT distags_manage_settings TO distags_api;
 
 CREATE ROLE distags_scraper WITH LOGIN PASSWORD '';
 GRANT distags_manage_levels TO distags_scraper;
+GRANT distags_manage_level_locks TO distags_scraper;
 
 CREATE ROLE distags_auto_tagger WITH LOGIN PASSWORD '';
 GRANT distags_read_levels TO distags_auto_tagger;
