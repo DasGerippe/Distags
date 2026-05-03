@@ -1,8 +1,8 @@
-﻿using DataClasses;
-using DataStoring;
+﻿using Distags.Core.Dtos;
+using Distags.Core.Queries;
+using Distags.Core.Queries.AppByApiKey;
 using LevelTagApi.Dtos;
 using Microsoft.AspNetCore.Authentication;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using System.Net.Http.Headers;
 using System.Security.Claims;
@@ -12,16 +12,16 @@ namespace LevelTagApi.Security;
 
 public class ApiKeyAuthenticationHandler : AuthenticationHandler<AuthenticationSchemeOptions>
 {
-    private readonly LevelTagDbContext _DbContext;
+    private readonly IQueryHandler<AppByApiKeyQuery, AppDto?> _AppByApiKeyQueryHandler;
 
     public ApiKeyAuthenticationHandler(
         IOptionsMonitor<AuthenticationSchemeOptions> options,
         ILoggerFactory logger,
         UrlEncoder encoder,
-        LevelTagDbContext dbContext)
+        IQueryHandler<AppByApiKeyQuery, AppDto?> appByApiKeyQueryHandler)
         : base(options, logger, encoder)
     {
-        _DbContext = dbContext;
+        _AppByApiKeyQueryHandler = appByApiKeyQueryHandler;
     }
 
     protected override async Task<AuthenticateResult> HandleAuthenticateAsync()
@@ -34,8 +34,8 @@ public class ApiKeyAuthenticationHandler : AuthenticationHandler<AuthenticationS
         if (apiKey == null)
             return AuthenticateResult.Fail("Invalid API key.");
 
-        App? app = await _DbContext.Set<App>()
-            .FirstOrDefaultAsync(app => app.ApiKey == apiKey);
+        AppByApiKeyQuery query = new AppByApiKeyQuery { ApiKey = apiKey };
+        AppDto? app = await _AppByApiKeyQueryHandler.HandleAsync(query);
 
         if (app == null)
             return AuthenticateResult.Fail("Invalid API key.");
