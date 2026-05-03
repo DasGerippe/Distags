@@ -1,16 +1,16 @@
-﻿using DataClasses;
+﻿using System.Linq.Expressions;
+using DataClasses;
 using Distags.Core.Dtos;
-using System.Linq.Expressions;
 
-namespace Distags.Core.Projection;
+namespace Distags.Core.Mapping;
 
-public class ContributionProjector : IEntityProjector<Contribution, ContributionDto>
+public class ContributionMapper : IEntityMapper<Contribution, ContributionDto>
 {
-    public Expression<Func<Contribution, ContributionDto>> Projection { get; }
+    public Expression<Func<Contribution, ContributionDto>> Expression { get; }
 
-    public ContributionProjector(bool ignoreAnonymity)
+    public ContributionMapper(bool ignoreAnonymity)
     {
-        Projection = contribution => new ContributionDto
+        Expression = contribution => new ContributionDto
         {
             Id = contribution.Id,
             Level = new ContributionLevelDto

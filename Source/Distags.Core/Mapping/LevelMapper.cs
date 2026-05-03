@@ -1,12 +1,12 @@
-﻿using DataClasses;
+﻿using System.Linq.Expressions;
+using DataClasses;
 using Distags.Core.Dtos;
-using System.Linq.Expressions;
 
-namespace Distags.Core.Projection;
+namespace Distags.Core.Mapping;
 
-public class LevelProjector : IEntityProjector<Level, LevelDto>
+public class LevelMapper : IEntityMapper<Level, LevelDto>
 {
-    public Expression<Func<Level, LevelDto>> Projection => level => new LevelDto
+    public Expression<Func<Level, LevelDto>> Expression => level => new LevelDto
     {
         Id = level.Id,
         Name = level.Name,

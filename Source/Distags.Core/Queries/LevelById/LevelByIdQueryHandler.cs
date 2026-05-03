@@ -1,7 +1,7 @@
 ﻿using DataClasses;
 using Distags.Core.Dtos;
 using Distags.Core.Exceptions;
-using Distags.Core.Projection;
+using Distags.Core.Mapping;
 using Microsoft.EntityFrameworkCore;
 
 namespace Distags.Core.Queries.LevelById;
@@ -17,10 +17,10 @@ public class LevelByIdQueryHandler : IQueryHandler<LevelByIdQuery, LevelDto>
 
     public async Task<LevelDto> HandleAsync(LevelByIdQuery query)
     {
-        LevelProjector levelProjector = new LevelProjector();
+        LevelMapper levelProjector = new LevelMapper();
         LevelDto? levelDto = await _DbContext.Set<Level>()
             .Where(level => level.Id == query.LevelId)
-            .Select(levelProjector.Projection)
+            .Select(levelProjector.Expression)
             .FirstOrDefaultAsync()
             .ConfigureAwait(false);
 

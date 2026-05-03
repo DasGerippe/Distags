@@ -1,7 +1,7 @@
 ﻿using DataClasses;
 using Distags.Core.Dtos;
 using Distags.Core.Exceptions;
-using Distags.Core.Projection;
+using Distags.Core.Mapping;
 using Microsoft.EntityFrameworkCore;
 
 namespace Distags.Core.Queries.AppByName;
@@ -9,19 +9,17 @@ namespace Distags.Core.Queries.AppByName;
 public class AppByNameQueryHandler : IQueryHandler<AppByNameQuery, AppDto>
 {
     private readonly DistagsDbContext _DbContext;
-    private readonly IEntityProjector<App, AppDto> _AppProjector;
 
-    public AppByNameQueryHandler(DistagsDbContext dbContext, IEntityProjector<App, AppDto> appProjector)
+    public AppByNameQueryHandler(DistagsDbContext dbContext)
     {
         _DbContext = dbContext;
-        _AppProjector = appProjector;
     }
 
     public async Task<AppDto> HandleAsync(AppByNameQuery query)
     {
         AppDto? appDto = await _DbContext.Set<App>()
             .Where(app => app.Name == query.AppName)
-            .Select(_AppProjector.Projection)
+            .Select(new AppMapper().Expression)
             .FirstOrDefaultAsync()
             .ConfigureAwait(false);
 

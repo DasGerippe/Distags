@@ -1,12 +1,12 @@
-﻿using DataClasses;
+﻿using System.Linq.Expressions;
+using DataClasses;
 using Distags.Core.Dtos;
-using System.Linq.Expressions;
 
-namespace Distags.Core.Projection;
+namespace Distags.Core.Mapping;
 
-public class UserBanProjector : IEntityProjector<UserBan, UserBanDto>
+public class UserBanMapper : IEntityMapper<UserBan, UserBanDto>
 {
-    public Expression<Func<UserBan, UserBanDto>> Projection => userBan => new UserBanDto
+    public Expression<Func<UserBan, UserBanDto>> Expression => userBan => new UserBanDto
     {
         SteamId = userBan.SteamId,
         SteamName = null, //userBan.User!.SteamName,

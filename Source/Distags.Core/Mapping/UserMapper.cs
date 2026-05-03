@@ -1,12 +1,12 @@
-﻿using DataClasses;
+﻿using System.Linq.Expressions;
+using DataClasses;
 using Distags.Core.Dtos;
-using System.Linq.Expressions;
 
-namespace Distags.Core.Projection;
+namespace Distags.Core.Mapping;
 
-public class UserProjector : IEntityProjector<User, UserDto>
+public class UserMapper : IEntityMapper<User, UserDto>
 {
-    public Expression<Func<User, UserDto>> Projection => user => new UserDto
+    public Expression<Func<User, UserDto>> Expression => user => new UserDto
     {
         SteamId = user.SteamId ?? -1,
         SteamName = user.SteamName,

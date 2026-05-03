@@ -2,11 +2,11 @@
 using Distags.Core.Dtos;
 using System.Linq.Expressions;
 
-namespace Distags.Core.Projection;
+namespace Distags.Core.Mapping;
 
-public class TagProjector : IEntityProjector<Tag, TagDto>
+public class TagMapper : IEntityMapper<Tag, TagDto>
 {
-    public Expression<Func<Tag, TagDto>> Projection => tag => new TagDto
+    public Expression<Func<Tag, TagDto>> Expression => tag => new TagDto
     {
         Name = tag.Name,
         DisplayName = tag.DisplayName,
