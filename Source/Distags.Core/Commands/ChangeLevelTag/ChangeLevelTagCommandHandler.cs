@@ -34,7 +34,7 @@ public class ChangeLevelTagCommandHandler : ICommandHandler<ChangeLevelTagComman
         User? user = await GetUserAsync(command.UserSteamId).ConfigureAwait(false);
         if (user != null && !user.Roles.Contains("Administrator") && !user.Roles.Contains("Moderator"))
         {
-            bool isMaintenanceActive = await _MaintenanceManager.GetSettingValue().ConfigureAwait(false);
+            bool isMaintenanceActive = await _MaintenanceManager.GetSettingValueAsync().ConfigureAwait(false);
             if (isMaintenanceActive)
                 throw new MaintenanceActiveException();
         }

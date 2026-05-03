@@ -13,6 +13,6 @@ public class SetMaintenanceCommandHandler : ICommandHandler<SetMaintenanceComman
 
     public Task HandleAsync(SetMaintenanceCommand command)
     {
-        return _MaintenanceManager.SetSettingValue(command.MaintenanceActive);
+        return _MaintenanceManager.SetSettingValueAsync(command.MaintenanceActive);
     }
 }

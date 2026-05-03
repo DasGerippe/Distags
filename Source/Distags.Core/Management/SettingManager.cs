@@ -18,7 +18,7 @@ public abstract class SettingManager<TValue>
         _DbContext = dbContext;
     }
 
-    public virtual async Task SetSettingValue(TValue value)
+    public virtual async Task SetSettingValueAsync(TValue value)
     {
         Setting? setting = await LoadSetting().ConfigureAwait(false);
         if (setting == null)
@@ -32,7 +32,7 @@ public abstract class SettingManager<TValue>
         await _DbContext.SaveChangesAsync().ConfigureAwait(false);
     }
 
-    public virtual async Task<TValue> GetSettingValue()
+    public virtual async Task<TValue> GetSettingValueAsync()
     {
         Setting? setting = await LoadSetting().ConfigureAwait(false);
         if (setting == null || !TValue.TryParse(setting.Value, CultureInfo.InvariantCulture, out TValue value))

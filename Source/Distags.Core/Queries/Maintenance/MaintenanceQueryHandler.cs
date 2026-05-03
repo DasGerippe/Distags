@@ -13,6 +13,6 @@ public class MaintenanceQueryHandler : IQueryHandler<MaintenanceQuery, bool>
 
     public Task<bool> HandleAsync(MaintenanceQuery query)
     {
-        return _MaintenanceManager.GetSettingValue();
+        return _MaintenanceManager.GetSettingValueAsync();
     }
 }
