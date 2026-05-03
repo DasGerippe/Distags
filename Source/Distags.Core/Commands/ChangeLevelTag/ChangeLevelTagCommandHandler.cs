@@ -31,17 +31,12 @@ public class ChangeLevelTagCommandHandler : ICommandHandler<ChangeLevelTagComman
 
     public async Task HandleAsync(ChangeLevelTagCommand command)
     {
-        User? user = await GetUserAsync(command.UserSteamId).ConfigureAwait(false);
-        if (user != null && !user.Roles.Contains("Administrator") && !user.Roles.Contains("Moderator"))
-        {
-            bool isMaintenanceActive = await _MaintenanceManager.GetSettingValueAsync().ConfigureAwait(false);
-            if (isMaintenanceActive)
-                throw new MaintenanceActiveException();
-        }
-
         Level level = await GetLevelAsync(command.LevelId).ConfigureAwait(false);
         Tag tag = await GetTagAsync(command.TagName).ConfigureAwait(false);
+        User? user = await GetUserAsync(command.UserSteamId).ConfigureAwait(false);
         App? app = await GetAppAsync(command.AppName).ConfigureAwait(false);
+
+        await EnsureTagChangeAllowedAsync(user, app, tag).ConfigureAwait(false);
 
         Func<Task> changeFunc = command.ChangeAction == ChangeActionDto.AddTag
             ? () => AddTagToLevel(level, tag, user, app)
@@ -88,6 +83,19 @@ public class ChangeLevelTagCommandHandler : ICommandHandler<ChangeLevelTagComman
             .ConfigureAwait(false);
 
         return app ?? throw new UnknownAppNameException(appName);
+    }
+
+    private async Task EnsureTagChangeAllowedAsync(User? user, App? app, Tag tag)
+    {
+        if (tag.IsAutoTag && (app == null || user != null))
+            throw new CannotChangeAutoTagException();
+
+        if (user != null && !user.Roles.Contains("Administrator") && !user.Roles.Contains("Moderator"))
+        {
+            bool isMaintenanceActive = await _MaintenanceManager.GetSettingValueAsync().ConfigureAwait(false);
+            if (isMaintenanceActive)
+                throw new MaintenanceActiveException();
+        }
     }
 
     private async Task AddTagToLevel(Level level, Tag tag, User? user, App? app)

@@ -12,7 +12,6 @@ using LevelTagApi.Management;
 using LevelTagApi.Security;
 using LevelTagApi.Sorting;
 using Microsoft.AspNetCore.Authentication;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.Extensions.Options;
 using Serilog;
 using SerilogUtils;
@@ -38,7 +37,6 @@ public class Program
                 .ConfigureConsoleAndFileSinks(nameof(LevelTagApi)));
 
             AddAuthentication(builder);
-            AddAuthorization(builder);
 
             builder.Services.AddControllers()
                 .AddJsonOptions(options => options.JsonSerializerOptions.Converters.Add(new PatchValueConverterFactory()));
@@ -167,17 +165,5 @@ public class Program
             {
                 options.SignInScheme = steamLoginCookieScheme;
             });
-    }
-
-    private static void AddAuthorization(WebApplicationBuilder builder)
-    {
-        builder.Services.AddAuthorization(options =>
-        {
-            options.AddPolicy(
-                Constants.Policies.Tagging,
-                policy => policy.Requirements.Add(new TaggingAuthorizationRequirement()));
-        });
-
-        builder.Services.AddScoped<IAuthorizationHandler, TaggingAuthorizationHandler>();
     }
 }

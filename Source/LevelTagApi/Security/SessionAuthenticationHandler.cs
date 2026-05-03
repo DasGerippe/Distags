@@ -49,12 +49,13 @@ public class SessionAuthenticationHandler : AuthenticationHandler<Authentication
         await _UpdateUserSessionLastSeenCommandHandler.HandleAsync(command);
 
         bool userCanTag = user.AcceptsGuidelines && !user.IsBanned;
+        if (userCanTag)
+            user.Roles.Add(Constants.Roles.Tagger);
 
         List<Claim> claims =
         [
             new Claim(Constants.Claims.SteamId, user.SteamId.ToString()),
             new Claim(Constants.Claims.SessionToken, sessionToken),
-            new Claim(Constants.Claims.CanTag, userCanTag.ToString()),
             .. user.Roles.Select(role => new Claim(ClaimTypes.Role, role)),
         ];
 

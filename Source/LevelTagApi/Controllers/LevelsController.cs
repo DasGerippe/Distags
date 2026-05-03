@@ -87,7 +87,7 @@ public class LevelsController : ControllerBase
     }
 
     [HttpPut("{levelId:long}/tags/{tagName}")]
-    [Authorize(Policy = Constants.Policies.Tagging)]
+    [Authorize(Roles = Constants.Roles.Tagger)]
     public async Task<IActionResult> PutLevelTag(long levelId, string tagName,
         [FromServices] ICommandHandler<ChangeLevelTagCommand> changeLevelTagCommandHandler)
     {
@@ -108,6 +108,10 @@ public class LevelsController : ControllerBase
         {
             return MaintenanceResult();
         }
+        catch (CannotChangeAutoTagException)
+        {
+            return CannotChangeAutoTagResult(tagName);
+        }
         catch (UnknownLevelException ex)
         {
             return LevelNotFound(ex.LevelId);
@@ -123,7 +127,7 @@ public class LevelsController : ControllerBase
     }
 
     [HttpDelete("{levelId:long}/tags/{tagName}")]
-    [Authorize(Policy = Constants.Policies.Tagging)]
+    [Authorize(Roles = Constants.Roles.Tagger)]
     public async Task<IActionResult> DeleteLevelTag(long levelId, string tagName,
         [FromServices] ICommandHandler<ChangeLevelTagCommand> changeLevelTagCommandHandler)
     {
@@ -143,6 +147,10 @@ public class LevelsController : ControllerBase
         catch (MaintenanceActiveException)
         {
             return MaintenanceResult();
+        }
+        catch (CannotChangeAutoTagException)
+        {
+            return CannotChangeAutoTagResult(tagName);
         }
         catch (UnknownLevelException ex)
         {
@@ -164,6 +172,15 @@ public class LevelsController : ControllerBase
         {
             Title = "Maintenance Active",
             Detail = "This operation is temporarily unavailable due to maintenance.",
+        });
+    }
+
+    private IActionResult CannotChangeAutoTagResult(string tagName)
+    {
+        return StatusCode(StatusCodes.Status403Forbidden, new ProblemDetails
+        {
+            Title = "Cannot Change AutoTag",
+            Detail = $"The tag {tagName} is an AutoTag and cannot be changed by users.",
         });
     }
 
