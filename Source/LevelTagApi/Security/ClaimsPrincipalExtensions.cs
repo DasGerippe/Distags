@@ -1,20 +1,14 @@
-﻿using System.Security.Claims;
+﻿using System.Globalization;
+using System.Security.Claims;
 
 namespace LevelTagApi.Security;
 
 public static class ClaimsPrincipalExtensions
 {
-    public static long? GetSteamId(this ClaimsPrincipal claimsPrincipal)
+    public static TValue? FindFirstValue<TValue>(this ClaimsPrincipal claimsPrincipal, string claimType)
+        where TValue : struct, IParsable<TValue>
     {
-        Claim? steamIdClaim = claimsPrincipal.FindFirst(Constants.Claims.SteamId);
-        return steamIdClaim != null
-            ? long.Parse(steamIdClaim.Value)
-            : null;
-    }
-
-    public static string? GetAppName(this ClaimsPrincipal claimsPrincipal)
-    {
-        Claim? appNameClaim = claimsPrincipal.FindFirst(Constants.Claims.AppName);
-        return appNameClaim?.Value;
+        string? claimValue = claimsPrincipal.FindFirstValue(claimType);
+        return claimValue == null ? null : TValue.Parse(claimValue, CultureInfo.InvariantCulture);
     }
 }

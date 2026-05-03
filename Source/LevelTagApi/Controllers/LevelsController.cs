@@ -11,6 +11,7 @@ using LevelTagApi.Dtos.Levels;
 using LevelTagApi.Security;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 using LevelDto = Distags.Core.Dtos.LevelDto;
 using LevelSortStrategy = Distags.Core.Sorting.Levels.LevelSortStrategy;
 
@@ -97,8 +98,8 @@ public class LevelsController : ControllerBase
             {
                 LevelId = levelId,
                 TagName = tagName,
-                UserSteamId = User.GetSteamId(),
-                AppName = User.GetAppName(),
+                UserSteamId = User.FindFirstValue<long>(Constants.Claims.SteamId),
+                AppName = User.FindFirstValue(Constants.Claims.AppName),
                 ChangeAction = ChangeActionDto.AddTag,
             };
             await changeLevelTagCommandHandler.HandleAsync(command);
@@ -137,8 +138,8 @@ public class LevelsController : ControllerBase
             {
                 LevelId = levelId,
                 TagName = tagName,
-                UserSteamId = User.GetSteamId(),
-                AppName = User.GetAppName(),
+                UserSteamId = User.FindFirstValue<long>(Constants.Claims.SteamId),
+                AppName = User.FindFirstValue(Constants.Claims.AppName),
                 ChangeAction = ChangeActionDto.RemoveTag,
             };
             await changeLevelTagCommandHandler.HandleAsync(command);

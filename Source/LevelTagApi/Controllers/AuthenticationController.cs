@@ -1,9 +1,12 @@
 ﻿using AspNet.Security.OpenId.Steam;
-using DataClasses;
-using DataStoring;
+using Distags.Core.Commands;
+using Distags.Core.Commands.CreateOrUpdateUser;
+using Distags.Core.Commands.CreateUserSession;
+using Distags.Core.Commands.DeleteUserSession;
+using Distags.Core.Commands.DeleteUserSessions;
+using Distags.Core.Exceptions;
 using LevelTagApi.Dtos;
 using LevelTagApi.Dtos.Authentication;
-using LevelTagApi.Management;
 using LevelTagApi.Security;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
@@ -20,28 +23,22 @@ namespace LevelTagApi.Controllers;
 [Route("[controller]")]
 public class AuthenticationController : ControllerBase
 {
-    private readonly LevelTagDbContext _DbContext;
     private readonly ITicketStore<long> _TicketStore;
     private readonly ITokenGenerator _TokenGenerator;
-    private readonly IUserManager _UserManager;
     private readonly ISteamUser _SteamUser;
     private readonly ILogger<AuthenticationController> _Logger;
 
     private readonly string _SteamWebApiKey;
 
     public AuthenticationController(
-        LevelTagDbContext dbContext,
         ITicketStore<long> ticketStore,
         ITokenGenerator tokenGenerator,
-        IUserManager userManager,
         ISteamUser steamUser,
         SteamWebApiSettings steamWebApiSettings,
         ILogger<AuthenticationController> logger)
     {
-        _DbContext = dbContext;
         _TicketStore = ticketStore;
         _TokenGenerator = tokenGenerator;
-        _UserManager = userManager;
         _SteamUser = steamUser;
         _Logger = logger;
 
@@ -62,7 +59,9 @@ public class AuthenticationController : ControllerBase
 
     [HttpGet("steam-callback")]
     [AllowAnonymous]
-    public async Task<IActionResult> SteamCallback([FromQuery] string? returnUrl = null)
+    public async Task<IActionResult> SteamCallback([FromQuery] string? returnUrl,
+        [FromServices] ICommandHandler<CreateOrUpdateUserCommand> createOrUpdateUserCommandHandler,
+        [FromServices] ICommandHandler<CreateUserSessionCommand> createUserSessionCommandHandler)
     {
         AuthenticateResult result = await HttpContext.AuthenticateAsync(SteamAuthenticationDefaults.AuthenticationScheme);
         if (!result.Succeeded || result.Principal == null)
@@ -84,19 +83,25 @@ public class AuthenticationController : ControllerBase
             return Redirect(returnUrlWithTicket);
         }
 
-        SessionResponse sessionResponse = await CreateSessionResponseForNewUserSession(steamId);
+        string sessionToken =
+            await CreateSessionForUserAsync(steamId, createOrUpdateUserCommandHandler, createUserSessionCommandHandler);
+        SessionResponse sessionResponse = new SessionResponse { Token = sessionToken };
         return Ok(sessionResponse);
     }
 
     [HttpPost("redeem-ticket")]
     [AllowAnonymous]
-    public async Task<ActionResult<SessionResponse>> RedeemTicket(string ticket)
+    public async Task<ActionResult<SessionResponse>> RedeemTicket(string ticket,
+        [FromServices] ICommandHandler<CreateOrUpdateUserCommand> createOrUpdateUserCommandHandler,
+        [FromServices] ICommandHandler<CreateUserSessionCommand> createUserSessionCommandHandler)
     {
         long? steamId = _TicketStore.Retrieve(ticket);
         if (steamId == null)
             return BadRequest("Ticket is invalid or expired.");
 
-        SessionResponse sessionResponse = await CreateSessionResponseForNewUserSession(steamId.Value);
+        string sessionToken =
+            await CreateSessionForUserAsync(steamId.Value, createOrUpdateUserCommandHandler, createUserSessionCommandHandler);
+        SessionResponse sessionResponse = new SessionResponse { Token = sessionToken };
         return Ok(sessionResponse);
     }
 
@@ -109,93 +114,84 @@ public class AuthenticationController : ControllerBase
 
     [HttpPost("logout")]
     [Authorize(AuthenticationSchemes = Constants.Authentication.SessionTokenScheme.Name)]
-    public async Task<IActionResult> Logout()
+    public async Task<IActionResult> Logout(
+        [FromServices] ICommandHandler<DeleteUserSessionCommand> deleteUserSessionCommandHandler)
     {
-        UserSession? userSession = await _UserManager.GetCurrentUserSessionAsync();
-        if (userSession == null)
+        try
+        {
+            string sessionToken = User.FindFirstValue(Constants.Claims.SessionToken)!;
+            DeleteUserSessionCommand command = new DeleteUserSessionCommand { SessionToken = sessionToken };
+            await deleteUserSessionCommandHandler.HandleAsync(command);
+            return NoContent();
+        }
+        catch (UnknownUserSessionException)
+        {
             return Unauthorized();
-
-        _DbContext.Remove(userSession);
-        await _DbContext.SaveChangesAsync();
-
-        return Ok();
+        }
     }
 
     [HttpPost("logout-all")]
     [Authorize(AuthenticationSchemes = Constants.Authentication.SessionTokenScheme.Name)]
-    public async Task<IActionResult> LogoutAll()
+    public async Task<IActionResult> LogoutAll(
+        [FromServices] ICommandHandler<DeleteUserSessionsCommand> deleteUserSessionsCommandHandler)
     {
-        User? user = await _UserManager.GetCurrentUserAsync(includes: nameof(user.Sessions));
-        if (user == null)
-            return Unauthorized();
-
-        _DbContext.RemoveRange(user.Sessions);
-        await _DbContext.SaveChangesAsync();
-
-        return Ok();
-    }
-
-    private async Task<SessionResponse> CreateSessionResponseForNewUserSession(long steamId)
-    {
-        User user = await GetOrCreateUser(steamId);
-        UserSession userSession = CreateUserSession(user);
-        await _DbContext.SaveChangesAsync();
-
-        SessionResponse sessionResponse = new SessionResponse { Token = userSession.Token };
-        return sessionResponse;
-    }
-
-    private async Task<User> GetOrCreateUser(long steamId)
-    {
-        User? user = _DbContext.Set<User>().FirstOrDefault(user => user.SteamId == steamId);
-        if (user == null)
+        try
         {
-            user = new User
-            {
-                SteamId = steamId,
-                IsBanned = _DbContext.Set<UserBan>().Any(userBan => userBan.SteamId == steamId),
-            };
-            _DbContext.Add(user);
+            long userSteamId = User.FindFirstValue<long>(Constants.Claims.SteamId)!.Value;
+            DeleteUserSessionsCommand command = new DeleteUserSessionsCommand { UserSteamId = userSteamId };
+            await deleteUserSessionsCommandHandler.HandleAsync(command);
+            return NoContent();
         }
-
-        await TrySetSteamData(user);
-
-        return user;
+        catch (UnknownUserException)
+        {
+            return Unauthorized();
+        }
     }
 
-    private async Task TrySetSteamData(User user)
+    private async Task<string> CreateSessionForUserAsync(long steamId,
+        ICommandHandler<CreateOrUpdateUserCommand> createOrUpdateUserCommandHandler,
+        ICommandHandler<CreateUserSessionCommand> createUserSessionCommandHandler)
+    {
+        PlayerSummary? playerSummary = await TryGetPlayerSummary(steamId);
+        CreateOrUpdateUserCommand createOrUpdateUserCommand = new CreateOrUpdateUserCommand
+        {
+            SteamId = steamId,
+            SteamName = playerSummary?.PersonaName,
+            SteamAvatarHash = playerSummary?.AvatarHash,
+        };
+        await createOrUpdateUserCommandHandler.HandleAsync(createOrUpdateUserCommand);
+
+        string sessionToken = _TokenGenerator.GenerateToken(32);
+        CreateUserSessionCommand createUserSessionCommand = new CreateUserSessionCommand
+        {
+            UserSteamId = steamId,
+            SessionToken = sessionToken,
+        };
+        await createUserSessionCommandHandler.HandleAsync(createUserSessionCommand);
+
+        return sessionToken;
+    }
+
+    private async Task<PlayerSummary?> TryGetPlayerSummary(long steamId)
     {
         try
         {
             GetPlayerSummariesParameters parameters = new GetPlayerSummariesParameters
             {
                 Key = _SteamWebApiKey,
-                SteamIds = [user.SteamId!.Value],
+                SteamIds = [steamId],
             };
 
-            IAsyncEnumerator<PlayerSummary> playerEnumerator = _SteamUser.GetPlayerSummariesAsync(parameters).GetAsyncEnumerator();
+            await using IAsyncEnumerator<PlayerSummary> playerEnumerator =
+                _SteamUser.GetPlayerSummariesAsync(parameters).GetAsyncEnumerator();
+            
             await playerEnumerator.MoveNextAsync();
-
-            PlayerSummary playerSummary = playerEnumerator.Current;
-            user.SteamName = playerSummary.PersonaName;
-            user.SteamAvatarHash = playerSummary.AvatarHash;
+            return playerEnumerator.Current;
         }
         catch (Exception ex)
         {
             _Logger.LogWarning(ex, "An error occurred while trying to get user data from Steam.");
+            return null;
         }
-    }
-
-    private UserSession CreateUserSession(User user)
-    {
-        UserSession userSession = new UserSession
-        {
-            Token = _TokenGenerator.GenerateToken(32),
-            User = user,
-            LastSeenOn = DateTimeOffset.UtcNow,
-        };
-
-        _DbContext.Add(userSession);
-        return userSession;
     }
 }
