@@ -1,6 +1,5 @@
-﻿using DataClasses;
-using DataStoring;
-using Microsoft.EntityFrameworkCore;
+﻿using Distags.Core.Commands;
+using Distags.Core.Commands.CleanupUserSessions;
 using Microsoft.Extensions.Options;
 
 namespace LevelTagApi.Security;
@@ -29,7 +28,7 @@ public class SessionCleanupService : BackgroundService
         {
             try
             {
-                await DeleteDeprecatedSessionsAsync(stoppingToken);
+                await DeleteDeprecatedSessionsAsync();
                 await Task.Delay(TimeSpan.FromMinutes(5), stoppingToken);
             }
             catch (TaskCanceledException)
@@ -44,30 +43,16 @@ public class SessionCleanupService : BackgroundService
         }
     }
 
-    private async Task DeleteDeprecatedSessionsAsync(CancellationToken stoppingToken)
+    private async Task DeleteDeprecatedSessionsAsync()
     {
-        _Logger.LogDebug("Performing session cleanup.");
-
         using IServiceScope scope = _ScopeFactory.CreateScope();
-        LevelTagDbContext dbContext = scope.ServiceProvider.GetRequiredService<LevelTagDbContext>();
+        ICommandHandler<CleanupUserSessionsCommand> cleanupUserSessionsCommandHandler =
+            scope.ServiceProvider.GetRequiredService<ICommandHandler<CleanupUserSessionsCommand>>();
 
-        DateTimeOffset cutOffDate = DateTimeOffset.UtcNow - _SessionExpirationDelay;
-
-        List<UserSession> deprecatedSessions = await dbContext.Set<UserSession>()
-            .Where(session => session.LastSeenOn < cutOffDate)
-            .ToListAsync(stoppingToken);
-
-        _Logger.LogDebug("Found {sessionCount} deprecated sessions for cleanup.", deprecatedSessions.Count);
-
-        if (deprecatedSessions.Count > 0)
+        CleanupUserSessionsCommand command = new CleanupUserSessionsCommand
         {
-            foreach (UserSession deprecatedSession in deprecatedSessions)
-            {
-                dbContext.Remove(deprecatedSession);
-            }
-            await dbContext.SaveChangesAsync(stoppingToken);
-
-            _Logger.LogDebug("Deleted deprecated sessions.");
-        }
+            SessionExpirationDelay = _SessionExpirationDelay,
+        };
+        await cleanupUserSessionsCommandHandler.HandleAsync(command);
     }
 }
