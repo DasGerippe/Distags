@@ -1,8 +1,15 @@
-﻿using Distags.Core.Commands;
+﻿using DataClasses;
+using Distags.Core.Commands;
+using Distags.Core.Filtering;
+using Distags.Core.Filtering.Contributions;
+using Distags.Core.Filtering.Levels;
 using Distags.Core.Management;
 using Distags.Core.Management.History;
 using Distags.Core.Queries;
 using Distags.Core.Security;
+using Distags.Core.Services;
+using Distags.Core.Sorting;
+using Distags.Core.Sorting.Levels;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Distags.Core;
@@ -16,6 +23,14 @@ public static class ServiceCollectionExtensions
         serviceCollection.AddTransient<ContributionManager>();
         serviceCollection.AddTransient<ContributionChangeManager>();
         serviceCollection.AddTransient<ContributionReplayEngine>();
+        serviceCollection.AddTransient<UserBanPermissionChecker>();
+
+        serviceCollection.AddTransient<MaintenanceManager>();
+
+        serviceCollection.AddTransient<IQueryableFilterFactory<Contribution, ContributionFilterParameters>, ContributionFilterFactory>();
+        serviceCollection.AddTransient<IQueryableFilterFactory<Level, LevelFilterParameters>, LevelFilterFactory>();
+
+        serviceCollection.AddTransient<IQueryableSorterFactory<Level, LevelSortStrategy>, LevelSorterFactory>();
 
         serviceCollection.AddGenericServiceImplementations(typeof(IQueryHandler<,>));
         serviceCollection.AddGenericServiceImplementations(typeof(ICommandHandler<>));
