@@ -1,4 +1,6 @@
 ﻿using DataClasses;
+using Distags.Core.Dtos;
+using Distags.Core.Events;
 using Distags.Core.Interfaces;
 using Microsoft.EntityFrameworkCore;
 
@@ -9,15 +11,18 @@ public class ContributionReplayEngine
     private readonly DistagsDbContext _DbContext;
     private readonly ContributionChangeManager _ContributionChangeManager;
     private readonly ISequentialLevelActionExecutor _SequentialLevelActionExecutor;
+    private readonly AppEventQueue _EventQueue;
 
     public ContributionReplayEngine(
         DistagsDbContext dbContext,
         ContributionChangeManager contributionChangeManager,
-        ISequentialLevelActionExecutor sequentialLevelActionExecutor)
+        ISequentialLevelActionExecutor sequentialLevelActionExecutor,
+        AppEventQueue eventQueue)
     {
         _DbContext = dbContext;
         _ContributionChangeManager = contributionChangeManager;
         _SequentialLevelActionExecutor = sequentialLevelActionExecutor;
+        _EventQueue = eventQueue;
     }
 
     public async Task ReplayContributionsAsync(long levelId)
@@ -26,8 +31,6 @@ public class ContributionReplayEngine
         {
             List<Contribution> contributions = await GetAllContributionsForLevel(levelId).ConfigureAwait(false);
             await ReplayContributionsAsync(levelId, contributions).ConfigureAwait(false);
-
-            await _DbContext.SaveChangesAsync().ConfigureAwait(false);
         }).ConfigureAwait(false);
     }
 
@@ -50,28 +53,42 @@ public class ContributionReplayEngine
             contribution.Changes = replayState.ApplyContribution(contribution);
         }
 
-        List<long> tagIdsForLevel = replayState.GetTagsForLevel()
-            .Select(tag => tag.Id)
-            .ToList();
-
-        List<long> currentTagIds = await _DbContext.Set<LevelTag>()
+        List<Tag> tagsForLevel = replayState.GetTagsForLevel().ToList();
+        List<Tag> currentTags = await _DbContext.Set<LevelTag>()
             .Where(levelTag => levelTag.LevelId == levelId)
-            .Select(levelTag => levelTag.TagId)
+            .Select(levelTag => levelTag.Tag)
             .ToListAsync().ConfigureAwait(false);
 
         List<LevelTag> removeLevelTags = await _DbContext.Set<LevelTag>()
-            .Where(levelTag => levelTag.LevelId == levelId && !tagIdsForLevel.Contains(levelTag.TagId))
+            .Include(levelTag => levelTag.Tag)
+            .Where(levelTag => levelTag.LevelId == levelId && !tagsForLevel.Contains(levelTag.Tag))
             .ToListAsync().ConfigureAwait(false);
 
-        List<LevelTag> addLevelTags = tagIdsForLevel.Except(currentTagIds)
-            .Select(newTagId => new LevelTag
+        List<LevelTag> addLevelTags = tagsForLevel.Except(currentTags)
+            .Select(newTag => new LevelTag
             {
                 LevelId = levelId,
-                TagId = newTagId,
+                Tag = newTag,
             })
             .ToList();
 
         _DbContext.RemoveRange(removeLevelTags);
         _DbContext.AddRange(addLevelTags);
+
+        await _DbContext.SaveChangesAsync().ConfigureAwait(false);
+
+        IEnumerable<TagChangeDto> addChanges = addLevelTags
+            .Select(levelTag => new TagChangeDto()
+            {
+                ChangeType = TagChangeType.Add,
+                TagName = levelTag.Tag.Name,
+            });
+        IEnumerable<TagChangeDto> removeChanges = removeLevelTags
+            .Select(levelTag => new TagChangeDto
+            {
+                ChangeType = TagChangeType.Remove,
+                TagName = levelTag.Tag.Name,
+            });
+        _EventQueue.Enqueue(new LevelTagsChangedEvent(levelId, addChanges.Concat(removeChanges).ToList()));
     }
 }

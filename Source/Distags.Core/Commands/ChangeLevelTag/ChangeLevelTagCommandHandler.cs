@@ -1,5 +1,6 @@
 ﻿using DataClasses;
 using Distags.Core.Dtos;
+using Distags.Core.Events;
 using Distags.Core.Exceptions;
 using Distags.Core.Interfaces;
 using Distags.Core.Management;
@@ -14,19 +15,22 @@ public class ChangeLevelTagCommandHandler : ICommandHandler<ChangeLevelTagComman
     private readonly ISequentialLevelActionExecutor _SequentialLevelActionExecutor;
     private readonly ContributionManager _ContributionManager;
     private readonly ContributionChangeManager _ContributionChangeManager;
+    private readonly AppEventQueue _AppEventQueue;
 
     public ChangeLevelTagCommandHandler(
         DistagsDbContext dbContext,
         MaintenanceManager maintenanceManager,
         ISequentialLevelActionExecutor sequentialLevelActionExecutor,
         ContributionManager contributionManager,
-        ContributionChangeManager contributionChangeManager)
+        ContributionChangeManager contributionChangeManager,
+        AppEventQueue appEventQueue)
     {
         _DbContext = dbContext;
         _MaintenanceManager = maintenanceManager;
         _SequentialLevelActionExecutor = sequentialLevelActionExecutor;
         _ContributionManager = contributionManager;
         _ContributionChangeManager = contributionChangeManager;
+        _AppEventQueue = appEventQueue;
     }
 
     public async Task HandleAsync(ChangeLevelTagCommand command)
@@ -38,13 +42,15 @@ public class ChangeLevelTagCommandHandler : ICommandHandler<ChangeLevelTagComman
 
         await EnsureTagChangeAllowedAsync(user, app, tag).ConfigureAwait(false);
 
-        Func<Task> changeFunc = command.ChangeAction == ChangeActionDto.AddTag
+        Func<Task<Contribution>> changeFunc = command.ChangeAction == ChangeActionDto.AddTag
             ? () => AddTagToLevel(level, tag, user, app)
             : () => RemoveTagFromLevel(level, tag, user, app);
 
-        await _SequentialLevelActionExecutor
+        Contribution contribution = await _SequentialLevelActionExecutor
             .ExecuteSequentialForLevelAsync(command.LevelId, changeFunc)
             .ConfigureAwait(false);
+
+        EnqueueEvents(contribution);
     }
 
     private async Task<Level> GetLevelAsync(long levelId)
@@ -98,7 +104,7 @@ public class ChangeLevelTagCommandHandler : ICommandHandler<ChangeLevelTagComman
         }
     }
 
-    private async Task AddTagToLevel(Level level, Tag tag, User? user, App? app)
+    private async Task<Contribution> AddTagToLevel(Level level, Tag tag, User? user, App? app)
     {
         LevelTag? levelTag = await _DbContext.Set<LevelTag>().FindAsync(level.Id, tag.Id).ConfigureAwait(false);
         if (levelTag != null)
@@ -121,6 +127,7 @@ public class ChangeLevelTagCommandHandler : ICommandHandler<ChangeLevelTagComman
         _DbContext.Add(contribution);
 
         await _DbContext.SaveChangesAsync().ConfigureAwait(false);
+        return contribution;
     }
 
     private async Task<List<LevelTag>> GetConflictingLevelTagsAsync(long levelId, Tag tag)
@@ -140,7 +147,7 @@ public class ChangeLevelTagCommandHandler : ICommandHandler<ChangeLevelTagComman
         return conflictingLevelTags;
     }
 
-    private async Task RemoveTagFromLevel(Level level, Tag tag, User? user, App? app)
+    private async Task<Contribution> RemoveTagFromLevel(Level level, Tag tag, User? user, App? app)
     {
         LevelTag? levelTag = await _DbContext.FindAsync<LevelTag>(level.Id, tag.Id).ConfigureAwait(false);
         if (levelTag == null)
@@ -154,5 +161,20 @@ public class ChangeLevelTagCommandHandler : ICommandHandler<ChangeLevelTagComman
         _DbContext.Add(contribution);
 
         await _DbContext.SaveChangesAsync().ConfigureAwait(false);
+        return contribution;
+    }
+
+    private void EnqueueEvents(Contribution contribution)
+    {
+        _AppEventQueue.Enqueue(new ContributionCreatedEvent(contribution.Id));
+
+        List<TagChangeDto> changeDtos = contribution.Changes
+            .Select(change => new TagChangeDto
+            {
+                ChangeType = (TagChangeType)change.Action,
+                TagName = change.TagName,
+            })
+            .ToList();
+        _AppEventQueue.Enqueue(new LevelTagsChangedEvent(contribution.LevelId, changeDtos));
     }
 }
