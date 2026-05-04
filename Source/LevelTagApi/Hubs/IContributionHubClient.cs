@@ -1,4 +1,4 @@
-﻿using LevelTagApi.Dtos.Contributions;
+﻿using Distags.Core.Dtos;
 
 namespace LevelTagApi.Hubs;
 

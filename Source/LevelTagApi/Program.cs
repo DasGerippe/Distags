@@ -1,8 +1,8 @@
 using Distags.Core;
+using Distags.Core.Events;
 using Distags.Infrastructure;
 using LevelTagApi.Dtos;
 using LevelTagApi.Hubs;
-using LevelTagApi.Interceptors;
 using LevelTagApi.Security;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.Extensions.Options;
@@ -37,17 +37,12 @@ public class Program
             // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
             builder.Services.AddOpenApi();
 
+            builder.Services.AddSignalR();
+
             string distagsDbConnectionString = builder.Configuration.GetConnectionString("DistagsDatabase") ??
                                                throw new InvalidOperationException("Connection string not configured.");
             builder.Services.AddDistagsInfrastructure(distagsDbConnectionString);
             builder.Services.AddDistagsCore();
-
-            builder.Services.AddSingleton<LevelTagBroadcastingInterceptor>();
-            builder.Services.AddSingleton<ContributionBroadcastingInterceptor>();
-
-            builder.Services.AddSignalR();
-            builder.Services.AddTransient<ILevelTagBroadcaster, LevelTagBroadcaster>();
-            builder.Services.AddTransient<IContributionBroadcaster, ContributionBroadcaster>();
 
             builder.Services.AddSteamWebApi("SteamWebApi");
 
@@ -55,6 +50,11 @@ public class Program
 
             builder.Services.AddSingleton<ITicketStore<long>, ConcurrentTicketStore<long>>();
             builder.Services.AddTransient<ITokenGenerator, RandomBase64UrlTokenGenerator>();
+
+            builder.Services.Scan(scan => scan
+                .FromAssemblyOf<Program>()
+                .AddClasses(classes => classes.AssignableTo(typeof(IAppEventHandler<>)))
+                .AsImplementedInterfaces());
 
             builder.Services.AddHostedService<SessionCleanupService>();
 
