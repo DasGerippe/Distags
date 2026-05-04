@@ -1,5 +1,6 @@
 ﻿using DataClasses;
 using Distags.Core.Commands;
+using Distags.Core.Events;
 using Distags.Core.Filtering;
 using Distags.Core.Filtering.Contributions;
 using Distags.Core.Filtering.Levels;
@@ -34,6 +35,9 @@ public static class ServiceCollectionExtensions
 
         serviceCollection.AddGenericServiceImplementations(typeof(IQueryHandler<,>));
         serviceCollection.AddGenericServiceImplementations(typeof(ICommandHandler<>));
+
+        serviceCollection.AddSingleton<AppEventQueue>();
+        serviceCollection.AddHostedService<AppEventDispatcherService>();
 
         return serviceCollection;
     }
