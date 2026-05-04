@@ -31,4 +31,25 @@ public class SequentialLevelActionExecutor : ISequentialLevelActionExecutor
 
         await transaction.CommitAsync().ConfigureAwait(false);
     }
+
+    public async Task<TResult> ExecuteSequentialForLevelAsync<TResult>(long levelId, Func<Task<TResult>> action)
+    {
+        await using IDbContextTransaction transaction = await _DbContext.Database.BeginTransactionAsync().ConfigureAwait(false);
+
+        await _DbContext.Database
+            .ExecuteSqlAsync(
+                $"""
+                 select 1
+                 from level_locks
+                 where level_id = {levelId}
+                 for update
+                 """)
+            .ConfigureAwait(false);
+
+        TResult result = await action().ConfigureAwait(false);
+
+        await transaction.CommitAsync().ConfigureAwait(false);
+
+        return result;
+    }
 }
