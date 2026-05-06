@@ -1,4 +1,4 @@
-﻿using DataClasses;
+﻿using Distags.Core.Entities;
 using Distags.Core.Management.History;
 using Microsoft.EntityFrameworkCore;
 

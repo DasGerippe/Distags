@@ -1,5 +1,5 @@
-﻿using DataClasses;
-using Distags.Contracts;
+﻿using Distags.Contracts;
+using Distags.Core.Entities;
 using Distags.Core.Mapping;
 using Microsoft.EntityFrameworkCore;
 

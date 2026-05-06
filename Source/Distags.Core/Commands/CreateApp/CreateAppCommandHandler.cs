@@ -1,4 +1,4 @@
-﻿using DataClasses;
+﻿using Distags.Core.Entities;
 using Distags.Core.Exceptions;
 using Distags.Core.Security;
 using Microsoft.EntityFrameworkCore;

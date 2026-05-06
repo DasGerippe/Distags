@@ -19,7 +19,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\DataStoring\DataStoring.csproj" />
     <ProjectReference Include="..\Distags.Contracts\Distags.Contracts.csproj" />
     <ProjectReference Include="..\Distags.Core\Distags.Core.csproj" />
     <ProjectReference Include="..\Distags.Infrastructure\Distags.Infrastructure.csproj" />

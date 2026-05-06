@@ -1,5 +1,5 @@
-﻿using DataClasses;
-using Distags.Contracts;
+﻿using Distags.Contracts;
+using Distags.Core.Entities;
 using Distags.Core.Filtering;
 using Distags.Core.Filtering.Levels;
 using Distags.Core.Mapping;

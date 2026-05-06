@@ -1,5 +1,5 @@
-﻿using DataClasses;
-using Distags.Core.Commands;
+﻿using Distags.Core.Commands;
+using Distags.Core.Entities;
 using Distags.Core.Events;
 using Distags.Core.Filtering;
 using Distags.Core.Filtering.Contributions;
