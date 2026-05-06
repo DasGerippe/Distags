@@ -1,0 +1,31 @@
+﻿@using Distags.WebApp.Services
+@inject IDialogService DialogService
+
+<button class="btn" @onclick="OnBanUserButtonClicked">
+    <svg style="width:1.5rem; height:1.5rem; color: @GetIconColor();"><use href="icons.svg#ban-solid" /></svg>
+</button>
+
+@code {
+
+    [Parameter]
+    public long? UserSteamId { get; set; }
+
+    [Parameter]
+    public string? UserSteamName { get; set; }
+
+    private string GetIconColor()
+    {
+        return UserSteamId != null ? "darkred" : "#AAA";
+    }
+
+    private async Task OnBanUserButtonClicked()
+    {
+        if (UserSteamId == null)
+            return;
+        
+        BanUserDialog? banUserDialog = DialogService.Get<BanUserDialog>();
+        if (banUserDialog != null)
+            await banUserDialog.ShowAsync(UserSteamId.Value, UserSteamName);
+    }
+
+}

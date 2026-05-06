@@ -1,5 +1,4 @@
-﻿using System.Runtime.CompilerServices;
-using Microsoft.Extensions.Configuration;
+﻿using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
@@ -7,6 +6,7 @@ using SteamWebApi;
 using SteamWebApi.ApiInterfaces;
 using SteamWebApi.Dtos.PublishedFileService;
 using SteamWebApi.Dtos.SteamUser;
+using System.Runtime.CompilerServices;
 
 namespace TestProject;
 

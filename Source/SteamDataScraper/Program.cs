@@ -1,4 +1,5 @@
-﻿using Distags.Infrastructure;
+﻿using Distags.Core;
+using Distags.Persistence;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -10,7 +11,6 @@ using SteamDataScraper.Creators;
 using SteamDataScraper.Levels;
 using SteamWebApi;
 using System.Runtime.CompilerServices;
-using Distags.Core;
 
 namespace SteamDataScraper;
 
@@ -58,7 +58,7 @@ internal class Program
 
                 string distagsDbConnectionString = context.Configuration.GetConnectionString("DistagsDatabase") ??
                                                    throw new InvalidOperationException("Connection string not configured.");
-                services.AddDistagsInfrastructure(distagsDbConnectionString);
+                services.AddDistagsPersistence(distagsDbConnectionString);
                 services.AddDistagsCore();
 
                 services.AddTransient<Program>();

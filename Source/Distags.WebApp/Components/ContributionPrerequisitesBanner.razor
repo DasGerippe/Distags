@@ -1,0 +1,29 @@
+﻿@using Distags.WebApp.Security
+@inject IUserInfoProvider UserInfoProvider
+
+@if (string.IsNullOrEmpty(_Text))
+	return;
+
+<div class="bg-warning-subtle shadow-sm">
+	<div class="container-fluid content">
+		<p class="py-2 text-center">
+			@_Text
+		</p>
+	</div>
+</div>
+
+@code {
+
+	private string? _Text;
+
+	protected override async Task OnInitializedAsync()
+	{
+		UserDto? user = await UserInfoProvider.GetUserInfoAsync();
+
+		if (user == null)
+			_Text = Resource.ContributionPrerequisiteLoginText;
+		else if (!user.AcceptsGuidelines)
+			_Text = Resource.ContributionPrerequisiteGuidelinesText;
+	}
+
+}

@@ -1,0 +1,54 @@
+﻿@using LevelTagWebApp.Components.Level
+
+<div class="row align-items-center border border-1 rounded-3 shadow mx-0 py-2 row-gap-2 @GetContainerClass()">
+    <!-- Level -->
+    <div class="col-12 col-sm-7 col-md-4">
+        <LevelDisplay Level="Contribution.Level!" />
+    </div>
+
+    <!-- Changes -->
+    <div class="col-12 col-sm-5 col-md-3 d-flex">
+        @if (ShowRevertContributionButton)
+        {
+            <RevertContributionButton Contribution="Contribution"/>
+        }
+        <TagChangesDisplay Changes="Contribution.Changes"/>
+    </div>
+
+    <!-- Contributor -->
+    <div class="col col-sm-7 col-md-3 d-flex">
+        @if (ShowBanUserButton)
+        {
+            <BanUserButton UserSteamId="Contribution.User?.SteamId" UserSteamName="@Contribution.User?.SteamName" />
+        }
+        <ContributorDisplay User="Contribution.User" App="Contribution.App"/>
+    </div>
+
+    <!-- Contribution Date -->
+    <div class="col-auto col-sm-5 col-md-2 d-flex justify-content-end justify-content-sm-start">
+        <ElapsedTimeDisplay class="text-muted text-truncate" Timestamp="Contribution.ContributedOn" />
+    </div>
+</div>
+
+@code {
+
+    [Parameter]
+    public required ContributionDto Contribution { get; set; }
+
+    [Parameter]
+    public bool ShowBanUserButton { get; set; }
+
+    [Parameter]
+    public bool ShowRevertContributionButton { get; set; }
+
+    private string GetContainerClass()
+    {
+        if (Contribution.Changes.Count == 1)
+            return Contribution.Changes[0].Action == TagAction.Add
+                ? "bg-success-subtle border-success-subtle"
+                : "bg-danger-subtle border-danger-subtle";
+        else
+            return "bg-warning-subtle border-warning border-opacity-50";
+    }
+
+}

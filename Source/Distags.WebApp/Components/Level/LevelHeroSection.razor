@@ -1,0 +1,31 @@
+﻿<div class="hero shadow py-3">
+	<div class="hero-background" style="background-image: url('@Level.IconUrl');"></div>
+	<div class="container-fluid content-wide">
+		<div class="d-flex flex-column align-items-center">
+
+			<img src="@Level.IconUrl"
+			     alt="Level Preview Image"
+			     class="img-fluid w-100 rounded-4 shadow mb-3"
+			     style="max-width:480px;"/>
+
+			<div class="d-flex align-items-baseline w-100 display-6 justify-content-center">
+				<h1 class="fw-bold text-truncate">@Level.Name</h1>
+				<a class="ms-2" href="https://steamcommunity.com/sharedfiles/filedetails/?id=@Level.Id">
+					<svg style="color: #1e3050; width: 1.5em; height: 1.5em;">
+						<use href="icons.svg#steam-solid"/>
+					</svg>
+				</a>
+			</div>
+
+			<p class="lead text-muted mb-0">@Level.CreatorName</p>
+
+		</div>
+	</div>
+</div>
+
+@code {
+	
+	[Parameter]
+	public required LevelDto Level { get; set; }
+
+}

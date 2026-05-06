@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 18
 VisualStudioVersion = 18.5.11709.299
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LevelTagApi", "LevelTagApi\LevelTagApi.csproj", "{E5720CEC-5A0C-475D-8D93-6A76D2B7EBDF}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Distags.Api", "Distags.Api\Distags.Api.csproj", "{E5720CEC-5A0C-475D-8D93-6A76D2B7EBDF}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DataClasses", "DataClasses\DataClasses.csproj", "{D3ECAA1E-0C07-4FBA-B2FB-3E6581066606}"
 EndProject
@@ -11,7 +11,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DataStoring", "DataStoring\
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SteamDataScraper", "SteamDataScraper\SteamDataScraper.csproj", "{F762BB94-3F02-45D3-BD3A-ED082157F10F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LevelTagApi.Dtos", "LevelTagApi.Dtos\LevelTagApi.Dtos.csproj", "{E3C74217-2B2F-4804-9F07-FD2327C23B10}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Distags.Api.Contracts", "Distags.Api.Contracts\Distags.Api.Contracts.csproj", "{E3C74217-2B2F-4804-9F07-FD2327C23B10}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestProject", "TestProject\TestProject.csproj", "{F4FC353E-0D0A-469A-990C-3A83B1D7063F}"
 EndProject
@@ -19,11 +19,11 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SteamWebApi", "SteamWebApi\
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SteamWebApi.Contract", "SteamWebApi.Contract\SteamWebApi.Contract.csproj", "{6382018F-4239-46F1-846F-9978B38C4578}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DataStoringMigrations", "DataStoringMigrations\DataStoringMigrations.csproj", "{E88531ED-E6CA-456D-9690-801A5824534E}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Distags.Persistence.Migrations.Dev", "Distags.Persistence.Migrations.Dev\Distags.Persistence.Migrations.Dev.csproj", "{E88531ED-E6CA-456D-9690-801A5824534E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DataStoringMigrator", "DataStoringMigrator\DataStoringMigrator.csproj", "{46FBA830-44A9-4075-AE4E-794D9D4D502E}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Distags.Persistence.Migrator", "Distags.Persistence.Migrator\Distags.Persistence.Migrator.csproj", "{46FBA830-44A9-4075-AE4E-794D9D4D502E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LevelTagWebApp", "LevelTagWebApp\LevelTagWebApp.csproj", "{CCFC3169-44F6-4874-AF8F-BC5D102EB375}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Distags.WebApp", "Distags.WebApp\Distags.WebApp.csproj", "{CCFC3169-44F6-4874-AF8F-BC5D102EB375}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HttpUtils", "HttpUtils\HttpUtils.csproj", "{26C1F54E-BA8A-46C7-85E5-92DA03CB7A70}"
 EndProject
@@ -45,7 +45,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AutoTagging.Abstractions", 
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Distags.Core", "Distags.Core\Distags.Core.csproj", "{A553C982-E54F-4CEA-8C40-737AAF74C872}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Distags.Infrastructure", "Distags.Infrastructure\Distags.Infrastructure.csproj", "{6E851C83-5101-488A-ABCD-8367F0952727}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Distags.Persistence", "Distags.Persistence\Distags.Persistence.csproj", "{6E851C83-5101-488A-ABCD-8367F0952727}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Distags.Contracts", "Distags.Contracts\Distags.Contracts.csproj", "{FA63A1B4-E921-58CD-1A55-36E7CCED5E1D}"
 EndProject

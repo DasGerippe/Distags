@@ -1,5 +1,5 @@
-﻿using System.Globalization;
-using Microsoft.Extensions.Logging;
+﻿using Microsoft.Extensions.Logging;
+using System.Globalization;
 
 namespace SteamDataScraper.Creators;
 

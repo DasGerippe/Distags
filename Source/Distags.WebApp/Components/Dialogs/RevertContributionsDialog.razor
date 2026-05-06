@@ -1,0 +1,82 @@
+﻿@using Distags.Api.Contracts.Contributions
+@using Distags.WebApp.Services
+@inherits DialogBase
+
+@inject LevelTagApiClient LevelTagApi
+
+<Dialog Id="@ModalId">
+	<Header>
+		<h5 class="modal-title">Revert Contributions</h5>
+		<button class="btn-close" data-bs-dismiss="modal"></button>
+	</Header>
+	<Body>
+		<form>
+			<label for="revertSteamIdInput" class="col-form-label">User Steam ID:</label>
+			<input id="revertSteamIdInput" class="form-control" value="@_RevertUserSteamId" disabled readonly />
+
+			<label for="revertSteamNameInput" class="col-form-label">User Steam Name:</label>
+			<input id="revertSteamNameInput" class="form-control" value="@_RevertUserSteamName" disabled readonly />
+
+			<label class="col-form-label">Reversal mode:</label>
+			<InputRadioGroup @bind-Value="_RevertAllUserContributions">
+				<div class="form-check">
+					<InputRadio Value="false" class="form-check-input" />
+					<label class="form-check-label">Revert since @(_RevertDateTime?.ToString("G")) UTC</label>
+				</div>
+				<div class="form-check">
+					<InputRadio Value="true" class="form-check-input" />
+					<label class="form-check-label">Revert all</label>
+				</div>
+			</InputRadioGroup>
+		</form>
+	</Body>
+	<Footer>
+		<button class="btn btn-primary" @onclick="RevertContributions">Revert</button>
+	</Footer>
+</Dialog>
+
+@code {
+
+	private long? _RevertUserSteamId;
+	private string? _RevertUserSteamName;
+	private DateTimeOffset? _RevertDateTime;
+	private bool _RevertAllUserContributions;
+
+	protected override string ModalId => "revertContributionsModal";
+
+	public event EventHandler<HttpResponseMessage>? ContributionsReverted;
+
+	public async ValueTask ShowAsync(ContributionDto contribution)
+	{
+		UserDto? user = contribution.User;
+		_RevertUserSteamId = user?.SteamId;
+		_RevertUserSteamName = user?.SteamName;
+		_RevertDateTime = contribution.ContributedOn;
+		StateHasChanged();
+
+		await ShowAsync();
+	}
+
+	public new ValueTask HideAsync()
+	{
+		return base.HideAsync();
+	}
+
+	private async Task RevertContributions()
+	{
+		if (_RevertUserSteamId == null)
+			return;
+
+		RevertContributionsParameters parameters = new RevertContributionsParameters
+		{
+			SteamId = _RevertUserSteamId.Value,
+			RevertStartDate = _RevertAllUserContributions ? null : _RevertDateTime,
+		};
+        HttpResponseMessage responseMessage = await LevelTagApi.RevertContributionsAsync(parameters);
+
+		await HideAsync();
+
+		ContributionsReverted?.Invoke(this, responseMessage);
+	}
+
+}

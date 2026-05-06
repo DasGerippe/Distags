@@ -3,11 +3,11 @@
     "Name": "API, WebApp",
     "Projects": [
       {
-        "Path": "LevelTagApi\\LevelTagApi.csproj",
+        "Path": "LevelTagApi\\Distags.Api.csproj",
         "Action": "Start"
       },
       {
-        "Path": "LevelTagWebApp\\LevelTagWebApp.csproj",
+        "Path": "LevelTagWebApp\\Distags.WebApp.csproj",
         "Action": "Start"
       }
     ]
@@ -16,7 +16,7 @@
     "Name": "API, AutoTagger (All)",
     "Projects": [
       {
-        "Path": "LevelTagApi\\LevelTagApi.csproj",
+        "Path": "LevelTagApi\\Distags.Api.csproj",
         "Action": "Start"
       },
       {

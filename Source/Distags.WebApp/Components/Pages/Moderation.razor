@@ -1,0 +1,34 @@
+﻿@page "/moderation"
+@rendermode InteractiveServer
+@using Distags.WebApp.Security
+@using LevelTagWebApp.Components.Contribution
+
+@inject IUserInfoProvider UserInfoProvider
+@inject NavigationManager NavigationManager
+
+<PageTitle>@Resource.PageTitle_Moderation</PageTitle>
+
+<div class="container-fluid content my-3">
+	<ContributionModerationList />
+</div>
+
+<InfoDialog/>
+<BanUserDialog />
+<RevertContributionsDialog />
+<RevertContributionsResultDialog />
+
+@code {
+
+	private UserDto? _User;
+
+	protected override async Task OnInitializedAsync()
+	{
+		_User = await UserInfoProvider.GetUserInfoAsync();
+        if (_User?.Roles.Contains("Moderator") != true)
+        {
+			NavigationManager.NotFound();
+            return;
+        }
+	}
+
+}

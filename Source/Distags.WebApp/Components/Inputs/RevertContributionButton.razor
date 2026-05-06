@@ -1,0 +1,28 @@
+﻿@using Distags.WebApp.Services
+@inject IDialogService DialogService
+
+<button class="btn" @onclick="OnRevertContributionClicked">
+    <svg class="flex-shrink-0" style="width:1.5rem; height:1.5rem; color:@GetIconColor();"><use href="icons.svg#rotate-left-solid" /></svg>
+</button>
+
+@code {
+
+    [Parameter]
+    public required ContributionDto Contribution { get; set; }
+
+    private string GetIconColor()
+    {
+        return Contribution.User != null ? "black" : "#AAA";
+    }
+
+    private async Task OnRevertContributionClicked()
+    {
+        if (Contribution.User == null)
+            return;
+
+        RevertContributionsDialog? revertContributionsDialog = DialogService.Get<RevertContributionsDialog>();
+        if (revertContributionsDialog != null)
+            await revertContributionsDialog.ShowAsync(Contribution);
+    }
+
+}

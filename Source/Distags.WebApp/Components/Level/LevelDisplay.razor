@@ -1,0 +1,14 @@
+﻿<div class="d-flex align-items-center">
+	<img class="rounded-1 shadow-sm" src="@Level.ImageUrl" alt="Image" style="max-height:45px;"/>
+	<div class="d-flex flex-column text-truncate ps-2">
+		<div class="text-truncate">@Level.Name</div>
+		<div class="text-truncate text-muted small fw-lighter">@Level.CreatorName</div>
+	</div>
+</div>
+
+@code {
+
+	[Parameter]
+	public required LevelDto Level { get; set; }
+
+}

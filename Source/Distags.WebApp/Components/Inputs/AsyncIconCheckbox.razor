@@ -1,0 +1,73 @@
+﻿@using Distags.WebApp.Services
+@typeparam TState
+
+<div class="custom-checkbox d-flex align-items-start gap-2"
+     @onclick="ReadOnly ? null : HandleClick">
+	
+	 @if (_IsInAsyncOperation)
+	 {
+		 <div class="spinner-grow text-secondary flex-shrink-0" style="width:1.5rem; height:1.5rem;" role="status">
+			 <span class="visually-hidden">Loading...</span>
+		 </div>
+	 }
+	 else
+	 {
+		 <svg class="icon-wrapper flex-shrink-0 @IconProvider.GetIconClass(State)">
+			 <use href="icons.svg#@(IconProvider.GetIconId(State))"/>
+		 </svg>
+	 }
+
+	<span class="form-check-label @GetLabelClass()"
+	      style="min-width: 0">
+		@Label
+	</span>
+
+</div>
+
+@code {
+
+	private bool _IsInAsyncOperation;
+
+	[Parameter]
+	public bool ReadOnly { get; set; }
+
+	[Parameter]
+	public string? Label { get; set; }
+
+	[Parameter]
+	public TState State { get; set; } = default!;
+
+	[Parameter]
+	public EventCallback<TState> StateChanged { get; set; }
+
+	[Parameter]
+	public required Func<TState, Task> AsyncOperation { get; set; }
+
+	[Parameter]
+	public required ICheckboxIconProvider<TState> IconProvider { get; set; }
+
+	private async Task HandleClick()
+	{
+		if (_IsInAsyncOperation)
+			return;
+
+		_IsInAsyncOperation = true;
+		StateHasChanged();
+
+		try
+		{
+			await AsyncOperation(State);
+		}
+		finally
+		{
+			_IsInAsyncOperation = false;
+			StateHasChanged();
+		}
+	}
+
+	private string GetLabelClass()
+	{
+		return ReadOnly ? "text-muted" : string.Empty;
+	}
+
+}

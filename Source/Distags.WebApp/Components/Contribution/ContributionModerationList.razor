@@ -1,0 +1,171 @@
+﻿@using Distags.Api.Contracts
+@using Distags.Api.Contracts.Contributions
+@using Distags.WebApp.Security
+@using Distags.WebApp.Services
+@using Microsoft.AspNetCore.Mvc
+@using Microsoft.AspNetCore.SignalR.Client
+@using Microsoft.Net.Http.Headers
+
+@inject ISessionTokenProvider SessionTokenProvider
+@inject LevelTagApiClient LevelTagApi
+@inject IDialogService DialogService
+
+<InfiniteScrollContainer OnScrolledToEnd="OnScrolledToEnd" class="d-flex flex-column gap-3 gap-md-2">
+	@foreach (ContributionDto contribution in Contributions)
+	{
+        <ContributionDisplay Contribution="contribution"
+                             ShowBanUserButton="true"
+                             ShowRevertContributionButton="true"
+                             @key="contribution.Id"/>
+	}
+</InfiniteScrollContainer>
+
+	@code {
+
+	private bool _IsLoadingNextBatch;
+	private string? _NextCursor;
+
+	private readonly List<ContributionDto> _LiveContributions = [];
+	private readonly List<ContributionDto> _CachedContributions = [];
+
+	private HubConnection? _ContributionsHubConnection;
+
+	private bool _Disposed;
+
+	private IEnumerable<ContributionDto> Contributions
+	{
+		get
+		{
+			for (int i = _LiveContributions.Count - 1; i >= 0; i--)
+			{
+				yield return _LiveContributions[i];
+			}
+
+			foreach (ContributionDto cachedContribution in _CachedContributions)
+			{
+				yield return cachedContribution;
+			}
+		}
+	}
+
+	protected override async Task OnAfterRenderAsync(bool firstRender)
+	{
+		if (firstRender)
+		{
+			await SetUpHubConnection();
+			await LoadNextContributionBatch();
+
+			BanUserDialog? banUserDialog = DialogService.Get<BanUserDialog>();
+			if (banUserDialog != null)
+				banUserDialog.UserBanPosted += OnUserBanPosted;
+
+			RevertContributionsDialog? revertContributionsDialog = DialogService.Get<RevertContributionsDialog>();
+			if (revertContributionsDialog != null)
+				revertContributionsDialog.ContributionsReverted += OnContributionsReverted;
+		}
+	}
+
+	private async void OnUserBanPosted(object? sender, HttpResponseMessage response)
+    {
+        try
+        {
+            if (response.IsSuccessStatusCode)
+                return;
+
+            InfoDialog? infoDialog = DialogService.Get<InfoDialog>();
+            if (infoDialog == null)
+                return;
+
+            ProblemDetails? problem = await response.Content.ReadFromJsonAsync<ProblemDetails>();
+            string message = problem?.Detail ?? "The user could not be banned.";
+            await infoDialog.ShowAsync("Could not ban user", message);
+        }
+        catch
+        {
+            // ignored
+        }
+    }
+
+    private async void OnContributionsReverted(object? sender, HttpResponseMessage responseMessage)
+	{
+		try
+		{
+			RevertContributionsResultDialog? revertContributionsResultDialog = DialogService.Get<RevertContributionsResultDialog>();
+			if (revertContributionsResultDialog != null)
+				await revertContributionsResultDialog.ShowAsync(responseMessage);
+		}
+		catch
+		{
+			// ignored
+		}
+	}
+
+	private async Task SetUpHubConnection()
+	{
+		_ContributionsHubConnection = new HubConnectionBuilder()
+			.WithUrl(LevelTagApi.ContributionHubEndpoint, options =>
+			{
+				options.Headers.Add(
+					HeaderNames.Authorization,
+					$"{LevelTagApiConstants.AuthorizationHeaderSchemes.SessionToken} {SessionTokenProvider.SessionToken}");
+			})
+			.WithAutomaticReconnect()
+			.Build();
+
+            _ContributionsHubConnection.On<ContributionDto>("NewContribution", ProcessNewContribution);
+
+		await _ContributionsHubConnection.StartAsync();
+	}
+
+	private async Task ProcessNewContribution(ContributionDto contribution)
+	{
+		await InvokeAsync(() =>
+		{
+			_LiveContributions.Add(contribution);
+			StateHasChanged();
+		});
+	}
+
+	private async Task LoadNextContributionBatch()
+	{
+		if (_IsLoadingNextBatch)
+			return;
+
+		_IsLoadingNextBatch = true;
+		await InvokeAsync(StateHasChanged);
+
+		GetContributionsParameters parameters = new GetContributionsParameters
+		{
+			Limit = 100,
+			Cursor = _NextCursor,
+		};
+		GetContributionsResponse response = await LevelTagApi.GetContributionsAsync(parameters);
+
+		_CachedContributions.AddRange(response.Contributions);
+		_NextCursor = response.NextCursor;
+
+		_IsLoadingNextBatch = false;
+		await InvokeAsync(StateHasChanged);
+	}
+
+	private async Task OnScrolledToEnd()
+	{
+		if (_NextCursor != null)
+			await LoadNextContributionBatch();
+	}
+
+	public async ValueTask DisposeAsync()
+	{
+		if (_Disposed)
+			return;
+
+		if (_ContributionsHubConnection != null)
+		{
+			await _ContributionsHubConnection.DisposeAsync();
+			_ContributionsHubConnection = null;
+		}
+
+		_Disposed = true;
+	}
+	
+}
