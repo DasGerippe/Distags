@@ -15,6 +15,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\DataClasses\DataClasses.csproj" />
+    <ProjectReference Include="..\Distags.Contracts\Distags.Contracts.csproj" />
   </ItemGroup>
 
 </Project>

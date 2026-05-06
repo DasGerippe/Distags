@@ -1,4 +1,4 @@
-﻿using Distags.Core.Dtos;
+﻿using Distags.Contracts;
 
 namespace Distags.Core.Queries.LevelById;
 

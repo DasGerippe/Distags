@@ -1,6 +1,6 @@
-﻿using Distags.Core.Commands;
+﻿using Distags.Contracts;
+using Distags.Core.Commands;
 using Distags.Core.Commands.UpdateUserSessionLastSeen;
-using Distags.Core.Dtos;
 using Distags.Core.Queries;
 using Distags.Core.Queries.UserBySessionToken;
 using LevelTagApi.Dtos;

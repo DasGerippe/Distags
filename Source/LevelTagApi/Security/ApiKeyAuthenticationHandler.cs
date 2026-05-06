@@ -1,4 +1,4 @@
-﻿using Distags.Core.Dtos;
+﻿using Distags.Contracts;
 using Distags.Core.Queries;
 using Distags.Core.Queries.AppByApiKey;
 using LevelTagApi.Dtos;

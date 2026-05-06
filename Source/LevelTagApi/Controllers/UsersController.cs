@@ -1,6 +1,6 @@
-﻿using Distags.Core.Commands;
+﻿using Distags.Contracts;
+using Distags.Core.Commands;
 using Distags.Core.Commands.UpdateUserSettings;
-using Distags.Core.Dtos;
 using Distags.Core.Exceptions;
 using Distags.Core.Queries;
 using Distags.Core.Queries.UserBySteamId;
@@ -8,7 +8,7 @@ using LevelTagApi.Dtos.Users;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
-using UserDto = Distags.Core.Dtos.UserDto;
+using UserDto = Distags.Contracts.UserDto;
 
 namespace LevelTagApi.Controllers;
 

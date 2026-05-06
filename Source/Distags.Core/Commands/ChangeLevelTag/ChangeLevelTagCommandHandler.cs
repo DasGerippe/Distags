@@ -1,5 +1,5 @@
 ﻿using DataClasses;
-using Distags.Core.Dtos;
+using Distags.Contracts;
 using Distags.Core.Events;
 using Distags.Core.Exceptions;
 using Distags.Core.Interfaces;

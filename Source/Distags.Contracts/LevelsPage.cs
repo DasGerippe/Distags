@@ -1,6 +1,4 @@
-﻿using Distags.Core.Dtos;
-
-namespace Distags.Core.Queries.BrowseLevels;
+﻿namespace Distags.Contracts;
 
 public class LevelsPage
 {

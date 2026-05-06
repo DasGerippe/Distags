@@ -8,7 +8,7 @@ using Distags.Core.Queries.Apps;
 using LevelTagApi.Dtos.Apps;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using AppDto = Distags.Core.Dtos.AppDto;
+using AppDto = Distags.Contracts.AppDto;
 
 namespace LevelTagApi.Controllers;
 

@@ -1,4 +1,4 @@
-﻿using Distags.Core.Dtos;
+﻿using Distags.Contracts;
 using Distags.Core.Events;
 using Distags.Core.Queries;
 using Distags.Core.Queries.ContributionById;

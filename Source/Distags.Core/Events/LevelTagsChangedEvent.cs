@@ -1,4 +1,4 @@
-﻿using Distags.Core.Dtos;
+﻿using Distags.Contracts;
 using System.Collections.ObjectModel;
 
 namespace Distags.Core.Events;

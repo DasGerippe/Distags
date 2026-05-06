@@ -1,6 +1,6 @@
-﻿using Distags.Core.Commands;
+﻿using Distags.Contracts;
+using Distags.Core.Commands;
 using Distags.Core.Commands.ChangeLevelTag;
-using Distags.Core.Dtos;
 using Distags.Core.Exceptions;
 using Distags.Core.Filtering.Levels;
 using Distags.Core.Queries;
@@ -12,7 +12,7 @@ using LevelTagApi.Security;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
-using LevelDto = Distags.Core.Dtos.LevelDto;
+using LevelDto = Distags.Contracts.LevelDto;
 using LevelSortStrategy = Distags.Core.Sorting.Levels.LevelSortStrategy;
 
 namespace LevelTagApi.Controllers;

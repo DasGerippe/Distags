@@ -1,6 +1,4 @@
-﻿using Distags.Core.Dtos;
-
-namespace Distags.Core.Queries.Contributions;
+﻿namespace Distags.Contracts;
 
 public class ContributionsPage
 {

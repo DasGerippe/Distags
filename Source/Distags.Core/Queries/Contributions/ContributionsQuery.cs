@@ -1,4 +1,6 @@
-﻿namespace Distags.Core.Queries.Contributions;
+﻿using Distags.Contracts;
+
+namespace Distags.Core.Queries.Contributions;
 
 public class ContributionsQuery : IQuery<ContributionsPage>
 {

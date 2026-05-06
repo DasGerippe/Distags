@@ -1,6 +1,6 @@
-﻿using System.Linq.Expressions;
-using DataClasses;
-using Distags.Core.Dtos;
+﻿using DataClasses;
+using Distags.Contracts;
+using System.Linq.Expressions;
 
 namespace Distags.Core.Mapping;
 

@@ -9,7 +9,7 @@ using LevelTagApi.Dtos.UserBans;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
-using UserBanDto = Distags.Core.Dtos.UserBanDto;
+using UserBanDto = Distags.Contracts.UserBanDto;
 
 namespace LevelTagApi.Controllers;
 

@@ -1,4 +1,5 @@
-﻿using Distags.Core.Filtering.Levels;
+﻿using Distags.Contracts;
+using Distags.Core.Filtering.Levels;
 using Distags.Core.Sorting.Levels;
 
 namespace Distags.Core.Queries.BrowseLevels;

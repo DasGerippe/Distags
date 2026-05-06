@@ -1,4 +1,4 @@
-﻿namespace Distags.Core.Dtos;
+﻿namespace Distags.Contracts;
 
 public class ContributionChangeDto
 {

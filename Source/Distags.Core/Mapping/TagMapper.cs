@@ -1,5 +1,5 @@
 ﻿using DataClasses;
-using Distags.Core.Dtos;
+using Distags.Contracts;
 using System.Linq.Expressions;
 
 namespace Distags.Core.Mapping;
