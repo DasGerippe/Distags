@@ -19,7 +19,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SteamWebApi", "SteamWebApi\
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SteamWebApi.Contract", "SteamWebApi.Contract\SteamWebApi.Contract.csproj", "{6382018F-4239-46F1-846F-9978B38C4578}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Distags.Persistence.Migrations.Dev", "Distags.Persistence.Migrations.Dev\Distags.Persistence.Migrations.Dev.csproj", "{E88531ED-E6CA-456D-9690-801A5824534E}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Distags.Persistence.Dev", "Distags.Persistence.Dev\Distags.Persistence.Dev.csproj", "{E88531ED-E6CA-456D-9690-801A5824534E}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Distags.Persistence.Migrator", "Distags.Persistence.Migrator\Distags.Persistence.Migrator.csproj", "{46FBA830-44A9-4075-AE4E-794D9D4D502E}"
 EndProject

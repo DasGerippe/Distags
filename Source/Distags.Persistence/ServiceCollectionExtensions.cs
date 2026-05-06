@@ -11,9 +11,14 @@ namespace Distags.Persistence;
 
 public static class ServiceCollectionExtensions
 {
-    public static IServiceCollection AddDistagsPersistence(this IServiceCollection serviceCollection, string dbConnectionString)
+    public static IServiceCollection AddDistagsPersistence(
+        this IServiceCollection serviceCollection,
+        string dbConnectionString,
+        Action<IServiceProvider, DbContextOptionsBuilder>? optionsAction = null,
+        Action<NpgsqlDbContextOptionsBuilder>? npgsqlOptionsAction = null)
     {
-        serviceCollection.AddDbContext<Core.DistagsDbContext, DistagsDbContext>(ConfigureOptions(dbConnectionString));
+        serviceCollection.AddDbContext<Core.DistagsDbContext, DistagsDbContext>(
+            ConfigureOptions(dbConnectionString, optionsAction, npgsqlOptionsAction));
 
         serviceCollection.AddTransient<ISequentialLevelActionExecutor, SequentialLevelActionExecutor>();
 

@@ -17,7 +17,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Distags.Persistence.Migrations.Dev\Distags.Persistence.Migrations.Dev.csproj" />
+    <ProjectReference Include="..\Distags.Persistence.Dev\Distags.Persistence.Dev.csproj" />
   </ItemGroup>
 
   <ItemGroup>

@@ -1,5 +1,4 @@
-﻿using DataStoring;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -23,19 +22,19 @@ internal class Program
 
         builder.ConfigureServices((context, services) =>
         {
-            string connectionString = context.Configuration.GetConnectionString("LevelTagsDatabase")
+            string connectionString = context.Configuration.GetConnectionString("DistagsDatabase")
                                       ?? throw new Exception("Connection string missing.");
-            services.AddNpgsqlLevelTagDbContext(
+            services.AddDistagsPersistence(
                 connectionString,
-                npgsqlOptionsAction: npgsqlOptions => npgsqlOptions.MigrationsAssembly(nameof(DataStoringMigrations)));
+                npgsqlOptionsAction: npgsqlOptions => npgsqlOptions
+                    .MigrationsAssembly($"{nameof(Distags)}.{nameof(Persistence)}.{nameof(Dev)}"));
         });
-
         IHost host = builder.Build();
 
         AsyncServiceScope scope = host.Services.CreateAsyncScope();
         await using ConfiguredAsyncDisposable awaitedScope = scope.ConfigureAwait(false);
 
-        LevelTagDbContext dbContext = scope.ServiceProvider.GetRequiredService<LevelTagDbContext>();
+        DistagsDbContext dbContext = scope.ServiceProvider.GetRequiredService<DistagsDbContext>();
 
         Console.WriteLine("Applying EF Core migrations...");
         await dbContext.Database.MigrateAsync();
