@@ -23,6 +23,12 @@ public class LevelFilterFactory : IQueryableFilterFactory<Level, LevelFilterPara
             levelFilterGroup.AddFilter(
                 _StringContainsFilterFactory.CreateFilter<Level>(level => level.Creator!.Name, filterParams.CreatorFilter));
 
+        if (filterParams.CreatedAfter != null)
+            levelFilterGroup.AddFilter(new SimpleFilter<Level>(level => level.CreatedOn >= filterParams.CreatedAfter));
+
+        if (filterParams.UpdatedAfter != null)
+            levelFilterGroup.AddFilter(new SimpleFilter<Level>(level => level.UpdatedOn >= filterParams.UpdatedAfter));
+
         if (filterParams.IncludeTags.Count > 0)
             levelFilterGroup.AddFilter(new LevelIncludeTagsFilter(filterParams.IncludeTags));
 
