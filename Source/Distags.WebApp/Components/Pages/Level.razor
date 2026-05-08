@@ -116,10 +116,10 @@
 	protected override async Task OnAfterRenderAsync(bool firstRender)
 	{
 		if (firstRender)
-            await SetUpLevelHubConnection();
+			await SetUpLevelHubConnection();
 	}
 
-    private void InitializeTagStates()
+	private void InitializeTagStates()
 	{
 		if (_LevelDto == null || _TagTree == null)
 			return;
@@ -140,17 +140,15 @@
 			.WithAutomaticReconnect()
 			.Build();
 
-		_LevelHubConnection.On<string>("TagAdded", tagName =>
+		_LevelHubConnection.On<IReadOnlyCollection<TagChangeDto>>("TagsChanged", tagChanges =>
 		{
-			_TagStates[tagName].State = true;
-			InvokeAsync(StateHasChanged);
-		});
-
-		_LevelHubConnection.On<string>("TagRemoved", tagName =>
-		{
-			_TagStates[tagName].State = false;
-			InvokeAsync(StateHasChanged);
-		});
+			foreach (TagChangeDto change in tagChanges)
+			{
+				bool state = change.Action == TagChangeAction.Add;
+                _TagStates[change.TagName].State = state;
+            }
+            InvokeAsync(StateHasChanged);
+        });
 
 		await _LevelHubConnection.StartAsync();
 		await _LevelHubConnection.InvokeAsync("JoinLevelGroup", LevelId);
