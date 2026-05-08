@@ -1,4 +1,5 @@
 ﻿using Distags.Core.Entities;
+using Distags.Persistence.Entities;
 using Microsoft.EntityFrameworkCore;
 
 namespace Distags.Persistence;

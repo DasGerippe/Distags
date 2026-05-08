@@ -202,18 +202,6 @@ namespace Distags.Persistence.Dev
                     b.ToTable("levels", (string)null);
                 });
 
-            modelBuilder.Entity("Distags.Core.Entities.LevelLock", b =>
-                {
-                    b.Property<long>("LevelId")
-                        .HasColumnType("bigint")
-                        .HasColumnName("level_id");
-
-                    b.HasKey("LevelId")
-                        .HasName("pk_level_locks");
-
-                    b.ToTable("level_locks", (string)null);
-                });
-
             modelBuilder.Entity("Distags.Core.Entities.LevelTag", b =>
                 {
                     b.Property<long>("LevelId")
@@ -427,6 +415,18 @@ namespace Distags.Persistence.Dev
                         .HasDatabaseName("ix_user_sessions_user_id");
 
                     b.ToTable("user_sessions", (string)null);
+                });
+
+            modelBuilder.Entity("Distags.Persistence.Entities.LevelLock", b =>
+                {
+                    b.Property<long>("LevelId")
+                        .HasColumnType("bigint")
+                        .HasColumnName("level_id");
+
+                    b.HasKey("LevelId")
+                        .HasName("pk_level_locks");
+
+                    b.ToTable("level_locks", (string)null);
                 });
 
             modelBuilder.Entity("Distags.Core.Entities.Contribution", b =>
