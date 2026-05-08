@@ -1,4 +1,6 @@
-﻿<div class="d-flex column-gap-2 align-items-center overflow-hidden">
+﻿@using Distags.Contracts
+
+<div class="d-flex column-gap-2 align-items-center overflow-hidden">
     @if (User is { IsAnonymous: false, SteamAvatarHash: not null })
     {
         <img class="rounded-5" src="https://avatars.steamstatic.com/@(User.SteamAvatarHash).jpg" alt="Contributor Avatar" />
@@ -18,10 +20,10 @@
 @code {
 
     [Parameter]
-    public required UserDto? User { get; set; }
+    public required ContributionUserDto? User { get; set; }
 
     [Parameter]
-    public required AppDto? App { get; set; }
+    public required ContributionAppDto? App { get; set; }
 
     [Parameter]
     public bool ShowSteamId { get; set; }

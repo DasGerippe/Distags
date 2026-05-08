@@ -1,9 +1,11 @@
-﻿@using LevelTagWebApp.Components.Level
+﻿@using Distags.Contracts
+@using Distags.WebApp.Components.Inputs
+@using Distags.WebApp.Components.Level
 
 <div class="row align-items-center border border-1 rounded-3 shadow mx-0 py-2 row-gap-2 @GetContainerClass()">
     <!-- Level -->
     <div class="col-12 col-sm-7 col-md-4">
-        <LevelDisplay Level="Contribution.Level!" />
+        <LevelDisplay Level="Contribution.Level" />
     </div>
 
     <!-- Changes -->
@@ -44,7 +46,7 @@
     private string GetContainerClass()
     {
         if (Contribution.Changes.Count == 1)
-            return Contribution.Changes[0].Action == TagAction.Add
+            return Contribution.Changes[0].Action == TagChangeAction.Add
                 ? "bg-success-subtle border-success-subtle"
                 : "bg-danger-subtle border-danger-subtle";
         else

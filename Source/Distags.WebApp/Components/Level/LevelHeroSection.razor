@@ -1,9 +1,11 @@
-﻿<div class="hero shadow py-3">
-	<div class="hero-background" style="background-image: url('@Level.IconUrl');"></div>
+﻿@using Distags.Contracts
+
+<div class="hero shadow py-3">
+	<div class="hero-background" style="background-image: url('@Level.ImageUrl');"></div>
 	<div class="container-fluid content-wide">
 		<div class="d-flex flex-column align-items-center">
 
-			<img src="@Level.IconUrl"
+			<img src="@Level.ImageUrl"
 			     alt="Level Preview Image"
 			     class="img-fluid w-100 rounded-4 shadow mb-3"
 			     style="max-width:480px;"/>

@@ -1,3 +1,4 @@
+using Distags.WebApp.Components;
 using Distags.WebApp.Security;
 using Distags.WebApp.Services;
 using Microsoft.AspNetCore.Components.Server.Circuits;
@@ -11,7 +12,7 @@ public class Program
     public static void Main(string[] args)
     {
         Log.Logger = new LoggerConfiguration()
-            .ConfigureConsoleAndFileSinks(nameof(LevelTagWebApp))
+            .ConfigureConsoleAndFileSinks($"{nameof(Distags)}.{nameof(WebApp)}")
             .CreateBootstrapLogger();
 
         try
@@ -20,15 +21,15 @@ public class Program
 
             builder.Services.AddSerilog(loggerConfig => loggerConfig
                 .ReadFrom.Configuration(builder.Configuration)
-                .ConfigureConsoleAndFileSinks(nameof(LevelTagWebApp)));
+                .ConfigureConsoleAndFileSinks($"{nameof(Distags)}.{nameof(WebApp)}"));
 
             // Add services to the container.
             builder.Services.AddRazorComponents()
                 .AddInteractiveServerComponents();
 
-            builder.Services.AddHttpClient<LevelTagApiClient>(httpClient =>
+            builder.Services.AddHttpClient<DistagsApiClient>(httpClient =>
             {
-                string levelTagApiUri = builder.Configuration[$"{nameof(LevelTagWebApp)}:LevelTagApiUri"]!;
+                string levelTagApiUri = builder.Configuration["DistagsWebApp:DistagsApiUri"]!;
                 httpClient.BaseAddress = new Uri(levelTagApiUri);
             });
 

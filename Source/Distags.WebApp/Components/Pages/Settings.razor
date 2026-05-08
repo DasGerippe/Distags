@@ -1,12 +1,14 @@
 ﻿@page "/settings"
-@using Distags.Api.Contracts.Guidelines
-@using Distags.Api.Contracts.Users
-@using Distags.WebApp.Security
-@using Distags.WebApp.Services
 @rendermode InteractiveServer
 
+@using Distags.Api.Contracts.Guidelines
+@using Distags.Api.Contracts.Users
+@using Distags.Contracts
+@using Distags.WebApp.Security
+@using Distags.WebApp.Services
+
 @inject IUserInfoProvider UserInfoProvider
-@inject LevelTagApiClient LevelTagApi
+@inject DistagsApiClient LevelTagApi
 
 <PageTitle>@Resource.PageTitle_Settings</PageTitle>
 

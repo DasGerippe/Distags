@@ -1,17 +1,18 @@
-﻿using Distags.WebApp.Services;
+﻿using Distags.Contracts;
+using Distags.WebApp.Services;
 using System.Net;
 
 namespace Distags.WebApp.Security;
 
 public class CachedUserInfoProvider : IUserInfoProvider
 {
-    private readonly LevelTagApiClient _LevelTagApi;
+    private readonly DistagsApiClient _LevelTagApi;
     private readonly ILogger<CachedUserInfoProvider> _Logger;
 
     private bool _IsInitialized;
     private UserDto? _CachedUser;
 
-    public CachedUserInfoProvider(LevelTagApiClient levelTagApi, ILogger<CachedUserInfoProvider> logger)
+    public CachedUserInfoProvider(DistagsApiClient levelTagApi, ILogger<CachedUserInfoProvider> logger)
     {
         _LevelTagApi = levelTagApi;
         _Logger = logger;

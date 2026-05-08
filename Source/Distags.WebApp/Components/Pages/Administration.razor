@@ -1,12 +1,14 @@
 ﻿@page "/admin"
+@rendermode InteractiveServer
+
 @using Distags.Api.Contracts.Configuration
+@using Distags.Contracts
 @using Distags.WebApp.Security
 @using Distags.WebApp.Services
-@rendermode InteractiveServer
 
 @inject IUserInfoProvider UserInfoProvider
 @inject NavigationManager NavigationManager
-@inject LevelTagApiClient LevelTagApi
+@inject DistagsApiClient LevelTagApi
 
 <PageTitle>@Resource.PageTitle_Administration</PageTitle>
 

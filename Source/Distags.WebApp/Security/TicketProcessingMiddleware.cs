@@ -16,7 +16,7 @@ public class TicketProcessingMiddleware
         _Logger = logger;
     }
 
-    public async Task InvokeAsync(HttpContext httpContext, LevelTagApiClient levelTagApi)
+    public async Task InvokeAsync(HttpContext httpContext, DistagsApiClient levelTagApi)
     {
         if (!httpContext.Request.Query.TryGetValue(DistagsApiConstants.TicketQueryParameterName, out StringValues ticketValue))
         {

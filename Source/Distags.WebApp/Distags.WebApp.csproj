@@ -13,6 +13,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Distags.Api.Contracts\Distags.Api.Contracts.csproj" />
+    <ProjectReference Include="..\Distags.Contracts\Distags.Contracts.csproj" />
     <ProjectReference Include="..\HttpUtils\HttpUtils.csproj" />
     <ProjectReference Include="..\SerilogUtils\SerilogUtils.csproj" />
   </ItemGroup>

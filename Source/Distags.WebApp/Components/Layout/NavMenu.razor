@@ -1,11 +1,12 @@
-﻿@using Distags.WebApp.Security
+﻿@using Distags.Contracts
+@using Distags.WebApp.Security
 @using Distags.WebApp.Services
 @using Microsoft.AspNetCore.WebUtilities
 
 @rendermode InteractiveServer
 
 @inject NavigationManager NavigationManager
-@inject LevelTagApiClient LevelTagApi
+@inject DistagsApiClient LevelTagApi
 @inject IUserInfoProvider UserInfoProvider
 
 <nav class="navbar navbar-expand-md shadow">

@@ -1,5 +1,7 @@
 ﻿@using Distags.Api.Contracts
 @using Distags.Api.Contracts.Contributions
+@using Distags.Contracts
+@using Distags.WebApp.Components.Dialogs
 @using Distags.WebApp.Security
 @using Distags.WebApp.Services
 @using Microsoft.AspNetCore.Mvc
@@ -7,7 +9,7 @@
 @using Microsoft.Net.Http.Headers
 
 @inject ISessionTokenProvider SessionTokenProvider
-@inject LevelTagApiClient LevelTagApi
+@inject DistagsApiClient LevelTagApi
 @inject IDialogService DialogService
 
 <InfiniteScrollContainer OnScrolledToEnd="OnScrolledToEnd" class="d-flex flex-column gap-3 gap-md-2">
@@ -139,10 +141,10 @@
 			Limit = 100,
 			Cursor = _NextCursor,
 		};
-		GetContributionsResponse response = await LevelTagApi.GetContributionsAsync(parameters);
+		ContributionsPage contributionsPage = await LevelTagApi.GetContributionsAsync(parameters);
 
-		_CachedContributions.AddRange(response.Contributions);
-		_NextCursor = response.NextCursor;
+		_CachedContributions.AddRange(contributionsPage.Contributions);
+		_NextCursor = contributionsPage.NextCursor;
 
 		_IsLoadingNextBatch = false;
 		await InvokeAsync(StateHasChanged);

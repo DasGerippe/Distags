@@ -1,4 +1,5 @@
-﻿@using System.Linq
+﻿@using Distags.Contracts
+@using System.Linq
 
 <div class="table-responsive">
 	<table class="table table-striped table-hover align-middle">
@@ -14,10 +15,10 @@
 			</tr>
 		</thead>
 		<tbody>
-			@foreach (LevelDto level in PagedItems)
+			@foreach (LevelDto level in Levels)
 			{
 				<tr @key="level.Id">
-					<td style="text-align:center;"><img src="@level.IconUrl" alt="Icon" style="max-height:40px;" /></td>
+					<td style="text-align:center;"><img src="@level.ImageUrl" alt="Icon" style="max-height:40px;" /></td>
 					<td>@level.Name</td>
 					<td>@level.CreatorName</td>
 					<td style="text-align:center;">@level.CreatedOn.ToString("d")</td>

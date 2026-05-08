@@ -5,7 +5,7 @@ public class ContributionDto
 
     public required long Id { get; set; }
 
-    public required ContributionLevelDto? Level { get; set; }
+    public required ContributionLevelDto Level { get; set; }
 
     public required List<TagChangeDto> Changes { get; set; }
 

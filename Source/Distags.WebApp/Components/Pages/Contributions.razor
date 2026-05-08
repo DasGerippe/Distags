@@ -1,18 +1,20 @@
 ﻿@page "/contributions"
 @rendermode InteractiveServer
+
 @using Distags.Api.Contracts
 @using Distags.Api.Contracts.Contributions
+@using Distags.Contracts
 @using Distags.WebApp.Collections
+@using Distags.WebApp.Components.Contribution
 @using Distags.WebApp.Security
 @using Distags.WebApp.Services
-@using LevelTagWebApp.Components.Contribution
 @using Microsoft.AspNetCore.SignalR.Client
 @using Microsoft.Net.Http.Headers
 
 @implements IAsyncDisposable
 
 @inject ISessionTokenProvider SessionTokenProvider
-@inject LevelTagApiClient LevelTagApi
+@inject DistagsApiClient LevelTagApi
 
 @if (!_IsInitialized)
 	return;
@@ -63,11 +65,11 @@
 		{
 			Limit = 100,
 		};
-		GetContributionsResponse response = await LevelTagApi.GetContributionsAsync(parameters);
-		int startIndex = Math.Min(_Contributions.Capacity, response.Contributions.Count) - 1;
+		ContributionsPage contributionsPage = await LevelTagApi.GetContributionsAsync(parameters);
+		int startIndex = Math.Min(_Contributions.Capacity, contributionsPage.Contributions.Count) - 1;
 		for (int i = startIndex; i >= 0; i--)
 		{
-			ContributionDto contribution = response.Contributions[i];
+			ContributionDto contribution = contributionsPage.Contributions[i];
 			_Contributions.Push(new ContributionInfo(contribution));
 		}
 	}

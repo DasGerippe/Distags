@@ -1,4 +1,6 @@
-﻿namespace Distags.WebApp.Security;
+﻿using Distags.Contracts;
+
+namespace Distags.WebApp.Security;
 
 public interface IUserInfoProvider
 {

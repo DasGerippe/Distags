@@ -1,11 +1,12 @@
 ﻿@page "/browse"
 @rendermode InteractiveServer
+
 @using Distags.Api.Contracts.Levels
+@using Distags.Contracts
+@using Distags.WebApp.Components.Filters
 @using Distags.WebApp.Components.Inputs
 @using Distags.WebApp.Models
 @using Distags.WebApp.Services
-@using LevelTagApi.Dtos.Tags
-@using LevelTagWebApp.Components.Filters
 @using Microsoft.AspNetCore.WebUtilities
 @using Microsoft.Extensions.Localization
 @using Microsoft.Extensions.Primitives
@@ -13,7 +14,7 @@
 @inject IStringLocalizer<Resource> Localizer
 @inject HistoryManager History
 @inject NavigationManager Navigation
-@inject LevelTagApiClient LevelTagApi
+@inject DistagsApiClient LevelTagApi
 
 <PageTitle>@Resource.PageTitle_BrowseLevels</PageTitle>
 
@@ -210,10 +211,10 @@
 			PageNumber = page,
 			SortStrategy = SortStrategy,
 		};
-		BrowseLevelsResponse levelsResponse = await LevelTagApi.BrowseLevelsAsync(parameters);
+		LevelsPage levelsPage = await LevelTagApi.BrowseLevelsAsync(parameters);
 		Page = page;
-		_PageCount = (int)Math.Ceiling((double)levelsResponse.TotalLevels / PageSize);
-		_Levels = levelsResponse.Levels;
+		_PageCount = (int)Math.Ceiling((double)levelsPage.TotalLevels / PageSize);
+		_Levels = levelsPage.Levels;
 	}
 
 	private string? GetFilterTermOrNullIfEmpty(string filterTerm)

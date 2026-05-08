@@ -1,7 +1,9 @@
-﻿<div class="d-flex align-items-center column-gap-2 overflow-hidden">
+﻿@using Distags.Contracts
+
+<div class="d-flex align-items-center column-gap-2 overflow-hidden">
     <svg class="flex-shrink-0" style="width:1.5rem; height:1.5rem;"><use href="icons.svg#tag-solid" /></svg>
     <div class="d-flex flex-column overflow-hidden">
-        @foreach (ChangeDto tagChange in Changes)
+        @foreach (TagChangeDto tagChange in Changes)
         {
             <div class="d-flex column-gap-1 overflow-hidden">
                 <svg class="flex-shrink-0" style="width:1.5rem; height:1.5rem;">
@@ -16,14 +18,14 @@
 @code {
     
     [Parameter]
-    public required List<ChangeDto> Changes { get; set; }
+    public required List<TagChangeDto> Changes { get; set; }
 
-    private string GetActionIconId(TagAction action)
+    private string GetActionIconId(TagChangeAction action)
     {
         return action switch
         {
-            TagAction.Add => "plus-solid",
-            TagAction.Remove => "minus-solid",
+            TagChangeAction.Add => "plus-solid",
+            TagChangeAction.Remove => "minus-solid",
             _ => throw new ArgumentOutOfRangeException(nameof(action), action, null),
         };
     }

@@ -15,7 +15,7 @@ public class LogoutProcessingMiddleware
         _Logger = logger;
     }
 
-    public async Task InvokeAsync(HttpContext httpContext, LevelTagApiClient levelTagApi)
+    public async Task InvokeAsync(HttpContext httpContext, DistagsApiClient levelTagApi)
     {
         if (!httpContext.Request.Query.TryGetValue(Constants.LogoutQueryParameterName, out StringValues logoutValue))
         {
@@ -44,7 +44,7 @@ public class LogoutProcessingMiddleware
         httpContext.Response.Redirect(redirectUrl);
     }
 
-    private Task PerformLogout(LevelTagApiClient levelTagApi, string logoutValue)
+    private Task PerformLogout(DistagsApiClient levelTagApi, string logoutValue)
     {
         return logoutValue switch
         {

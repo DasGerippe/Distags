@@ -6,17 +6,16 @@ using Distags.Api.Contracts.Guidelines;
 using Distags.Api.Contracts.Levels;
 using Distags.Api.Contracts.UserBans;
 using Distags.Api.Contracts.Users;
+using Distags.Contracts;
 using Distags.WebApp.Security;
 using HttpUtils;
 using System.Net.Http.Headers;
 using System.Text.Json;
 using System.Text.Json.Serialization;
-using LevelDto = LevelTagApi.Dtos.Levels.LevelDto;
-using UserDto = LevelTagApi.Dtos.Users.UserDto;
 
 namespace Distags.WebApp.Services;
 
-public class LevelTagApiClient : IDisposable
+public class DistagsApiClient : IDisposable
 {
     private readonly HttpClient _HttpClient;
     private readonly JsonSerializerOptions _JsonOptions;
@@ -26,7 +25,7 @@ public class LevelTagApiClient : IDisposable
 
     public Uri ContributionHubEndpoint { get; }
 
-    public LevelTagApiClient(HttpClient httpClient, ISessionTokenProvider sessionTokenProvider)
+    public DistagsApiClient(HttpClient httpClient, ISessionTokenProvider sessionTokenProvider)
     {
         _HttpClient = httpClient;
         _SessionTokenProvider = sessionTokenProvider;
@@ -70,14 +69,14 @@ public class LevelTagApiClient : IDisposable
         return tagTree;
     }
 
-    public async Task<BrowseLevelsResponse> BrowseLevelsAsync(
+    public async Task<LevelsPage> BrowseLevelsAsync(
         BrowseLevelsParameters parameters, CancellationToken cancellationToken = default)
     {
         string query = QueryBuilder.BuildQueryString(parameters);
         string requestUri = $"levels?{query}";
 
         HttpResponseMessage responseMessage = await _HttpClient.GetAsync(requestUri, cancellationToken).ConfigureAwait(false);
-        BrowseLevelsResponse levelsResponse = await GetContentAsync<BrowseLevelsResponse>(responseMessage, cancellationToken).ConfigureAwait(false);
+        LevelsPage levelsResponse = await GetContentAsync<LevelsPage>(responseMessage, cancellationToken).ConfigureAwait(false);
         return levelsResponse;
     }
 
@@ -160,15 +159,14 @@ public class LevelTagApiClient : IDisposable
         responseMessage.EnsureSuccessStatusCode();
     }
 
-    public async Task<GetContributionsResponse> GetContributionsAsync(
+    public async Task<ContributionsPage> GetContributionsAsync(
         GetContributionsParameters parameters, CancellationToken cancellationToken = default)
     {
         string query = QueryBuilder.BuildQueryString(parameters);
         string requestUri = $"contributions?{query}";
 
         HttpResponseMessage responseMessage = await _HttpClient.GetAsync(requestUri, cancellationToken).ConfigureAwait(false);
-        GetContributionsResponse response =
-            await GetContentAsync<GetContributionsResponse>(responseMessage, cancellationToken).ConfigureAwait(false);
+        ContributionsPage response = await GetContentAsync<ContributionsPage>(responseMessage, cancellationToken).ConfigureAwait(false);
         return response;
     }
 
@@ -191,7 +189,7 @@ public class LevelTagApiClient : IDisposable
 
     public async Task<GuidelinesDto> GetContributionGuidelinesAsync(CancellationToken cancellationToken = default)
     {
-        string requestUri = "guidelines/contribution";
+        string requestUri = "guidelines";
         HttpResponseMessage responseMessage = await _HttpClient.GetAsync(requestUri, cancellationToken).ConfigureAwait(false);
         GuidelinesDto response = await GetContentAsync<GuidelinesDto>(responseMessage, cancellationToken).ConfigureAwait(false);
         return response;

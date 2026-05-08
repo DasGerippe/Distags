@@ -1,8 +1,10 @@
 ﻿@using Distags.Api.Contracts.Contributions
+@using Distags.Contracts
 @using Distags.WebApp.Services
+
 @inherits DialogBase
 
-@inject LevelTagApiClient LevelTagApi
+@inject DistagsApiClient LevelTagApi
 
 <Dialog Id="@ModalId">
 	<Header>
@@ -48,7 +50,7 @@
 
 	public async ValueTask ShowAsync(ContributionDto contribution)
 	{
-		UserDto? user = contribution.User;
+		ContributionUserDto? user = contribution.User;
 		_RevertUserSteamId = user?.SteamId;
 		_RevertUserSteamName = user?.SteamName;
 		_RevertDateTime = contribution.ContributedOn;

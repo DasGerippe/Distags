@@ -1,15 +1,17 @@
 ﻿@page "/level/{levelId:long}"
 @rendermode InteractiveServer
+
+@using Distags.Contracts
+@using Distags.WebApp.Components.Inputs
+@using Distags.WebApp.Components.Level
 @using Distags.WebApp.Security
 @using Distags.WebApp.Services
-@using LevelTagApi.Dtos.Tags
-@using LevelTagWebApp.Components.Level
 @using Microsoft.AspNetCore.SignalR.Client
 @using System.Net
 
 @implements IAsyncDisposable
 
-@inject LevelTagApiClient LevelTagApi
+@inject DistagsApiClient LevelTagApi
 @inject IUserInfoProvider UserInfoProvider
 
 @if (_IsLoadingData)
@@ -151,7 +153,7 @@
 		});
 
 		await _LevelHubConnection.StartAsync();
-		await _LevelHubConnection.InvokeAsync("JoinLevelGroup", _LevelDto!.Id);
+		await _LevelHubConnection.InvokeAsync("JoinLevelGroup", LevelId);
 	}
 
 	private async Task TryChangeTagState(string tag, bool state)
