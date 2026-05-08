@@ -1,8 +1,8 @@
-﻿using DataClasses;
+﻿using Distags.Contracts;
 
 namespace AutoTaggerRunner;
 
 public interface IAutoTaggerLevelProvider
 {
-    Task<List<Level>> GetLevelsToTagAsync(AutoTaggerState state);
+    Task<List<LevelProjectionDto>> GetLevelsToTagAsync(AutoTaggerState state);
 }

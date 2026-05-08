@@ -12,7 +12,6 @@ using Distags.Core.Queries.LevelTags;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
-using LevelDto = Distags.Contracts.LevelDto;
 using LevelSortStrategy = Distags.Core.Sorting.Levels.LevelSortStrategy;
 
 namespace Distags.Api.Controllers;

@@ -1,25 +1,22 @@
 ﻿using AutoTagging.Abstractions;
-using DataStoring;
-using Microsoft.EntityFrameworkCore;
+using Distags.Contracts;
+using Distags.Core.Mapping;
+using Distags.Core.Queries;
+using Distags.Core.Queries.LevelsProjection;
 
 namespace AutoTaggerRunner;
 
 public class AutoTaggerLevelProviderFactory : IAutoTaggerLevelProviderFactory
 {
-    private readonly IDbContextFactory<LevelTagDbContext> _DbContextFactory;
+    private readonly IQueryHandler<LevelsProjectionQuery, List<LevelProjectionDto>> _LevelsProjectionQueryHandler;
 
-    public AutoTaggerLevelProviderFactory(IDbContextFactory<LevelTagDbContext> dbContextFactory)
+    public AutoTaggerLevelProviderFactory(IQueryHandler<LevelsProjectionQuery, List<LevelProjectionDto>> levelsProjectionQueryHandler)
     {
-        _DbContextFactory = dbContextFactory;
+        _LevelsProjectionQueryHandler = levelsProjectionQueryHandler;
     }
 
-    public IAutoTaggerLevelProvider CreateLevelProvider(TaggingStrategy taggingStrategy)
+    public IAutoTaggerLevelProvider CreateLevelProvider(TaggingStrategy taggingStrategy, LevelProjectionIncludes requiredIncludes)
     {
-        return taggingStrategy switch
-        {
-            TaggingStrategy.NewLevels => new AutoTaggerNewLevelsProvider(_DbContextFactory),
-            TaggingStrategy.NewAndUpdatedLevels => new AutoTaggerUpdatedLevelsProvider(_DbContextFactory),
-            _ => throw new ArgumentOutOfRangeException(nameof(taggingStrategy), taggingStrategy, null),
-        };
+        return new AutoTaggerLevelProvider(taggingStrategy, requiredIncludes, _LevelsProjectionQueryHandler);
     }
 }

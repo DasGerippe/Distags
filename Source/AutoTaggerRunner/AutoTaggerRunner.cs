@@ -1,6 +1,6 @@
 ﻿using AutoTagging.Abstractions;
-using DataClasses;
-using DataStoring;
+using Distags.Contracts;
+using Distags.Core.Mapping;
 using Microsoft.Extensions.Logging;
 using System.Reflection;
 
@@ -8,24 +8,18 @@ namespace AutoTaggerRunner;
 
 public class AutoTaggerRunner
 {
-    private readonly LevelTagDbContext _DbContext;
     private readonly IAutoTaggerStateManager _StateManager;
-    private readonly IAutoTaggerStateUpdater _StateUpdater;
     private readonly IAutoTaggerLevelProviderFactory _LevelProviderFactory;
     private readonly LevelTagApiClient _LevelTagApi;
     private readonly ILogger<AutoTaggerRunner> _Logger;
 
     public AutoTaggerRunner(
-        LevelTagDbContext dbContext,
         IAutoTaggerStateManager stateManager,
-        IAutoTaggerStateUpdater stateUpdater,
         IAutoTaggerLevelProviderFactory levelProviderFactory,
         LevelTagApiClient levelTagApi,
         ILogger<AutoTaggerRunner> logger)
     {
-        _DbContext = dbContext;
         _StateManager = stateManager;
-        _StateUpdater = stateUpdater;
         _LevelProviderFactory = levelProviderFactory;
         _LevelTagApi = levelTagApi;
         _Logger = logger;
@@ -100,12 +94,13 @@ public class AutoTaggerRunner
     {
         try
         {
-            IAutoTaggerLevelProvider levelProvider = _LevelProviderFactory.CreateLevelProvider(autoTagger.TaggingStrategy);
-            List<Level> levels = await levelProvider.GetLevelsToTagAsync(state).ConfigureAwait(false);
+            LevelProjectionIncludes levelIncludes = EnrichLevelProjectionIncludes(autoTagger);
+            IAutoTaggerLevelProvider levelProvider = _LevelProviderFactory.CreateLevelProvider(autoTagger.TaggingStrategy, levelIncludes);
+            List<LevelProjectionDto> levels = await levelProvider.GetLevelsToTagAsync(state).ConfigureAwait(false);
 
             _Logger.LogDebug("Got {levelCount} levels to tag.", levels.Count);
 
-            foreach (Level level in levels)
+            foreach (LevelProjectionDto level in levels)
             {
                 _Logger.LogDebug("Calculating tag delta for level {levelId} with {autoTagger}...", level.Id, autoTagger.Name);
 
@@ -115,20 +110,37 @@ public class AutoTaggerRunner
                 {
                     _Logger.LogDebug("Calculated tag delta: +{tagsToAdd}; -{tagsToRemove}", tagDelta.AddTags, tagDelta.RemoveTags);
 
-                    await SendTagChangesToApiAsync(level.Id, tagDelta).ConfigureAwait(false);
+                    await SendTagChangesToApiAsync(level.Id!.Value, tagDelta).ConfigureAwait(false);
                 }
                 else
                 {
                     _Logger.LogDebug("Calculated tag delta is empty.");
                 }
 
-                _StateUpdater.UpdateAutoTaggerState(state, level, autoTagger.TaggingStrategy);
+                UpdateAutoTaggerState(state, level, autoTagger.TaggingStrategy);
             }
         }
         catch (Exception ex)
         {
             _Logger.LogError(ex, "An error occurred while running {autoTagger}.", autoTagger.Name);
         }
+    }
+
+    private LevelProjectionIncludes EnrichLevelProjectionIncludes(AutoTagger autoTagger)
+    {
+        LevelProjectionIncludes includes = autoTagger.RequiredIncludes | LevelProjectionIncludes.Id;
+
+        switch (autoTagger.TaggingStrategy)
+        {
+            case TaggingStrategy.NewLevels:
+                includes |= LevelProjectionIncludes.CreatedOn;
+                break;
+            case TaggingStrategy.NewAndUpdatedLevels:
+                includes |= LevelProjectionIncludes.UpdatedOn;
+                break;
+        }
+
+        return includes;
     }
 
     private async Task SendTagChangesToApiAsync(long levelId, TagDelta tagDelta)
@@ -150,5 +162,15 @@ public class AutoTaggerRunner
         }
 
         await Task.WhenAll(tagChangeTasks).ConfigureAwait(false);
+    }
+
+    private void UpdateAutoTaggerState(AutoTaggerState state, LevelProjectionDto level, TaggingStrategy strategy)
+    {
+        state.LastAutoTagging = strategy switch
+        {
+            TaggingStrategy.NewLevels => level.CreatedOn!.Value,
+            TaggingStrategy.NewAndUpdatedLevels => level.UpdatedOn!.Value,
+            _ => throw new ArgumentOutOfRangeException(nameof(strategy), strategy, null),
+        };
     }
 }

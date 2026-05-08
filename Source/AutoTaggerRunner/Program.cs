@@ -1,4 +1,5 @@
-﻿using DataStoring;
+﻿using Distags.Core;
+using Distags.Persistence;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -44,9 +45,10 @@ internal class Program
                     .ReadFrom.Configuration(context.Configuration)
                     .ConfigureConsoleAndFileSinks(nameof(AutoTaggerRunner)));
 
-                string levelTagsDbConnectionString = context.Configuration.GetConnectionString("LevelTagsDatabase") ??
+                string levelTagsDbConnectionString = context.Configuration.GetConnectionString("DistagsDatabase") ??
                                                      throw new InvalidOperationException("Connection string not configured.");
-                services.AddNpgsqlLevelTagDbContextFactory(levelTagsDbConnectionString);
+                services.AddDistagsPersistence(levelTagsDbConnectionString);
+                services.AddDistagsCore();
 
                 services.AddHttpClient<LevelTagApiClient>(httpClient =>
                 {
@@ -58,7 +60,6 @@ internal class Program
                 });
 
                 services.AddTransient<IAutoTaggerStateManager, AutoTaggerStateFileManager>();
-                services.AddTransient<IAutoTaggerStateUpdater, AutoTaggerStateUpdater>();
                 services.AddTransient<IAutoTaggerLevelProviderFactory, AutoTaggerLevelProviderFactory>();
 
                 services.AddTransient<AutoTaggerRunner>();

@@ -1,4 +1,5 @@
-﻿using DataClasses;
+﻿using Distags.Contracts;
+using Distags.Core.Mapping;
 
 namespace AutoTagging.Abstractions;
 
@@ -8,5 +9,7 @@ public abstract class AutoTagger
 
     public abstract TaggingStrategy TaggingStrategy { get; }
 
-    public abstract Task<TagDelta> CalculateTagDeltaAsync(Level level, CancellationToken cancellationToken = default);
+    public abstract LevelProjectionIncludes RequiredIncludes { get; }
+
+    public abstract Task<TagDelta> CalculateTagDeltaAsync(LevelProjectionDto level, CancellationToken cancellationToken = default);
 }

@@ -17,7 +17,9 @@
 
   <ItemGroup>
     <ProjectReference Include="..\AutoTagging.Abstractions\AutoTagging.Abstractions.csproj" />
-    <ProjectReference Include="..\DataStoring\DataStoring.csproj" />
+    <ProjectReference Include="..\Distags.Contracts\Distags.Contracts.csproj" />
+    <ProjectReference Include="..\Distags.Core\Distags.Core.csproj" />
+    <ProjectReference Include="..\Distags.Persistence\Distags.Persistence.csproj" />
     <ProjectReference Include="..\SerilogUtils\SerilogUtils.csproj" />
   </ItemGroup>
 

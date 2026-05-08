@@ -1,5 +1,6 @@
 ﻿using AutoTagging.Abstractions;
-using DataClasses;
+using Distags.Contracts;
+using Distags.Core.Mapping;
 
 namespace AutoTagging.GameMode;
 
@@ -16,11 +17,18 @@ public class GameModeAutoTagger : AutoTagger
 
     public override TaggingStrategy TaggingStrategy => TaggingStrategy.NewAndUpdatedLevels;
 
-    public override Task<TagDelta> CalculateTagDeltaAsync(Level level, CancellationToken cancellationToken = default)
+    public override LevelProjectionIncludes RequiredIncludes =>
+        LevelProjectionIncludes.WorkshopTags |
+        LevelProjectionIncludes.Tags;
+
+    public override Task<TagDelta> CalculateTagDeltaAsync(LevelProjectionDto level, CancellationToken cancellationToken = default)
     {
+        if (level.WorkshopTags == null || level.Tags == null)
+            throw new ArgumentException("Required properties of level not initialized.", nameof(level));
+
         List<string> currentGameModeTags = level.Tags
-            .Where(tag => GameModeTags.Values.Contains(tag.Name))
-            .Select(tag => tag.Name)
+            .Where(tag => GameModeTags.Values.Contains(tag))
+            .Select(tag => tag)
             .ToList();
 
         IEnumerable<string> desiredGameModeTags = GameModeTags
