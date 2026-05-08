@@ -92,7 +92,7 @@ namespace Distags.Persistence.Dev
                         .HasColumnType("bigint")
                         .HasColumnName("user_id");
 
-                    b.ComplexCollection(typeof(List<Dictionary<string, object>>), "Changes", "Distags.Core.Entities.Contribution.Changes#ContributionChange", b1 =>
+                    b.ComplexCollection(typeof(List<Dictionary<string, object>>), "Changes", "Distags.Core.Entities.Contribution.Changes#TagChange", b1 =>
                         {
                             b1.IsRequired();
 
@@ -174,10 +174,10 @@ namespace Distags.Persistence.Dev
                         .HasColumnType("text")
                         .HasColumnName("file_url");
 
-                    b.Property<string>("IconUrl")
+                    b.Property<string>("ImageUrl")
                         .IsRequired()
                         .HasColumnType("text")
-                        .HasColumnName("icon_url");
+                        .HasColumnName("image_url");
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -188,7 +188,7 @@ namespace Distags.Persistence.Dev
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("updated_on");
 
-                    b.PrimitiveCollection<string[]>("WorkshopTags")
+                    b.PrimitiveCollection<List<string>>("WorkshopTags")
                         .IsRequired()
                         .HasColumnType("text[]")
                         .HasColumnName("workshop_tags");

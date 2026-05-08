@@ -19,7 +19,7 @@ public class ContributionMapper : IEntityMapper<Contribution, ContributionDto>
                 Name = contribution.Level.Name,
                 CreatorName = contribution.Level.Creator!.Name,
                 CreatorAvatarHash = contribution.Level.Creator!.AvatarHash,
-                ImageUrl = contribution.Level.IconUrl,
+                ImageUrl = contribution.Level.ImageUrl,
             },
             Changes = contribution.Changes
                 .Select(change => new TagChangeDto

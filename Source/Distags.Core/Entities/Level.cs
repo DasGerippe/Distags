@@ -14,13 +14,13 @@ public class Level
 
     public string FileUrl { get; set; } = string.Empty;
 
-    public string IconUrl { get; set; } = string.Empty;
+    public string ImageUrl { get; set; } = string.Empty;
 
     public DateTimeOffset CreatedOn { get; set; }
 
     public DateTimeOffset UpdatedOn { get; set; }
 
-    public string[] WorkshopTags { get; set; } = [];
+    public List<string> WorkshopTags { get; set; } = [];
 
     public List<Tag> Tags { get; } = [];
 

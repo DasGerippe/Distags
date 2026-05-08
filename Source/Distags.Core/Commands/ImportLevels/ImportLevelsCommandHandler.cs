@@ -38,10 +38,10 @@ public class ImportLevelsCommandHandler : ICommandHandler<ImportLevelsCommand>
         level.Name = scrapedLevel.Name;
         level.FileName = scrapedLevel.FileName;
         level.FileUrl = scrapedLevel.FileUrl;
-        level.IconUrl = scrapedLevel.ImageUrl;
+        level.ImageUrl = scrapedLevel.ImageUrl;
         level.CreatorId = scrapedLevel.CreatorId;
         level.CreatedOn = scrapedLevel.CreatedOn;
         level.UpdatedOn = scrapedLevel.UpdatedOn;
-        level.WorkshopTags = scrapedLevel.WorkshopTags.ToArray();
+        level.WorkshopTags = scrapedLevel.WorkshopTags;
     }
 }

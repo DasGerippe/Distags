@@ -10,7 +10,7 @@ public class LevelMapper : IEntityMapper<Level, LevelDto>
     {
         Id = level.Id,
         Name = level.Name,
-        ImageUrl = level.IconUrl,
+        ImageUrl = level.ImageUrl,
         CreatorId = level.CreatorId,
         CreatorName = level.Creator!.Name,
         CreatorAvatarHash = level.Creator!.AvatarHash,

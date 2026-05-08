@@ -27,7 +27,7 @@ public class LevelProjectionMapper : IEntityMapper<Level, LevelProjectionDto>
         {
             Id = includeId ? level.Id : null,
             Name = includeName ? level.Name : null,
-            ImageUrl = includeImageUrl ? level.IconUrl : null,
+            ImageUrl = includeImageUrl ? level.ImageUrl : null,
             CreatorId = includeCreatorId ? level.CreatorId : null,
             CreatorName = includeCreatorName ? level.Creator!.Name : null,
             CreatorAvatarHash = includeCreatorAvatarHash ? level.Creator!.AvatarHash : null,
@@ -35,7 +35,7 @@ public class LevelProjectionMapper : IEntityMapper<Level, LevelProjectionDto>
             UpdatedOn = includeUpdatedOn ? level.UpdatedOn : null,
             FileName = includeFileName ? level.FileName : null,
             FileUrl = includeFileUrl ? level.FileUrl : null,
-            WorkshopTags = includeWorkshopTags ? level.WorkshopTags.ToList() : null,
+            WorkshopTags = includeWorkshopTags ? level.WorkshopTags : null,
             Tags = includeTags ? level.Tags.Select(tag => tag.Name).ToList() : null,
         };
     }
