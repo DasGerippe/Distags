@@ -1,11 +1,11 @@
 info:
-  name: Patch API State
+  name: Update Configuration
   type: http
   seq: 2
 
 http:
   method: PATCH
-  url: "{{url}}/api/state"
+  url: "{{url}}/configuration"
   body:
     type: json
     data: |-

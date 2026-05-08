@@ -6,6 +6,11 @@ info:
 http:
   method: GET
   url: "{{url}}/levels"
+  params:
+    - name: pageSize
+      value: "10"
+      type: query
+      disabled: true
   auth: inherit
 
 settings:

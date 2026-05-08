@@ -5,10 +5,10 @@ info:
 
 http:
   method: GET
-  url: "{{url}}/contributions?tagName=medals"
+  url: "{{url}}/contributions?tagName=laps"
   params:
     - name: tagName
-      value: medals
+      value: laps
       type: query
   auth: inherit
 
