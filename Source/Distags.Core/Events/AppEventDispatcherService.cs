@@ -33,7 +33,7 @@ public class AppEventDispatcherService : BackgroundService
                 }
             }
         }
-        catch (TaskCanceledException)
+        catch (OperationCanceledException)
         {
         }
     }

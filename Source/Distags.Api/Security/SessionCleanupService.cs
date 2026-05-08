@@ -39,7 +39,7 @@ public class SessionCleanupService : BackgroundService
 
                 await Task.Delay(TimeSpan.FromMinutes(5), stoppingToken);
             }
-            catch (TaskCanceledException)
+            catch (OperationCanceledException)
             {
                 _Logger.LogDebug($"Execution of {nameof(SessionCleanupService)} was cancelled.");
             }
