@@ -30,8 +30,8 @@ public class LevelsController : ControllerBase
         {
             FilterParameters = new LevelFilterParameters
             {
-                LevelFilter = parameters.LevelFilter,
-                CreatorFilter = parameters.CreatorFilter,
+                LevelName = parameters.LevelName,
+                CreatorName = parameters.CreatorName,
                 IncludeTags = GetNormalizedTagNames(parameters.IncludeTags),
                 ExcludeTags = GetNormalizedTagNames(parameters.ExcludeTags),
             },

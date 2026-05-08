@@ -2,9 +2,9 @@
 
 public class LevelFilterParameters
 {
-    public string? LevelFilter { get; set; }
+    public string? LevelName { get; set; }
 
-    public string? CreatorFilter { get; set; }
+    public string? CreatorName { get; set; }
 
     public DateTimeOffset? CreatedAfter { get; set; }
 

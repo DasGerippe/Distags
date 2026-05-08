@@ -202,8 +202,8 @@
 	{
 		BrowseLevelsParameters parameters = new BrowseLevelsParameters
 		{
-			LevelFilter = GetFilterTermOrNullIfEmpty(LevelFilter),
-			CreatorFilter = GetFilterTermOrNullIfEmpty(CreatorFilter),
+			LevelName = GetFilterTermOrNullIfEmpty(LevelFilter),
+			CreatorName = GetFilterTermOrNullIfEmpty(CreatorFilter),
 			IncludeTags = GetTagParameterByState(TagFilterState.Required),
 			ExcludeTags = GetTagParameterByState(TagFilterState.Forbidden),
 			PageSize = PageSize,
