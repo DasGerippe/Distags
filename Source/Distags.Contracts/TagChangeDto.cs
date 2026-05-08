@@ -2,7 +2,7 @@
 
 public class TagChangeDto
 {
-    public TagChangeType ChangeType { get; init; }
+    public TagChangeAction Action { get; init; }
 
     public string TagName { get; init; } = string.Empty;
 }

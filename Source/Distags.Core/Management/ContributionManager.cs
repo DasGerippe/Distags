@@ -1,11 +1,12 @@
-﻿using Distags.Core.Entities;
+﻿using Distags.Contracts;
+using Distags.Core.Entities;
 
 namespace Distags.Core.Management;
 
 public class ContributionManager
 {
     public Contribution CreateContribution(
-        Level level, Tag tag, User? user, App? app, ChangeAction action, List<ContributionChange> changes)
+        Level level, Tag tag, User? user, App? app, TagChangeAction action, List<TagChange> changes)
     {
         return new Contribution
         {

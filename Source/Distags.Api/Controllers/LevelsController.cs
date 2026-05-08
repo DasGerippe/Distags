@@ -99,7 +99,7 @@ public class LevelsController : ControllerBase
                 TagName = tagName,
                 UserSteamId = User.FindFirstValue<long>(Constants.Claims.SteamId),
                 AppName = User.FindFirstValue(Constants.Claims.AppName),
-                ChangeAction = ChangeActionDto.AddTag,
+                Action = TagChangeAction.Add,
             };
             await changeLevelTagCommandHandler.HandleAsync(command);
             return Created();
@@ -139,7 +139,7 @@ public class LevelsController : ControllerBase
                 TagName = tagName,
                 UserSteamId = User.FindFirstValue<long>(Constants.Claims.SteamId),
                 AppName = User.FindFirstValue(Constants.Claims.AppName),
-                ChangeAction = ChangeActionDto.RemoveTag,
+                Action = TagChangeAction.Remove,
             };
             await changeLevelTagCommandHandler.HandleAsync(command);
             return NoContent();

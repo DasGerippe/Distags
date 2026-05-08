@@ -1,6 +1,6 @@
 ﻿namespace Distags.Contracts;
 
-public enum TagChangeType
+public enum TagChangeAction
 {
     Add,
     Remove,

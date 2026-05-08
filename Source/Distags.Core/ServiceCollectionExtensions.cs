@@ -22,7 +22,7 @@ public static class ServiceCollectionExtensions
         serviceCollection.AddTransient<TokenGenerator>();
 
         serviceCollection.AddTransient<ContributionManager>();
-        serviceCollection.AddTransient<ContributionChangeManager>();
+        serviceCollection.AddTransient<TagChangeManager>();
         serviceCollection.AddTransient<ContributionReplayEngine>();
         serviceCollection.AddTransient<UserBanPermissionChecker>();
 

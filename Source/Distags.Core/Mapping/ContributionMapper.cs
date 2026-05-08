@@ -22,9 +22,9 @@ public class ContributionMapper : IEntityMapper<Contribution, ContributionDto>
                 ImageUrl = contribution.Level.IconUrl,
             },
             Changes = contribution.Changes
-                .Select(change => new ContributionChangeDto
+                .Select(change => new TagChangeDto
                 {
-                    Action = (ChangeActionDto)change.Action,
+                    Action = change.Action,
                     TagName = change.TagName,
                 })
                 .ToList(),

@@ -12,5 +12,5 @@ public class ChangeLevelTagCommand : ICommand
 
     public string? AppName { get; set; }
 
-    public ChangeActionDto ChangeAction { get; set; }
+    public TagChangeAction Action { get; set; }
 }

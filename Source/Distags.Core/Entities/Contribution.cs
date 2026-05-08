@@ -1,4 +1,6 @@
-﻿namespace Distags.Core.Entities;
+﻿using Distags.Contracts;
+
+namespace Distags.Core.Entities;
 
 public class Contribution
 {
@@ -20,11 +22,11 @@ public class Contribution
 
     public App? App { get; set; }
 
-    public ChangeAction Action { get; set; }
+    public TagChangeAction Action { get; set; }
 
     public DateTimeOffset ContributedOn { get; set; }
 
-    public List<ContributionChange> Changes { get; set; }
+    public List<TagChange> Changes { get; set; }
 
     public bool IsReverted { get; set; }
 }

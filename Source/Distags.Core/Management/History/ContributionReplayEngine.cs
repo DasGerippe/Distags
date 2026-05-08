@@ -9,18 +9,18 @@ namespace Distags.Core.Management.History;
 public class ContributionReplayEngine
 {
     private readonly DistagsDbContext _DbContext;
-    private readonly ContributionChangeManager _ContributionChangeManager;
+    private readonly TagChangeManager _TagChangeManager;
     private readonly ISequentialLevelActionExecutor _SequentialLevelActionExecutor;
     private readonly AppEventQueue _EventQueue;
 
     public ContributionReplayEngine(
         DistagsDbContext dbContext,
-        ContributionChangeManager contributionChangeManager,
+        TagChangeManager tagChangeManager,
         ISequentialLevelActionExecutor sequentialLevelActionExecutor,
         AppEventQueue eventQueue)
     {
         _DbContext = dbContext;
-        _ContributionChangeManager = contributionChangeManager;
+        _TagChangeManager = tagChangeManager;
         _SequentialLevelActionExecutor = sequentialLevelActionExecutor;
         _EventQueue = eventQueue;
     }
@@ -47,7 +47,7 @@ public class ContributionReplayEngine
 
     private async Task ReplayContributionsAsync(long levelId, List<Contribution> contributions)
     {
-        ContributionReplayState replayState = new ContributionReplayState(_ContributionChangeManager);
+        ContributionReplayState replayState = new ContributionReplayState(_TagChangeManager);
         foreach (Contribution contribution in contributions)
         {
             contribution.Changes = replayState.ApplyContribution(contribution);
@@ -80,13 +80,13 @@ public class ContributionReplayEngine
         IEnumerable<TagChangeDto> addChanges = addLevelTags
             .Select(levelTag => new TagChangeDto()
             {
-                ChangeType = TagChangeType.Add,
+                Action = TagChangeAction.Add,
                 TagName = levelTag.Tag.Name,
             });
         IEnumerable<TagChangeDto> removeChanges = removeLevelTags
             .Select(levelTag => new TagChangeDto
             {
-                ChangeType = TagChangeType.Remove,
+                Action = TagChangeAction.Remove,
                 TagName = levelTag.Tag.Name,
             });
         _EventQueue.Enqueue(new LevelTagsChangedEvent(levelId, addChanges.Concat(removeChanges).ToList()));

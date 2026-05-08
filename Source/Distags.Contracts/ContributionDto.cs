@@ -7,7 +7,7 @@ public class ContributionDto
 
     public required ContributionLevelDto? Level { get; set; }
 
-    public required List<ContributionChangeDto> Changes { get; set; }
+    public required List<TagChangeDto> Changes { get; set; }
 
     public required ContributionUserDto? User { get; set; }
 

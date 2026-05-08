@@ -1,20 +1,21 @@
-﻿using Distags.Core.Entities;
+﻿using Distags.Contracts;
+using Distags.Core.Entities;
 
 namespace Distags.Core.Management.History;
 
 public class ContributionReplayState
 {
-    private readonly ContributionChangeManager _ContributionChangeCreator;
+    private readonly TagChangeManager _TagChangeManager;
     private readonly HashSet<Tag> _CombinableTags = [];
 
     private readonly Dictionary<(int Exclusivity, long? GroupId), Tag> _ExclusiveTags = [];
 
-    public ContributionReplayState(ContributionChangeManager contributionChangeCreator)
+    public ContributionReplayState(TagChangeManager tagChangeManager)
     {
-        _ContributionChangeCreator = contributionChangeCreator;
+        _TagChangeManager = tagChangeManager;
     }
 
-    public List<ContributionChange> ApplyContribution(Contribution contribution)
+    public List<TagChange> ApplyContribution(Contribution contribution)
     {
         return contribution.Tag.Exclusivity == null
             ? ApplyCombinableTagContribution(contribution.Action, contribution.Tag)
@@ -26,37 +27,37 @@ public class ContributionReplayState
         return _CombinableTags.Concat(_ExclusiveTags.Values);
     }
 
-    private List<ContributionChange> ApplyCombinableTagContribution(ChangeAction action, Tag tag)
+    private List<TagChange> ApplyCombinableTagContribution(TagChangeAction action, Tag tag)
     {
         bool tagStateChanged =
-            action == ChangeAction.AddTag && _CombinableTags.Add(tag) ||
-            action == ChangeAction.RemoveTag && _CombinableTags.Remove(tag);
+            action == TagChangeAction.Add && _CombinableTags.Add(tag) ||
+            action == TagChangeAction.Remove && _CombinableTags.Remove(tag);
 
-        List<ContributionChange> changes = tagStateChanged
-            ? [_ContributionChangeCreator.CreateChange(action, tag)]
+        List<TagChange> changes = tagStateChanged
+            ? [_TagChangeManager.CreateChange(action, tag)]
             : [];
 
         return changes;
     }
 
-    private List<ContributionChange> ApplyExclusiveTagContribution(ChangeAction action, Tag tag)
+    private List<TagChange> ApplyExclusiveTagContribution(TagChangeAction action, Tag tag)
     {
-        List<ContributionChange> changes = new List<ContributionChange>(2);
+        List<TagChange> changes = new List<TagChange>(2);
 
-        if (action == ChangeAction.AddTag)
+        if (action == TagChangeAction.Add)
         {
             if (_ExclusiveTags.Remove((tag.Exclusivity!.Value, tag.GroupId), out Tag? existingTag))
-                changes.Add(_ContributionChangeCreator.CreateChange(ChangeAction.RemoveTag, existingTag));
+                changes.Add(_TagChangeManager.CreateChange(TagChangeAction.Remove, existingTag));
 
             if (_ExclusiveTags.TryAdd((tag.Exclusivity!.Value, tag.GroupId), tag))
-                changes.Add(_ContributionChangeCreator.CreateChange(ChangeAction.AddTag, tag));
+                changes.Add(_TagChangeManager.CreateChange(TagChangeAction.Add, tag));
         }
-        else if (action == ChangeAction.RemoveTag)
+        else if (action == TagChangeAction.Remove)
         {
             if (_ExclusiveTags.TryGetValue((tag.Exclusivity!.Value, tag.GroupId), out Tag? existingTag) && existingTag == tag)
             {
                 _ExclusiveTags.Remove((tag.Exclusivity!.Value, tag.GroupId));
-                changes.Add(_ContributionChangeCreator.CreateChange(ChangeAction.RemoveTag, tag));
+                changes.Add(_TagChangeManager.CreateChange(TagChangeAction.Remove, tag));
             }
         }
 

@@ -14,7 +14,7 @@ public class ChangeLevelTagCommandHandler : ICommandHandler<ChangeLevelTagComman
     private readonly MaintenanceManager _MaintenanceManager;
     private readonly ISequentialLevelActionExecutor _SequentialLevelActionExecutor;
     private readonly ContributionManager _ContributionManager;
-    private readonly ContributionChangeManager _ContributionChangeManager;
+    private readonly TagChangeManager _TagChangeManager;
     private readonly AppEventQueue _AppEventQueue;
 
     public ChangeLevelTagCommandHandler(
@@ -22,14 +22,14 @@ public class ChangeLevelTagCommandHandler : ICommandHandler<ChangeLevelTagComman
         MaintenanceManager maintenanceManager,
         ISequentialLevelActionExecutor sequentialLevelActionExecutor,
         ContributionManager contributionManager,
-        ContributionChangeManager contributionChangeManager,
+        TagChangeManager tagChangeManager,
         AppEventQueue appEventQueue)
     {
         _DbContext = dbContext;
         _MaintenanceManager = maintenanceManager;
         _SequentialLevelActionExecutor = sequentialLevelActionExecutor;
         _ContributionManager = contributionManager;
-        _ContributionChangeManager = contributionChangeManager;
+        _TagChangeManager = tagChangeManager;
         _AppEventQueue = appEventQueue;
     }
 
@@ -42,7 +42,7 @@ public class ChangeLevelTagCommandHandler : ICommandHandler<ChangeLevelTagComman
 
         await EnsureTagChangeAllowedAsync(user, app, tag).ConfigureAwait(false);
 
-        Func<Task<Contribution>> changeFunc = command.ChangeAction == ChangeActionDto.AddTag
+        Func<Task<Contribution>> changeFunc = command.Action == TagChangeAction.Add
             ? () => AddTagToLevel(level, tag, user, app)
             : () => RemoveTagFromLevel(level, tag, user, app);
 
@@ -117,10 +117,10 @@ public class ChangeLevelTagCommandHandler : ICommandHandler<ChangeLevelTagComman
             Tag = tag,
         };
 
-        List<ContributionChange> changes = _ContributionChangeManager
+        List<TagChange> changes = _TagChangeManager
             .CreateChanges(tag, conflictingLevelTags.Select(removedLevelTag => removedLevelTag.Tag));
         Contribution contribution = _ContributionManager
-            .CreateContribution(level, tag, user, app, ChangeAction.AddTag, changes);
+            .CreateContribution(level, tag, user, app, TagChangeAction.Add, changes);
 
         _DbContext.RemoveRange(conflictingLevelTags);
         _DbContext.Add(addedLevelTag);
@@ -153,9 +153,9 @@ public class ChangeLevelTagCommandHandler : ICommandHandler<ChangeLevelTagComman
         if (levelTag == null)
             throw new LevelTagNotFoundException(level.Id, tag.Name);
 
-        ContributionChange change = _ContributionChangeManager.CreateChange(ChangeAction.RemoveTag, tag);
+        TagChange change = _TagChangeManager.CreateChange(TagChangeAction.Remove, tag);
         Contribution contribution = _ContributionManager
-            .CreateContribution(level, tag, user, app, ChangeAction.RemoveTag, [change]);
+            .CreateContribution(level, tag, user, app, TagChangeAction.Remove, [change]);
 
         _DbContext.Remove(levelTag);
         _DbContext.Add(contribution);
@@ -171,7 +171,7 @@ public class ChangeLevelTagCommandHandler : ICommandHandler<ChangeLevelTagComman
         List<TagChangeDto> changeDtos = contribution.Changes
             .Select(change => new TagChangeDto
             {
-                ChangeType = (TagChangeType)change.Action,
+                Action = (TagChangeAction)change.Action,
                 TagName = change.TagName,
             })
             .ToList();
