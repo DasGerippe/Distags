@@ -7,9 +7,9 @@ public class ConcurrentTicketStore<TTicketData> : ITicketStore<TTicketData>
     private readonly ConcurrentDictionary<string, TicketData> _Tickets = new ConcurrentDictionary<string, TicketData>();
     private readonly TimeSpan _TicketExpirationDelay;
 
-    public ConcurrentTicketStore(LevelTagApiSettings levelTagApiSettings)
+    public ConcurrentTicketStore(DistagsApiSettings distagsApiSettings)
     {
-        _TicketExpirationDelay = levelTagApiSettings.TicketExpirationDelay;
+        _TicketExpirationDelay = distagsApiSettings.TicketExpirationDelay;
     }
 
     public void Store(string ticket, TTicketData data)

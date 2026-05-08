@@ -1,10 +1,10 @@
 ﻿namespace AutoTaggerRunner;
 
-public class LevelTagApiClient
+public class DistagsApiClient
 {
     private readonly HttpClient _HttpClient;
 
-    public LevelTagApiClient(HttpClient httpClient)
+    public DistagsApiClient(HttpClient httpClient)
     {
         _HttpClient = httpClient;
     }

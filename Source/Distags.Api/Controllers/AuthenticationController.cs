@@ -79,7 +79,7 @@ public class AuthenticationController : ControllerBase
             string ticket = _TokenGenerator.GenerateToken(8);
             _TicketStore.Store(ticket, steamId);
 
-            string returnUrlWithTicket = QueryHelpers.AddQueryString(returnUrl, LevelTagApiConstants.TicketQueryParameterName, ticket);
+            string returnUrlWithTicket = QueryHelpers.AddQueryString(returnUrl, DistagsApiConstants.TicketQueryParameterName, ticket);
             return Redirect(returnUrlWithTicket);
         }
 

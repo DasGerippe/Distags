@@ -45,18 +45,18 @@ internal class Program
                     .ReadFrom.Configuration(context.Configuration)
                     .ConfigureConsoleAndFileSinks(nameof(AutoTaggerRunner)));
 
-                string levelTagsDbConnectionString = context.Configuration.GetConnectionString("DistagsDatabase") ??
-                                                     throw new InvalidOperationException("Connection string not configured.");
-                services.AddDistagsPersistence(levelTagsDbConnectionString);
+                string distagsDbConnectionString = context.Configuration.GetConnectionString("DistagsDatabase") ??
+                                                   throw new InvalidOperationException("Connection string not configured.");
+                services.AddDistagsPersistence(distagsDbConnectionString);
                 services.AddDistagsCore();
 
-                services.AddHttpClient<LevelTagApiClient>(httpClient =>
+                services.AddHttpClient<DistagsApiClient>(httpClient =>
                 {
-                    string levelTagApiUri = context.Configuration["LevelTagApi:Uri"]!;
-                    httpClient.BaseAddress = new Uri(levelTagApiUri);
+                    string distagsApiUri = context.Configuration["DistagsApi:Uri"]!;
+                    httpClient.BaseAddress = new Uri(distagsApiUri);
 
-                    string levelTagApiKey = context.Configuration["LevelTagApi:ApiKey"]!;
-                    httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("ApiKey", levelTagApiKey);
+                    string distagsApiKey = context.Configuration["DistagsApi:ApiKey"]!;
+                    httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("ApiKey", distagsApiKey);
                 });
 
                 services.AddTransient<IAutoTaggerStateManager, AutoTaggerStateFileManager>();

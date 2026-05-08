@@ -32,7 +32,7 @@ public class SessionAuthenticationHandler : AuthenticationHandler<Authentication
     protected override async Task<AuthenticateResult> HandleAuthenticateAsync()
     {
         AuthenticationHeaderValue.TryParse(Request.Headers.Authorization.ToString(), out AuthenticationHeaderValue? authHeader);
-        if (authHeader?.Scheme != LevelTagApiConstants.AuthorizationHeaderSchemes.SessionToken)
+        if (authHeader?.Scheme != DistagsApiConstants.AuthorizationHeaderSchemes.SessionToken)
             return AuthenticateResult.NoResult();
 
         string? sessionToken = authHeader.Parameter;

@@ -13,7 +13,7 @@ public class SessionCleanupService : BackgroundService
 
     public SessionCleanupService(
         IServiceScopeFactory scopeFactory,
-        IOptions<LevelTagApiSettings> options,
+        IOptions<DistagsApiSettings> options,
         ILogger<SessionCleanupService> logger)
     {
         _ScopeFactory = scopeFactory;

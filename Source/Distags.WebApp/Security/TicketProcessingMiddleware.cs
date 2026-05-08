@@ -18,7 +18,7 @@ public class TicketProcessingMiddleware
 
     public async Task InvokeAsync(HttpContext httpContext, LevelTagApiClient levelTagApi)
     {
-        if (!httpContext.Request.Query.TryGetValue(LevelTagApiConstants.TicketQueryParameterName, out StringValues ticketValue))
+        if (!httpContext.Request.Query.TryGetValue(DistagsApiConstants.TicketQueryParameterName, out StringValues ticketValue))
         {
             await _Next(httpContext);
             return;
@@ -42,7 +42,7 @@ public class TicketProcessingMiddleware
         }
 
         IEnumerable<KeyValuePair<string, StringValues>> newQueryParams = httpContext.Request.Query
-            .Where(queryParam => queryParam.Key != LevelTagApiConstants.TicketQueryParameterName);
+            .Where(queryParam => queryParam.Key != DistagsApiConstants.TicketQueryParameterName);
         string redirectUrl = httpContext.Request.Path + QueryString.Create(newQueryParams).ToUriComponent();
         httpContext.Response.Redirect(redirectUrl);
     }

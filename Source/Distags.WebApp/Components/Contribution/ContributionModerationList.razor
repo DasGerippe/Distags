@@ -107,7 +107,7 @@
 			{
 				options.Headers.Add(
 					HeaderNames.Authorization,
-					$"{LevelTagApiConstants.AuthorizationHeaderSchemes.SessionToken} {SessionTokenProvider.SessionToken}");
+					$"{DistagsApiConstants.AuthorizationHeaderSchemes.SessionToken} {SessionTokenProvider.SessionToken}");
 			})
 			.WithAutomaticReconnect()
 			.Build();

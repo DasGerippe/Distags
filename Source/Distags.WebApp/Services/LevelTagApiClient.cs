@@ -59,7 +59,7 @@ public class LevelTagApiClient : IDisposable
     {
         string? sessionToken = _SessionTokenProvider.SessionToken;
         _HttpClient.DefaultRequestHeaders.Authorization = sessionToken != null
-            ? new AuthenticationHeaderValue(LevelTagApiConstants.AuthorizationHeaderSchemes.SessionToken, sessionToken)
+            ? new AuthenticationHeaderValue(DistagsApiConstants.AuthorizationHeaderSchemes.SessionToken, sessionToken)
             : null;
     }
 

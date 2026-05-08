@@ -46,7 +46,7 @@ public class Program
 
             builder.Services.AddSteamWebApi("SteamWebApi");
 
-            AddValidatedConfigOptions<LevelTagApiSettings>(builder, "LevelTagApiSettings");
+            AddValidatedConfigOptions<DistagsApiSettings>(builder, "DistagsApiSettings");
 
             builder.Services.AddSingleton<ITicketStore<long>, ConcurrentTicketStore<long>>();
             builder.Services.AddTransient<ITokenGenerator, RandomBase64UrlTokenGenerator>();
@@ -120,8 +120,8 @@ public class Program
 
                     return authHeader?.Scheme switch
                     {
-                        LevelTagApiConstants.AuthorizationHeaderSchemes.SessionToken => Constants.Authentication.SessionTokenScheme.Name,
-                        LevelTagApiConstants.AuthorizationHeaderSchemes.ApiKey => Constants.Authentication.ApiKeyScheme.Name,
+                        DistagsApiConstants.AuthorizationHeaderSchemes.SessionToken => Constants.Authentication.SessionTokenScheme.Name,
+                        DistagsApiConstants.AuthorizationHeaderSchemes.ApiKey => Constants.Authentication.ApiKeyScheme.Name,
                         _ => anonymousAuthScheme,
                     };
                 };

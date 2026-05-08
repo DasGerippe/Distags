@@ -27,7 +27,7 @@ public class ApiKeyAuthenticationHandler : AuthenticationHandler<AuthenticationS
     protected override async Task<AuthenticateResult> HandleAuthenticateAsync()
     {
         AuthenticationHeaderValue.TryParse(Request.Headers.Authorization.ToString(), out AuthenticationHeaderValue? authHeader);
-        if (authHeader?.Scheme != LevelTagApiConstants.AuthorizationHeaderSchemes.ApiKey)
+        if (authHeader?.Scheme != DistagsApiConstants.AuthorizationHeaderSchemes.ApiKey)
             return AuthenticateResult.NoResult();
 
         string? apiKey = authHeader.Parameter;

@@ -1,6 +1,6 @@
 ﻿namespace Distags.Api.Contracts;
 
-public static class LevelTagApiConstants
+public static class DistagsApiConstants
 {
     public const string TicketQueryParameterName = "ticket";
 

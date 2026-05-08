@@ -10,18 +10,18 @@ public class AutoTaggerRunner
 {
     private readonly IAutoTaggerStateManager _StateManager;
     private readonly IAutoTaggerLevelProviderFactory _LevelProviderFactory;
-    private readonly LevelTagApiClient _LevelTagApi;
+    private readonly DistagsApiClient _DistagsApiClient;
     private readonly ILogger<AutoTaggerRunner> _Logger;
 
     public AutoTaggerRunner(
         IAutoTaggerStateManager stateManager,
         IAutoTaggerLevelProviderFactory levelProviderFactory,
-        LevelTagApiClient levelTagApi,
+        DistagsApiClient distagsApiClient,
         ILogger<AutoTaggerRunner> logger)
     {
         _StateManager = stateManager;
         _LevelProviderFactory = levelProviderFactory;
-        _LevelTagApi = levelTagApi;
+        _DistagsApiClient = distagsApiClient;
         _Logger = logger;
     }
 
@@ -151,14 +151,14 @@ public class AutoTaggerRunner
 
         foreach (string tagToAdd in tagDelta.AddTags)
         {
-            Task postLevelTagTask = _LevelTagApi.PutLevelTagAsync(levelId, tagToAdd);
-            tagChangeTasks.Add(postLevelTagTask);
+            Task addTagTask = _DistagsApiClient.PutLevelTagAsync(levelId, tagToAdd);
+            tagChangeTasks.Add(addTagTask);
         }
 
         foreach (string tagToRemove in tagDelta.RemoveTags)
         {
-            Task deleteLevelTagTask = _LevelTagApi.DeleteLevelTagAsync(levelId, tagToRemove);
-            tagChangeTasks.Add(deleteLevelTagTask);
+            Task removeTagTask = _DistagsApiClient.DeleteLevelTagAsync(levelId, tagToRemove);
+            tagChangeTasks.Add(removeTagTask);
         }
 
         await Task.WhenAll(tagChangeTasks).ConfigureAwait(false);
