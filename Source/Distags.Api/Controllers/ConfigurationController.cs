@@ -1,7 +1,6 @@
 ﻿using Distags.Api.Contracts.Configuration;
-using Distags.Core.Commands;
+using Distags.Core;
 using Distags.Core.Commands.SetMaintenance;
-using Distags.Core.Queries;
 using Distags.Core.Queries.Maintenance;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -13,11 +12,11 @@ namespace Distags.Api.Controllers;
 public class ConfigurationController : ControllerBase
 {
     public async Task<ActionResult<ConfigurationDto>> GetConfiguration(
-        [FromServices] IQueryHandler<MaintenanceQuery, bool> maintenanceQueryHandler)
+        [FromServices] IRequestDispatcher requestDispatcher)
     {
         ConfigurationDto configuration = new ConfigurationDto
         {
-            MaintenanceActive = await maintenanceQueryHandler.HandleAsync(new MaintenanceQuery()),
+            MaintenanceActive = await requestDispatcher.DispatchAsync(new MaintenanceQuery()),
         };
 
         return Ok(configuration);
@@ -26,12 +25,12 @@ public class ConfigurationController : ControllerBase
     [HttpPatch]
     [Authorize(Roles = Constants.Roles.Administrator)]
     public async Task<IActionResult> PatchConfiguration([FromBody] PatchConfigurationParameters apiSettings,
-        [FromServices] ICommandHandler<SetMaintenanceCommand> setMaintenanceCommandHandler)
+        [FromServices] IRequestDispatcher requestDispatcher)
     {
         if (apiSettings.MaintenanceActive != null)
         {
             SetMaintenanceCommand command = new SetMaintenanceCommand { MaintenanceActive = apiSettings.MaintenanceActive };
-            await setMaintenanceCommandHandler.HandleAsync(command);
+            await requestDispatcher.DispatchAsync(command);
         }
 
         return NoContent();

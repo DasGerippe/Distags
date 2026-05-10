@@ -33,33 +33,16 @@ public static class ServiceCollectionExtensions
 
         serviceCollection.AddTransient<IQueryableSorterFactory<Level, LevelSortStrategy>, LevelSorterFactory>();
 
-        serviceCollection.AddGenericServiceImplementations(typeof(IQueryHandler<,>));
-        serviceCollection.AddGenericServiceImplementations(typeof(ICommandHandler<>));
+        serviceCollection.AddTransient<IRequestDispatcher, RequestDispatcher>();
+        serviceCollection.Scan(scan => scan
+            .FromAssemblies(typeof(ServiceCollectionExtensions).Assembly)
+            .AddClasses(classes => classes.AssignableTo(typeof(IQueryHandler<,>)))
+            .AsImplementedInterfaces()
+            .AddClasses(classes => classes.AssignableTo(typeof(ICommandHandler<>)))
+            .AsImplementedInterfaces());
 
         serviceCollection.AddSingleton<AppEventQueue>();
         serviceCollection.AddHostedService<AppEventDispatcherService>();
-
-        return serviceCollection;
-    }
-
-    private static IServiceCollection AddGenericServiceImplementations(
-        this IServiceCollection serviceCollection, Type genericServiceType)
-    {
-        IEnumerable<Type> classTypes = typeof(ServiceCollectionExtensions).Assembly.GetTypes()
-            .Where(type => !type.IsInterface && !type.IsAbstract);
-
-        foreach (Type classType in classTypes)
-        {
-            IEnumerable<Type> queryHandlerInterfaces = classType.GetInterfaces()
-                .Where(classInterface =>
-                    classInterface.IsGenericType &&
-                    classInterface.GetGenericTypeDefinition() == genericServiceType);
-
-            foreach (Type queryHandlerInterface in queryHandlerInterfaces)
-            {
-                serviceCollection.Add(new ServiceDescriptor(queryHandlerInterface, classType, ServiceLifetime.Transient));
-            }
-        }
 
         return serviceCollection;
     }

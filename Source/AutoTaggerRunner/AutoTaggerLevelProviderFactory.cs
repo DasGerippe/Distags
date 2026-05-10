@@ -1,22 +1,20 @@
 ﻿using AutoTagging.Abstractions;
-using Distags.Contracts;
+using Distags.Core;
 using Distags.Core.Mapping;
-using Distags.Core.Queries;
-using Distags.Core.Queries.LevelsProjection;
 
 namespace AutoTaggerRunner;
 
 public class AutoTaggerLevelProviderFactory : IAutoTaggerLevelProviderFactory
 {
-    private readonly IQueryHandler<LevelsProjectionQuery, List<LevelProjectionDto>> _LevelsProjectionQueryHandler;
+    private readonly IRequestDispatcher _RequestDispatcher;
 
-    public AutoTaggerLevelProviderFactory(IQueryHandler<LevelsProjectionQuery, List<LevelProjectionDto>> levelsProjectionQueryHandler)
+    public AutoTaggerLevelProviderFactory(IRequestDispatcher requestDispatcher)
     {
-        _LevelsProjectionQueryHandler = levelsProjectionQueryHandler;
+        _RequestDispatcher = requestDispatcher;
     }
 
     public IAutoTaggerLevelProvider CreateLevelProvider(TaggingStrategy taggingStrategy, LevelProjectionIncludes requiredIncludes)
     {
-        return new AutoTaggerLevelProvider(taggingStrategy, requiredIncludes, _LevelsProjectionQueryHandler);
+        return new AutoTaggerLevelProvider(taggingStrategy, requiredIncludes, _RequestDispatcher);
     }
 }

@@ -2,7 +2,7 @@
 using Distags.Api.Contracts;
 using Distags.Api.Contracts.Authentication;
 using Distags.Api.Security;
-using Distags.Core.Commands;
+using Distags.Core;
 using Distags.Core.Commands.CreateOrUpdateUser;
 using Distags.Core.Commands.CreateUserSession;
 using Distags.Core.Commands.DeleteUserSession;
@@ -60,8 +60,7 @@ public class AuthenticationController : ControllerBase
     [HttpGet("steam-callback")]
     [AllowAnonymous]
     public async Task<IActionResult> SteamCallback([FromQuery] string? returnUrl,
-        [FromServices] ICommandHandler<CreateOrUpdateUserCommand> createOrUpdateUserCommandHandler,
-        [FromServices] ICommandHandler<CreateUserSessionCommand> createUserSessionCommandHandler)
+        [FromServices] IRequestDispatcher requestDispatcher)
     {
         AuthenticateResult result = await HttpContext.AuthenticateAsync(SteamAuthenticationDefaults.AuthenticationScheme);
         if (!result.Succeeded || result.Principal == null)
@@ -83,8 +82,7 @@ public class AuthenticationController : ControllerBase
             return Redirect(returnUrlWithTicket);
         }
 
-        string sessionToken =
-            await CreateSessionForUserAsync(steamId, createOrUpdateUserCommandHandler, createUserSessionCommandHandler);
+        string sessionToken = await CreateSessionForUserAsync(steamId, requestDispatcher);
         SessionResponse sessionResponse = new SessionResponse { Token = sessionToken };
         return Ok(sessionResponse);
     }
@@ -92,15 +90,13 @@ public class AuthenticationController : ControllerBase
     [HttpPost("redeem-ticket")]
     [AllowAnonymous]
     public async Task<ActionResult<SessionResponse>> RedeemTicket(string ticket,
-        [FromServices] ICommandHandler<CreateOrUpdateUserCommand> createOrUpdateUserCommandHandler,
-        [FromServices] ICommandHandler<CreateUserSessionCommand> createUserSessionCommandHandler)
+        [FromServices] IRequestDispatcher requestDispatcher)
     {
         long? steamId = _TicketStore.Retrieve(ticket);
         if (steamId == null)
             return BadRequest("Ticket is invalid or expired.");
 
-        string sessionToken =
-            await CreateSessionForUserAsync(steamId.Value, createOrUpdateUserCommandHandler, createUserSessionCommandHandler);
+        string sessionToken = await CreateSessionForUserAsync(steamId.Value, requestDispatcher);
         SessionResponse sessionResponse = new SessionResponse { Token = sessionToken };
         return Ok(sessionResponse);
     }
@@ -115,13 +111,13 @@ public class AuthenticationController : ControllerBase
     [HttpPost("logout")]
     [Authorize(AuthenticationSchemes = Constants.Authentication.SessionTokenScheme.Name)]
     public async Task<IActionResult> Logout(
-        [FromServices] ICommandHandler<DeleteUserSessionCommand> deleteUserSessionCommandHandler)
+        [FromServices] IRequestDispatcher requestDispatcher)
     {
         try
         {
             string sessionToken = User.FindFirstValue(Constants.Claims.SessionToken)!;
             DeleteUserSessionCommand command = new DeleteUserSessionCommand { SessionToken = sessionToken };
-            await deleteUserSessionCommandHandler.HandleAsync(command);
+            await requestDispatcher.DispatchAsync(command);
             return NoContent();
         }
         catch (UnknownUserSessionException)
@@ -133,13 +129,13 @@ public class AuthenticationController : ControllerBase
     [HttpPost("logout-all")]
     [Authorize(AuthenticationSchemes = Constants.Authentication.SessionTokenScheme.Name)]
     public async Task<IActionResult> LogoutAll(
-        [FromServices] ICommandHandler<DeleteUserSessionsCommand> deleteUserSessionsCommandHandler)
+        [FromServices] IRequestDispatcher requestDispatcher)
     {
         try
         {
             long userSteamId = User.FindFirstValue<long>(Constants.Claims.SteamId)!.Value;
             DeleteUserSessionsCommand command = new DeleteUserSessionsCommand { UserSteamId = userSteamId };
-            await deleteUserSessionsCommandHandler.HandleAsync(command);
+            await requestDispatcher.DispatchAsync(command);
             return NoContent();
         }
         catch (UnknownUserException)
@@ -148,9 +144,7 @@ public class AuthenticationController : ControllerBase
         }
     }
 
-    private async Task<string> CreateSessionForUserAsync(long steamId,
-        ICommandHandler<CreateOrUpdateUserCommand> createOrUpdateUserCommandHandler,
-        ICommandHandler<CreateUserSessionCommand> createUserSessionCommandHandler)
+    private async Task<string> CreateSessionForUserAsync(long steamId, IRequestDispatcher requestDispatcher)
     {
         PlayerSummary? playerSummary = await TryGetPlayerSummary(steamId);
         CreateOrUpdateUserCommand createOrUpdateUserCommand = new CreateOrUpdateUserCommand
@@ -159,7 +153,7 @@ public class AuthenticationController : ControllerBase
             SteamName = playerSummary?.PersonaName,
             SteamAvatarHash = playerSummary?.AvatarHash,
         };
-        await createOrUpdateUserCommandHandler.HandleAsync(createOrUpdateUserCommand);
+        await requestDispatcher.DispatchAsync(createOrUpdateUserCommand);
 
         string sessionToken = _TokenGenerator.GenerateToken(32);
         CreateUserSessionCommand createUserSessionCommand = new CreateUserSessionCommand
@@ -167,7 +161,7 @@ public class AuthenticationController : ControllerBase
             UserSteamId = steamId,
             SessionToken = sessionToken,
         };
-        await createUserSessionCommandHandler.HandleAsync(createUserSessionCommand);
+        await requestDispatcher.DispatchAsync(createUserSessionCommand);
 
         return sessionToken;
     }

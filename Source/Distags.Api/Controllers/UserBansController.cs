@@ -1,9 +1,8 @@
 ﻿using Distags.Api.Contracts.UserBans;
-using Distags.Core.Commands;
+using Distags.Core;
 using Distags.Core.Commands.BanSteamId;
 using Distags.Core.Commands.UnbanSteamId;
 using Distags.Core.Exceptions;
-using Distags.Core.Queries;
 using Distags.Core.Queries.UserBanBySteamId;
 using Distags.Core.Queries.UserBans;
 using Microsoft.AspNetCore.Authorization;
@@ -20,19 +19,19 @@ public class UserBansController : ControllerBase
     [HttpGet]
     [Authorize(Roles = Constants.Roles.Moderator)]
     public async Task<ActionResult<List<UserBanDto>>> GetUserBans(
-        [FromServices] IQueryHandler<UserBansQuery, List<UserBanDto>> userBansQueryHandler)
+        [FromServices] IRequestDispatcher requestDispatcher)
     {
-        List<UserBanDto> userBanDtos = await userBansQueryHandler.HandleAsync(new UserBansQuery());
+        List<UserBanDto> userBanDtos = await requestDispatcher.DispatchAsync(new UserBansQuery());
         return Ok(userBanDtos);
     }
 
     [HttpGet("{steamId:long}")]
     [Authorize(Roles = Constants.Roles.Moderator)]
     public async Task<ActionResult<UserBanDto>> GetUserBan(long steamId,
-        [FromServices] UserBanBySteamIdQueryHandler userBanBySteamIdQueryHandler)
+        [FromServices] IRequestDispatcher requestDispatcher)
     {
         UserBanBySteamIdQuery query = new UserBanBySteamIdQuery { SteamId = steamId };
-        UserBanDto? userBanDto = await userBanBySteamIdQueryHandler.HandleAsync(query);
+        UserBanDto? userBanDto = await requestDispatcher.DispatchAsync(query);
 
         return userBanDto != null
             ? Ok(userBanDto)
@@ -42,7 +41,7 @@ public class UserBansController : ControllerBase
     [HttpPost]
     [Authorize(Roles = Constants.Roles.Moderator)]
     public async Task<IActionResult> PostUserBan([FromBody] CreateUserBanDto userBanDto,
-        [FromServices] ICommandHandler<BanSteamIdCommand> banSteamIdCommandHandler)
+        [FromServices] IRequestDispatcher requestDispatcher)
     {
         try
         {
@@ -56,7 +55,7 @@ public class UserBansController : ControllerBase
                 BannerSteamId = bannerSteamId,
                 Reason = userBanDto.Reason,
             };
-            await banSteamIdCommandHandler.HandleAsync(command);
+            await requestDispatcher.DispatchAsync(command);
 
             return CreatedAtAction(nameof(GetUserBan), new { steamId = userBanDto.SteamId }, null);
         }
@@ -85,12 +84,12 @@ public class UserBansController : ControllerBase
     [HttpDelete("{steamId:long}")]
     [Authorize(Roles = Constants.Roles.Moderator)]
     public async Task<IActionResult> DeleteUserBan(long steamId,
-        [FromServices] ICommandHandler<UnbanSteamIdCommand> unbanSteamIdCommandHandler)
+        [FromServices] IRequestDispatcher requestDispatcher)
     {
         try
         {
             UnbanSteamIdCommand command = new UnbanSteamIdCommand { SteamId = steamId };
-            await unbanSteamIdCommandHandler.HandleAsync(command);
+            await requestDispatcher.DispatchAsync(command);
 
             return NoContent();
         }

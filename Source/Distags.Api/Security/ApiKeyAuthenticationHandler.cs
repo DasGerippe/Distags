@@ -1,6 +1,6 @@
 ﻿using Distags.Api.Contracts;
 using Distags.Contracts;
-using Distags.Core.Queries;
+using Distags.Core;
 using Distags.Core.Queries.AppByApiKey;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.Extensions.Options;
@@ -12,16 +12,16 @@ namespace Distags.Api.Security;
 
 public class ApiKeyAuthenticationHandler : AuthenticationHandler<AuthenticationSchemeOptions>
 {
-    private readonly IQueryHandler<AppByApiKeyQuery, AppDto?> _AppByApiKeyQueryHandler;
+    private readonly IRequestDispatcher _RequestDispatcher;
 
     public ApiKeyAuthenticationHandler(
         IOptionsMonitor<AuthenticationSchemeOptions> options,
         ILoggerFactory logger,
         UrlEncoder encoder,
-        IQueryHandler<AppByApiKeyQuery, AppDto?> appByApiKeyQueryHandler)
+        IRequestDispatcher requestDispatcher)
         : base(options, logger, encoder)
     {
-        _AppByApiKeyQueryHandler = appByApiKeyQueryHandler;
+        _RequestDispatcher = requestDispatcher;
     }
 
     protected override async Task<AuthenticateResult> HandleAuthenticateAsync()
@@ -35,7 +35,7 @@ public class ApiKeyAuthenticationHandler : AuthenticationHandler<AuthenticationS
             return AuthenticateResult.Fail("Invalid API key.");
 
         AppByApiKeyQuery query = new AppByApiKeyQuery { ApiKey = apiKey };
-        AppDto? app = await _AppByApiKeyQueryHandler.HandleAsync(query);
+        AppDto? app = await _RequestDispatcher.DispatchAsync(query);
 
         if (app == null)
             return AuthenticateResult.Fail("Invalid API key.");

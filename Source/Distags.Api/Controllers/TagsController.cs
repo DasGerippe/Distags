@@ -1,5 +1,5 @@
 ﻿using Distags.Contracts;
-using Distags.Core.Queries;
+using Distags.Core;
 using Distags.Core.Queries.TagTree;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -13,9 +13,9 @@ public class TagsController : ControllerBase
     [HttpGet("tree")]
     [AllowAnonymous]
     public async Task<ActionResult<IEnumerable<TagGroupDto>>> GetTagTreeAsync(
-        [FromServices] IQueryHandler<TagTreeQuery, List<TagGroupDto>> tagTreeQueryHandler)
+        [FromServices] IRequestDispatcher requestDispatcher)
     {
-        List<TagGroupDto> tagGroupDtos = await tagTreeQueryHandler.HandleAsync(new TagTreeQuery());
+        List<TagGroupDto> tagGroupDtos = await requestDispatcher.DispatchAsync(new TagTreeQuery());
         return Ok(tagGroupDtos);
     }
 }

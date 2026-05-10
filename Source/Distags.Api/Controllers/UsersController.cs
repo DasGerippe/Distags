@@ -1,8 +1,8 @@
 ﻿using Distags.Api.Contracts.Users;
+using Distags.Core;
 using Distags.Core.Commands;
 using Distags.Core.Commands.UpdateUserSettings;
 using Distags.Core.Exceptions;
-using Distags.Core.Queries;
 using Distags.Core.Queries.UserBySteamId;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -18,13 +18,13 @@ public class UsersController : ControllerBase
     [HttpGet("me")]
     [Authorize]
     public async Task<ActionResult<UserDto>> GetMe(
-        [FromServices] IQueryHandler<UserBySteamIdQuery, UserDto?> userBySteamIdQueryHandler)
+        [FromServices] IRequestDispatcher requestDispatcher)
     {
         Claim? steamIdClaim = User.FindFirst(Constants.Claims.SteamId);
         if (steamIdClaim == null || !long.TryParse(steamIdClaim.Value, out long steamId))
             return Unauthorized();
 
-        UserDto? user = await userBySteamIdQueryHandler.HandleAsync(new UserBySteamIdQuery { SteamId = steamId });
+        UserDto? user = await requestDispatcher.DispatchAsync(new UserBySteamIdQuery { SteamId = steamId });
         return user == null
             ? Unauthorized()
             : Ok(user);
@@ -33,7 +33,7 @@ public class UsersController : ControllerBase
     [HttpPatch("me/settings")]
     [Authorize]
     public async Task<IActionResult> PatchSettings([FromBody] PatchUserSettingsParameters parameters,
-        [FromServices] ICommandHandler<UpdateUserSettingsCommand> updateUserSettingsCommandHandler)
+        [FromServices] IRequestDispatcher requestDispatcher)
     {
         try
         {
@@ -48,7 +48,7 @@ public class UsersController : ControllerBase
                 IsAnonymous = parameters.IsAnonymous?.Value ?? default(UpdateValue<bool>),
             };
 
-            await updateUserSettingsCommandHandler.HandleAsync(command);
+            await requestDispatcher.DispatchAsync(command);
 
             return NoContent();
         }

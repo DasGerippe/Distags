@@ -1,7 +1,7 @@
 ﻿using Distags.Api.Hubs;
 using Distags.Contracts;
+using Distags.Core;
 using Distags.Core.Events;
-using Distags.Core.Queries;
 using Distags.Core.Queries.ContributionById;
 using Microsoft.AspNetCore.SignalR;
 
@@ -10,14 +10,14 @@ namespace Distags.Api.EventHandlers;
 public class ContributionCreatedBroadcastingEventHandler : IAppEventHandler<ContributionCreatedEvent>
 {
     private readonly IHubContext<ContributionHub, IContributionHubClient> _ContributionHub;
-    private readonly IQueryHandler<ContributionByIdQuery, ContributionDto?> _ContributionByIdQueryHandler;
+    private readonly IRequestDispatcher _RequestDispatcher;
 
     public ContributionCreatedBroadcastingEventHandler(
         IHubContext<ContributionHub, IContributionHubClient> contributionHub,
-        IQueryHandler<ContributionByIdQuery, ContributionDto?> contributionByIdQueryHandler)
+        IRequestDispatcher requestDispatcher)
     {
         _ContributionHub = contributionHub;
-        _ContributionByIdQueryHandler = contributionByIdQueryHandler;
+        _RequestDispatcher = requestDispatcher;
     }
 
     public async Task HandleAsync(ContributionCreatedEvent appEvent)
@@ -33,7 +33,7 @@ public class ContributionCreatedBroadcastingEventHandler : IAppEventHandler<Cont
             ContributionId = contributionId,
             IgnoreAnonymity = ignoreAnonymity,
         };
-        ContributionDto? contributionDto = await _ContributionByIdQueryHandler.HandleAsync(query);
+        ContributionDto? contributionDto = await _RequestDispatcher.DispatchAsync(query);
         if (contributionDto != null)
             await _ContributionHub.Clients.Group(groupName).NewContribution(contributionDto);
     }

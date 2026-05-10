@@ -1,11 +1,10 @@
 ﻿using Distags.Api.Contracts.Levels;
 using Distags.Api.Security;
 using Distags.Contracts;
-using Distags.Core.Commands;
+using Distags.Core;
 using Distags.Core.Commands.ChangeLevelTag;
 using Distags.Core.Exceptions;
 using Distags.Core.Filtering.Levels;
-using Distags.Core.Queries;
 using Distags.Core.Queries.BrowseLevels;
 using Distags.Core.Queries.LevelById;
 using Distags.Core.Queries.LevelTags;
@@ -24,7 +23,7 @@ public class LevelsController : ControllerBase
     [AllowAnonymous]
     public async Task<ActionResult<LevelsPage>> BrowseLevels(
         [FromQuery] BrowseLevelsParameters parameters,
-        [FromServices] IQueryHandler<BrowseLevelsQuery, LevelsPage> browseLevelsQueryHandler)
+        [FromServices] IRequestDispatcher dispatcher)
     {
         BrowseLevelsQuery query = new BrowseLevelsQuery
         {
@@ -40,7 +39,7 @@ public class LevelsController : ControllerBase
             PageSize = parameters.PageSize,
         };
 
-        LevelsPage levelsPage = await browseLevelsQueryHandler.HandleAsync(query);
+        LevelsPage levelsPage = await dispatcher.DispatchAsync(query);
         return Ok(levelsPage);
     }
 
@@ -57,11 +56,11 @@ public class LevelsController : ControllerBase
     [HttpGet("{levelId:long}")]
     [AllowAnonymous]
     public async Task<ActionResult<LevelDto>> GetLevel(long levelId,
-        [FromServices] IQueryHandler<LevelByIdQuery, LevelDto> levelByIdQueryHandler)
+        [FromServices] IRequestDispatcher requestDispatcher)
     {
         try
         {
-            LevelDto levelDto = await levelByIdQueryHandler.HandleAsync(new LevelByIdQuery { LevelId = levelId });
+            LevelDto levelDto = await requestDispatcher.DispatchAsync(new LevelByIdQuery { LevelId = levelId });
             return Ok(levelDto);
         }
         catch (UnknownLevelException ex)
@@ -73,11 +72,11 @@ public class LevelsController : ControllerBase
     [HttpGet("{levelId:long}/tags")]
     [AllowAnonymous]
     public async Task<ActionResult<IEnumerable<string>>> GetLevelTags(long levelId,
-        [FromServices] IQueryHandler<LevelTagsQuery, List<string>> levelTagsQueryHandler)
+        [FromServices] IRequestDispatcher requestDispatcher)
     {
         try
         {
-            List<string> tags = await levelTagsQueryHandler.HandleAsync(new LevelTagsQuery { LevelId = levelId });
+            List<string> tags = await requestDispatcher.DispatchAsync(new LevelTagsQuery { LevelId = levelId });
             return Ok(tags);
         }
         catch (UnknownLevelException ex)
@@ -89,7 +88,7 @@ public class LevelsController : ControllerBase
     [HttpPut("{levelId:long}/tags/{tagName}")]
     [Authorize(Roles = Constants.Roles.Tagger)]
     public async Task<IActionResult> PutLevelTag(long levelId, string tagName,
-        [FromServices] ICommandHandler<ChangeLevelTagCommand> changeLevelTagCommandHandler)
+        [FromServices] IRequestDispatcher requestDispatcher)
     {
         try
         {
@@ -101,7 +100,7 @@ public class LevelsController : ControllerBase
                 AppName = User.FindFirstValue(Constants.Claims.AppName),
                 Action = TagChangeAction.Add,
             };
-            await changeLevelTagCommandHandler.HandleAsync(command);
+            await requestDispatcher.DispatchAsync(command);
             return Created();
         }
         catch (MaintenanceActiveException)
@@ -129,7 +128,7 @@ public class LevelsController : ControllerBase
     [HttpDelete("{levelId:long}/tags/{tagName}")]
     [Authorize(Roles = Constants.Roles.Tagger)]
     public async Task<IActionResult> DeleteLevelTag(long levelId, string tagName,
-        [FromServices] ICommandHandler<ChangeLevelTagCommand> changeLevelTagCommandHandler)
+        [FromServices] IRequestDispatcher requestDispatcher)
     {
         try
         {
@@ -141,7 +140,7 @@ public class LevelsController : ControllerBase
                 AppName = User.FindFirstValue(Constants.Claims.AppName),
                 Action = TagChangeAction.Remove,
             };
-            await changeLevelTagCommandHandler.HandleAsync(command);
+            await requestDispatcher.DispatchAsync(command);
             return NoContent();
         }
         catch (MaintenanceActiveException)

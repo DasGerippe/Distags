@@ -1,4 +1,5 @@
-﻿using Distags.Core.Commands;
+﻿using Distags.Core;
+using Distags.Core.Commands;
 using Distags.Core.Commands.CleanupUserSessions;
 using Microsoft.Extensions.Options;
 
@@ -49,13 +50,12 @@ public class SessionCleanupService : BackgroundService
     private async Task DeleteDeprecatedSessionsAsync()
     {
         using IServiceScope scope = _ScopeFactory.CreateScope();
-        ICommandHandler<CleanupUserSessionsCommand> cleanupUserSessionsCommandHandler =
-            scope.ServiceProvider.GetRequiredService<ICommandHandler<CleanupUserSessionsCommand>>();
+        IRequestDispatcher requestDispatcher = scope.ServiceProvider.GetRequiredService<IRequestDispatcher>();
 
         CleanupUserSessionsCommand command = new CleanupUserSessionsCommand
         {
             SessionExpirationDelay = _SessionExpirationDelay,
         };
-        await cleanupUserSessionsCommandHandler.HandleAsync(command);
+        await requestDispatcher.DispatchAsync(command);
     }
 }

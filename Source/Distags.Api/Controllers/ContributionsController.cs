@@ -1,8 +1,7 @@
 ﻿using Distags.Api.Contracts.Contributions;
 using Distags.Contracts;
-using Distags.Core.Commands;
+using Distags.Core;
 using Distags.Core.Commands.RevertContributions;
-using Distags.Core.Queries;
 using Distags.Core.Queries.Contributions;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -15,7 +14,7 @@ public class ContributionsController : ControllerBase
 {
     [HttpGet]
     public async Task<ActionResult<ContributionsPage>> GetContributions([FromQuery] GetContributionsParameters parameters,
-        [FromServices] IQueryHandler<ContributionsQuery, ContributionsPage> contributionsQueryHandler)
+        [FromServices] IRequestDispatcher requestDispatcher)
     {
         ContributionsQuery query = new ContributionsQuery
         {
@@ -27,7 +26,7 @@ public class ContributionsController : ControllerBase
             Limit = parameters.Limit,
             Cursor = parameters.Cursor,
         };
-        ContributionsPage contributionsPage = await contributionsQueryHandler.HandleAsync(query);
+        ContributionsPage contributionsPage = await requestDispatcher.DispatchAsync(query);
         return Ok(contributionsPage);
     }
 
@@ -35,14 +34,14 @@ public class ContributionsController : ControllerBase
     [Authorize(Roles = Constants.Roles.Moderator)]
     public async Task<IActionResult> RevertContributions(
         [FromBody] RevertContributionsParameters parameters,
-        [FromServices] ICommandHandler<RevertContributionsCommand> revertContributionsCommandHandler)
+        [FromServices] IRequestDispatcher requestDispatcher)
     {
         RevertContributionsCommand command = new RevertContributionsCommand
         {
             UserSteamId = parameters.SteamId,
             RevertStartDate = parameters.RevertStartDate,
         };
-        await revertContributionsCommandHandler.HandleAsync(command);
+        await requestDispatcher.DispatchAsync(command);
         return NoContent();
     }
 }

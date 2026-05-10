@@ -1,6 +1,5 @@
-﻿using Distags.Core.Commands;
+﻿using Distags.Core;
 using Distags.Core.Commands.ImportLevels;
-using Distags.Core.Queries;
 using Distags.Core.Queries.LatestLevelDate;
 using Microsoft.Extensions.Logging;
 using SteamWebApi;
@@ -13,8 +12,7 @@ public class LevelScraper
 {
     private const int DistanceAppId = 233610;
 
-    private readonly IQueryHandler<LatestLevelDateQuery, DateTimeOffset?> _LatestLevelDateQueryHandler;
-    private readonly ICommandHandler<ImportLevelsCommand> _ImportLevelsCommandHandler;
+    private readonly IRequestDispatcher _RequestDispatcher;
     private readonly IPublishedFileService _PublishedFileService;
 
     private readonly string _SteamWebApiKey;
@@ -22,14 +20,12 @@ public class LevelScraper
     private readonly ILogger<LevelScraper> _Logger;
 
     public LevelScraper(
-        IQueryHandler<LatestLevelDateQuery, DateTimeOffset?> latestLevelDateQueryHandler,
-        ICommandHandler<ImportLevelsCommand> importLevelsCommandHandler,
+        IRequestDispatcher requestDispatcher,
         IPublishedFileService publishedFileService,
         SteamWebApiSettings steamWebApiSettings,
         ILogger<LevelScraper> logger)
     {
-        _LatestLevelDateQueryHandler = latestLevelDateQueryHandler;
-        _ImportLevelsCommandHandler = importLevelsCommandHandler;
+        _RequestDispatcher = requestDispatcher;
         _PublishedFileService = publishedFileService;
         _SteamWebApiKey = steamWebApiSettings.ApiKey;
 
@@ -40,7 +36,7 @@ public class LevelScraper
     {
         _Logger.LogDebug("Scraping levels from Steam web API...");
 
-        DateTimeOffset? cutOffDate = await _LatestLevelDateQueryHandler.HandleAsync(new LatestLevelDateQuery()).ConfigureAwait(false);
+        DateTimeOffset? cutOffDate = await _RequestDispatcher.DispatchAsync(new LatestLevelDateQuery()).ConfigureAwait(false);
 
         List<ScrapedLevel> scrapedLevels = await ScrapeNewLevelsAsync(cutOffDate, cancellationToken).ConfigureAwait(false);
 
@@ -48,7 +44,7 @@ public class LevelScraper
             scrapedLevels.AddRange(await ScrapeUpdatedLevelsAsync(cutOffDate.Value, cancellationToken).ConfigureAwait(false));
 
         ImportLevelsCommand importLevelsCommand = new ImportLevelsCommand { ScrapedLevels = scrapedLevels };
-        await _ImportLevelsCommandHandler.HandleAsync(importLevelsCommand).ConfigureAwait(false);
+        await _RequestDispatcher.DispatchAsync(importLevelsCommand).ConfigureAwait(false);
 
         _Logger.LogDebug("Scraped levels from Steam web API.");
     }

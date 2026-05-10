@@ -1,6 +1,5 @@
-﻿using Distags.Core.Commands;
+﻿using Distags.Core;
 using Distags.Core.Commands.ImportCreators;
-using Distags.Core.Queries;
 using Distags.Core.Queries.StalestCreators;
 using Distags.Core.Queries.UnknownCreators;
 using Microsoft.Extensions.Logging;
@@ -12,9 +11,7 @@ namespace SteamDataScraper.Creators;
 
 public class CreatorScraper
 {
-    private readonly IQueryHandler<UnknownCreatorsQuery, List<long>> _UnknownCreatorsQueryHandler;
-    private readonly IQueryHandler<StalestCreatorsQuery, List<long>> _StalestCreatorsQueryHandler;
-    private readonly ICommandHandler<ImportCreatorsCommand> _ImportCreatorsCommandHandler;
+    private readonly IRequestDispatcher _RequestDispatcher;
     private readonly ISteamUser _SteamUser;
     private readonly ICreatorRefreshCountCalculator _RefreshCountCalculator;
     private readonly ICreatorRefreshDateManager _RefreshDateManager;
@@ -24,18 +21,14 @@ public class CreatorScraper
     private readonly ILogger<CreatorScraper> _Logger;
 
     public CreatorScraper(
-        IQueryHandler<UnknownCreatorsQuery, List<long>> unknownCreatorsQueryHandler,
-        IQueryHandler<StalestCreatorsQuery, List<long>> stalestCreatorsQueryHandler,
-        ICommandHandler<ImportCreatorsCommand> importCreatorsCommandHandler,
+        IRequestDispatcher requestDispatcher,
         ISteamUser steamUser,
         ICreatorRefreshCountCalculator refreshCountCalculator,
         ICreatorRefreshDateManager refreshDateManager,
         SteamWebApiSettings steamWebApiSettings,
         ILogger<CreatorScraper> logger)
     {
-        _UnknownCreatorsQueryHandler = unknownCreatorsQueryHandler;
-        _StalestCreatorsQueryHandler = stalestCreatorsQueryHandler;
-        _ImportCreatorsCommandHandler = importCreatorsCommandHandler;
+        _RequestDispatcher = requestDispatcher;
         _SteamUser = steamUser;
         _RefreshCountCalculator = refreshCountCalculator;
         _RefreshDateManager = refreshDateManager;
@@ -52,7 +45,7 @@ public class CreatorScraper
         List<ScrapedCreator> scrapedCreators = await ScrapeLevelCreatorsAsync(creatorIds, cancellationToken).ConfigureAwait(false);
 
         ImportCreatorsCommand importCreatorsCommand = new ImportCreatorsCommand { ScrapedCreators = scrapedCreators };
-        await _ImportCreatorsCommandHandler.HandleAsync(importCreatorsCommand).ConfigureAwait(false);
+        await _RequestDispatcher.DispatchAsync(importCreatorsCommand).ConfigureAwait(false);
 
         await _RefreshDateManager.SetRefreshDateAsync(DateTimeOffset.UtcNow, cancellationToken).ConfigureAwait(false);
 
@@ -63,13 +56,13 @@ public class CreatorScraper
     {
         _Logger.LogDebug("Determining IDs of creators to be scraped...");
 
-        List<long> creatorIds = await _UnknownCreatorsQueryHandler.HandleAsync(new UnknownCreatorsQuery()).ConfigureAwait(false);
+        List<long> creatorIds = await _RequestDispatcher.DispatchAsync(new UnknownCreatorsQuery()).ConfigureAwait(false);
 
         int refreshCount = await _RefreshCountCalculator.CalculateCreatorRefreshCountAsync(cancellationToken).ConfigureAwait(false);
         if (refreshCount > 0)
         {
             StalestCreatorsQuery stalestCreatorsQuery = new StalestCreatorsQuery { Limit = refreshCount };
-            List<long> stalestCreatorIds = await _StalestCreatorsQueryHandler.HandleAsync(stalestCreatorsQuery).ConfigureAwait(false);
+            List<long> stalestCreatorIds = await _RequestDispatcher.DispatchAsync(stalestCreatorsQuery).ConfigureAwait(false);
             creatorIds.AddRange(stalestCreatorIds);
         }
 

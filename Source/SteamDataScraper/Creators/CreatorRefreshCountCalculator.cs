@@ -1,4 +1,4 @@
-﻿using Distags.Core.Queries;
+﻿using Distags.Core;
 using Distags.Core.Queries.CreatorCount;
 using Microsoft.Extensions.Logging;
 
@@ -6,18 +6,18 @@ namespace SteamDataScraper.Creators;
 
 public class CreatorRefreshCountCalculator : ICreatorRefreshCountCalculator
 {
-    private readonly IQueryHandler<CreatorCountQuery, long> _CreatorCountQueryHandler;
+    private readonly IRequestDispatcher _RequestDispatcher;
     private readonly CreatorRefreshSettings _Settings;
     private readonly ICreatorRefreshDateManager _RefreshDateManager;
     private readonly ILogger<CreatorRefreshCountCalculator> _Logger;
 
     public CreatorRefreshCountCalculator(
-        IQueryHandler<CreatorCountQuery, long> creatorCountQueryHandler,
+        IRequestDispatcher requestDispatcher,
         CreatorRefreshSettings settings,
         ICreatorRefreshDateManager refreshDateManager,
         ILogger<CreatorRefreshCountCalculator>  logger)
     {
-        _CreatorCountQueryHandler = creatorCountQueryHandler;
+        _RequestDispatcher = requestDispatcher;
         _Settings = settings;
         _RefreshDateManager = refreshDateManager;
         _Logger = logger;
@@ -27,7 +27,7 @@ public class CreatorRefreshCountCalculator : ICreatorRefreshCountCalculator
     {
         _Logger.LogDebug("Calculating creator refresh count...");
 
-        long creatorCount = await _CreatorCountQueryHandler.HandleAsync(new CreatorCountQuery()).ConfigureAwait(false);
+        long creatorCount = await _RequestDispatcher.DispatchAsync(new CreatorCountQuery()).ConfigureAwait(false);
         if (creatorCount == 0)
         {
             _Logger.LogDebug("No creators exist that could be refreshed.");

@@ -1,8 +1,8 @@
 ﻿using AutoTagging.Abstractions;
 using Distags.Contracts;
+using Distags.Core;
 using Distags.Core.Filtering.Levels;
 using Distags.Core.Mapping;
-using Distags.Core.Queries;
 using Distags.Core.Queries.LevelsProjection;
 
 namespace AutoTaggerRunner;
@@ -12,16 +12,16 @@ public class AutoTaggerLevelProvider : IAutoTaggerLevelProvider
     private readonly TaggingStrategy _TaggingStrategy;
     private readonly LevelProjectionIncludes _RequiredIncludes;
 
-    private readonly IQueryHandler<LevelsProjectionQuery, List<LevelProjectionDto>> _LevelsProjectionQueryHandler;
+    private readonly IRequestDispatcher _RequestDispatcher;
 
     public AutoTaggerLevelProvider(
         TaggingStrategy taggingStrategy,
         LevelProjectionIncludes requiredIncludes,
-        IQueryHandler<LevelsProjectionQuery, List<LevelProjectionDto>> levelsProjectionQueryHandler)
+        IRequestDispatcher requestDispatcher)
     {
         _TaggingStrategy = taggingStrategy;
         _RequiredIncludes = requiredIncludes;
-        _LevelsProjectionQueryHandler = levelsProjectionQueryHandler;
+        _RequestDispatcher = requestDispatcher;
     }
 
     public async Task<List<LevelProjectionDto>> GetLevelsToTagAsync(AutoTaggerState state)
@@ -42,7 +42,7 @@ public class AutoTaggerLevelProvider : IAutoTaggerLevelProvider
             FilterParameters = filterParameters,
             Includes = _RequiredIncludes,
         };
-        List<LevelProjectionDto> levels = await _LevelsProjectionQueryHandler.HandleAsync(query);
+        List<LevelProjectionDto> levels = await _RequestDispatcher.DispatchAsync(query);
         return levels;
     }
 }

@@ -1,8 +1,7 @@
 ﻿using Distags.Api.Contracts;
 using Distags.Contracts;
-using Distags.Core.Commands;
+using Distags.Core;
 using Distags.Core.Commands.UpdateUserSessionLastSeen;
-using Distags.Core.Queries;
 using Distags.Core.Queries.UserBySessionToken;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.Extensions.Options;
@@ -14,19 +13,16 @@ namespace Distags.Api.Security;
 
 public class SessionAuthenticationHandler : AuthenticationHandler<AuthenticationSchemeOptions>
 {
-    private readonly IQueryHandler<UserBySessionTokenQuery, UserDto?> _UserBySessionTokenQueryHandler;
-    private readonly ICommandHandler<UpdateUserSessionLastSeenCommand> _UpdateUserSessionLastSeenCommandHandler;
+    private readonly IRequestDispatcher _RequestDispatcher;
 
     public SessionAuthenticationHandler(
         IOptionsMonitor<AuthenticationSchemeOptions> options,
         ILoggerFactory logger,
         UrlEncoder encoder,
-        IQueryHandler<UserBySessionTokenQuery, UserDto?> userBySessionTokenQueryHandler,
-        ICommandHandler<UpdateUserSessionLastSeenCommand> updateUserSessionLastSeenCommandHandler)
+        IRequestDispatcher requestDispatcher)
         : base(options, logger, encoder)
     {
-        _UserBySessionTokenQueryHandler = userBySessionTokenQueryHandler;
-        _UpdateUserSessionLastSeenCommandHandler = updateUserSessionLastSeenCommandHandler;
+        _RequestDispatcher = requestDispatcher;
     }
 
     protected override async Task<AuthenticateResult> HandleAuthenticateAsync()
@@ -40,13 +36,13 @@ public class SessionAuthenticationHandler : AuthenticationHandler<Authentication
             return AuthenticateResult.Fail("Invalid session token.");
 
         UserBySessionTokenQuery query = new UserBySessionTokenQuery { SessionToken = sessionToken };
-        UserDto? user = await _UserBySessionTokenQueryHandler.HandleAsync(query);
+        UserDto? user = await _RequestDispatcher.DispatchAsync(query);
 
         if (user == null)
             return AuthenticateResult.Fail("Invalid session token.");
 
         UpdateUserSessionLastSeenCommand command = new UpdateUserSessionLastSeenCommand { SessionToken = sessionToken };
-        await _UpdateUserSessionLastSeenCommandHandler.HandleAsync(command);
+        await _RequestDispatcher.DispatchAsync(command);
 
         bool userCanTag = user.AcceptsGuidelines && !user.IsBanned;
         if (userCanTag)
