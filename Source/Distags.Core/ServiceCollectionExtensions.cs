@@ -12,38 +12,54 @@ using Distags.Core.Services;
 using Distags.Core.Sorting;
 using Distags.Core.Sorting.Levels;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
 
 namespace Distags.Core;
 
 public static class ServiceCollectionExtensions
 {
-    public static IServiceCollection AddDistagsCore(this IServiceCollection serviceCollection)
+    public static IServiceCollection AddDistagsCore(this IServiceCollection services, string? configSectionPath = null)
     {
-        serviceCollection.AddTransient<TokenGenerator>();
+        configSectionPath ??= $"{nameof(Distags)}:{nameof(Core)}";
+        services.AddValidatedConfigOptions<DistagsCoreSettings>(configSectionPath);
 
-        serviceCollection.AddTransient<ContributionManager>();
-        serviceCollection.AddTransient<TagChangeManager>();
-        serviceCollection.AddTransient<ContributionReplayEngine>();
-        serviceCollection.AddTransient<UserBanPermissionChecker>();
+        services.AddTransient<TokenGenerator>();
 
-        serviceCollection.AddTransient<MaintenanceManager>();
+        services.AddTransient<ContributionManager>();
+        services.AddTransient<TagChangeManager>();
+        services.AddTransient<ContributionReplayEngine>();
+        services.AddTransient<UserBanPermissionChecker>();
 
-        serviceCollection.AddTransient<IQueryableFilterFactory<Contribution, ContributionFilterParameters>, ContributionFilterFactory>();
-        serviceCollection.AddTransient<IQueryableFilterFactory<Level, LevelFilterParameters>, LevelFilterFactory>();
+        services.AddTransient<MaintenanceManager>();
 
-        serviceCollection.AddTransient<IQueryableSorterFactory<Level, LevelSortStrategy>, LevelSorterFactory>();
+        services.AddTransient<IQueryableFilterFactory<Contribution, ContributionFilterParameters>, ContributionFilterFactory>();
+        services.AddTransient<IQueryableFilterFactory<Level, LevelFilterParameters>, LevelFilterFactory>();
 
-        serviceCollection.AddTransient<IRequestDispatcher, RequestDispatcher>();
-        serviceCollection.Scan(scan => scan
+        services.AddTransient<IQueryableSorterFactory<Level, LevelSortStrategy>, LevelSorterFactory>();
+
+        services.AddTransient<IRequestDispatcher, RequestDispatcher>();
+        services.Scan(scan => scan
             .FromAssemblies(typeof(ServiceCollectionExtensions).Assembly)
             .AddClasses(classes => classes.AssignableTo(typeof(IQueryHandler<,>)))
             .AsImplementedInterfaces()
             .AddClasses(classes => classes.AssignableTo(typeof(ICommandHandler<>)))
             .AsImplementedInterfaces());
 
-        serviceCollection.AddSingleton<AppEventQueue>();
-        serviceCollection.AddHostedService<AppEventDispatcherService>();
+        services.AddSingleton<AppEventQueue>();
+        services.AddHostedService<AppEventDispatcherService>();
 
-        return serviceCollection;
+        return services;
+    }
+
+    private static IServiceCollection AddValidatedConfigOptions<TOptions>(this IServiceCollection services, string configSectionPath)
+        where TOptions : class
+    {
+        services.AddOptions<TOptions>()
+            .BindConfiguration(configSectionPath)
+            .ValidateDataAnnotations()
+            .ValidateOnStart();
+
+        services.AddTransient<TOptions>(services => services.GetRequiredService<IOptions<TOptions>>().Value);
+        return services;
     }
 }

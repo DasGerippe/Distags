@@ -93,10 +93,20 @@ public class ChangeLevelTagCommandHandler : ICommandHandler<ChangeLevelTagComman
 
     private async Task EnsureTagChangeAllowedAsync(User? user, App? app, Tag tag)
     {
+        if (user?.IsBanned == true)
+            throw new UserBannedException();
+
+        if (user?.AcceptsGuidelines == false)
+            throw new UserNotAllowedException();
+
         if (tag.IsAutoTag && (app == null || user != null))
             throw new CannotChangeAutoTagException();
 
-        if (user != null && !user.Roles.Contains("Administrator") && !user.Roles.Contains("Moderator"))
+        bool isMaintenanceAffectedUser =
+            user != null &&
+            !user.Roles.Contains(Constants.UserRoles.Administrator) &&
+            !user.Roles.Contains(Constants.UserRoles.Moderator);
+        if (isMaintenanceAffectedUser)
         {
             bool isMaintenanceActive = await _MaintenanceManager.GetSettingValueAsync().ConfigureAwait(false);
             if (isMaintenanceActive)
