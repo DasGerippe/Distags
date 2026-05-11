@@ -51,6 +51,7 @@ public class BanSteamIdCommandHandler : ICommandHandler<BanSteamIdCommand>
         UserBan userBan = new UserBan
         {
             SteamId = command.SteamId,
+            User = bannedUser,
             BannedOn = DateTimeOffset.UtcNow,
             Banner = banner,
             Reason = command.Reason,

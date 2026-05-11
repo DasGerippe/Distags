@@ -9,8 +9,8 @@ public class UserBanMapper : IEntityMapper<UserBan, UserBanDto>
     public Expression<Func<UserBan, UserBanDto>> Expression => userBan => new UserBanDto
     {
         SteamId = userBan.SteamId,
-        SteamName = null, //userBan.User!.SteamName,
-        SteamAvatarHash = null, //userBan.User!.SteamAvatarHash,
+        SteamName = userBan.User!.SteamName,
+        SteamAvatarHash = userBan.User!.SteamAvatarHash,
         BannedOn = userBan.BannedOn,
         Banner = new UserBanBannerDto
         {

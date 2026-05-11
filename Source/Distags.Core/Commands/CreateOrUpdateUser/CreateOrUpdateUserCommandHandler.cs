@@ -35,18 +35,24 @@ public class CreateOrUpdateUserCommandHandler : ICommandHandler<CreateOrUpdateUs
 
     private async Task<User> CreateUserAsync(long steamId, string? steamName, string? steamAvatarHash)
     {
-        bool userBanExists = await _DbContext.Set<UserBan>()
-            .Where(userBan => userBan.SteamId == steamId)
-            .AnyAsync()
-            .ConfigureAwait(false);
-
         User user = new User
         {
             SteamId = steamId,
             SteamName = steamName,
             SteamAvatarHash = steamAvatarHash,
-            IsBanned = userBanExists,
         };
+
+        UserBan? userBan = await _DbContext.Set<UserBan>()
+            .Where(userBan => userBan.SteamId == steamId)
+            .FirstOrDefaultAsync()
+            .ConfigureAwait(false);
+
+        if (userBan != null)
+        {
+            user.IsBanned = true;
+            userBan.User = user;
+        }
+
         _DbContext.Add(user);
         return user;
     }

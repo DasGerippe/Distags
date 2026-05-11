@@ -385,11 +385,18 @@ namespace Distags.Persistence.Dev
                         .HasColumnType("text")
                         .HasColumnName("reason");
 
+                    b.Property<long?>("UserId")
+                        .HasColumnType("bigint")
+                        .HasColumnName("user_id");
+
                     b.HasKey("SteamId")
                         .HasName("pk_user_bans");
 
                     b.HasIndex("BannerId")
                         .HasDatabaseName("ix_user_bans_banner_id");
+
+                    b.HasIndex("UserId")
+                        .HasDatabaseName("ix_user_bans_user_id");
 
                     b.ToTable("user_bans", (string)null);
                 });
@@ -514,7 +521,14 @@ namespace Distags.Persistence.Dev
                         .IsRequired()
                         .HasConstraintName("fk_user_bans_users_banner_id");
 
+                    b.HasOne("Distags.Core.Entities.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .HasConstraintName("fk_user_bans_users_user_id");
+
                     b.Navigation("Banner");
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("Distags.Core.Entities.UserSession", b =>
