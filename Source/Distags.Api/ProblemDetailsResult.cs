@@ -14,6 +14,26 @@ public static class ProblemDetailsResult
         });
     }
 
+    public static ObjectResult ForbiddenBanSelf()
+    {
+        return ForbiddenBan("You cannot ban yourself.");
+    }
+
+    public static ObjectResult ForbiddenBanOtherUser()
+    {
+        return ForbiddenBan("You cannot ban the user of that Steam ID.");
+    }
+
+    private static ObjectResult ForbiddenBan(string detail)
+    {
+        return ObjectResult(new ProblemDetails
+        {
+            Status = StatusCodes.Status403Forbidden,
+            Title = "Cannot Ban Steam ID",
+            Detail = detail,
+        });
+    }
+
     public static ObjectResult MaintenanceActive()
     {
         return ObjectResult(new ProblemDetails
@@ -91,6 +111,26 @@ public static class ProblemDetailsResult
             Status = StatusCodes.Status404NotFound,
             Title = "User Not Found",
             Detail = $"Could not find user with Steam ID {userSteamId}.",
+        });
+    }
+
+    public static ObjectResult UserBanNotFound(long steamId)
+    {
+        return ObjectResult(new ProblemDetails
+        {
+            Status = StatusCodes.Status404NotFound,
+            Title = "User Ban Not Found",
+            Detail = $"The Steam ID {steamId} is not banned.",
+        });
+    }
+
+    public static ObjectResult UserBanConflict(long steamId)
+    {
+        return ObjectResult(new ProblemDetails
+        {
+            Status = StatusCodes.Status409Conflict,
+            Title = "Steam ID Already Banned",
+            Detail = $"A ban for the Steam ID {steamId} already exists.",
         });
     }
 

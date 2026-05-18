@@ -35,7 +35,7 @@ public class UserBansController : ControllerBase
 
         return userBanDto != null
             ? Ok(userBanDto)
-            : NotFound("The Steam ID is not banned.");
+            : ProblemDetailsResult.UserBanNotFound(steamId);
     }
 
     [HttpPost]
@@ -65,19 +65,15 @@ public class UserBansController : ControllerBase
         }
         catch (CannotBanSelfException)
         {
-            return Problem(
-                statusCode: StatusCodes.Status403Forbidden,
-                detail: "You don't have permission to ban yourself.");
+            return ProblemDetailsResult.ForbiddenBanSelf();
         }
         catch (CannotBanOtherUserException)
         {
-            return Problem(
-                statusCode: StatusCodes.Status403Forbidden,
-                detail: "You don't have permission to ban that Steam ID.");
+            return ProblemDetailsResult.ForbiddenBanOtherUser();
         }
         catch (SteamIdAlreadyBannedException)
         {
-            return Conflict("The Steam ID is already banned.");
+            return ProblemDetailsResult.UserBanConflict(userBanDto.SteamId);
         }
     }
 
@@ -95,7 +91,7 @@ public class UserBansController : ControllerBase
         }
         catch (SteamIdNotBannedException)
         {
-            return NotFound("The Steam ID is not banned.");
+            return ProblemDetailsResult.UserBanNotFound(steamId);
         }
     }
 }
