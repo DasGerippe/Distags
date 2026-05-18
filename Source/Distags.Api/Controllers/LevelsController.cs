@@ -63,9 +63,9 @@ public class LevelsController : ControllerBase
             LevelDto levelDto = await requestDispatcher.DispatchAsync(new LevelByIdQuery { LevelId = levelId });
             return Ok(levelDto);
         }
-        catch (UnknownLevelException ex)
+        catch (UnknownLevelException)
         {
-            return LevelNotFound(ex.LevelId);
+            return ProblemDetailsResult.LevelNotFound(levelId);
         }
     }
 
@@ -79,9 +79,9 @@ public class LevelsController : ControllerBase
             List<string> tags = await requestDispatcher.DispatchAsync(new LevelTagsQuery { LevelId = levelId });
             return Ok(tags);
         }
-        catch (UnknownLevelException ex)
+        catch (UnknownLevelException)
         {
-            return LevelNotFound(ex.LevelId);
+            return ProblemDetailsResult.LevelNotFound(levelId);
         }
     }
 
@@ -105,23 +105,23 @@ public class LevelsController : ControllerBase
         }
         catch (MaintenanceActiveException)
         {
-            return MaintenanceResult();
+            return ProblemDetailsResult.MaintenanceActive();
         }
         catch (CannotChangeAutoTagException)
         {
-            return CannotChangeAutoTagResult(tagName);
+            return ProblemDetailsResult.ForbiddenChangeAutoTag(tagName);
         }
-        catch (UnknownLevelException ex)
+        catch (UnknownLevelException)
         {
-            return LevelNotFound(ex.LevelId);
+            return ProblemDetailsResult.LevelNotFound(levelId);
         }
-        catch (UnknownTagException ex)
+        catch (UnknownTagException)
         {
-            return TagNotSupported(ex.TagName);
+            return ProblemDetailsResult.TagNotFound(tagName);
         }
         catch (LevelTagExistsException)
         {
-            return NoContent();
+            return ProblemDetailsResult.LevelTagConflict(levelId, tagName);
         }
     }
 
@@ -145,59 +145,23 @@ public class LevelsController : ControllerBase
         }
         catch (MaintenanceActiveException)
         {
-            return MaintenanceResult();
+            return ProblemDetailsResult.MaintenanceActive();
         }
         catch (CannotChangeAutoTagException)
         {
-            return CannotChangeAutoTagResult(tagName);
+            return ProblemDetailsResult.ForbiddenChangeAutoTag(tagName);
         }
-        catch (UnknownLevelException ex)
+        catch (UnknownLevelException)
         {
-            return LevelNotFound(ex.LevelId);
+            return ProblemDetailsResult.LevelNotFound(levelId);
         }
-        catch (UnknownTagException ex)
+        catch (UnknownTagException)
         {
-            return TagNotSupported(ex.TagName);
+            return ProblemDetailsResult.TagNotFound(tagName);
         }
         catch (LevelTagNotFoundException)
         {
-            return NotFound();
+            return ProblemDetailsResult.LevelTagNotFound(levelId, tagName);
         }
-    }
-
-    private IActionResult MaintenanceResult()
-    {
-        return StatusCode(StatusCodes.Status503ServiceUnavailable, new ProblemDetails
-        {
-            Title = "Maintenance Active",
-            Detail = "This operation is temporarily unavailable due to maintenance.",
-        });
-    }
-
-    private IActionResult CannotChangeAutoTagResult(string tagName)
-    {
-        return StatusCode(StatusCodes.Status403Forbidden, new ProblemDetails
-        {
-            Title = "Cannot Change AutoTag",
-            Detail = $"The tag {tagName} is an AutoTag and cannot be changed by users.",
-        });
-    }
-
-    private NotFoundObjectResult LevelNotFound(long levelId)
-    {
-        return NotFound(new ProblemDetails
-        {
-            Title = "Unknown level",
-            Detail = $"Could not find level with ID {levelId}.",
-        });
-    }
-
-    private BadRequestObjectResult TagNotSupported(string tagName)
-    {
-        return BadRequest(new ProblemDetails
-        {
-            Title = "Unsupported tag",
-            Detail = $"The tag '{tagName}' is not supported.",
-        });
     }
 }
