@@ -1,0 +1,22 @@
+info:
+  name: Remove Role
+  type: http
+  seq: 5
+
+http:
+  method: DELETE
+  url: "{{url}}/users/:steamId/roles/:role"
+  params:
+    - name: role
+      value: Moderator
+      type: path
+    - name: steamId
+      value: "76561198139613473"
+      type: path
+  auth: inherit
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

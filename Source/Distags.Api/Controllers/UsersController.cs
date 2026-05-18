@@ -1,13 +1,16 @@
 ﻿using Distags.Api.Contracts.Users;
+using Distags.Contracts;
 using Distags.Core;
 using Distags.Core.Commands;
+using Distags.Core.Commands.AddUserRole;
+using Distags.Core.Commands.RemoveUserRole;
 using Distags.Core.Commands.UpdateUserSettings;
 using Distags.Core.Exceptions;
 using Distags.Core.Queries.UserBySteamId;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
-using UserDto = Distags.Contracts.UserDto;
+using static Distags.Contracts.Constants;
 
 namespace Distags.Api.Controllers;
 
@@ -55,6 +58,60 @@ public class UsersController : ControllerBase
         catch (UnknownUserException)
         {
             return Unauthorized();
+        }
+    }
+
+    [HttpGet("{userSteamId:long}")]
+    [Authorize(Roles = UserRoles.Administrator)]
+    public async Task<IActionResult> GetUser(long userSteamId,
+        [FromServices] IRequestDispatcher requestDispatcher)
+    {
+        UserBySteamIdQuery query = new UserBySteamIdQuery { SteamId = userSteamId };
+        UserDto? user = await requestDispatcher.DispatchAsync(query);
+        return user != null
+            ? Ok(user)
+            : ProblemDetailsResult.UserNotFound(userSteamId);
+    }
+
+    [HttpPut("{userSteamId:long}/roles/{role}")]
+    [Authorize(Roles = UserRoles.Administrator)]
+    public async Task<IActionResult> AddUserRole(long userSteamId, string role,
+        [FromServices] IRequestDispatcher requestDispatcher)
+    {
+        try
+        {
+            AddUserRoleCommand command = new AddUserRoleCommand
+            {
+                UserSteamId = userSteamId,
+                Role = role,
+            };
+            await requestDispatcher.DispatchAsync(command);
+            return NoContent();
+        }
+        catch (UnknownUserException)
+        {
+            return ProblemDetailsResult.UserNotFound(userSteamId);
+        }
+    }
+
+    [HttpDelete("{userSteamId:long}/roles/{role}")]
+    [Authorize(Roles = UserRoles.Administrator)]
+    public async Task<IActionResult> RemoveUserRole(long userSteamId, string role,
+        [FromServices] IRequestDispatcher requestDispatcher)
+    {
+        try
+        {
+            RemoveUserRoleCommand command = new RemoveUserRoleCommand
+            {
+                UserSteamId = userSteamId,
+                Role = role,
+            };
+            await requestDispatcher.DispatchAsync(command);
+            return NoContent();
+        }
+        catch
+        {
+            return ProblemDetailsResult.UserNotFound(userSteamId);
         }
     }
 }

@@ -1,0 +1,22 @@
+info:
+  name: Add Role
+  type: http
+  seq: 4
+
+http:
+  method: PUT
+  url: "{{url}}/users/:steamId/roles/:role"
+  params:
+    - name: role
+      value: Moderator
+      type: path
+    - name: steamId
+      value: "76561198139613473"
+      type: path
+  auth: inherit
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
