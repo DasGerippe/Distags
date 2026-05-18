@@ -35,9 +35,9 @@ public class AppsController : ControllerBase
             AppDto appDto = await requestDispatcher.DispatchAsync(query);
             return Ok(appDto);
         }
-        catch (UnknownAppNameException ex)
+        catch (UnknownAppNameException)
         {
-            return NotFound();
+            return ProblemDetailsResult.AppNotFound(appName);
         }
     }
 
@@ -52,9 +52,9 @@ public class AppsController : ControllerBase
             await requestDispatcher.DispatchAsync(command);
             return CreatedAtAction(nameof(GetApp), new { appName = createAppDto.Name }, null);
         }
-        catch (AppNameTakenException ex)
+        catch (AppNameTakenException)
         {
-            return Conflict();
+            return ProblemDetailsResult.AppConflict(createAppDto.Name);
         }
     }
 
@@ -69,9 +69,9 @@ public class AppsController : ControllerBase
             await requestDispatcher.DispatchAsync(command);
             return NoContent();
         }
-        catch (UnknownAppNameException ex)
+        catch (UnknownAppNameException)
         {
-            return NotFound();
+            return ProblemDetailsResult.AppNotFound(appName);
         }
     }
 }

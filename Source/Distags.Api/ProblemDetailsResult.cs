@@ -24,6 +24,26 @@ public static class ProblemDetailsResult
         });
     }
 
+    public static ObjectResult AppNotFound(string appName)
+    {
+        return ObjectResult(new ProblemDetails
+        {
+            Status = StatusCodes.Status404NotFound,
+            Title = "App Not Found",
+            Detail = $"Could not find app with name '{appName}'.",
+        });
+    }
+
+    public static ObjectResult AppConflict(string appName)
+    {
+        return ObjectResult(new ProblemDetails
+        {
+            Status = StatusCodes.Status409Conflict,
+            Title = "App Already Exists",
+            Detail = $"An app with the name '{appName}' already exists.",
+        });
+    }
+
     public static ObjectResult LevelNotFound(long levelId)
     {
         return ObjectResult(new ProblemDetails
