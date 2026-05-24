@@ -1,4 +1,5 @@
 ﻿using Distags.Api.Contracts.Users;
+using Distags.Api.Security;
 using Distags.Contracts;
 using Distags.Core;
 using Distags.Core.Commands;
@@ -9,7 +10,6 @@ using Distags.Core.Exceptions;
 using Distags.Core.Queries.UserBySteamId;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using System.Security.Claims;
 using static Distags.Contracts.Constants;
 
 namespace Distags.Api.Controllers;
@@ -19,34 +19,30 @@ namespace Distags.Api.Controllers;
 public class UsersController : ControllerBase
 {
     [HttpGet("me")]
-    [Authorize]
+    [Authorize(AuthenticationSchemes = Constants.Authentication.SessionTokenScheme.Name)]
     public async Task<ActionResult<UserDto>> GetMe(
         [FromServices] IRequestDispatcher requestDispatcher)
     {
-        Claim? steamIdClaim = User.FindFirst(Constants.Claims.SteamId);
-        if (steamIdClaim == null || !long.TryParse(steamIdClaim.Value, out long steamId))
-            return Unauthorized();
-
-        UserDto? user = await requestDispatcher.DispatchAsync(new UserBySteamIdQuery { SteamId = steamId });
+        UserBySteamIdQuery query = new UserBySteamIdQuery
+        {
+            SteamId = User.FindFirstValue<long>(Constants.Claims.SteamId)!.Value,
+        };
+        UserDto? user = await requestDispatcher.DispatchAsync(query);
         return user == null
             ? Unauthorized()
             : Ok(user);
     }
 
     [HttpPatch("me/settings")]
-    [Authorize]
+    [Authorize(AuthenticationSchemes = Constants.Authentication.SessionTokenScheme.Name)]
     public async Task<IActionResult> PatchSettings([FromBody] PatchUserSettingsParameters parameters,
         [FromServices] IRequestDispatcher requestDispatcher)
     {
         try
         {
-            Claim? steamIdClaim = User.FindFirst(Constants.Claims.SteamId);
-            if (steamIdClaim == null || !long.TryParse(steamIdClaim.Value, out long steamId))
-                return Unauthorized();
-
             UpdateUserSettingsCommand command = new UpdateUserSettingsCommand
             {
-                SteamId = steamId,
+                SteamId = User.FindFirstValue<long>(Constants.Claims.SteamId)!.Value,
                 AcceptsGuidelines = parameters.AcceptsGuidelines?.Value ?? default(UpdateValue<bool>),
                 IsAnonymous = parameters.IsAnonymous?.Value ?? default(UpdateValue<bool>),
             };
