@@ -8,6 +8,7 @@ using Distags.Core.Queries.UserBans;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
+using static Distags.Contracts.Constants;
 using UserBanDto = Distags.Contracts.UserBanDto;
 
 namespace Distags.Api.Controllers;
@@ -17,7 +18,7 @@ namespace Distags.Api.Controllers;
 public class UserBansController : ControllerBase
 {
     [HttpGet]
-    [Authorize(Roles = Constants.Roles.Moderator)]
+    [Authorize(Roles = UserRoles.Moderator)]
     public async Task<ActionResult<List<UserBanDto>>> GetUserBans(
         [FromServices] IRequestDispatcher requestDispatcher)
     {
@@ -26,7 +27,7 @@ public class UserBansController : ControllerBase
     }
 
     [HttpGet("{steamId:long}")]
-    [Authorize(Roles = Constants.Roles.Moderator)]
+    [Authorize(Roles = UserRoles.Moderator)]
     public async Task<ActionResult<UserBanDto>> GetUserBan(long steamId,
         [FromServices] IRequestDispatcher requestDispatcher)
     {
@@ -39,7 +40,7 @@ public class UserBansController : ControllerBase
     }
 
     [HttpPost]
-    [Authorize(Roles = Constants.Roles.Moderator)]
+    [Authorize(Roles = UserRoles.Moderator)]
     public async Task<IActionResult> PostUserBan([FromBody] CreateUserBanDto userBanDto,
         [FromServices] IRequestDispatcher requestDispatcher)
     {
@@ -78,7 +79,7 @@ public class UserBansController : ControllerBase
     }
 
     [HttpDelete("{steamId:long}")]
-    [Authorize(Roles = Constants.Roles.Moderator)]
+    [Authorize(Roles = UserRoles.Moderator)]
     public async Task<IActionResult> DeleteUserBan(long steamId,
         [FromServices] IRequestDispatcher requestDispatcher)
     {

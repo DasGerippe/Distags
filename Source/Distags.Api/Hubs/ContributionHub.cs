@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.SignalR;
 using System.Security.Claims;
+using static Distags.Contracts.Constants;
 
 namespace Distags.Api.Hubs;
 
@@ -22,7 +23,7 @@ public class ContributionHub : Hub<IContributionHubClient>
 
     private static string GetGroupForUser(ClaimsPrincipal user)
     {
-        return user.IsInRole(Constants.Roles.Moderator)
+        return user.IsInRole(UserRoles.Moderator)
             ? ModeratorsGroupName
             : UsersGroupName;
     }

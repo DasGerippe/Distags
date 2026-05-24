@@ -20,8 +20,6 @@ internal static class Constants
     internal static class Roles
     {
         internal const string Contributor = "Contributor";
-        internal const string Moderator = "Moderator";
-        internal const string Administrator = "Administrator";
     }
 
     internal static class Claims

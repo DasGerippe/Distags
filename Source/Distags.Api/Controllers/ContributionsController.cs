@@ -5,6 +5,7 @@ using Distags.Core.Commands.RevertContributions;
 using Distags.Core.Queries.Contributions;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using static Distags.Contracts.Constants;
 
 namespace Distags.Api.Controllers;
 
@@ -18,7 +19,7 @@ public class ContributionsController : ControllerBase
     {
         ContributionsQuery query = new ContributionsQuery
         {
-            IgnoreAnonymity = User.IsInRole(Constants.Roles.Moderator),
+            IgnoreAnonymity = User.IsInRole(UserRoles.Moderator),
             UserSteamId = parameters.UserSteamId,
             AppName = parameters.AppName,
             LevelId = parameters.LevelId,
@@ -31,7 +32,7 @@ public class ContributionsController : ControllerBase
     }
 
     [HttpPost("revert")]
-    [Authorize(Roles = Constants.Roles.Moderator)]
+    [Authorize(Roles = UserRoles.Moderator)]
     public async Task<IActionResult> RevertContributions(
         [FromBody] RevertContributionsParameters parameters,
         [FromServices] IRequestDispatcher requestDispatcher)
