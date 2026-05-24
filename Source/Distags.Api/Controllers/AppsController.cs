@@ -7,6 +7,7 @@ using Distags.Core.Queries.AppByName;
 using Distags.Core.Queries.Apps;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using static Distags.Contracts.Constants;
 using AppDto = Distags.Contracts.AppDto;
 
 namespace Distags.Api.Controllers;
@@ -16,7 +17,7 @@ namespace Distags.Api.Controllers;
 public class AppsController : ControllerBase
 {
     [HttpGet]
-    [Authorize(Roles = Constants.Roles.AppManager)]
+    [Authorize(Roles = UserRoles.Administrator)]
     public async Task<ActionResult<List<AppDto>>> GetApps(
         [FromServices] IRequestDispatcher requestDispatcher)
     {
@@ -25,7 +26,7 @@ public class AppsController : ControllerBase
     }
 
     [HttpGet("{appName}")]
-    [Authorize(Roles = Constants.Roles.AppManager)]
+    [Authorize(Roles = UserRoles.Administrator)]
     public async Task<ActionResult<List<AppDto>>> GetApp(string appName,
         [FromServices] IRequestDispatcher requestDispatcher)
     {
@@ -42,7 +43,7 @@ public class AppsController : ControllerBase
     }
 
     [HttpPost]
-    [Authorize(Roles = Constants.Roles.AppManager)]
+    [Authorize(Roles = UserRoles.Administrator)]
     public async Task<ActionResult<AppDto>> CreateApp([FromBody] CreateAppDto createAppDto,
         [FromServices] IRequestDispatcher requestDispatcher)
     {
@@ -59,7 +60,7 @@ public class AppsController : ControllerBase
     }
 
     [HttpDelete("{appName}")]
-    [Authorize(Roles = Constants.Roles.AppManager)]
+    [Authorize(Roles = UserRoles.Administrator)]
     public async Task<IActionResult> DeleteApiKey(string appName,
         [FromServices] IRequestDispatcher requestDispatcher)
     {
