@@ -8,7 +8,6 @@ using Distags.Core.Management;
 using Distags.Core.Management.History;
 using Distags.Core.Queries;
 using Distags.Core.Security;
-using Distags.Core.Services;
 using Distags.Core.Sorting;
 using Distags.Core.Sorting.Levels;
 using Microsoft.Extensions.DependencyInjection;
@@ -28,7 +27,6 @@ public static class ServiceCollectionExtensions
         services.AddTransient<ContributionManager>();
         services.AddTransient<TagChangeManager>();
         services.AddTransient<ContributionReplayEngine>();
-        services.AddTransient<UserBanPermissionChecker>();
 
         services.AddTransient<MaintenanceManager>();
 

@@ -1,6 +1,6 @@
-﻿using Distags.Core.Entities;
+﻿using Distags.Contracts;
+using Distags.Core.Entities;
 using Distags.Core.Exceptions;
-using Distags.Core.Services;
 using Microsoft.EntityFrameworkCore;
 
 namespace Distags.Core.Commands.BanSteamId;
@@ -8,12 +8,10 @@ namespace Distags.Core.Commands.BanSteamId;
 public class BanSteamIdCommandHandler : ICommandHandler<BanSteamIdCommand>
 {
     private readonly DistagsDbContext _DbContext;
-    private readonly UserBanPermissionChecker _PermissionChecker;
 
-    public BanSteamIdCommandHandler(DistagsDbContext dbContext, UserBanPermissionChecker permissionChecker)
+    public BanSteamIdCommandHandler(DistagsDbContext dbContext)
     {
         _DbContext = dbContext;
-        _PermissionChecker = permissionChecker;
     }
 
     public async Task HandleAsync(BanSteamIdCommand command)
@@ -21,32 +19,20 @@ public class BanSteamIdCommandHandler : ICommandHandler<BanSteamIdCommand>
         if (command.SteamId == command.BannerSteamId)
             throw new CannotBanSelfException();
 
-        User? banner = await _DbContext.Set<User>()
-            .Where(user => user.SteamId == command.BannerSteamId)
-            .FirstOrDefaultAsync()
-            .ConfigureAwait(false);
+        User? banner = await GetUser(command.BannerSteamId).ConfigureAwait(false);
         if (banner == null)
             throw new UnknownUserException(command.BannerSteamId);
 
-        bool steamIdBanned = await _DbContext.Set<UserBan>()
+        User? bannedUser = await GetUser(command.SteamId).ConfigureAwait(false);
+
+        if (bannedUser != null && !UserCanBanOtherUser(banner, bannedUser))
+            throw new CannotBanOtherUserException();
+
+        bool isSteamIdBanned = await _DbContext.Set<UserBan>()
             .Where(userBan => userBan.SteamId == command.SteamId)
-            .AnyAsync()
-            .ConfigureAwait(false);
-        if (steamIdBanned)
+            .AnyAsync().ConfigureAwait(false);
+        if (isSteamIdBanned)
             throw new SteamIdAlreadyBannedException();
-
-        User? bannedUser = await _DbContext.Set<User>()
-            .Where(user => user.SteamId == command.SteamId)
-            .FirstOrDefaultAsync()
-            .ConfigureAwait(false);
-        if (bannedUser != null)
-        {
-            if (!_PermissionChecker.CanBan(banner, bannedUser))
-                throw new CannotBanOtherUserException();
-
-            bannedUser.IsBanned = true;
-            bannedUser.Roles = [];
-        }
 
         UserBan userBan = new UserBan
         {
@@ -57,7 +43,31 @@ public class BanSteamIdCommandHandler : ICommandHandler<BanSteamIdCommand>
             Reason = command.Reason,
         };
 
+        if (bannedUser != null)
+        {
+            bannedUser.IsBanned = true;
+            bannedUser.Roles = [];
+        }
+
         _DbContext.Add(userBan);
         await _DbContext.SaveChangesAsync().ConfigureAwait(false);
+    }
+
+    private Task<User?> GetUser(long steamId)
+    {
+        return _DbContext.Set<User>()
+            .Where(user => user.SteamId == steamId)
+            .FirstOrDefaultAsync();
+    }
+
+    private bool UserCanBanOtherUser(User banner, User bannedUser)
+    {
+        if (bannedUser.Roles.Contains(Constants.UserRoles.Administrator))
+            return false;
+
+        if (bannedUser.Roles.Contains(Constants.UserRoles.Moderator))
+            return banner.Roles.Contains(Constants.UserRoles.Administrator);
+
+        return true;
     }
 }
