@@ -86,7 +86,7 @@ public class LevelsController : ControllerBase
     }
 
     [HttpPut("{levelId:long}/tags/{tagName}")]
-    [Authorize(Roles = Constants.Roles.Tagger)]
+    [Authorize(Roles = Constants.Roles.Contributor)]
     public async Task<IActionResult> PutLevelTag(long levelId, string tagName,
         [FromServices] IRequestDispatcher requestDispatcher)
     {
@@ -126,7 +126,7 @@ public class LevelsController : ControllerBase
     }
 
     [HttpDelete("{levelId:long}/tags/{tagName}")]
-    [Authorize(Roles = Constants.Roles.Tagger)]
+    [Authorize(Roles = Constants.Roles.Contributor)]
     public async Task<IActionResult> DeleteLevelTag(long levelId, string tagName,
         [FromServices] IRequestDispatcher requestDispatcher)
     {

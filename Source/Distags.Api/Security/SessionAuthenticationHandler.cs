@@ -44,9 +44,9 @@ public class SessionAuthenticationHandler : AuthenticationHandler<Authentication
         UpdateUserSessionLastSeenCommand command = new UpdateUserSessionLastSeenCommand { SessionToken = sessionToken };
         await _RequestDispatcher.DispatchAsync(command);
 
-        bool userCanTag = user.AcceptsGuidelines && !user.IsBanned;
-        if (userCanTag)
-            user.Roles.Add(Constants.Roles.Tagger);
+        bool userCanContribute = user.AcceptsGuidelines && !user.IsBanned;
+        if (userCanContribute)
+            user.Roles.Add(Constants.Roles.Contributor);
 
         List<Claim> claims =
         [
