@@ -27,7 +27,7 @@ public class GameModeAutoTagger : AutoTagger
             throw new ArgumentException("Required properties of level not initialized.", nameof(level));
 
         List<string> currentGameModeTags = level.Tags
-            .Where(tag => GameModeTags.Values.Contains(tag))
+            .Where(tag => GameModeTags.ContainsValue(tag))
             .Select(tag => tag)
             .ToList();
 
