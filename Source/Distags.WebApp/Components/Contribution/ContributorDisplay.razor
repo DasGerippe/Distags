@@ -30,13 +30,21 @@
 
     private string GetContributorNameClass()
     {
-        if (User != null && (User.IsAnonymous || User.SteamName == null))
-            return "fst-italic text-muted";
-
         if (App != null)
             return "fst-italic";
 
-        return string.Empty;
+        if (User == null)
+            return string.Empty;
+
+        List<string> cssClasses = [];
+
+        if (User.IsAnonymous || User.SteamName == null)
+            cssClasses.Add("fst-italic");
+
+        if (User?.IsBanned == true)
+            cssClasses.Add("text-decoration-line-through");
+
+        return string.Join(' ', cssClasses);
     }
 
     private string GetContributorName()
