@@ -1,7 +1,7 @@
 ﻿@using Distags.Contracts
 
 <div class="d-flex column-gap-2 align-items-center overflow-hidden">
-    @if (User is { IsAnonymous: false, SteamAvatarHash: not null })
+    @if (User?.SteamAvatarHash != null && (IgnoreAnonymity || !User.IsAnonymous))
     {
         <img class="rounded-5" src="https://avatars.steamstatic.com/@(User.SteamAvatarHash).jpg" alt="Contributor Avatar" />
     }
@@ -13,7 +13,7 @@
     {
         <svg style="width: 2rem; height: 2rem;"><use href="icons.svg#microchip-solid" /></svg>
     }
-    
+
     <span class="text-truncate @GetContributorNameClass()">@GetContributorName()</span>
 </div>
 
@@ -24,9 +24,6 @@
 
     [Parameter]
     public required ContributionAppDto? App { get; set; }
-
-    [Parameter]
-    public bool ShowSteamId { get; set; }
 
     [Parameter]
     public bool IgnoreAnonymity { get; set; }

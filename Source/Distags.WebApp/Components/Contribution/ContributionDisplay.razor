@@ -10,7 +10,7 @@
 
     <!-- Changes -->
     <div class="col-12 col-sm-5 col-md-3 d-flex">
-        @if (ShowRevertContributionButton)
+        @if (EnableModeration)
         {
             <RevertContributionButton Contribution="Contribution"/>
         }
@@ -19,11 +19,11 @@
 
     <!-- Contributor -->
     <div class="col col-sm-7 col-md-3 d-flex">
-        @if (ShowBanUserButton)
+        @if (EnableModeration)
         {
             <BanUserButton UserSteamId="Contribution.User?.SteamId" UserSteamName="@Contribution.User?.SteamName" />
         }
-        <ContributorDisplay User="Contribution.User" App="Contribution.App"/>
+        <ContributorDisplay User="Contribution.User" App="Contribution.App" IgnoreAnonymity="EnableModeration"/>
     </div>
 
     <!-- Contribution Date -->
@@ -38,10 +38,7 @@
     public required ContributionDto Contribution { get; set; }
 
     [Parameter]
-    public bool ShowBanUserButton { get; set; }
-
-    [Parameter]
-    public bool ShowRevertContributionButton { get; set; }
+    public bool EnableModeration { get; set; }
 
     private string GetContainerClass()
     {

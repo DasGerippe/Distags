@@ -16,8 +16,7 @@
 	@foreach (ContributionDto contribution in Contributions)
 	{
         <ContributionDisplay Contribution="contribution"
-                             ShowBanUserButton="true"
-                             ShowRevertContributionButton="true"
+							 EnableModeration="true"
                              @key="contribution.Id"/>
 	}
 </InfiniteScrollContainer>
