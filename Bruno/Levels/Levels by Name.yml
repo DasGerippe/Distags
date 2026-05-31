@@ -5,9 +5,9 @@ info:
 
 http:
   method: GET
-  url: "{{url}}/levels?levelFilter=Broken Symmetry"
+  url: "{{url}}/levels?levelName=Broken Symmetry"
   params:
-    - name: levelFilter
+    - name: levelName
       value: Broken Symmetry
       type: query
   auth: inherit

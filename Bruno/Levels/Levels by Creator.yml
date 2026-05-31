@@ -5,9 +5,9 @@ info:
 
 http:
   method: GET
-  url: "{{url}}/levels?creatorFilter=Backgrounds"
+  url: "{{url}}/levels?creatorName=Backgrounds"
   params:
-    - name: creatorFilter
+    - name: creatorName
       value: Backgrounds
       type: query
   auth: inherit
