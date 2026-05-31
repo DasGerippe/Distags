@@ -9,7 +9,7 @@
 @using Microsoft.Net.Http.Headers
 
 @inject ISessionTokenProvider SessionTokenProvider
-@inject DistagsApiClient LevelTagApi
+@inject DistagsApiClient DistagsApi
 @inject IDialogService DialogService
 
 <InfiniteScrollContainer OnScrolledToEnd="OnScrolledToEnd" class="d-flex flex-column gap-3 gap-md-2">
@@ -24,7 +24,7 @@
 	@code {
 
 	private bool _IsLoadingNextBatch;
-	private string? _NextCursor;
+    private bool _CachedAllContributions;
 
 	private readonly List<ContributionDto> _LiveContributions = [];
 	private readonly List<ContributionDto> _CachedContributions = [];
@@ -104,7 +104,7 @@
 	private async Task SetUpHubConnection()
 	{
 		_ContributionsHubConnection = new HubConnectionBuilder()
-			.WithUrl(LevelTagApi.ContributionHubEndpoint, options =>
+			.WithUrl(DistagsApi.ContributionHubEndpoint, options =>
 			{
 				options.Headers.Add(
 					HeaderNames.Authorization,
@@ -135,15 +135,21 @@
 		_IsLoadingNextBatch = true;
 		await InvokeAsync(StateHasChanged);
 
+        DateTimeOffset? contributedBeforeFilter = _CachedContributions.Count > 0
+            ? _CachedContributions[^1].ContributedOn
+            : null;
+
+        const int batchSize = 100;
 		GetContributionsParameters parameters = new GetContributionsParameters
 		{
-			Limit = 100,
-			Cursor = _NextCursor,
+			Limit = batchSize,
+			ContributedBefore = contributedBeforeFilter,
 		};
-		ContributionsPage contributionsPage = await LevelTagApi.GetContributionsAsync(parameters);
+		ContributionsPage contributionsPage = await DistagsApi.GetContributionsAsync(parameters);
 
 		_CachedContributions.AddRange(contributionsPage.Contributions);
-		_NextCursor = contributionsPage.NextCursor;
+        if (contributionsPage.Contributions.Count < batchSize)
+            _CachedAllContributions = true;
 
 		_IsLoadingNextBatch = false;
 		await InvokeAsync(StateHasChanged);
@@ -151,7 +157,7 @@
 
 	private async Task OnScrolledToEnd()
 	{
-		if (_NextCursor != null)
+		if (!_CachedAllContributions)
 			await LoadNextContributionBatch();
 	}
 

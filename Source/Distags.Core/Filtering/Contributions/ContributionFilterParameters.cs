@@ -10,5 +10,9 @@ public class ContributionFilterParameters
 
     public string? TagName { get; set; }
 
+    public DateTimeOffset? ContributedAfter { get; set; }
+
+    public DateTimeOffset? ContributedBefore { get; set; }
+
     public bool IgnoreAnonymity { get; set; }
 }

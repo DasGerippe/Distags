@@ -24,8 +24,10 @@ public class ContributionsController : ControllerBase
             AppName = parameters.AppName,
             LevelId = parameters.LevelId,
             TagName = parameters.TagName,
+            ContributedAfter = parameters.ContributedAfter,
+            ContributedBefore = parameters.ContributedBefore,
+            DescendingOrder = parameters.DescendingOrder,
             Limit = parameters.Limit,
-            Cursor = parameters.Cursor,
         };
         ContributionsPage contributionsPage = await requestDispatcher.DispatchAsync(query);
         return Ok(contributionsPage);

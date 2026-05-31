@@ -65,6 +65,11 @@ public static class QueryBuilder
                 AppendValueList(queryStringBuilder, enumerable);
                 break;
 
+            case DateTimeOffset dateTimeOffset:
+                value = Uri.EscapeDataString(dateTimeOffset.ToString("O"));
+                queryStringBuilder.Append(value);
+                break;
+
             default:
                 queryStringBuilder.Append(value);
                 break;

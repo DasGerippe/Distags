@@ -20,6 +20,12 @@ public class ContributionFilterFactory : IQueryableFilterFactory<Contribution, C
         if (filterParams.TagName != null)
             filterGroup.AddFilter(new ChangedTagFilter(filterParams.TagName));
 
+        if (filterParams.ContributedAfter != null)
+            filterGroup.AddFilter(new SimpleFilter<Contribution>(contribution => contribution.ContributedOn > filterParams.ContributedAfter));
+
+        if (filterParams.ContributedBefore != null)
+            filterGroup.AddFilter(new SimpleFilter<Contribution>(contribution => contribution.ContributedOn < filterParams.ContributedBefore));
+
         return filterGroup;
     }
 }

@@ -12,9 +12,13 @@ public class ContributionsQuery : IQuery<ContributionsPage>
 
     public string? TagName { get; set; }
 
+    public DateTimeOffset? ContributedAfter { get; set; }
+
+    public DateTimeOffset? ContributedBefore { get; set; }
+
+    public bool DescendingOrder { get; set; } = true;
+
     public bool IgnoreAnonymity { get; set; }
 
     public int Limit { get; set; }
-
-    public string? Cursor { get; set; }
 }

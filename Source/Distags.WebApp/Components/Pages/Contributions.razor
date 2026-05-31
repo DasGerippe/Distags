@@ -14,7 +14,7 @@
 @implements IAsyncDisposable
 
 @inject ISessionTokenProvider SessionTokenProvider
-@inject DistagsApiClient LevelTagApi
+@inject DistagsApiClient DistagsApi
 
 @if (!_IsInitialized)
 	return;
@@ -65,7 +65,7 @@
 		{
 			Limit = 100,
 		};
-		ContributionsPage contributionsPage = await LevelTagApi.GetContributionsAsync(parameters);
+		ContributionsPage contributionsPage = await DistagsApi.GetContributionsAsync(parameters);
 		int startIndex = Math.Min(_Contributions.Capacity, contributionsPage.Contributions.Count) - 1;
 		for (int i = startIndex; i >= 0; i--)
 		{
@@ -77,7 +77,7 @@
 	private async Task SetUpHubConnection()
 	{
 		_ContributionsHubConnection = new HubConnectionBuilder()
-			.WithUrl(LevelTagApi.ContributionHubEndpoint, options =>
+			.WithUrl(DistagsApi.ContributionHubEndpoint, options =>
 			{
 				options.Headers.Add(
 					HeaderNames.Authorization,

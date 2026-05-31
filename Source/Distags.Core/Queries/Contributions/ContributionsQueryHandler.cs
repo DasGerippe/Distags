@@ -25,17 +25,15 @@ public class ContributionsQueryHandler : IQueryHandler<ContributionsQuery, Contr
         IQueryable<Contribution> contributions = _DbContext.Set<Contribution>()
             .Where(contribution => !contribution.IsReverted && contribution.Changes.Any());
 
-        ContributionsCursor? cursor = CursorEncoder.Decode<ContributionsCursor>(query.Cursor);
-        if (cursor != null)
-            contributions = contributions.Where(contribution => contribution.ContributedOn < cursor.ContributedOn);
-
         ContributionFilterParameters filterParams = CreateFilterParameters(query);
         IQueryableFilter<Contribution> contributionFilter = _ContributionFilterFactory.GetQueryableFilter(filterParams);
         contributions = contributionFilter.Filter(contributions);
 
-        contributions = contributions
-            .OrderByDescending(contribution => contribution.ContributedOn)
-            .Take(query.Limit);
+        contributions = query.DescendingOrder
+            ? contributions.OrderByDescending(contribution => contribution.ContributedOn)
+            : contributions.OrderBy(contribution => contribution.ContributedOn);
+
+        contributions = contributions.Take(query.Limit);
 
         ContributionMapper contributionProjector = new ContributionMapper(query.IgnoreAnonymity);
         List<ContributionDto> contributionDtos = await contributions
@@ -46,7 +44,6 @@ public class ContributionsQueryHandler : IQueryHandler<ContributionsQuery, Contr
         ContributionsPage contributionsPage = new ContributionsPage
         {
             Contributions = contributionDtos,
-            NextCursor = GetNextCursor(contributionDtos, query.Limit),
         };
 
         return contributionsPage;
@@ -60,21 +57,9 @@ public class ContributionsQueryHandler : IQueryHandler<ContributionsQuery, Contr
             AppName = query.AppName,
             LevelId = query.LevelId,
             TagName = query.TagName,
+            ContributedAfter = query.ContributedAfter,
+            ContributedBefore = query.ContributedBefore,
             IgnoreAnonymity = query.IgnoreAnonymity,
         };
-    }
-
-    private string? GetNextCursor(List<ContributionDto> contributionDtos, int queryLimit)
-    {
-        if (contributionDtos.Count == 0 || contributionDtos.Count < queryLimit)
-            return null;
-
-        ContributionDto lastContribution = contributionDtos[^1];
-        ContributionsCursor nextCursor = new ContributionsCursor
-        {
-            ContributedOn = lastContribution.ContributedOn,
-        };
-
-        return CursorEncoder.Encode(nextCursor);
     }
 }
