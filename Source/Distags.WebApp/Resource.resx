@@ -249,4 +249,7 @@
   <data name="PageTitle_Level" xml:space="preserve">
     <value>Level: {0}</value>
   </data>
+  <data name="BrowseLevels_NoLevelsFound" xml:space="preserve">
+    <value>No Levels Found</value>
+  </data>
 </root>

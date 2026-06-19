@@ -20,4 +20,9 @@ public static class DateTimeExtensions
 
         return dateTime.ToString("d");
     }
+
+    public static string ToApproximateString(this DateTimeOffset dateTime)
+    {
+        return dateTime.ToString(DateTimeOffset.UtcNow - dateTime < TimeSpan.FromDays(180) ? "m" : "y");
+    }
 }

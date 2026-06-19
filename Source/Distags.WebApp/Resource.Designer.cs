@@ -97,6 +97,15 @@ namespace Distags.WebApp {
         }
         
         /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die No Levels Found ähnelt.
+        /// </summary>
+        internal static string BrowseLevels_NoLevelsFound {
+            get {
+                return ResourceManager.GetString("BrowseLevels_NoLevelsFound", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Sucht eine lokalisierte Zeichenfolge, die Please accept the contribution guidelines to add or remove tags. ähnelt.
         /// </summary>
         internal static string ContributionPrerequisiteGuidelinesText {

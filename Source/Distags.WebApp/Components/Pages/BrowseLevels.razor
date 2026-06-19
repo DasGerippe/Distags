@@ -3,8 +3,8 @@
 
 @using Distags.Api.Contracts.Levels
 @using Distags.Contracts
-@using Distags.WebApp.Components.Filters
 @using Distags.WebApp.Components.Inputs
+@using Distags.WebApp.Components.Level
 @using Distags.WebApp.Models
 @using Distags.WebApp.Services
 @using Microsoft.AspNetCore.WebUtilities
@@ -19,228 +19,253 @@
 <PageTitle>@Resource.PageTitle_BrowseLevels</PageTitle>
 
 @if (!_IsInitialized)
-	return;
+    return;
 
 <div class="container-fluid content-wide">
 
-	<div class="row">
-		@foreach (TagGroupDto tagGroup in _TagGroups)
-		{
-			<TagGroupColumnCard Title="@tagGroup.Name">
-				@foreach (TagDto tag in tagGroup.Tags)
-				{
-					TagFilter tagFilter = _TagFilters[tag.Name];
-					<IconCheckbox TState="TagFilterState"
-					              Label="@tag.DisplayName"
-					              Logic="GetCheckboxLogic(tag.Exclusivity)"
-					              IconProvider="_TagFilterStateIconProvider"
-					              State="tagFilter.State"
-					              StateChanged="newState => OnTagFilterStateChanged(tagFilter, newState)" />
-				}
-			</TagGroupColumnCard>
-		}
-	</div>
-	
-	<div class="row align-items-center m-1">
-		<div class="col-12 col-sm-6 col-lg-3 order-0 d-flex align-items-baseline p-1">
-			<label class="form-label me-2 text-nowrap">Level Name:</label>
-			<input class="form-control" type="text" value="@LevelFilter" @onchange="OnLevelFilterChanged" />
-		</div>
-		<div class="col-12 col-sm-6 col-lg-3 order-1 order-sm-2 order-lg-1 d-flex align-items-baseline p-1">
-			<label class="form-label me-2 text-nowrap">Creator:</label>
-			<input class="form-control" type="text" value="@CreatorFilter" @onchange="OnCreatorFilterChanged" />
-		</div>
-		<div class="col-12 col-sm-6 col-lg-3 order-2 order-sm-1 order-lg-2 d-flex align-items-baseline p-1">
-			<label class="form-label me-2 text-nowrap">Sort by:</label>
-			<GenericDropdown TValue="LevelSortStrategy" ItemProvider="_SortStrategyItemsProvider" Value="SortStrategy" ValueChanged="OnSortStrategyChanged" />
-		</div>
-		<div class="col-12 col-sm-6 col-lg-3 order-3 d-flex align-items-baseline p-1">
-			<label class="form-label me-2 text-nowrap">Page Size:</label>
-			<GenericDropdown TValue="int" ItemProvider="_PageSizeItemsProvider" Value="PageSize" ValueChanged="OnPageSizeChanged" />
-		</div>
-	</div>
+    <div class="row">
+        @foreach (TagGroupDto tagGroup in _TagGroups)
+        {
+            <TagGroupColumnCard Title="@tagGroup.Name">
+                @foreach (TagDto tag in tagGroup.Tags)
+                {
+                    TagFilter tagFilter = _TagFilters[tag.Name];
+                    <IconCheckbox TState="TagFilterState"
+                                  Label="@tag.DisplayName"
+                                  Logic="GetCheckboxLogic(tag.Exclusivity)"
+                                  IconProvider="_TagFilterStateIconProvider"
+                                  State="tagFilter.State"
+                                  StateChanged="newState => OnTagFilterStateChanged(tagFilter, newState)" />
+                }
+            </TagGroupColumnCard>
+        }
+    </div>
+    
+    <div class="row align-items-center m-1">
+        <div class="col-12 col-sm-6 col-lg-3 order-0 d-flex align-items-baseline p-1">
+            <label class="form-label me-2 text-nowrap">Level Name:</label>
+            <input class="form-control" type="text" value="@LevelFilter" @onchange="OnLevelFilterChanged" />
+        </div>
+        <div class="col-12 col-sm-6 col-lg-3 order-1 order-sm-2 order-lg-1 d-flex align-items-baseline p-1">
+            <label class="form-label me-2 text-nowrap">Creator:</label>
+            <input class="form-control" type="text" value="@CreatorFilter" @onchange="OnCreatorFilterChanged" />
+        </div>
+        <div class="col-12 col-sm-6 col-lg-3 order-2 order-sm-1 order-lg-2 d-flex align-items-baseline p-1">
+            <label class="form-label me-2 text-nowrap">Sort by:</label>
+            <GenericDropdown TValue="LevelSortStrategy" ItemProvider="_SortStrategyItemsProvider" Value="SortStrategy" ValueChanged="OnSortStrategyChanged" />
+        </div>
+        <div class="col-12 col-sm-6 col-lg-3 order-3 d-flex align-items-baseline p-1">
+            <label class="form-label me-2 text-nowrap">Page Size:</label>
+            <GenericDropdown TValue="int" ItemProvider="_PageSizeItemsProvider" Value="PageSize" ValueChanged="OnPageSizeChanged" />
+        </div>
+    </div>
 
-	<div class="text-center">
-		<button class="btn btn-primary w-100 shadow" type="submit" @onclick="() => QueryLevelsAsync()">Browse</button>
-	</div>
-	
-	<Paginator CurrentPageChanged="OnPageChanged" CurrentPage="Page" PageCount="_PageCount" />
-	<ResultSection Levels="_Levels" />
-	<Paginator CurrentPageChanged="OnPageChanged" CurrentPage="Page" PageCount="_PageCount" />
+    <div class="text-center">
+        <button class="btn btn-primary w-100 shadow" type="submit" @onclick="() => QueryLevelsAsync()">Browse</button>
+    </div>
+</div>
 
+@if (!_BrowseClicked)
+    return;
+
+<div class="container-fluid content my-4">
+    @if (_Levels.Count == 0)
+    {
+        <div class="text-center fst-italic">
+            @Resource.BrowseLevels_NoLevelsFound
+        </div>
+    }
+    else
+    {
+        <Paginator CurrentPageChanged="OnPageChanged" CurrentPage="Page" PageCount="_PageCount"/>
+
+        <div class="row gy-3">
+            @foreach (LevelDto level in _Levels)
+            {
+                <div class="col-12 col-md-6">
+                    <LevelPanel Level="level"/>
+                </div>
+            }
+        </div>
+
+        <Paginator CurrentPageChanged="OnPageChanged" CurrentPage="Page" PageCount="_PageCount"/>
+    }
 </div>
 
 @code {
 
-	private const string IncludeTagsQueryParamKey = "IncludeTags";
-	private const string ExcludeTagsQueryParamKey = "ExcludeTags";
+    private const string IncludeTagsQueryParamKey = "IncludeTags";
+    private const string ExcludeTagsQueryParamKey = "ExcludeTags";
 
-	private bool _IsInitialized;
+    private bool _IsInitialized;
+    private bool _BrowseClicked;
 
-	private List<TagGroupDto> _TagGroups = [];
-	private Dictionary<string, TagFilter> _TagFilters = [];
+    private List<TagGroupDto> _TagGroups = [];
+    private Dictionary<string, TagFilter> _TagFilters = [];
 
-	private readonly ICheckboxLogic<TagFilterState> _ExclusiveTagFilterLogic = new ExclusiveTagCheckboxLogic();
-	private readonly ICheckboxLogic<TagFilterState> _CombinableTagFilterLogic = new CombinableTagCheckboxLogic();
-	private readonly ICheckboxIconProvider<TagFilterState> _TagFilterStateIconProvider = new TagFilterStateIconProvider();
+    private readonly ICheckboxLogic<TagFilterState> _ExclusiveTagFilterLogic = new ExclusiveTagCheckboxLogic();
+    private readonly ICheckboxLogic<TagFilterState> _CombinableTagFilterLogic = new CombinableTagCheckboxLogic();
+    private readonly ICheckboxIconProvider<TagFilterState> _TagFilterStateIconProvider = new TagFilterStateIconProvider();
 
-	private readonly IGenericDropdownItemProvider<int> _PageSizeItemsProvider = new IntDropdownItemProvider(10, 25, 50, 100);
-	private IGenericDropdownItemProvider<LevelSortStrategy>? _SortStrategyItemsProvider;
+    private readonly IGenericDropdownItemProvider<int> _PageSizeItemsProvider = new IntDropdownItemProvider(10, 20, 30, 50, 100);
+    private IGenericDropdownItemProvider<LevelSortStrategy>? _SortStrategyItemsProvider;
 
-	private List<LevelDto> _Levels = [];
-	private int _PageCount;
+    private List<LevelDto> _Levels = [];
+    private int _PageCount;
 
-	private string LevelFilter { get; set; } = string.Empty;
+    private string LevelFilter { get; set; } = string.Empty;
 
-	private string CreatorFilter { get; set; } = string.Empty;
+    private string CreatorFilter { get; set; } = string.Empty;
 
-	private LevelSortStrategy SortStrategy { get; set; } = LevelSortStrategy.CreatedDesc;
+    private LevelSortStrategy SortStrategy { get; set; } = LevelSortStrategy.CreatedDesc;
 
-	private int PageSize { get; set; } = 25;
+    private int PageSize { get; set; } = 20;
 
-	private int Page { get; set; } = 1;
+    private int Page { get; set; } = 1;
 
-	protected override void OnInitialized()
-	{
-		_SortStrategyItemsProvider = new EnumDropdownItemProvider<LevelSortStrategy>(Localizer);
-	}
+    protected override void OnInitialized()
+    {
+        _SortStrategyItemsProvider = new EnumDropdownItemProvider<LevelSortStrategy>(Localizer);
+    }
 
-	protected override async Task OnInitializedAsync()
-	{
-		_TagGroups = await LevelTagApi.GetTagTreeAsync();
-		_TagFilters = _TagGroups
-			.SelectMany(tagGroup => tagGroup.Tags.Select(tag => new TagFilter(tag)))
-			.ToDictionary(tagFilter => tagFilter.Tag.Name);
+    protected override async Task OnInitializedAsync()
+    {
+        _TagGroups = await LevelTagApi.GetTagTreeAsync();
+        _TagFilters = _TagGroups
+            .SelectMany(tagGroup => tagGroup.Tags.Select(tag => new TagFilter(tag)))
+            .ToDictionary(tagFilter => tagFilter.Tag.Name);
 
-		LoadStateFromQueryParameters();
+        LoadStateFromQueryParameters();
 
-		_IsInitialized = true;
-	}
+        _IsInitialized = true;
+    }
 
-	private void LoadStateFromQueryParameters()
-	{
-		Uri uri = Navigation.ToAbsoluteUri(Navigation.Uri);
-		Dictionary<string, StringValues> queryParams = QueryHelpers.ParseQuery(uri.Query);
+    private void LoadStateFromQueryParameters()
+    {
+        Uri uri = Navigation.ToAbsoluteUri(Navigation.Uri);
+        Dictionary<string, StringValues> queryParams = QueryHelpers.ParseQuery(uri.Query);
 
-		if (queryParams.TryGetValue(nameof(LevelFilter), out StringValues levelFilter))
-			LevelFilter = levelFilter!;
+        if (queryParams.TryGetValue(nameof(LevelFilter), out StringValues levelFilter))
+            LevelFilter = levelFilter!;
 
-		if (queryParams.TryGetValue(nameof(CreatorFilter), out StringValues creatorFilter))
-			CreatorFilter = creatorFilter!;
+        if (queryParams.TryGetValue(nameof(CreatorFilter), out StringValues creatorFilter))
+            CreatorFilter = creatorFilter!;
 
-		if (queryParams.TryGetValue(IncludeTagsQueryParamKey, out StringValues includeTags))
-			LoadFilterStates(includeTags!, TagFilterState.Required);
+        if (queryParams.TryGetValue(IncludeTagsQueryParamKey, out StringValues includeTags))
+            LoadFilterStates(includeTags!, TagFilterState.Required);
 
-		if (queryParams.TryGetValue(ExcludeTagsQueryParamKey, out StringValues excludeTags))
-			LoadFilterStates(excludeTags!, TagFilterState.Forbidden);
-	}
+        if (queryParams.TryGetValue(ExcludeTagsQueryParamKey, out StringValues excludeTags))
+            LoadFilterStates(excludeTags!, TagFilterState.Forbidden);
+    }
 
-	private void LoadFilterStates(string commaSeparatedTags, TagFilterState filterState)
-	{
-		string[] tagNames = commaSeparatedTags.Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
-		foreach (string tagName in tagNames)
-		{
-			bool filterExists = _TagFilters.TryGetValue(tagName, out TagFilter? tagFilter);
-			if (filterExists)
-				tagFilter!.State = filterState;
-		}
-	}
+    private void LoadFilterStates(string commaSeparatedTags, TagFilterState filterState)
+    {
+        string[] tagNames = commaSeparatedTags.Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+        foreach (string tagName in tagNames)
+        {
+            bool filterExists = _TagFilters.TryGetValue(tagName, out TagFilter? tagFilter);
+            if (filterExists)
+                tagFilter!.State = filterState;
+        }
+    }
 
-	private async Task OnTagFilterStateChanged(TagFilter tagFilter, TagFilterState newState)
-	{
-		tagFilter.State = newState;
-		await UpdateBrowserUrl();
-	}
+    private async Task OnTagFilterStateChanged(TagFilter tagFilter, TagFilterState newState)
+    {
+        tagFilter.State = newState;
+        await UpdateBrowserUrl();
+    }
 
-	private async Task OnLevelFilterChanged(ChangeEventArgs args)
-	{
-		LevelFilter = args.Value?.ToString() ?? string.Empty;
-		await UpdateBrowserUrl();
-	}
+    private async Task OnLevelFilterChanged(ChangeEventArgs args)
+    {
+        LevelFilter = args.Value?.ToString() ?? string.Empty;
+        await UpdateBrowserUrl();
+    }
 
-	private async Task OnCreatorFilterChanged(ChangeEventArgs args)
-	{
-		CreatorFilter = args.Value?.ToString() ?? string.Empty;
-		await UpdateBrowserUrl();
-	}
+    private async Task OnCreatorFilterChanged(ChangeEventArgs args)
+    {
+        CreatorFilter = args.Value?.ToString() ?? string.Empty;
+        await UpdateBrowserUrl();
+    }
 
-	private async Task OnPageSizeChanged(int newPageSize)
-	{
-		PageSize = newPageSize;
-		await UpdateBrowserUrl();
-	}
+    private async Task OnPageSizeChanged(int newPageSize)
+    {
+        PageSize = newPageSize;
+        await UpdateBrowserUrl();
+    }
 
-	private async Task OnSortStrategyChanged(LevelSortStrategy newSortStrategy)
-	{
-		SortStrategy = newSortStrategy;
-		await UpdateBrowserUrl();
-	}
+    private async Task OnSortStrategyChanged(LevelSortStrategy newSortStrategy)
+    {
+        SortStrategy = newSortStrategy;
+        await UpdateBrowserUrl();
+    }
 
-	private async Task OnPageChanged(int newPage)
-	{
-		await QueryLevelsAsync(newPage);
-	}
+    private async Task OnPageChanged(int newPage)
+    {
+        await QueryLevelsAsync(newPage);
+    }
 
-	private ICheckboxLogic<TagFilterState> GetCheckboxLogic(int? tagExclusivity)
-	{
-		return tagExclusivity == null ? _CombinableTagFilterLogic : _ExclusiveTagFilterLogic;
-	}
+    private ICheckboxLogic<TagFilterState> GetCheckboxLogic(int? tagExclusivity)
+    {
+        return tagExclusivity == null ? _CombinableTagFilterLogic : _ExclusiveTagFilterLogic;
+    }
 
-	private async Task UpdateBrowserUrl()
-	{
-		Dictionary<string, object?> queryParameters = new Dictionary<string, object?>
-		{
-			{ nameof(LevelFilter), GetFilterTermOrNullIfEmpty(LevelFilter) },
-			{ nameof(CreatorFilter), GetFilterTermOrNullIfEmpty(CreatorFilter) },
-			{ IncludeTagsQueryParamKey, GetTagParameterByState(TagFilterState.Required) },
-			{ ExcludeTagsQueryParamKey, GetTagParameterByState(TagFilterState.Forbidden) },
-		};
-		string uri = Navigation.GetUriWithQueryParameters(queryParameters);
-		await History.ReplaceState(uri);
-	}
+    private async Task UpdateBrowserUrl()
+    {
+        Dictionary<string, object?> queryParameters = new Dictionary<string, object?>
+        {
+            { nameof(LevelFilter), GetFilterTermOrNullIfEmpty(LevelFilter) },
+            { nameof(CreatorFilter), GetFilterTermOrNullIfEmpty(CreatorFilter) },
+            { IncludeTagsQueryParamKey, GetTagParameterByState(TagFilterState.Required) },
+            { ExcludeTagsQueryParamKey, GetTagParameterByState(TagFilterState.Forbidden) },
+        };
+        string uri = Navigation.GetUriWithQueryParameters(queryParameters);
+        await History.ReplaceState(uri);
+    }
 
-	private async Task QueryLevelsAsync(int page = 1)
-	{
-		BrowseLevelsParameters parameters = new BrowseLevelsParameters
-		{
-			LevelName = GetFilterTermOrNullIfEmpty(LevelFilter),
-			CreatorName = GetFilterTermOrNullIfEmpty(CreatorFilter),
-			IncludeTags = GetTagParameterByState(TagFilterState.Required),
-			ExcludeTags = GetTagParameterByState(TagFilterState.Forbidden),
-			PageSize = PageSize,
-			PageNumber = page,
-			SortStrategy = SortStrategy,
-		};
-		LevelsPage levelsPage = await LevelTagApi.BrowseLevelsAsync(parameters);
-		Page = page;
-		_PageCount = (int)Math.Ceiling((double)levelsPage.TotalLevels / PageSize);
-		_Levels = levelsPage.Levels;
-	}
+    private async Task QueryLevelsAsync(int page = 1)
+    {
+        _BrowseClicked = true;
 
-	private string? GetFilterTermOrNullIfEmpty(string filterTerm)
-	{
-		return string.IsNullOrEmpty(filterTerm) ? null : filterTerm;
-	}
+        BrowseLevelsParameters parameters = new BrowseLevelsParameters
+        {
+            LevelName = GetFilterTermOrNullIfEmpty(LevelFilter),
+            CreatorName = GetFilterTermOrNullIfEmpty(CreatorFilter),
+            IncludeTags = GetTagParameterByState(TagFilterState.Required),
+            ExcludeTags = GetTagParameterByState(TagFilterState.Forbidden),
+            PageSize = PageSize,
+            PageNumber = page,
+            SortStrategy = SortStrategy,
+        };
+        LevelsPage levelsPage = await LevelTagApi.BrowseLevelsAsync(parameters);
+        Page = page;
+        _PageCount = (int)Math.Ceiling((double)levelsPage.TotalLevels / PageSize);
+        _Levels = levelsPage.Levels;
+    }
 
-	private string? GetTagParameterByState(TagFilterState tagFilterState)
-	{
-		IEnumerable<string> tagNames = _TagFilters
-			.Where(tagFilter => tagFilter.Value.State == tagFilterState)
-			.Select(tagFilter => tagFilter.Key);
+    private string? GetFilterTermOrNullIfEmpty(string filterTerm)
+    {
+        return string.IsNullOrEmpty(filterTerm) ? null : filterTerm;
+    }
 
-		string tagsParameter = string.Join(',', tagNames);
-		return string.IsNullOrEmpty(tagsParameter) ? null : tagsParameter;
-	}
+    private string? GetTagParameterByState(TagFilterState tagFilterState)
+    {
+        IEnumerable<string> tagNames = _TagFilters
+            .Where(tagFilter => tagFilter.Value.State == tagFilterState)
+            .Select(tagFilter => tagFilter.Key);
 
-	private class TagFilter
-	{
-		public TagDto Tag { get; }
-		public TagFilterState State { get; set; } = TagFilterState.Neutral;
+        string tagsParameter = string.Join(',', tagNames);
+        return string.IsNullOrEmpty(tagsParameter) ? null : tagsParameter;
+    }
 
-		public TagFilter(TagDto tag)
-		{
-			Tag = tag;
-		}
-	}
+    private class TagFilter
+    {
+        public TagDto Tag { get; }
+        public TagFilterState State { get; set; } = TagFilterState.Neutral;
+
+        public TagFilter(TagDto tag)
+        {
+            Tag = tag;
+        }
+    }
 
 }
