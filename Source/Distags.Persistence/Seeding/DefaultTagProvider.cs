@@ -181,7 +181,7 @@ public class DefaultTagProvider
                     NewTag("Spooky"),
                     NewTag("Cave"),
                     NewTag("Corrupted"),
-                    NewTag("Ascent/Descent", name: "vertical"),
+                    NewTag("Vertical"),
                     NewTag("Spaghetti"),
                     NewTag("Variety"),
                     NewTag("Clutter"),
