@@ -163,5 +163,9 @@ public class LevelsController : ControllerBase
         {
             return ProblemDetailsResult.LevelTagNotFound(levelId, tagName);
         }
+        catch (CannotRemoveFallbackTagException)
+        {
+            return ProblemDetailsResult.BadRequestRemoveFallbackTag(tagName);
+        }
     }
 }

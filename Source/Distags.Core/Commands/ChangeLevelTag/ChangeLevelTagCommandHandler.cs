@@ -3,6 +3,7 @@ using Distags.Core.Entities;
 using Distags.Core.Events;
 using Distags.Core.Exceptions;
 using Distags.Core.Interfaces;
+using Distags.Core.Logic;
 using Distags.Core.Management;
 using Microsoft.EntityFrameworkCore;
 
@@ -13,6 +14,8 @@ public class ChangeLevelTagCommandHandler : ICommandHandler<ChangeLevelTagComman
     private readonly DistagsDbContext _DbContext;
     private readonly MaintenanceManager _MaintenanceManager;
     private readonly ISequentialLevelActionExecutor _SequentialLevelActionExecutor;
+    private readonly LevelTagAdder _LevelTagAdder;
+    private readonly LevelTagRemover _LevelTagRemover;
     private readonly ContributionManager _ContributionManager;
     private readonly TagChangeManager _TagChangeManager;
     private readonly AppEventQueue _AppEventQueue;
@@ -21,6 +24,8 @@ public class ChangeLevelTagCommandHandler : ICommandHandler<ChangeLevelTagComman
         DistagsDbContext dbContext,
         MaintenanceManager maintenanceManager,
         ISequentialLevelActionExecutor sequentialLevelActionExecutor,
+        LevelTagAdder levelTagAdder,
+        LevelTagRemover levelTagRemover,
         ContributionManager contributionManager,
         TagChangeManager tagChangeManager,
         AppEventQueue appEventQueue)
@@ -28,6 +33,8 @@ public class ChangeLevelTagCommandHandler : ICommandHandler<ChangeLevelTagComman
         _DbContext = dbContext;
         _MaintenanceManager = maintenanceManager;
         _SequentialLevelActionExecutor = sequentialLevelActionExecutor;
+        _LevelTagAdder = levelTagAdder;
+        _LevelTagRemover = levelTagRemover;
         _ContributionManager = contributionManager;
         _TagChangeManager = tagChangeManager;
         _AppEventQueue = appEventQueue;
@@ -42,12 +49,8 @@ public class ChangeLevelTagCommandHandler : ICommandHandler<ChangeLevelTagComman
 
         await EnsureTagChangeAllowedAsync(user, app, tag).ConfigureAwait(false);
 
-        Func<Task<Contribution>> changeFunc = command.Action == TagChangeAction.Add
-            ? () => AddTagToLevel(level, tag, user, app)
-            : () => RemoveTagFromLevel(level, tag, user, app);
-
         Contribution contribution = await _SequentialLevelActionExecutor
-            .ExecuteSequentialForLevelAsync(command.LevelId, changeFunc)
+            .ExecuteSequentialForLevelAsync(command.LevelId, () => ChangeLevelTagAsync(level, tag, command.Action, user, app))
             .ConfigureAwait(false);
 
         EnqueueEvents(contribution);
@@ -55,13 +58,20 @@ public class ChangeLevelTagCommandHandler : ICommandHandler<ChangeLevelTagComman
 
     private async Task<Level> GetLevelAsync(long levelId)
     {
-        Level? level = await _DbContext.FindAsync<Level>(levelId).ConfigureAwait(false);
+        Level? level = await _DbContext.Set<Level>()
+            .Include(level => level.Tags)
+            .Where(level => level.Id == levelId)
+            .FirstOrDefaultAsync()
+            .ConfigureAwait(false);
         return level ?? throw new UnknownLevelException(levelId);
     }
 
     private async Task<Tag> GetTagAsync(string tagName)
     {
-        Tag? tag = await _DbContext.Set<Tag>().FirstOrDefaultAsync(tag => tag.Name == tagName).ConfigureAwait(false);
+        Tag? tag = await _DbContext.Set<Tag>()
+            .Include(tag => tag.LogicGroup!.Tags)
+            .FirstOrDefaultAsync(tag => tag.Name == tagName)
+            .ConfigureAwait(false);
         return tag ?? throw new UnknownTagException(tagName);
     }
 
@@ -114,63 +124,33 @@ public class ChangeLevelTagCommandHandler : ICommandHandler<ChangeLevelTagComman
         }
     }
 
-    private async Task<Contribution> AddTagToLevel(Level level, Tag tag, User? user, App? app)
+    private async Task<Contribution> ChangeLevelTagAsync(Level level, Tag tag, TagChangeAction action, User? user, App? app)
     {
-        LevelTag? levelTag = await _DbContext.Set<LevelTag>().FindAsync(level.Id, tag.Id).ConfigureAwait(false);
-        if (levelTag != null)
-            throw new LevelTagExistsException(level.Id, tag.Name);
+        DomainResult<List<TagChange>> changeResult = action == TagChangeAction.Add
+            ? _LevelTagAdder.AddTagToLevel(level, tag)
+            : _LevelTagRemover.RemoveTagFromLevel(level, tag);
 
-        List<LevelTag> conflictingLevelTags = await GetConflictingLevelTagsAsync(level.Id, tag).ConfigureAwait(false);
-        LevelTag addedLevelTag = new LevelTag
+        if (!changeResult.IsSuccess)
         {
-            Level = level,
-            Tag = tag,
-        };
+            switch (changeResult.Error)
+            {
+                case DomainError.LevelTagAlreadyExists:
+                    throw new LevelTagExistsException(level.Id, tag.Name);
+                case DomainError.LevelTagDoesNotExist:
+                    throw new LevelTagNotFoundException(level.Id, tag.Name);
+                case DomainError.CannotRemoveFallbackTag:
+                    throw new CannotRemoveFallbackTagException();
+                default:
+                    throw new Exception();
+            }
+        }
 
-        List<TagChange> changes = _TagChangeManager
-            .CreateChanges(tag, conflictingLevelTags.Select(removedLevelTag => removedLevelTag.Tag));
-        Contribution contribution = _ContributionManager
-            .CreateContribution(level, tag, user, app, TagChangeAction.Add, changes);
+        Contribution contribution =
+            _ContributionManager.CreateContribution(level, tag, user, app, action, changeResult.Value);
 
-        _DbContext.RemoveRange(conflictingLevelTags);
-        _DbContext.Add(addedLevelTag);
         _DbContext.Add(contribution);
-
         await _DbContext.SaveChangesAsync().ConfigureAwait(false);
-        return contribution;
-    }
 
-    private async Task<List<LevelTag>> GetConflictingLevelTagsAsync(long levelId, Tag tag)
-    {
-        if (tag.Exclusivity == null)
-            return [];
-
-        List<LevelTag> conflictingLevelTags = await _DbContext.Set<LevelTag>()
-            .Include(levelTag => levelTag.Tag)
-            .Where(levelTag =>
-                levelTag.Level.Id == levelId &&
-                levelTag.Tag.GroupId == tag.GroupId &&
-                levelTag.Tag.Exclusivity == tag.Exclusivity)
-            .ToListAsync()
-            .ConfigureAwait(false);
-
-        return conflictingLevelTags;
-    }
-
-    private async Task<Contribution> RemoveTagFromLevel(Level level, Tag tag, User? user, App? app)
-    {
-        LevelTag? levelTag = await _DbContext.FindAsync<LevelTag>(level.Id, tag.Id).ConfigureAwait(false);
-        if (levelTag == null)
-            throw new LevelTagNotFoundException(level.Id, tag.Name);
-
-        TagChange change = _TagChangeManager.CreateChange(TagChangeAction.Remove, tag);
-        Contribution contribution = _ContributionManager
-            .CreateContribution(level, tag, user, app, TagChangeAction.Remove, [change]);
-
-        _DbContext.Remove(levelTag);
-        _DbContext.Add(contribution);
-
-        await _DbContext.SaveChangesAsync().ConfigureAwait(false);
         return contribution;
     }
 
@@ -181,7 +161,7 @@ public class ChangeLevelTagCommandHandler : ICommandHandler<ChangeLevelTagComman
         List<TagChangeDto> changeDtos = contribution.Changes
             .Select(change => new TagChangeDto
             {
-                Action = (TagChangeAction)change.Action,
+                Action = change.Action,
                 TagName = change.TagName,
             })
             .ToList();

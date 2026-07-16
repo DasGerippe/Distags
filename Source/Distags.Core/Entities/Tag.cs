@@ -12,13 +12,19 @@ public class Tag
 
     public int Position { get; set; } = 0;
 
-    public int? Exclusivity { get; set; }
+    public bool IsExclusive { get; set; }
+
+    public bool IsFallback { get; set; }
 
     public bool IsAutoTag { get; set; }
 
-    public long? GroupId { get; set; }
+    public long DisplayGroupId { get; set; }
 
-    public TagGroup? Group { get; set; }
+    public DisplayGroup DisplayGroup { get; set; }
+
+    public long? LogicGroupId { get; set; }
+
+    public LogicGroup? LogicGroup { get; set; }
 
     public List<Level> Levels { get; set; } = [];
 

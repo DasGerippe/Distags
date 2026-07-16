@@ -28,8 +28,8 @@ GRANT SELECT, INSERT, UPDATE, DELETE ON TABLE level_locks TO distags_manage_leve
 
 CREATE ROLE distags_manage_tags NOLOGIN;
 GRANT distags_user TO distags_manage_tags;
-GRANT SELECT, INSERT, UPDATE, DELETE ON TABLE tag_groups, tags TO distags_manage_tags;
-GRANT USAGE, SELECT, UPDATE ON SEQUENCE tags_id_seq, tag_groups_id_seq TO distags_manage_tags;
+GRANT SELECT, INSERT, UPDATE, DELETE ON TABLE display_groups, logic_groups, tags TO distags_manage_tags;
+GRANT USAGE, SELECT, UPDATE ON SEQUENCE display_groups_id_seq, logic_groups_id_seq, tags_id_seq TO distags_manage_tags;
 
 CREATE ROLE distags_assign_tags NOLOGIN;
 GRANT distags_user TO distags_assign_tags;

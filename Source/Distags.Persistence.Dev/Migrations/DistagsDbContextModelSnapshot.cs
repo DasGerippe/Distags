@@ -150,6 +150,44 @@ namespace Distags.Persistence.Dev
                     b.ToTable("creators", (string)null);
                 });
 
+            modelBuilder.Entity("Distags.Core.Entities.DisplayGroup", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint")
+                        .HasColumnName("id");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("description");
+
+                    b.Property<string>("DisplayName")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("display_name");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("name");
+
+                    b.Property<int>("Position")
+                        .HasColumnType("integer")
+                        .HasColumnName("position");
+
+                    b.HasKey("Id")
+                        .HasName("pk_display_groups");
+
+                    b.HasIndex("Name")
+                        .IsUnique()
+                        .HasDatabaseName("ix_display_groups_name");
+
+                    b.ToTable("display_groups", (string)null);
+                });
+
             modelBuilder.Entity("Distags.Core.Entities.Level", b =>
                 {
                     b.Property<long>("Id")
@@ -221,6 +259,34 @@ namespace Distags.Persistence.Dev
                     b.ToTable("level_tags", (string)null);
                 });
 
+            modelBuilder.Entity("Distags.Core.Entities.LogicGroup", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint")
+                        .HasColumnName("id");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
+
+                    b.Property<bool>("AllExclusive")
+                        .HasColumnType("boolean")
+                        .HasColumnName("all_exclusive");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("name");
+
+                    b.HasKey("Id")
+                        .HasName("pk_logic_groups");
+
+                    b.HasIndex("Name")
+                        .IsUnique()
+                        .HasDatabaseName("ix_logic_groups_name");
+
+                    b.ToTable("logic_groups", (string)null);
+                });
+
             modelBuilder.Entity("Distags.Core.Entities.Setting", b =>
                 {
                     b.Property<string>("Key")
@@ -251,22 +317,30 @@ namespace Distags.Persistence.Dev
                         .HasColumnType("text")
                         .HasColumnName("description");
 
+                    b.Property<long>("DisplayGroupId")
+                        .HasColumnType("bigint")
+                        .HasColumnName("display_group_id");
+
                     b.Property<string>("DisplayName")
                         .IsRequired()
                         .HasColumnType("text")
                         .HasColumnName("display_name");
 
-                    b.Property<int?>("Exclusivity")
-                        .HasColumnType("integer")
-                        .HasColumnName("exclusivity");
-
-                    b.Property<long?>("GroupId")
-                        .HasColumnType("bigint")
-                        .HasColumnName("group_id");
-
                     b.Property<bool>("IsAutoTag")
                         .HasColumnType("boolean")
                         .HasColumnName("is_auto_tag");
+
+                    b.Property<bool>("IsExclusive")
+                        .HasColumnType("boolean")
+                        .HasColumnName("is_exclusive");
+
+                    b.Property<bool>("IsFallback")
+                        .HasColumnType("boolean")
+                        .HasColumnName("is_fallback");
+
+                    b.Property<long?>("LogicGroupId")
+                        .HasColumnType("bigint")
+                        .HasColumnName("logic_group_id");
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -280,43 +354,17 @@ namespace Distags.Persistence.Dev
                     b.HasKey("Id")
                         .HasName("pk_tags");
 
-                    b.HasIndex("GroupId")
-                        .HasDatabaseName("ix_tags_group_id");
+                    b.HasIndex("DisplayGroupId")
+                        .HasDatabaseName("ix_tags_display_group_id");
+
+                    b.HasIndex("LogicGroupId")
+                        .HasDatabaseName("ix_tags_logic_group_id");
 
                     b.HasIndex("Name")
                         .IsUnique()
                         .HasDatabaseName("ix_tags_name");
 
                     b.ToTable("tags", (string)null);
-                });
-
-            modelBuilder.Entity("Distags.Core.Entities.TagGroup", b =>
-                {
-                    b.Property<long>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("bigint")
-                        .HasColumnName("id");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
-
-                    b.Property<string>("Description")
-                        .IsRequired()
-                        .HasColumnType("text")
-                        .HasColumnName("description");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("text")
-                        .HasColumnName("name");
-
-                    b.Property<int>("Position")
-                        .HasColumnType("integer")
-                        .HasColumnName("position");
-
-                    b.HasKey("Id")
-                        .HasName("pk_tag_groups");
-
-                    b.ToTable("tag_groups", (string)null);
                 });
 
             modelBuilder.Entity("Distags.Core.Entities.User", b =>
@@ -504,12 +552,21 @@ namespace Distags.Persistence.Dev
 
             modelBuilder.Entity("Distags.Core.Entities.Tag", b =>
                 {
-                    b.HasOne("Distags.Core.Entities.TagGroup", "Group")
+                    b.HasOne("Distags.Core.Entities.DisplayGroup", "DisplayGroup")
                         .WithMany("Tags")
-                        .HasForeignKey("GroupId")
-                        .HasConstraintName("fk_tags_tag_groups_group_id");
+                        .HasForeignKey("DisplayGroupId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("fk_tags_display_groups_display_group_id");
 
-                    b.Navigation("Group");
+                    b.HasOne("Distags.Core.Entities.LogicGroup", "LogicGroup")
+                        .WithMany("Tags")
+                        .HasForeignKey("LogicGroupId")
+                        .HasConstraintName("fk_tags_logic_groups_logic_group_id");
+
+                    b.Navigation("DisplayGroup");
+
+                    b.Navigation("LogicGroup");
                 });
 
             modelBuilder.Entity("Distags.Core.Entities.UserBan", b =>
@@ -548,19 +605,24 @@ namespace Distags.Persistence.Dev
                     b.Navigation("CreatedLevels");
                 });
 
+            modelBuilder.Entity("Distags.Core.Entities.DisplayGroup", b =>
+                {
+                    b.Navigation("Tags");
+                });
+
             modelBuilder.Entity("Distags.Core.Entities.Level", b =>
                 {
                     b.Navigation("LevelTags");
                 });
 
+            modelBuilder.Entity("Distags.Core.Entities.LogicGroup", b =>
+                {
+                    b.Navigation("Tags");
+                });
+
             modelBuilder.Entity("Distags.Core.Entities.Tag", b =>
                 {
                     b.Navigation("LevelTags");
-                });
-
-            modelBuilder.Entity("Distags.Core.Entities.TagGroup", b =>
-                {
-                    b.Navigation("Tags");
                 });
 
             modelBuilder.Entity("Distags.Core.Entities.User", b =>

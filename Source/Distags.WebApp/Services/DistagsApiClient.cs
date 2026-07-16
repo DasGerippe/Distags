@@ -62,11 +62,25 @@ public class DistagsApiClient : IDisposable
             : null;
     }
 
-    public async Task<List<TagGroupDto>> GetTagTreeAsync(CancellationToken cancellationToken = default)
+    public async Task<List<DisplayGroupDto>> GetDisplayGroupsAsync(CancellationToken cancellationToken = default)
     {
-        HttpResponseMessage responseMessage = await _HttpClient.GetAsync("tags/tree", cancellationToken).ConfigureAwait(false);
-        List<TagGroupDto> tagTree = await GetContentAsync<List<TagGroupDto>>(responseMessage, cancellationToken).ConfigureAwait(false);
-        return tagTree;
+        HttpResponseMessage responseMessage = await _HttpClient.GetAsync("DisplayGroups", cancellationToken).ConfigureAwait(false);
+        List<DisplayGroupDto> displayGroups = await GetContentAsync<List<DisplayGroupDto>>(responseMessage, cancellationToken).ConfigureAwait(false);
+        return displayGroups;
+    }
+
+    public async Task<List<LogicGroupDto>> GetLogicGroupsAsync(CancellationToken cancellationToken = default)
+    {
+        HttpResponseMessage responseMessage = await _HttpClient.GetAsync("LogicGroups", cancellationToken).ConfigureAwait(false);
+        List<LogicGroupDto> logicGroups = await GetContentAsync<List<LogicGroupDto>>(responseMessage, cancellationToken).ConfigureAwait(false);
+        return logicGroups;
+    }
+
+    public async Task<List<TagDto>> GetTagsAsync(CancellationToken cancellationToken = default)
+    {
+        HttpResponseMessage responseMessage = await _HttpClient.GetAsync("Tags", cancellationToken).ConfigureAwait(false);
+        List<TagDto> logicGroups = await GetContentAsync<List<TagDto>>(responseMessage, cancellationToken).ConfigureAwait(false);
+        return logicGroups;
     }
 
     public async Task<LevelsPage> BrowseLevelsAsync(
@@ -88,18 +102,16 @@ public class DistagsApiClient : IDisposable
         return level;
     }
 
-    public async Task PostLevelTag(long levelId, string tagName, CancellationToken cancellationToken = default)
+    public Task PostLevelTag(long levelId, string tagName, CancellationToken cancellationToken = default)
     {
         string requestUri = $"levels/{levelId}/tags/{tagName}";
-        HttpResponseMessage responseMessage = await _HttpClient.PutAsync(requestUri, null, cancellationToken).ConfigureAwait(false);
-        responseMessage.EnsureSuccessStatusCode();
+        return _HttpClient.PutAsync(requestUri, null, cancellationToken);
     }
 
-    public async Task DeleteLevelTag(long levelId, string tagName, CancellationToken cancellationToken = default)
+    public Task DeleteLevelTag(long levelId, string tagName, CancellationToken cancellationToken = default)
     {
         string requestUri = $"levels/{levelId}/tags/{tagName}";
-        HttpResponseMessage responseMessage = await _HttpClient.DeleteAsync(requestUri, cancellationToken).ConfigureAwait(false);
-        responseMessage.EnsureSuccessStatusCode();
+        return _HttpClient.DeleteAsync(requestUri, cancellationToken);
     }
 
     public string GetSteamLoginEndpoint(string? returnUrl = null)

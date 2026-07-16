@@ -8,9 +8,15 @@ public class TagDto
 
     public string Description { get; set; } = string.Empty;
 
+    public string DisplayGroupName { get; set; } = string.Empty;
+
     public int Position { get; set; }
 
-    public int? Exclusivity { get; set; }
+    public string? LogicGroupName { get; set; } = string.Empty;
+
+    public bool IsExclusive { get; set; }
+
+    public bool IsFallback { get; set; }
 
     public bool IsAutoTag { get; set; }
 }

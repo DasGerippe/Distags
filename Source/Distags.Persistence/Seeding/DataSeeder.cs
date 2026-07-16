@@ -12,10 +12,19 @@ internal class DataSeeder
 
     public async Task SeedAsync(DbContext context, bool dataStoreChanged, CancellationToken cancellationToken)
     {
-        if (!context.Set<Tag>().Any() && !context.Set<TagGroup>().Any())
+        bool shouldCreateDefaultTagsAndGroups =
+            !await context.Set<DisplayGroup>().AnyAsync(cancellationToken).ConfigureAwait(false) &&
+            !await context.Set<LogicGroup>().AnyAsync(cancellationToken).ConfigureAwait(false) &&
+            !await context.Set<Tag>().AnyAsync(cancellationToken).ConfigureAwait(false);
+
+        if (shouldCreateDefaultTagsAndGroups)
         {
-            IEnumerable<TagGroup> defaultTagTree = new DefaultTagProvider().GetDefaultTagTree();
-            context.AddRange(defaultTagTree);
+            DefaultTagProvider defaultTagProvider = new DefaultTagProvider();
+
+            context.AddRange(defaultTagProvider.GetDefaultDisplayGroups());
+            context.AddRange(defaultTagProvider.GetDefaultLogicGroups());
+            context.AddRange(defaultTagProvider.GetDefaultTags());
+
             await context.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
         }
     }

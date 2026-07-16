@@ -4,6 +4,7 @@
 @using Distags.Contracts
 @using Distags.WebApp.Components.Inputs
 @using Distags.WebApp.Components.Level
+@using Distags.WebApp.Models
 @using Distags.WebApp.Security
 @using Distags.WebApp.Services
 @using Microsoft.AspNetCore.SignalR.Client
@@ -12,6 +13,7 @@
 @implements IAsyncDisposable
 
 @inject DistagsApiClient LevelTagApi
+@inject TagTreeProvider TagTreeProvider
 @inject IUserInfoProvider UserInfoProvider
 
 @if (_IsLoadingData)
@@ -45,15 +47,15 @@
 
 <div class="container-fluid content-wide">
 	<div class="row">
-		@foreach (TagGroupDto tagGroup in _TagTree!)
+		@foreach (DisplayGroupWithTags tagGroup in _TagTree!)
 		{
-			<TagGroupColumnCard Title="@tagGroup.Name">
+			<TagGroupColumnCard Title="@tagGroup.DisplayGroup.DisplayName">
 				@{
 					bool isFirst = true;
-					int? lastExclusivity = null;
+					string? previousLogicGroupName = null;
 					foreach (TagDto tag in tagGroup.Tags)
 					{
-						if (!isFirst && tag.Exclusivity != lastExclusivity)
+						if (!isFirst && tag.LogicGroupName != previousLogicGroupName)
 						{
 							<div class="my-2"></div>
 						}
@@ -65,7 +67,7 @@
 										   AsyncOperation="state => TryChangeTagState(tag.Name, state)"
 										   IconProvider="_CheckboxIconProvider" />
 
-						lastExclusivity = tag.Exclusivity;
+						previousLogicGroupName = tag.LogicGroupName;
 						isFirst = false;
 					}
 				}
@@ -80,7 +82,7 @@
 	private bool _IsReadOnly;
 
 	private LevelDto? _LevelDto;
-	private List<TagGroupDto>? _TagTree;
+    private IReadOnlyCollection<DisplayGroupWithTags>? _TagTree;
 
 	private readonly ICheckboxIconProvider<bool> _CheckboxIconProvider = new BoolCheckboxIconProvider();
 
@@ -107,7 +109,7 @@
 		UserDto? user = await UserInfoProvider.GetUserInfoAsync();
 		_IsReadOnly = user?.AcceptsGuidelines != true;
 
-		_TagTree = await LevelTagApi.GetTagTreeAsync();
+        _TagTree = await TagTreeProvider.GetTagTreeAsync();
 		InitializeTagStates();
 
 		_IsLoadingData = false;
@@ -154,20 +156,18 @@
 		await _LevelHubConnection.InvokeAsync("JoinLevelGroup", LevelId);
 	}
 
-	private async Task TryChangeTagState(string tag, bool state)
+	private async Task TryChangeTagState(string tagName, bool state)
 	{
 		if (state)
-			await LevelTagApi.DeleteLevelTag(LevelId, tag);
+			await LevelTagApi.DeleteLevelTag(LevelId, tagName);
 		else
-			await LevelTagApi.PostLevelTag(LevelId, tag);
+			await LevelTagApi.PostLevelTag(LevelId, tagName);
 	}
 
 	public async ValueTask DisposeAsync()
 	{
 		if (_LevelHubConnection != null)
-		{
-			await _LevelHubConnection.DisposeAsync();
-		}
+            await _LevelHubConnection.DisposeAsync();
 	}
 
 	private class TagState

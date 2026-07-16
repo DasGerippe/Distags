@@ -15,6 +15,7 @@
 @inject HistoryManager History
 @inject NavigationManager Navigation
 @inject DistagsApiClient LevelTagApi
+@inject TagTreeProvider TagTreeProvider
 
 <PageTitle>@Resource.PageTitle_BrowseLevels</PageTitle>
 
@@ -24,15 +25,15 @@
 <div class="container-fluid content-wide">
 
     <div class="row">
-        @foreach (TagGroupDto tagGroup in _TagGroups)
+        @foreach (DisplayGroupWithTags tagGroup in _TagTree)
         {
-            <TagGroupColumnCard Title="@tagGroup.Name">
+            <TagGroupColumnCard Title="@tagGroup.DisplayGroup.DisplayName">
                 @foreach (TagDto tag in tagGroup.Tags)
                 {
                     TagFilter tagFilter = _TagFilters[tag.Name];
                     <IconCheckbox TState="TagFilterState"
                                   Label="@tag.DisplayName"
-                                  Logic="GetCheckboxLogic(tag.Exclusivity)"
+                                  Logic="GetCheckboxLogic(tagGroup.AllTagsExclusive)"
                                   IconProvider="_TagFilterStateIconProvider"
                                   State="tagFilter.State"
                                   StateChanged="newState => OnTagFilterStateChanged(tagFilter, newState)" />
@@ -100,7 +101,7 @@
     private bool _IsInitialized;
     private bool _BrowseClicked;
 
-    private List<TagGroupDto> _TagGroups = [];
+    private IReadOnlyCollection<DisplayGroupWithTags> _TagTree = [];
     private Dictionary<string, TagFilter> _TagFilters = [];
 
     private readonly ICheckboxLogic<TagFilterState> _ExclusiveTagFilterLogic = new ExclusiveTagCheckboxLogic();
@@ -130,8 +131,8 @@
 
     protected override async Task OnInitializedAsync()
     {
-        _TagGroups = await LevelTagApi.GetTagTreeAsync();
-        _TagFilters = _TagGroups
+        _TagTree = await TagTreeProvider.GetTagTreeAsync();
+        _TagFilters = _TagTree
             .SelectMany(tagGroup => tagGroup.Tags.Select(tag => new TagFilter(tag)))
             .ToDictionary(tagFilter => tagFilter.Tag.Name);
 
@@ -204,9 +205,9 @@
         await QueryLevelsAsync(newPage);
     }
 
-    private ICheckboxLogic<TagFilterState> GetCheckboxLogic(int? tagExclusivity)
+    private ICheckboxLogic<TagFilterState> GetCheckboxLogic(bool allTagsExclusive)
     {
-        return tagExclusivity == null ? _CombinableTagFilterLogic : _ExclusiveTagFilterLogic;
+        return allTagsExclusive ? _ExclusiveTagFilterLogic : _CombinableTagFilterLogic;
     }
 
     private async Task UpdateBrowserUrl()

@@ -4,8 +4,8 @@ using Distags.Core.Events;
 using Distags.Core.Filtering;
 using Distags.Core.Filtering.Contributions;
 using Distags.Core.Filtering.Levels;
+using Distags.Core.Logic;
 using Distags.Core.Management;
-using Distags.Core.Management.History;
 using Distags.Core.Queries;
 using Distags.Core.Security;
 using Distags.Core.Sorting;
@@ -26,7 +26,11 @@ public static class ServiceCollectionExtensions
 
         services.AddTransient<ContributionManager>();
         services.AddTransient<TagChangeManager>();
-        services.AddTransient<ContributionReplayEngine>();
+        services.AddTransient<ContributionReplayer>();
+        services.AddTransient<LevelTagAdder>();
+        services.AddTransient<LevelTagRemover>();
+
+        services.AddScoped<FallbackTagProvider>();
 
         services.AddTransient<MaintenanceManager>();
 

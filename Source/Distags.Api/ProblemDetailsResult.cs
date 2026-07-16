@@ -14,6 +14,16 @@ public static class ProblemDetailsResult
         });
     }
 
+    public static ObjectResult BadRequestRemoveFallbackTag(string fallbackTagName)
+    {
+        return ObjectResult(new ProblemDetails
+        {
+            Status = StatusCodes.Status400BadRequest,
+            Title = "Cannot Remove Fallback Tag",
+            Detail = $"You cannot remove the fallback tag '{fallbackTagName}' because it is the last one of it's group.",
+        });
+    }
+
     public static ObjectResult ForbiddenBanSelf()
     {
         return ForbiddenBan("You cannot ban yourself.");

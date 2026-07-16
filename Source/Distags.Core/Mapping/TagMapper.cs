@@ -11,8 +11,11 @@ public class TagMapper : IEntityMapper<Tag, TagDto>
         Name = tag.Name,
         DisplayName = tag.DisplayName,
         Description = tag.Description,
+        DisplayGroupName = tag.DisplayGroup.Name,
         Position = tag.Position,
-        Exclusivity = tag.Exclusivity,
+        LogicGroupName = tag.LogicGroup!.Name,
+        IsExclusive = tag.IsExclusive,
+        IsFallback = tag.IsFallback,
         IsAutoTag = tag.IsAutoTag,
     };
 }

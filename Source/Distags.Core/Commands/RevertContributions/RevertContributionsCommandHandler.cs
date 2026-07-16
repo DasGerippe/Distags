@@ -1,5 +1,5 @@
 ﻿using Distags.Core.Entities;
-using Distags.Core.Management.History;
+using Distags.Core.Management;
 using Microsoft.EntityFrameworkCore;
 
 namespace Distags.Core.Commands.RevertContributions;
@@ -7,12 +7,12 @@ namespace Distags.Core.Commands.RevertContributions;
 public class RevertContributionsCommandHandler : ICommandHandler<RevertContributionsCommand>
 {
     private readonly DistagsDbContext _DbContext;
-    private readonly ContributionReplayEngine _ContributionReplayEngine;
+    private readonly ContributionReplayer _ContributionReplayer;
 
-    public RevertContributionsCommandHandler(DistagsDbContext dbContext, ContributionReplayEngine contributionReplayEngine)
+    public RevertContributionsCommandHandler(DistagsDbContext dbContext, ContributionReplayer contributionReplayer)
     {
         _DbContext = dbContext;
-        _ContributionReplayEngine = contributionReplayEngine;
+        _ContributionReplayer = contributionReplayer;
     }
 
     public async Task HandleAsync(RevertContributionsCommand command)
@@ -48,7 +48,7 @@ public class RevertContributionsCommandHandler : ICommandHandler<RevertContribut
         {
             try
             {
-                await _ContributionReplayEngine.ReplayContributionsAsync(levelId).ConfigureAwait(false);
+                await _ContributionReplayer.ReplayContributionsAsync(levelId).ConfigureAwait(false);
             }
             catch
             {

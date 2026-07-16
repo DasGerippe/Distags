@@ -22,8 +22,10 @@ public class DistagsDbContext : Distags.Core.DistagsDbContext
         ConfigureAppEntity(modelBuilder);
         ConfigureContributionEntity(modelBuilder);
         ConfigureCreatorEntity(modelBuilder);
+        ConfigureDisplayGroupEntity(modelBuilder);
         ConfigureLevelEntity(modelBuilder);
         ConfigureLevelLockEntity(modelBuilder);
+        ConfigureLogicGroupEntity(modelBuilder);
         ConfigureSettingEntity(modelBuilder);
         ConfigureTagEntity(modelBuilder);
         ConfigureUserEntity(modelBuilder);
@@ -55,6 +57,13 @@ public class DistagsDbContext : Distags.Core.DistagsDbContext
             .ValueGeneratedNever();
     }
 
+    private void ConfigureDisplayGroupEntity(ModelBuilder modelBuilder)
+    {
+        modelBuilder.Entity<DisplayGroup>()
+            .HasIndex(displayGroup => displayGroup.Name)
+            .IsUnique();
+    }
+
     private void ConfigureLevelEntity(ModelBuilder modelBuilder)
     {
         modelBuilder.Entity<Level>()
@@ -80,6 +89,13 @@ public class DistagsDbContext : Distags.Core.DistagsDbContext
         modelBuilder.Entity<LevelLock>()
             .Property(levelLock => levelLock.LevelId)
             .ValueGeneratedNever();
+    }
+
+    private void ConfigureLogicGroupEntity(ModelBuilder modelBuilder)
+    {
+        modelBuilder.Entity<LogicGroup>()
+            .HasIndex(logicGroup => logicGroup.Name)
+            .IsUnique();
     }
 
     private void ConfigureSettingEntity(ModelBuilder modelBuilder)
