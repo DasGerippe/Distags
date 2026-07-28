@@ -1,4 +1,5 @@
 ﻿using Distags.Core.Entities;
+using Distags.Core.Management;
 using Microsoft.EntityFrameworkCore;
 
 namespace Distags.Core.Commands.ImportLevels;
@@ -6,10 +7,12 @@ namespace Distags.Core.Commands.ImportLevels;
 public class ImportLevelsCommandHandler : ICommandHandler<ImportLevelsCommand>
 {
     private readonly DistagsDbContext _DbContext;
+    private readonly FallbackTagProvider _FallbackTagProvider;
 
-    public ImportLevelsCommandHandler(DistagsDbContext dbContext)
+    public ImportLevelsCommandHandler(DistagsDbContext dbContext, FallbackTagProvider fallbackTagProvider)
     {
         _DbContext = dbContext;
+        _FallbackTagProvider = fallbackTagProvider;
     }
 
     public async Task HandleAsync(ImportLevelsCommand command)
@@ -25,6 +28,7 @@ public class ImportLevelsCommandHandler : ICommandHandler<ImportLevelsCommand>
             if (!existingLevels.TryGetValue(scrapedLevel.Id, out Level? level))
             {
                 level = new Level { Id = scrapedLevel.Id };
+                level.Tags.AddRange(await _FallbackTagProvider.GetFallbackTagsAsync().ConfigureAwait(false));
                 _DbContext.Add(level);
             }
             SetLevelProperties(level, scrapedLevel);
