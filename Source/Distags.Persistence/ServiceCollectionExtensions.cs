@@ -4,6 +4,7 @@ using Distags.Persistence.Filtering;
 using Distags.Persistence.Implementations;
 using Distags.Persistence.Seeding;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.Extensions.DependencyInjection;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Infrastructure;
 
@@ -24,6 +25,9 @@ public static class ServiceCollectionExtensions
 
         serviceCollection.AddTransient<IStringContainsFilterFactory, StringContainsFilterFactory>();
 
+        serviceCollection.AddTransient<DefaultTagProvider>();
+        serviceCollection.AddTransient<DataSeeder>();
+
         return serviceCollection;
     }
 
@@ -34,13 +38,19 @@ public static class ServiceCollectionExtensions
     {
         return (services, options) =>
         {
-            DataSeeder dataSeeder = new DataSeeder();
-
             options
                 .UseNpgsql(connectionString, ConfigureNpgsqlOptions(npgsqlOptionsAction))
                 .UseSnakeCaseNamingConvention()
-                .UseSeeding(dataSeeder.Seed)
-                .UseAsyncSeeding(dataSeeder.SeedAsync);
+                .UseSeeding((dbContext, dataStoreChanged) =>
+                {
+                    DataSeeder dataSeeder = dbContext.GetService<DataSeeder>();
+                    dataSeeder.Seed(dbContext, dataStoreChanged);
+                })
+                .UseAsyncSeeding(async (dbContext, dataStoreChanged, cancellationToken) =>
+                {
+                    DataSeeder dataSeeder = dbContext.GetService<DataSeeder>();
+                    await dataSeeder.SeedAsync(dbContext, dataStoreChanged, cancellationToken).ConfigureAwait(false);
+                });
 
             optionsAction?.Invoke(services, options);
         };

@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Distags.Core;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -28,6 +29,7 @@ internal class Program
                 connectionString,
                 npgsqlOptionsAction: npgsqlOptions => npgsqlOptions
                     .MigrationsAssembly($"{nameof(Distags)}.{nameof(Persistence)}.{nameof(Dev)}"));
+            services.AddDistagsCore();
         });
         IHost host = builder.Build();
 
