@@ -6,7 +6,6 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Serilog;
 using SerilogUtils;
-using System.Net.Http.Headers;
 using System.Runtime.CompilerServices;
 
 namespace AutoTaggerRunner;
@@ -29,9 +28,8 @@ internal class Program
             {
                 IHostEnvironment environment = context.HostingEnvironment;
 
-                configBuilder.AddJsonFile("appsettings.json", optional: false, reloadOnChange: true);
-                configBuilder.AddJsonFile($"appsettings.{environment.EnvironmentName}.json", optional: true,
-                    reloadOnChange: true);
+                configBuilder.AddJsonFile("appsettings.json", optional: false);
+                configBuilder.AddJsonFile($"appsettings.{environment.EnvironmentName}.json", optional: true);
 
                 if (environment.IsDevelopment())
                     configBuilder.AddUserSecrets<Program>();
@@ -54,9 +52,6 @@ internal class Program
                 {
                     string distagsApiUri = context.Configuration["DistagsApi:Uri"]!;
                     httpClient.BaseAddress = new Uri(distagsApiUri);
-
-                    string distagsApiKey = context.Configuration["DistagsApi:ApiKey"]!;
-                    httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("ApiKey", distagsApiKey);
                 });
 
                 services.AddTransient<IAutoTaggerStateManager, AutoTaggerStateFileManager>();

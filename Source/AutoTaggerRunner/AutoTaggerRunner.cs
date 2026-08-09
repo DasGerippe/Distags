@@ -1,6 +1,7 @@
 ﻿using AutoTagging.Abstractions;
 using Distags.Contracts;
 using Distags.Core.Mapping;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using System.Reflection;
 
@@ -11,17 +12,20 @@ public class AutoTaggerRunner
     private readonly IAutoTaggerStateManager _StateManager;
     private readonly IAutoTaggerLevelProviderFactory _LevelProviderFactory;
     private readonly DistagsApiClient _DistagsApiClient;
+    private readonly IConfiguration _Configuration;
     private readonly ILogger<AutoTaggerRunner> _Logger;
 
     public AutoTaggerRunner(
         IAutoTaggerStateManager stateManager,
         IAutoTaggerLevelProviderFactory levelProviderFactory,
         DistagsApiClient distagsApiClient,
+        IConfiguration configuration,
         ILogger<AutoTaggerRunner> logger)
     {
         _StateManager = stateManager;
         _LevelProviderFactory = levelProviderFactory;
         _DistagsApiClient = distagsApiClient;
+        _Configuration = configuration;
         _Logger = logger;
     }
 
@@ -68,7 +72,7 @@ public class AutoTaggerRunner
         }
         catch (Exception ex)
         {
-            _Logger.LogError(ex, null);
+            _Logger.LogError(ex, "An error occured while running {AutoTagger}s of DLL {dll}.", nameof(AutoTagger), pluginDll);
         }
     }
 
@@ -94,6 +98,14 @@ public class AutoTaggerRunner
     {
         try
         {
+            IConfiguration autoTaggerConfig = CreateAutoTaggerConfiguration(autoTagger);
+            string? distagsApiKey = autoTaggerConfig["DistagsApiKey"];
+            if (string.IsNullOrEmpty(distagsApiKey))
+            {
+                _Logger.LogWarning("Distags API key not configured for {AutoTagger}.", autoTagger.Name);
+                return;
+            }
+
             LevelProjectionIncludes levelIncludes = EnrichLevelProjectionIncludes(autoTagger);
             IAutoTaggerLevelProvider levelProvider = _LevelProviderFactory.CreateLevelProvider(autoTagger.TaggingStrategy, levelIncludes);
             List<LevelProjectionDto> levels = await levelProvider.GetLevelsToTagAsync(state).ConfigureAwait(false);
@@ -106,11 +118,11 @@ public class AutoTaggerRunner
 
                 TagDelta tagDelta = await autoTagger.CalculateTagDeltaAsync(level).ConfigureAwait(false);
 
-                if (tagDelta.AddTags.Any() || tagDelta.RemoveTags.Any())
+                if (tagDelta.AddTags.Count > 0 || tagDelta.RemoveTags.Count > 0)
                 {
                     _Logger.LogDebug("Calculated tag delta: +{tagsToAdd}; -{tagsToRemove}", tagDelta.AddTags, tagDelta.RemoveTags);
 
-                    await SendTagChangesToApiAsync(level.Id!.Value, tagDelta).ConfigureAwait(false);
+                    await SendTagChangesToApiAsync(level.Id!.Value, tagDelta, distagsApiKey).ConfigureAwait(false);
                 }
                 else
                 {
@@ -124,6 +136,15 @@ public class AutoTaggerRunner
         {
             _Logger.LogError(ex, "An error occurred while running {autoTagger}.", autoTagger.Name);
         }
+    }
+
+    private IConfiguration CreateAutoTaggerConfiguration(AutoTagger autoTagger)
+    {
+        return new ConfigurationBuilder()
+            .AddConfiguration(_Configuration.GetSection($"AutoTaggers:{autoTagger.Name}"))
+            .AddJsonFile(Path.Combine(Constants.PluginsFolderName, $"{autoTagger.Name}.appsettings.json"), optional: true)
+            .AddEnvironmentVariables($"Distags_{autoTagger.Name}_")
+            .Build();
     }
 
     private LevelProjectionIncludes EnrichLevelProjectionIncludes(AutoTagger autoTagger)
@@ -143,7 +164,7 @@ public class AutoTaggerRunner
         return includes;
     }
 
-    private async Task SendTagChangesToApiAsync(long levelId, TagDelta tagDelta)
+    private async Task SendTagChangesToApiAsync(long levelId, TagDelta tagDelta, string distagsApiKey)
     {
         _Logger.LogDebug("Sending tag updates to API...");
 
@@ -151,13 +172,13 @@ public class AutoTaggerRunner
 
         foreach (string tagToAdd in tagDelta.AddTags)
         {
-            Task addTagTask = _DistagsApiClient.PutLevelTagAsync(levelId, tagToAdd);
+            Task addTagTask = _DistagsApiClient.PutLevelTagAsync(levelId, tagToAdd, distagsApiKey);
             tagChangeTasks.Add(addTagTask);
         }
 
         foreach (string tagToRemove in tagDelta.RemoveTags)
         {
-            Task removeTagTask = _DistagsApiClient.DeleteLevelTagAsync(levelId, tagToRemove);
+            Task removeTagTask = _DistagsApiClient.DeleteLevelTagAsync(levelId, tagToRemove, distagsApiKey);
             tagChangeTasks.Add(removeTagTask);
         }
 
