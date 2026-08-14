@@ -24,10 +24,10 @@ public class UpdateUserSettingsCommandHandler : ICommandHandler<UpdateUserSettin
             throw new UnknownUserException(command.SteamId);
 
         if (command.AcceptsGuidelines.HasValue)
-            user.AcceptsGuidelines = command.AcceptsGuidelines;
+            user.AcceptsGuidelines = command.AcceptsGuidelines.Value;
 
         if (command.IsAnonymous.HasValue)
-            user.IsAnonymous = command.IsAnonymous;
+            user.IsAnonymous = command.IsAnonymous.Value;
 
         await _DbContext.SaveChangesAsync().ConfigureAwait(false);
     }

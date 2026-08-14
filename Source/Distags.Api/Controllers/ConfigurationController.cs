@@ -30,7 +30,10 @@ public class ConfigurationController : ControllerBase
     {
         if (apiSettings.MaintenanceActive != null)
         {
-            SetMaintenanceCommand command = new SetMaintenanceCommand { MaintenanceActive = apiSettings.MaintenanceActive };
+            SetMaintenanceCommand command = new SetMaintenanceCommand
+            {
+                MaintenanceActive = apiSettings.MaintenanceActive.Value,
+            };
             await requestDispatcher.DispatchAsync(command);
         }
 

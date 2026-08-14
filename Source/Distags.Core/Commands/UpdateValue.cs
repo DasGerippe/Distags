@@ -17,7 +17,7 @@ public readonly struct UpdateValue<TValue>
         return new UpdateValue<TValue?>(value, true);
     }
 
-    public static implicit operator TValue(UpdateValue<TValue> updateValue)
+    public static explicit operator TValue(UpdateValue<TValue> updateValue)
     {
         return updateValue.Value;
     }
