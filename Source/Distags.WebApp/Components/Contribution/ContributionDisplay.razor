@@ -4,26 +4,36 @@
 
 <div class="row align-items-center border border-1 rounded-3 shadow mx-0 py-2 row-gap-2 @GetContainerClass()">
     <!-- Level -->
-    <div class="col-12 col-sm-7 col-md-4">
+    <div class="col-12 col-sm-7 col-md-4 d-flex align-items-center gap-1">
+        @if (EnableModeration)
+        {
+            <button class="icon-button" @onclick="OnLevelFilterClicked">
+                <i class="bi @GetFilterIconClassName(LevelFilterActive) fs-5"></i>
+            </button>
+        }
         <LevelDisplay Level="Contribution.Level" />
     </div>
 
     <!-- Changes -->
-    <div class="col-12 col-sm-5 col-md-3 d-flex">
+    <div class="col-12 col-sm-5 col-md-3 d-flex align-items-center">
         @if (EnableModeration)
         {
-            <RevertContributionButton Contribution="Contribution"/>
+            <RevertContributionButton Contribution="Contribution" />
         }
-        <TagChangesDisplay Changes="Contribution.Changes"/>
+        <TagChangesDisplay Changes="Contribution.Changes" />
     </div>
 
     <!-- Contributor -->
-    <div class="col col-sm-7 col-md-3 d-flex">
+    <div class="col col-sm-7 col-md-3 d-flex align-items-center gap-1">
         @if (EnableModeration)
         {
+            <button class="icon-button" @onclick="OnUserFilterClicked" disabled="@(Contribution.User == null)">
+                <i class="bi @GetFilterIconClassName(UserFilterActive) fs-5"></i>
+            </button>
+
             <BanUserButton UserSteamId="Contribution.User?.SteamId" UserSteamName="@Contribution.User?.SteamName" />
         }
-        <ContributorDisplay User="Contribution.User" App="Contribution.App" IgnoreAnonymity="EnableModeration"/>
+        <ContributorDisplay User="Contribution.User" App="Contribution.App" IgnoreAnonymity="EnableModeration" />
     </div>
 
     <!-- Contribution Date -->
@@ -40,6 +50,18 @@
     [Parameter]
     public bool EnableModeration { get; set; }
 
+    [Parameter]
+    public bool LevelFilterActive { get; set; }
+
+    [Parameter]
+    public bool UserFilterActive { get; set; }
+
+    [Parameter]
+    public EventCallback<ContributionLevelDto> LevelFilterClicked { get; set; }
+
+    [Parameter]
+    public EventCallback<ContributionUserDto> UserFilterClicked { get; set; }
+
     private string GetContainerClass()
     {
         if (Contribution.Changes.Count == 1)
@@ -48,6 +70,21 @@
                 : "bg-danger-subtle border-danger-subtle";
         else
             return "bg-warning-subtle border-warning border-opacity-50";
+    }
+
+    private string GetFilterIconClassName(bool isFilterActive)
+    {
+        return isFilterActive ? "bi-funnel-fill" : "bi-funnel";
+    }
+
+    private Task OnLevelFilterClicked()
+    {
+        return LevelFilterClicked.InvokeAsync(Contribution.Level);
+    }
+
+    private Task OnUserFilterClicked()
+    {
+        return UserFilterClicked.InvokeAsync(Contribution.User);
     }
 
 }
