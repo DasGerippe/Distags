@@ -1,0 +1,36 @@
+<Project>
+
+  <!--
+    Shared post-build step for all AutoTagging.* plugin projects.
+
+    AutoTaggerRunner need plugins and loads them via Assemblz.LoadFrom. The dependencies
+    and assets (like conifg/import files) have to be placed next to the dll. Assemblis coming
+    from ProjectReferecne are deliberately not coipied, the runner already ship them in its own
+    output and can resolve them from there, additional copying is bad...
+
+    Favor mbsuild copy task over xcopy (robocopy, blablcopy, ...) for OS compatibility
+
+    Paths are built from MSBuildThisFileDirectory rather than SolutionDir, which is only defined
+    when building through the .sln - building a plugin project on its own would otherwise copy
+    the DLL to a wrong, working-directory-relative location. That works best ofr me. Lets talk about it
+    if u have some trouble.
+  -->
+
+  <PropertyGroup>
+    <AutoTaggerRunnerPluginsDir>$(MSBuildThisFileDirectory)AutoTaggerRunner/bin/$(Configuration)/$(TargetFramework)/Plugins/</AutoTaggerRunnerPluginsDir>
+  </PropertyGroup>
+
+  <Target Name="CopyToAutoTaggerRunnerPlugins" AfterTargets="Build">
+    <ItemGroup>
+      <PluginSharedOutput Include="@(ReferenceCopyLocalPaths->WithMetadataValue('ReferenceSourceTarget', 'ProjectReference')->'%(Filename)%(Extension)')" />
+
+      <PluginOutputFiles Include="$(TargetDir)**/*.*" />
+      <PluginOutputFiles Remove="@(PluginSharedOutput->'$(TargetDir)%(Identity)')" />
+    </ItemGroup>
+
+    <Copy SourceFiles="@(PluginOutputFiles)"
+          DestinationFolder="$(AutoTaggerRunnerPluginsDir)%(RecursiveDir)"
+          SkipUnchangedFiles="true" />
+  </Target>
+
+</Project>

@@ -29,22 +29,6 @@
       </None>
     </ItemGroup>
 
-    <PropertyGroup>
-      <AutoTaggerRunnerPluginsDir>$(MSBuildThisFileDirectory)..\AutoTaggerRunner\bin\$(Configuration)\$(TargetFramework)\Plugins\</AutoTaggerRunnerPluginsDir>
-    </PropertyGroup>
-
-    <!--
-      AutoTaggerRunner loads this plugin via Assembly.LoadFrom, which only resolves dependencies
-      that physically sit next to the loaded DLL in Plugins/ - unlike GameMode/MissingLevel, this
-      project has extra NuGet dependencies (CsvHelper, Microsoft.Extensions.Configuration.Json),
-      so the whole build output has to be copied, not just the plugin's own DLL. Uses MSBuild's
-      Copy task rather than xcopy to avoid shell quoting/prompt issues with the multi-file wildcard copy.
-    -->
-    <Target Name="PostBuild" AfterTargets="PostBuildEvent">
-      <ItemGroup>
-        <PluginOutputFiles Include="$(TargetDir)**\*.*" />
-      </ItemGroup>
-      <Copy SourceFiles="@(PluginOutputFiles)" DestinationFolder="$(AutoTaggerRunnerPluginsDir)%(RecursiveDir)" SkipUnchangedFiles="false" />
-    </Target>
+    <Import Project="..\AutoTagging.Plugin.targets" />
 
 </Project>
