@@ -170,21 +170,19 @@ public class AutoTaggerRunner
     {
         _Logger.LogDebug("Sending tag updates to API...");
 
-        List<Task> tagChangeTasks = [];
-
+        // Sequential on purpose: each PUT/DELETE loads and saves the same Level's tag collection
+        // through its own DbContext. Firing them concurrently (e.g. via Task.WhenAll) races
+        // multiple requests against the same row and can trigger a DbUpdateConcurrencyException
+        // server-side - a real risk here since a single level can have many tags to add/remove at once.
         foreach (string tagToAdd in tagDelta.AddTags)
         {
-            Task addTagTask = _DistagsApiClient.PutLevelTagAsync(levelId, tagToAdd, distagsApiKey);
-            tagChangeTasks.Add(addTagTask);
+            await _DistagsApiClient.PutLevelTagAsync(levelId, tagToAdd, distagsApiKey).ConfigureAwait(false);
         }
 
         foreach (string tagToRemove in tagDelta.RemoveTags)
         {
-            Task removeTagTask = _DistagsApiClient.DeleteLevelTagAsync(levelId, tagToRemove, distagsApiKey);
-            tagChangeTasks.Add(removeTagTask);
+            await _DistagsApiClient.DeleteLevelTagAsync(levelId, tagToRemove, distagsApiKey).ConfigureAwait(false);
         }
-
-        await Task.WhenAll(tagChangeTasks).ConfigureAwait(false);
     }
 
     private void UpdateAutoTaggerState(AutoTaggerState state, LevelProjectionDto level, TaggingStrategy strategy)
