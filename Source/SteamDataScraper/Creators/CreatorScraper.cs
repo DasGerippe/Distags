@@ -1,4 +1,4 @@
-﻿using Distags.Core;
+using Distags.Core;
 using Distags.Core.Commands.ImportCreators;
 using Distags.Core.Queries.StalestCreators;
 using Distags.Core.Queries.UnknownCreators;

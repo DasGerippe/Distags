@@ -13,7 +13,7 @@ internal class Program
             Console.WriteLine("Usage: dotnet run --project AutoTagging.MaxterCsvImporter -- generate-mapping");
             return 1;
         }
-        
+
         string baseDirectory = AppContext.BaseDirectory;
         IConfiguration configuration = new ConfigurationBuilder()
             .SetBasePath(baseDirectory)

@@ -1,4 +1,4 @@
-﻿namespace Distags.Core.Filtering;
+namespace Distags.Core.Filtering;
 
 public class FilterGroup<TEntity> : IQueryableFilter<TEntity>
 {

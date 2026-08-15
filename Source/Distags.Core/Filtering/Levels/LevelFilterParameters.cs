@@ -1,4 +1,4 @@
-﻿namespace Distags.Core.Filtering.Levels;
+namespace Distags.Core.Filtering.Levels;
 
 public class LevelFilterParameters
 {

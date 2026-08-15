@@ -1,4 +1,4 @@
-﻿using SteamWebApi.Dtos.PublishedFileService;
+using SteamWebApi.Dtos.PublishedFileService;
 
 namespace SteamWebApi.ApiInterfaces;
 

@@ -1,4 +1,4 @@
-﻿namespace Distags.Api.Contracts.Contributions;
+namespace Distags.Api.Contracts.Contributions;
 
 public class RevertContributionsParameters
 {

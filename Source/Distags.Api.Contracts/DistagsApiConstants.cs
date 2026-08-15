@@ -1,4 +1,4 @@
-﻿namespace Distags.Api.Contracts;
+namespace Distags.Api.Contracts;
 
 public static class DistagsApiConstants
 {

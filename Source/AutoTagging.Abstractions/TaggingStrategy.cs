@@ -1,4 +1,4 @@
-﻿namespace AutoTagging.Abstractions;
+namespace AutoTagging.Abstractions;
 
 public enum TaggingStrategy
 {

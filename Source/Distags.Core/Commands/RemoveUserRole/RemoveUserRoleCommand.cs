@@ -1,4 +1,4 @@
-﻿namespace Distags.Core.Commands.RemoveUserRole;
+namespace Distags.Core.Commands.RemoveUserRole;
 
 public class RemoveUserRoleCommand : ICommand
 {

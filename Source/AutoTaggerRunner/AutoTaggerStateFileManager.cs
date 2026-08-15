@@ -1,4 +1,4 @@
-﻿using AutoTagging.Abstractions;
+using AutoTagging.Abstractions;
 using Microsoft.Extensions.Logging;
 using System.Runtime.CompilerServices;
 using System.Text.Json;

@@ -1,4 +1,4 @@
-﻿namespace Distags.Core.Commands.SetMaintenance;
+namespace Distags.Core.Commands.SetMaintenance;
 
 public class SetMaintenanceCommand : ICommand
 {

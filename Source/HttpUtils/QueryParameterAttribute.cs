@@ -1,4 +1,4 @@
-﻿namespace HttpUtils;
+namespace HttpUtils;
 
 [AttributeUsage(AttributeTargets.Property)]
 public class QueryParameterAttribute : Attribute

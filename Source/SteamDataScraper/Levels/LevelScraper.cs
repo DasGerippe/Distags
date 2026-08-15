@@ -1,4 +1,4 @@
-﻿using Distags.Core;
+using Distags.Core;
 using Distags.Core.Commands.ImportLevels;
 using Distags.Core.Queries.LatestLevelDate;
 using Microsoft.Extensions.Logging;
@@ -99,7 +99,7 @@ public class LevelScraper
                     publishedFile.PublishedFileId);
                 continue;
             }
-            
+
             scrapedLevels.Add(ToScrapedLevel(publishedFile));
 
             _Logger.LogDebug("Added scraped level {id} to result.", publishedFile.PublishedFileId);

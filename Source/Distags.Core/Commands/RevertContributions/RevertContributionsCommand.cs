@@ -1,4 +1,4 @@
-﻿namespace Distags.Core.Commands.RevertContributions;
+namespace Distags.Core.Commands.RevertContributions;
 
 public class RevertContributionsCommand : ICommand
 {

@@ -1,4 +1,4 @@
-﻿using Distags.Core.Interfaces;
+using Distags.Core.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage;
 

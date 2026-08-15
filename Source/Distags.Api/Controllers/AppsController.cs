@@ -1,4 +1,4 @@
-﻿using Distags.Api.Contracts.Apps;
+using Distags.Api.Contracts.Apps;
 using Distags.Core;
 using Distags.Core.Commands.CreateApp;
 using Distags.Core.Commands.DeleteApp;

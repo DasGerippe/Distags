@@ -1,4 +1,4 @@
-﻿namespace SteamDataScraper.Creators;
+namespace SteamDataScraper.Creators;
 
 public interface ICreatorRefreshDateManager
 {

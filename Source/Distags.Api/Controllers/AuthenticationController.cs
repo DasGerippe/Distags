@@ -1,4 +1,4 @@
-﻿using AspNet.Security.OpenId.Steam;
+using AspNet.Security.OpenId.Steam;
 using Distags.Api.Contracts;
 using Distags.Api.Contracts.Authentication;
 using Distags.Api.Security;
@@ -178,7 +178,7 @@ public class AuthenticationController : ControllerBase
 
             await using IAsyncEnumerator<PlayerSummary> playerEnumerator =
                 _SteamUser.GetPlayerSummariesAsync(parameters).GetAsyncEnumerator();
-            
+
             await playerEnumerator.MoveNextAsync();
             return playerEnumerator.Current;
         }

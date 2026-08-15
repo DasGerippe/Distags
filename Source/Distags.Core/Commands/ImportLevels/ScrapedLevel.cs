@@ -1,4 +1,4 @@
-﻿namespace Distags.Core.Commands.ImportLevels;
+namespace Distags.Core.Commands.ImportLevels;
 
 public class ScrapedLevel
 {

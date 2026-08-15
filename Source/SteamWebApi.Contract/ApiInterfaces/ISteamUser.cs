@@ -1,4 +1,4 @@
-﻿using SteamWebApi.Dtos.SteamUser;
+using SteamWebApi.Dtos.SteamUser;
 
 namespace SteamWebApi.ApiInterfaces;
 

@@ -1,4 +1,4 @@
-﻿namespace Distags.Core.Commands;
+namespace Distags.Core.Commands;
 
 public readonly struct UpdateValue<TValue>
 {

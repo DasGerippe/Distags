@@ -1,4 +1,4 @@
-﻿using Distags.Core.Entities;
+using Distags.Core.Entities;
 using Distags.Core.Management;
 
 namespace Distags.Core.Logic;

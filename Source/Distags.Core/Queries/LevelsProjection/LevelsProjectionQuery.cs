@@ -1,4 +1,4 @@
-﻿using Distags.Contracts;
+using Distags.Contracts;
 using Distags.Core.Filtering.Levels;
 using Distags.Core.Mapping;
 

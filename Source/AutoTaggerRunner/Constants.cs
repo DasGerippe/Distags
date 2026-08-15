@@ -1,4 +1,4 @@
-﻿namespace AutoTaggerRunner;
+namespace AutoTaggerRunner;
 
 internal static class Constants
 {

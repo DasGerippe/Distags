@@ -1,4 +1,4 @@
-﻿namespace Distags.Api.Contracts.Apps;
+namespace Distags.Api.Contracts.Apps;
 
 public class CreateAppDto
 {

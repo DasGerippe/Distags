@@ -1,4 +1,4 @@
-﻿using Distags.Core.Filtering;
+using Distags.Core.Filtering;
 using Distags.Core.Interfaces;
 using Distags.Persistence.Filtering;
 using Distags.Persistence.Implementations;

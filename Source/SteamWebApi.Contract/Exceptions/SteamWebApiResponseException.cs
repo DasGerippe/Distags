@@ -1,4 +1,4 @@
-﻿namespace SteamWebApi.Exceptions;
+namespace SteamWebApi.Exceptions;
 
 public class SteamWebApiResponseException : SteamWebApiException
 {

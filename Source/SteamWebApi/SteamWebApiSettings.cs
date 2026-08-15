@@ -1,4 +1,4 @@
-﻿namespace SteamWebApi;
+namespace SteamWebApi;
 
 public class SteamWebApiSettings
 {

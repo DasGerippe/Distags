@@ -1,4 +1,4 @@
-﻿namespace Distags.Api.Contracts.Guidelines;
+namespace Distags.Api.Contracts.Guidelines;
 
 public class GuidelinesDto
 {

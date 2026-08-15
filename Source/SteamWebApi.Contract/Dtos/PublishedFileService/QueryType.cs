@@ -1,4 +1,4 @@
-﻿namespace SteamWebApi.Dtos.PublishedFileService;
+namespace SteamWebApi.Dtos.PublishedFileService;
 
 public enum QueryType
 {

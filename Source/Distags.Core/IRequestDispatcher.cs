@@ -1,4 +1,4 @@
-﻿using Distags.Core.Commands;
+using Distags.Core.Commands;
 using Distags.Core.Queries;
 
 namespace Distags.Core;

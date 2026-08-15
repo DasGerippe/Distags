@@ -1,4 +1,4 @@
-﻿using Distags.Api.Contracts.UserBans;
+using Distags.Api.Contracts.UserBans;
 using Distags.Api.Security;
 using Distags.Core;
 using Distags.Core.Commands.BanSteamId;

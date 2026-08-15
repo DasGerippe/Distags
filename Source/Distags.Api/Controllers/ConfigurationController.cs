@@ -1,4 +1,4 @@
-﻿using Distags.Api.Contracts.Configuration;
+using Distags.Api.Contracts.Configuration;
 using Distags.Core;
 using Distags.Core.Commands.SetMaintenance;
 using Distags.Core.Queries.Maintenance;

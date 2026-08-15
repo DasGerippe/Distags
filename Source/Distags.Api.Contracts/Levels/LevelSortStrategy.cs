@@ -1,4 +1,4 @@
-﻿namespace Distags.Api.Contracts.Levels;
+namespace Distags.Api.Contracts.Levels;
 
 public enum LevelSortStrategy
 {

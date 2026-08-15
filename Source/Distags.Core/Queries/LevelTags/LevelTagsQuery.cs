@@ -1,4 +1,4 @@
-﻿namespace Distags.Core.Queries.LevelTags;
+namespace Distags.Core.Queries.LevelTags;
 
 public class LevelTagsQuery : IQuery<List<string>>
 {

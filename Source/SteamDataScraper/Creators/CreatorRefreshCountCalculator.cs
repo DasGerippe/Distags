@@ -1,4 +1,4 @@
-﻿using Distags.Core;
+using Distags.Core;
 using Distags.Core.Queries.CreatorCount;
 using Microsoft.Extensions.Logging;
 
@@ -15,7 +15,7 @@ public class CreatorRefreshCountCalculator : ICreatorRefreshCountCalculator
         IRequestDispatcher requestDispatcher,
         CreatorRefreshSettings settings,
         ICreatorRefreshDateManager refreshDateManager,
-        ILogger<CreatorRefreshCountCalculator>  logger)
+        ILogger<CreatorRefreshCountCalculator> logger)
     {
         _RequestDispatcher = requestDispatcher;
         _Settings = settings;

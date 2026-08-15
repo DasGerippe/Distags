@@ -1,4 +1,4 @@
-﻿namespace AutoTaggerRunner;
+namespace AutoTaggerRunner;
 
 public class AutoTaggerState
 {
