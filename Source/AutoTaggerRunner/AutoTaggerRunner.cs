@@ -159,6 +159,8 @@ public class AutoTaggerRunner
             case TaggingStrategy.NewAndUpdatedLevels:
                 includes |= LevelProjectionIncludes.UpdatedOn;
                 break;
+            case TaggingStrategy.AllLevels:
+                break;
         }
 
         return includes;
@@ -191,6 +193,7 @@ public class AutoTaggerRunner
         {
             TaggingStrategy.NewLevels => level.CreatedOn!.Value,
             TaggingStrategy.NewAndUpdatedLevels => level.UpdatedOn!.Value,
+            TaggingStrategy.AllLevels => state.LastAutoTagging,
             _ => throw new ArgumentOutOfRangeException(nameof(strategy), strategy, null),
         };
     }
