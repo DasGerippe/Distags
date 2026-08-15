@@ -1,4 +1,4 @@
-﻿using AutoTagging.Abstractions;
+using AutoTagging.Abstractions;
 using Distags.Contracts;
 using Distags.Core.Mapping;
 using Microsoft.Extensions.Configuration;
@@ -170,10 +170,6 @@ public class AutoTaggerRunner
     {
         _Logger.LogDebug("Sending tag updates to API...");
 
-        // Sequential on purpose: each PUT/DELETE loads and saves the same Level's tag collection
-        // through its own DbContext. Firing them concurrently (e.g. via Task.WhenAll) races
-        // multiple requests against the same row and can trigger a DbUpdateConcurrencyException
-        // server-side - a real risk here since a single level can have many tags to add/remove at once.
         foreach (string tagToAdd in tagDelta.AddTags)
         {
             await _DistagsApiClient.PutLevelTagAsync(levelId, tagToAdd, distagsApiKey).ConfigureAwait(false);
@@ -191,7 +187,7 @@ public class AutoTaggerRunner
         {
             TaggingStrategy.NewLevels => level.CreatedOn!.Value,
             TaggingStrategy.NewAndUpdatedLevels => level.UpdatedOn!.Value,
-            TaggingStrategy.AllLevels => state.LastAutoTagging,
+            TaggingStrategy.AllLevels => DateTime.UtcNow,
             _ => throw new ArgumentOutOfRangeException(nameof(strategy), strategy, null),
         };
     }
