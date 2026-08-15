@@ -52,7 +52,7 @@ public class BrowseLevelsQueryHandler : IQueryHandler<BrowseLevelsQuery, LevelsP
         if (query.PageNumber > 1)
             levels = levels.Skip((query.PageNumber - 1) * query.PageSize);
 
-        if (levelsPage.TotalLevels - query.PageNumber * query.PageSize > query.PageSize)
+        if (levelsPage.TotalLevels - query.PageNumber * query.PageSize > 0)
             levels = levels.Take(query.PageSize);
 
         List<LevelDto> levelDtos = await levels
