@@ -45,6 +45,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Distags.Persistence", "Dist
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Distags.Contracts", "Distags.Contracts\Distags.Contracts.csproj", "{FA63A1B4-E921-58CD-1A55-36E7CCED5E1D}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AutoTagging.MaxterCsvImporter", "AutoTagging.MaxterCsvImporter\AutoTagging.MaxterCsvImporter.csproj", "{AAD5C861-11E0-4CEE-9B53-40072861A222}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -123,6 +125,10 @@ Global
 		{FA63A1B4-E921-58CD-1A55-36E7CCED5E1D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{FA63A1B4-E921-58CD-1A55-36E7CCED5E1D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{FA63A1B4-E921-58CD-1A55-36E7CCED5E1D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{AAD5C861-11E0-4CEE-9B53-40072861A222}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AAD5C861-11E0-4CEE-9B53-40072861A222}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AAD5C861-11E0-4CEE-9B53-40072861A222}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AAD5C861-11E0-4CEE-9B53-40072861A222}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -130,6 +136,7 @@ Global
 	GlobalSection(NestedProjects) = preSolution
 		{392CB2E5-41B3-9E24-A87F-023DF9CC4D18} = {02EA681E-C7D8-13C7-8484-4AC65E1B71E8}
 		{1B4236C6-D385-8BB1-DEB3-56E66649E190} = {02EA681E-C7D8-13C7-8484-4AC65E1B71E8}
+		{AAD5C861-11E0-4CEE-9B53-40072861A222} = {02EA681E-C7D8-13C7-8484-4AC65E1B71E8}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {AA7EDBC3-335C-4567-BF43-795798227B77}

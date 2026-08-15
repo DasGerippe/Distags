@@ -12,6 +12,13 @@
       "environmentVariables": {
         "DOTNET_ENVIRONMENT": "Development"
       }
+    },
+    "Run MaxterCsvImporter": {
+      "commandName": "Project",
+      "commandLineArgs": "MaxterCsvImporter",
+      "environmentVariables": {
+        "DOTNET_ENVIRONMENT": "Development"
+      }
     }
   }
 }
