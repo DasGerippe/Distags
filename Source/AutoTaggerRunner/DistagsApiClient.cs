@@ -37,7 +37,7 @@ public class DistagsApiClient
             },
         };
     }
-    
+
     private static async Task EnsureSuccessAsync(
         HttpResponseMessage responseMessage,
         HttpRequestMessage requestMessage,
@@ -53,9 +53,9 @@ public class DistagsApiClient
         throw new HttpRequestException(
             $"""
             {requestMessage.Method} {requestMessage.RequestUri} failed with status code {(int)responseMessage.StatusCode}: {responseMessage.ReasonPhrase}
-            {responseMessage.StatusCode} for level {levelId}, tag '{tagName}'. 
+            {responseMessage.StatusCode} for level {levelId}, tag '{tagName}'.
             Response body: {(string.IsNullOrWhiteSpace(responseBody) ? "(empty)" : responseBody)}
-            """, 
+            """,
             inner: null,
             statusCode: responseMessage.StatusCode);
     }
