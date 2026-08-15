@@ -29,6 +29,6 @@
       </None>
     </ItemGroup>
 
-    <Import Project="..\AutoTagging.Plugin.targets" />
+    <Import Project="..\Build\AutoTagging.Plugin.targets" />
 
 </Project>
