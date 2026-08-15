@@ -23,47 +23,50 @@
     return;
 
 <div class="container-fluid content-wide">
+    <form @onsubmit="() => QueryLevelsAsync()">
 
-    <div class="row">
-        @foreach (DisplayGroupWithTags tagGroup in _TagTree)
-        {
-            <TagGroupColumnCard Title="@tagGroup.DisplayGroup.DisplayName">
-                @foreach (TagDto tag in tagGroup.Tags)
-                {
-                    TagFilter tagFilter = _TagFilters[tag.Name];
-                    <IconCheckbox TState="TagFilterState"
-                                  Label="@tag.DisplayName"
-                                  Logic="GetCheckboxLogic(tagGroup.AllTagsExclusive)"
-                                  IconProvider="_TagFilterStateIconProvider"
-                                  State="tagFilter.State"
-                                  StateChanged="newState => OnTagFilterStateChanged(tagFilter, newState)" />
-                }
-            </TagGroupColumnCard>
-        }
-    </div>
-    
-    <div class="row align-items-center m-1">
-        <div class="col-12 col-sm-6 col-lg-3 order-0 d-flex align-items-baseline p-1">
-            <label class="form-label me-2 text-nowrap">Level Name:</label>
-            <input class="form-control" type="text" value="@LevelFilter" @onchange="OnLevelFilterChanged" />
+        <div class="row">
+            @foreach (DisplayGroupWithTags tagGroup in _TagTree)
+            {
+                <TagGroupColumnCard Title="@tagGroup.DisplayGroup.DisplayName">
+                    @foreach (TagDto tag in tagGroup.Tags)
+                    {
+                        TagFilter tagFilter = _TagFilters[tag.Name];
+                        <IconCheckbox TState="TagFilterState"
+                                      Label="@tag.DisplayName"
+                                      Logic="GetCheckboxLogic(tagGroup.AllTagsExclusive)"
+                                      IconProvider="_TagFilterStateIconProvider"
+                                      State="tagFilter.State"
+                                      StateChanged="newState => OnTagFilterStateChanged(tagFilter, newState)" />
+                    }
+                </TagGroupColumnCard>
+            }
         </div>
-        <div class="col-12 col-sm-6 col-lg-3 order-1 order-sm-2 order-lg-1 d-flex align-items-baseline p-1">
-            <label class="form-label me-2 text-nowrap">Creator:</label>
-            <input class="form-control" type="text" value="@CreatorFilter" @onchange="OnCreatorFilterChanged" />
-        </div>
-        <div class="col-12 col-sm-6 col-lg-3 order-2 order-sm-1 order-lg-2 d-flex align-items-baseline p-1">
-            <label class="form-label me-2 text-nowrap">Sort by:</label>
-            <GenericDropdown TValue="LevelSortStrategy" ItemProvider="_SortStrategyItemsProvider" Value="SortStrategy" ValueChanged="OnSortStrategyChanged" />
-        </div>
-        <div class="col-12 col-sm-6 col-lg-3 order-3 d-flex align-items-baseline p-1">
-            <label class="form-label me-2 text-nowrap">Page Size:</label>
-            <GenericDropdown TValue="int" ItemProvider="_PageSizeItemsProvider" Value="PageSize" ValueChanged="OnPageSizeChanged" />
-        </div>
-    </div>
 
-    <div class="text-center">
-        <button class="btn btn-primary w-100 shadow" type="submit" @onclick="() => QueryLevelsAsync()">Browse</button>
-    </div>
+        <div class="row align-items-center m-1">
+            <div class="col-12 col-sm-6 col-lg-3 order-0 d-flex align-items-baseline p-1">
+                <label class="form-label me-2 text-nowrap">Level Name:</label>
+                <input class="form-control" type="text" value="@LevelFilter" @onchange="OnLevelFilterChanged" />
+            </div>
+            <div class="col-12 col-sm-6 col-lg-3 order-1 order-sm-2 order-lg-1 d-flex align-items-baseline p-1">
+                <label class="form-label me-2 text-nowrap">Creator:</label>
+                <input class="form-control" type="text" value="@CreatorFilter" @onchange="OnCreatorFilterChanged" />
+            </div>
+            <div class="col-12 col-sm-6 col-lg-3 order-2 order-sm-1 order-lg-2 d-flex align-items-baseline p-1">
+                <label class="form-label me-2 text-nowrap">Sort by:</label>
+                <GenericDropdown TValue="LevelSortStrategy" ItemProvider="_SortStrategyItemsProvider" Value="SortStrategy" ValueChanged="OnSortStrategyChanged" />
+            </div>
+            <div class="col-12 col-sm-6 col-lg-3 order-3 d-flex align-items-baseline p-1">
+                <label class="form-label me-2 text-nowrap">Page Size:</label>
+                <GenericDropdown TValue="int" ItemProvider="_PageSizeItemsProvider" Value="PageSize" ValueChanged="OnPageSizeChanged" />
+            </div>
+        </div>
+
+        <div class="text-center">
+            <button class="btn btn-primary w-100 shadow" type="submit">Browse</button>
+        </div>
+
+    </form>
 </div>
 
 @if (!_BrowseClicked)
@@ -78,18 +81,18 @@
     }
     else
     {
-        <Paginator CurrentPageChanged="OnPageChanged" CurrentPage="Page" PageCount="_PageCount"/>
+        <Paginator CurrentPageChanged="OnPageChanged" CurrentPage="Page" PageCount="_PageCount" />
 
         <div class="row gy-3">
             @foreach (LevelDto level in _Levels)
             {
                 <div class="col-12 col-md-6">
-                    <LevelPanel Level="level"/>
+                    <LevelPanel Level="level" />
                 </div>
             }
         </div>
 
-        <Paginator CurrentPageChanged="OnPageChanged" CurrentPage="Page" PageCount="_PageCount"/>
+        <Paginator CurrentPageChanged="OnPageChanged" CurrentPage="Page" PageCount="_PageCount" />
     }
 </div>
 
