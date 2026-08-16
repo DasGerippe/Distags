@@ -40,19 +40,19 @@ public class PlayerSummary
 
     //[JsonPropertyName("personastate")]
     //public required int PersonaState { get; set; }
-    
+
     //[JsonPropertyName("realname")]
     //public required string RealName { get; set; }
-    
+
     //[JsonPropertyName("primaryclanid")]
     //public required string PrimaryClanId { get; set; }
-    
+
     //[JsonPropertyName("timecreated")]
     //public required int TimeCreated { get; set; }
-    
+
     //[JsonPropertyName("personastateflags")]
     //public required int PersonaStateFlags { get; set; }
-    
+
     //[JsonPropertyName("loccountrycode")]
     //public required string LocationCountryCode { get; set; }
 }

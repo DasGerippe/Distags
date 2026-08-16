@@ -105,7 +105,7 @@ public class DefaultTagProvider
         CreateTag("gameplay", "gameplay", "Maze");
         CreateTag("gameplay", "gameplay", "Low Input");
         CreateTag("gameplay", "gameplay", "Other", name: "gameplay-other");
-        
+
         CreateTag("gimmicks", "gimmicks", "Unspecified", name: "gimmicks-unspecified", isExclusive: true, isFallback: true);
         CreateTag("gimmicks", "gimmicks", "None", name: "gimmicks-none", isExclusive: true);
         CreateTag("gimmicks", "gimmicks", "Teleports");
@@ -124,13 +124,13 @@ public class DefaultTagProvider
         CreateTag("gimmicks", "gimmicks", "Required Checkpoints");
         CreateTag("gimmicks", "gimmicks", "Collectibles");
         CreateTag("gimmicks", "gimmicks", "Discoverables");
-        
+
         CreateTag("readability", "readability", "Unspecified", name: "readability-unspecified", isExclusive: true, isFallback: true);
         CreateTag("readability", "readability", "Very Readable", isExclusive: true);
         CreateTag("readability", "readability", "Mostly Readable", isExclusive: true);
         CreateTag("readability", "readability", "Poorly Readable", isExclusive: true);
         CreateTag("readability", "readability", "Unreadable", isExclusive: true);
-        
+
         CreateTag("theme", "theme", "Unspecified", name: "theme-unspecified", isExclusive: true, isFallback: true);
         CreateTag("theme", "theme", "Other", name: "theme-other");
         CreateTag("theme", "theme", "Distance");
@@ -178,10 +178,10 @@ public class DefaultTagProvider
         CreateTag("theme", "theme", "High Contrast", name: "contrast");
         CreateTag("theme", "theme", "Colorful");
         CreateTag("theme", "theme", "Monochromatic");
-        
+
         CreateTag("level-info", null, "Medals");
         CreateTag("level-info", null, "Missing Level Bug", name: "missing-level", isAutoTag: true);
-        
+
         CreateTag("wr-difficulty", "wr-difficulty", "Unspecified", name: "wr-difficulty-unspecified", isExclusive: true, isFallback: true);
         CreateTag("wr-difficulty", "wr-difficulty", "Casual", name: "wr-casual", isExclusive: true);
         CreateTag("wr-difficulty", "wr-difficulty", "Normal", name: "wr-normal", isExclusive: true);
@@ -192,7 +192,7 @@ public class DefaultTagProvider
         CreateTag("wr-difficulty", "wr-difficulty", "Lunatic", name: "wr-lunatic", isExclusive: true);
         CreateTag("wr-difficulty", "wr-difficulty", "Insane", name: "wr-insane", isExclusive: true);
         CreateTag("wr-difficulty", "wr-difficulty", "Impossible", name: "wr-impossible", isExclusive: true);
-        
+
         CreateTag("wr-length", "wr-length", "Unspecified", name: "wr-length-unspecified", isExclusive: true, isFallback: true);
         CreateTag("wr-length", "wr-length", "~30 Seconds", name: "wr-30-sec", isExclusive: true);
         CreateTag("wr-length", "wr-length", "~1 Minute", name: "wr-1-min", isExclusive: true);
@@ -203,7 +203,7 @@ public class DefaultTagProvider
         CreateTag("wr-length", "wr-length", "10+ Minutes", name: "wr-15-min", isExclusive: true);
         CreateTag("wr-length", "wr-length", "30+ Minutes", name: "wr-45-min", isExclusive: true);
         CreateTag("wr-length", "wr-length", "1+ Hour", name: "wr-hours", isExclusive: true);
-        
+
         CreateTag("wr-tech", "wr-tech", "Unspecified", name: "wr-tech-unspecified", isExclusive: true, isFallback: true);
         CreateTag("wr-tech", "wr-tech", "None", name: "wr-tech-none", isExclusive: true);
         CreateTag("wr-tech", "wr-tech", "Saw Boost");

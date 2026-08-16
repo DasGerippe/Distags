@@ -99,7 +99,7 @@ public class LevelScraper
                     publishedFile.PublishedFileId);
                 continue;
             }
-            
+
             scrapedLevels.Add(ToScrapedLevel(publishedFile));
 
             _Logger.LogDebug("Added scraped level {id} to result.", publishedFile.PublishedFileId);

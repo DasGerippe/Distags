@@ -15,7 +15,7 @@ public class CreatorRefreshCountCalculator : ICreatorRefreshCountCalculator
         IRequestDispatcher requestDispatcher,
         CreatorRefreshSettings settings,
         ICreatorRefreshDateManager refreshDateManager,
-        ILogger<CreatorRefreshCountCalculator>  logger)
+        ILogger<CreatorRefreshCountCalculator> logger)
     {
         _RequestDispatcher = requestDispatcher;
         _Settings = settings;
