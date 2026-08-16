@@ -13,11 +13,14 @@ internal class Program
             Console.WriteLine("Usage: dotnet run --project AutoTagging.MaxterCsvImporter -- generate-mapping");
             return 1;
         }
-        
+
+        string environment = Environment.GetEnvironmentVariable("DOTNET_ENVIRONMENT")
+                             ?? "Production";
         string baseDirectory = AppContext.BaseDirectory;
         IConfiguration configuration = new ConfigurationBuilder()
             .SetBasePath(baseDirectory)
             .AddJsonFile("appsettings.json", optional: false)
+            .AddJsonFile($"appsettings.{environment}.json", optional: true)
             .Build();
 
         string apiUri = configuration["DistagsApi:Uri"]

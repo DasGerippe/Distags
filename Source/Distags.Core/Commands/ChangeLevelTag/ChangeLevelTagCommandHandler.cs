@@ -42,7 +42,6 @@ public class ChangeLevelTagCommandHandler : ICommandHandler<ChangeLevelTagComman
 
     public async Task HandleAsync(ChangeLevelTagCommand command)
     {
-        Level level = await GetLevelAsync(command.LevelId).ConfigureAwait(false);
         Tag tag = await GetTagAsync(command.TagName).ConfigureAwait(false);
         User? user = await GetUserAsync(command.UserSteamId).ConfigureAwait(false);
         App? app = await GetAppAsync(command.AppName).ConfigureAwait(false);
@@ -50,7 +49,9 @@ public class ChangeLevelTagCommandHandler : ICommandHandler<ChangeLevelTagComman
         await EnsureTagChangeAllowedAsync(user, app, tag).ConfigureAwait(false);
 
         Contribution contribution = await _SequentialLevelActionExecutor
-            .ExecuteSequentialForLevelAsync(command.LevelId, () => ChangeLevelTagAsync(level, tag, command.Action, user, app))
+            .ExecuteSequentialForLevelAsync(
+                command.LevelId,
+                () => ChangeLevelTagAsync(command.LevelId, tag, command.Action, user, app))
             .ConfigureAwait(false);
 
         EnqueueEvents(contribution);
@@ -124,8 +125,10 @@ public class ChangeLevelTagCommandHandler : ICommandHandler<ChangeLevelTagComman
         }
     }
 
-    private async Task<Contribution> ChangeLevelTagAsync(Level level, Tag tag, TagChangeAction action, User? user, App? app)
+    private async Task<Contribution> ChangeLevelTagAsync(long levelId, Tag tag, TagChangeAction action, User? user, App? app)
     {
+        Level level = await GetLevelAsync(levelId).ConfigureAwait(false);
+
         DomainResult<List<TagChange>> changeResult = action == TagChangeAction.Add
             ? _LevelTagAdder.AddTagToLevel(level, tag)
             : _LevelTagRemover.RemoveTagFromLevel(level, tag);
