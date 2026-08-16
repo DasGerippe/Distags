@@ -14,8 +14,7 @@
     and not at SolutionDir. SolutionDir is only defined when building through the .sln, so building
     a plugin project on its own would copy the DLL to a wrong, working-directory-relative location.
     Anchoring at the .sln instead of MSBuildThisFileDirectory keeps this file movable - relocating
-    it does not change where plugins end up. That works best for me. Lets talk about it
-    if u have some trouble.
+    it does not change where plugins end up.
   -->
 
   <PropertyGroup>

@@ -114,14 +114,8 @@ public static class MaxterTagResolver
 
     private static IEnumerable<string> SplitTokens(string? cellValue)
     {
-        if (string.IsNullOrWhiteSpace(cellValue))
-            yield break;
-
-        foreach (string part in cellValue.Split(','))
-        {
-            string trimmed = part.Trim();
-            if (trimmed.Length > 0)
-                yield return trimmed;
-        }
+        return string.IsNullOrWhiteSpace(cellValue)
+            ? []
+            : cellValue.Split(',', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries);
     }
 }
