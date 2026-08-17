@@ -4,4 +4,5 @@ public enum TaggingStrategy
 {
     NewLevels,
     NewAndUpdatedLevels,
+    AllLevels,
 }

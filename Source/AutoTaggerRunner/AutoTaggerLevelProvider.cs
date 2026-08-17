@@ -35,6 +35,8 @@ public class AutoTaggerLevelProvider : IAutoTaggerLevelProvider
             case TaggingStrategy.NewAndUpdatedLevels:
                 filterParameters.UpdatedAfter = state.LastAutoTagging;
                 break;
+            case TaggingStrategy.AllLevels:
+                break;
         }
 
         LevelsProjectionQuery query = new LevelsProjectionQuery

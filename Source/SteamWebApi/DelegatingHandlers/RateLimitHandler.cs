@@ -23,7 +23,7 @@ public class RateLimitHandler : DelegatingHandler
         try
         {
             DateTimeOffset utcNow = DateTimeOffset.UtcNow;
-            int timeSinceLastRequestMs = (int)(utcNow -  _LastRequestTime).TotalMilliseconds;
+            int timeSinceLastRequestMs = (int)(utcNow - _LastRequestTime).TotalMilliseconds;
 
             if (timeSinceLastRequestMs < _Settings.RequestDelayMs)
             {

@@ -1,4 +1,4 @@
-﻿using AutoTagging.Abstractions;
+using AutoTagging.Abstractions;
 using Distags.Contracts;
 using Distags.Core.Mapping;
 using Microsoft.Extensions.Configuration;
@@ -159,6 +159,8 @@ public class AutoTaggerRunner
             case TaggingStrategy.NewAndUpdatedLevels:
                 includes |= LevelProjectionIncludes.UpdatedOn;
                 break;
+            case TaggingStrategy.AllLevels:
+                break;
         }
 
         return includes;
@@ -168,21 +170,15 @@ public class AutoTaggerRunner
     {
         _Logger.LogDebug("Sending tag updates to API...");
 
-        List<Task> tagChangeTasks = [];
-
         foreach (string tagToAdd in tagDelta.AddTags)
         {
-            Task addTagTask = _DistagsApiClient.PutLevelTagAsync(levelId, tagToAdd, distagsApiKey);
-            tagChangeTasks.Add(addTagTask);
+            await _DistagsApiClient.PutLevelTagAsync(levelId, tagToAdd, distagsApiKey).ConfigureAwait(false);
         }
 
         foreach (string tagToRemove in tagDelta.RemoveTags)
         {
-            Task removeTagTask = _DistagsApiClient.DeleteLevelTagAsync(levelId, tagToRemove, distagsApiKey);
-            tagChangeTasks.Add(removeTagTask);
+            await _DistagsApiClient.DeleteLevelTagAsync(levelId, tagToRemove, distagsApiKey).ConfigureAwait(false);
         }
-
-        await Task.WhenAll(tagChangeTasks).ConfigureAwait(false);
     }
 
     private void UpdateAutoTaggerState(AutoTaggerState state, LevelProjectionDto level, TaggingStrategy strategy)
@@ -191,6 +187,7 @@ public class AutoTaggerRunner
         {
             TaggingStrategy.NewLevels => level.CreatedOn!.Value,
             TaggingStrategy.NewAndUpdatedLevels => level.UpdatedOn!.Value,
+            TaggingStrategy.AllLevels => DateTime.UtcNow,
             _ => throw new ArgumentOutOfRangeException(nameof(strategy), strategy, null),
         };
     }

@@ -178,7 +178,7 @@ public class AuthenticationController : ControllerBase
 
             await using IAsyncEnumerator<PlayerSummary> playerEnumerator =
                 _SteamUser.GetPlayerSummariesAsync(parameters).GetAsyncEnumerator();
-            
+
             await playerEnumerator.MoveNextAsync();
             return playerEnumerator.Current;
         }

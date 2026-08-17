@@ -10,8 +10,6 @@
     <ProjectReference Include="..\AutoTagging.Abstractions\AutoTagging.Abstractions.csproj" />
   </ItemGroup>
 
-  <Target Name="PostBuild" AfterTargets="PostBuildEvent">
-    <Exec Command="xcopy &quot;$(TargetPath)&quot; &quot;$(SolutionDir)AutoTaggerRunner\bin\$(Configuration)\$(TargetFramework)\Plugins\&quot; /Y" />
-  </Target>
+  <Import Project="..\Build\AutoTagging.Plugin.targets" />
 
 </Project>
