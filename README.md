@@ -2,6 +2,10 @@
 
 Distags is a collection of software that allows users to add (and remove) tags to levels of the game Distance by Refract. Levels can then be searched based on those tags.
 
+## Architecture Communication Canvas
+
+![Architecture Communication Canvas](docs\ArchitectureCommunicationCanvas.drawio.svg)
+
 ## Dev info
 
 ### Add/Remove database migrations
