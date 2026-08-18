@@ -1,4 +1,4 @@
-﻿using Distags.Core;
+using Distags.Core;
 using Distags.Core.Commands;
 using Distags.Core.Commands.CleanupUserSessions;
 using Microsoft.Extensions.Options;

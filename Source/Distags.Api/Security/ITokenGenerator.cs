@@ -1,4 +1,4 @@
-﻿namespace Distags.Api.Security;
+namespace Distags.Api.Security;
 
 public interface ITokenGenerator
 {

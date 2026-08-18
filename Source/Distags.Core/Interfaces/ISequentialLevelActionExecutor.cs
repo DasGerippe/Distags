@@ -1,4 +1,4 @@
-﻿namespace Distags.Core.Interfaces;
+namespace Distags.Core.Interfaces;
 
 public interface ISequentialLevelActionExecutor
 {

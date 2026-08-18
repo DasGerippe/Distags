@@ -1,4 +1,4 @@
-﻿namespace Distags.Core.Filtering;
+namespace Distags.Core.Filtering;
 
 public interface IQueryableFilterFactory<TEntity, TFilterParams>
 {

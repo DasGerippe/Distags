@@ -1,4 +1,4 @@
-﻿namespace Distags.WebApp.Services;
+namespace Distags.WebApp.Services;
 
 public interface ICheckboxLogic<TState>
 {

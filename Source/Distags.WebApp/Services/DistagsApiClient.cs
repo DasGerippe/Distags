@@ -1,4 +1,4 @@
-﻿using Distags.Api.Contracts;
+using Distags.Api.Contracts;
 using Distags.Api.Contracts.Authentication;
 using Distags.Api.Contracts.Configuration;
 using Distags.Api.Contracts.Contributions;

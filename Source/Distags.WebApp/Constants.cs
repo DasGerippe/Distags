@@ -1,4 +1,4 @@
-﻿namespace Distags.WebApp;
+namespace Distags.WebApp;
 
 internal static class Constants
 {

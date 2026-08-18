@@ -1,4 +1,4 @@
-﻿using SteamWebApi.Dtos;
+using SteamWebApi.Dtos;
 using SteamWebApi.Exceptions;
 using System.Text.Json;
 

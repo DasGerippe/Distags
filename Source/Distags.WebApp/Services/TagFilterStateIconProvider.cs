@@ -1,4 +1,4 @@
-﻿using Distags.WebApp.Models;
+using Distags.WebApp.Models;
 
 namespace Distags.WebApp.Services;
 

@@ -1,4 +1,4 @@
-﻿namespace Distags.Core.Commands.DeleteUserSession;
+namespace Distags.Core.Commands.DeleteUserSession;
 
 public class DeleteUserSessionCommand : ICommand
 {

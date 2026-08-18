@@ -1,4 +1,4 @@
-﻿using Distags.Core.Commands;
+using Distags.Core.Commands;
 using Distags.Core.Queries;
 using Microsoft.Extensions.DependencyInjection;
 

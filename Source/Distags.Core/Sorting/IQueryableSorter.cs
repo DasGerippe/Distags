@@ -1,4 +1,4 @@
-﻿namespace Distags.Core.Sorting;
+namespace Distags.Core.Sorting;
 
 public interface IQueryableSorter<TEntity>
 {

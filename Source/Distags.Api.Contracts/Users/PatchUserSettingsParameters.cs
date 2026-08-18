@@ -1,4 +1,4 @@
-﻿namespace Distags.Api.Contracts.Users;
+namespace Distags.Api.Contracts.Users;
 
 public class PatchUserSettingsParameters
 {

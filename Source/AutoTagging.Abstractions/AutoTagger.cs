@@ -1,4 +1,4 @@
-﻿using Distags.Contracts;
+using Distags.Contracts;
 using Distags.Core.Mapping;
 
 namespace AutoTagging.Abstractions;

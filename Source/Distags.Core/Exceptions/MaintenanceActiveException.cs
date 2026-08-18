@@ -1,4 +1,4 @@
-﻿namespace Distags.Core.Exceptions;
+namespace Distags.Core.Exceptions;
 
 public class MaintenanceActiveException : DistagsException
 {

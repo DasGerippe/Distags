@@ -1,4 +1,4 @@
-﻿namespace Distags.Core;
+namespace Distags.Core;
 
 public enum DomainError
 {

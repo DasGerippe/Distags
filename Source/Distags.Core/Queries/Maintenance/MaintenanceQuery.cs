@@ -1,4 +1,4 @@
-﻿namespace Distags.Core.Queries.Maintenance;
+namespace Distags.Core.Queries.Maintenance;
 
 public class MaintenanceQuery : IQuery<bool>
 {

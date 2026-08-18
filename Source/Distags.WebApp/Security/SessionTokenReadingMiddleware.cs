@@ -1,4 +1,4 @@
-﻿namespace Distags.WebApp.Security;
+namespace Distags.WebApp.Security;
 
 public class SessionTokenReadingMiddleware
 {

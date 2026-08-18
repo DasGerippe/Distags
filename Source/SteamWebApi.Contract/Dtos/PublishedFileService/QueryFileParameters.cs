@@ -1,4 +1,4 @@
-﻿using HttpUtils;
+using HttpUtils;
 
 namespace SteamWebApi.Dtos.PublishedFileService;
 

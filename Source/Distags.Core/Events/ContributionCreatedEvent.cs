@@ -1,4 +1,4 @@
-﻿namespace Distags.Core.Events;
+namespace Distags.Core.Events;
 
 public class ContributionCreatedEvent : IAppEvent
 {

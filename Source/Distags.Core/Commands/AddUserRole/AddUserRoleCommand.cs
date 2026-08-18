@@ -1,4 +1,4 @@
-﻿namespace Distags.Core.Commands.AddUserRole;
+namespace Distags.Core.Commands.AddUserRole;
 
 public class AddUserRoleCommand : ICommand
 {

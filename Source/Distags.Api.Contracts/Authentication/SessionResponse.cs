@@ -1,4 +1,4 @@
-﻿namespace Distags.Api.Contracts.Authentication;
+namespace Distags.Api.Contracts.Authentication;
 
 public class SessionResponse
 {

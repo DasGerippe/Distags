@@ -1,4 +1,4 @@
-﻿using Distags.Api.Contracts.Levels;
+using Distags.Api.Contracts.Levels;
 using Distags.Api.Security;
 using Distags.Contracts;
 using Distags.Core;

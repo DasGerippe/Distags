@@ -1,4 +1,4 @@
-﻿using SteamWebApi.Converter;
+using SteamWebApi.Converter;
 using System.Text.Json.Serialization;
 
 namespace SteamWebApi.Dtos.PublishedFileService;

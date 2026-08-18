@@ -1,4 +1,4 @@
-﻿using Distags.Core.Filtering;
+using Distags.Core.Filtering;
 using System.Linq.Expressions;
 
 namespace Distags.Persistence.Filtering;

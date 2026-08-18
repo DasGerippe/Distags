@@ -1,4 +1,4 @@
-﻿namespace Distags.Core.Filtering.Contributions;
+namespace Distags.Core.Filtering.Contributions;
 
 public class ContributionFilterParameters
 {

@@ -1,4 +1,4 @@
-﻿namespace Distags.Persistence.Entities;
+namespace Distags.Persistence.Entities;
 
 public class LevelLock
 {

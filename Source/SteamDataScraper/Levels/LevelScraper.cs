@@ -1,4 +1,4 @@
-﻿using Distags.Core;
+using Distags.Core;
 using Distags.Core.Commands.ImportLevels;
 using Distags.Core.Queries.LatestLevelDate;
 using Microsoft.Extensions.Logging;

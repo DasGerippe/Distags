@@ -1,4 +1,4 @@
-﻿namespace Distags.Core.Commands.CreateUserSession;
+namespace Distags.Core.Commands.CreateUserSession;
 
 public class CreateUserSessionCommand : ICommand
 {

@@ -1,4 +1,4 @@
-﻿using AutoTagging.Abstractions;
+using AutoTagging.Abstractions;
 using Distags.Core.Mapping;
 
 namespace AutoTaggerRunner;

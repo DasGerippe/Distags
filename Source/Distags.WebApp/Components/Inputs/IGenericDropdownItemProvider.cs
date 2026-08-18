@@ -1,4 +1,4 @@
-﻿namespace Distags.WebApp.Components.Inputs;
+namespace Distags.WebApp.Components.Inputs;
 
 public interface IGenericDropdownItemProvider<TValue>
 {

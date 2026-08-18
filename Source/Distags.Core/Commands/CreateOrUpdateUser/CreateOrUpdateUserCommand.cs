@@ -1,4 +1,4 @@
-﻿namespace Distags.Core.Commands.CreateOrUpdateUser;
+namespace Distags.Core.Commands.CreateOrUpdateUser;
 
 public class CreateOrUpdateUserCommand : ICommand
 {

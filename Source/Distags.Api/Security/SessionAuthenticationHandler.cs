@@ -1,4 +1,4 @@
-﻿using Distags.Api.Contracts;
+using Distags.Api.Contracts;
 using Distags.Contracts;
 using Distags.Core;
 using Distags.Core.Commands.UpdateUserSessionLastSeen;

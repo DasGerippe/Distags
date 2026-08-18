@@ -1,4 +1,4 @@
-﻿namespace Distags.Core.Mapping;
+namespace Distags.Core.Mapping;
 
 [Flags]
 public enum LevelProjectionIncludes

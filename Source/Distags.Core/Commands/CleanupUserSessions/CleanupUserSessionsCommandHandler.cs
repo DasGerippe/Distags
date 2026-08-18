@@ -1,4 +1,4 @@
-﻿using Distags.Core.Entities;
+using Distags.Core.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 

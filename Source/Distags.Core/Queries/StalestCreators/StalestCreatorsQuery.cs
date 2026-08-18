@@ -1,4 +1,4 @@
-﻿namespace Distags.Core.Queries.StalestCreators;
+namespace Distags.Core.Queries.StalestCreators;
 
 public class StalestCreatorsQuery : IQuery<List<long>>
 {

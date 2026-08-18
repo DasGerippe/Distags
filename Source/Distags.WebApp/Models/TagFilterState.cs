@@ -1,4 +1,4 @@
-﻿namespace Distags.WebApp.Models;
+namespace Distags.WebApp.Models;
 
 public enum TagFilterState
 {

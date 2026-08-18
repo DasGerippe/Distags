@@ -1,4 +1,4 @@
-﻿using Distags.WebApp.Services;
+using Distags.WebApp.Services;
 using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
 

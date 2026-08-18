@@ -1,4 +1,4 @@
-﻿namespace Distags.Core.Commands.CleanupUserSessions;
+namespace Distags.Core.Commands.CleanupUserSessions;
 
 public class CleanupUserSessionsCommand : ICommand
 {

@@ -1,4 +1,4 @@
-﻿using Distags.WebApp.Services;
+using Distags.WebApp.Services;
 using Microsoft.Extensions.Primitives;
 using System.Net;
 

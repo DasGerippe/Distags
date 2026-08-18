@@ -1,4 +1,4 @@
-﻿namespace Distags.Core.Queries.LatestLevelDate;
+namespace Distags.Core.Queries.LatestLevelDate;
 
 public class LatestLevelDateQuery : IQuery<DateTimeOffset?>
 {
