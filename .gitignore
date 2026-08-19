@@ -80,6 +80,10 @@ artifacts/
 # ASP.NET Scaffolding
 ScaffoldingReadMe.txt
 
+# Draw.io
+*.dtmp
+*.bkp
+
 # StyleCop
 StyleCopReport.xml
 
