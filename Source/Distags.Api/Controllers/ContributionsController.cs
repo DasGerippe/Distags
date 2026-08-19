@@ -1,4 +1,4 @@
-﻿using Distags.Api.Contracts.Contributions;
+using Distags.Api.Contracts.Contributions;
 using Distags.Contracts;
 using Distags.Core;
 using Distags.Core.Commands.RevertContributions;

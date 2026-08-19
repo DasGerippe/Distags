@@ -1,4 +1,4 @@
-﻿using Distags.WebApp.Components.Inputs;
+using Distags.WebApp.Components.Inputs;
 using Microsoft.Extensions.Localization;
 
 namespace Distags.WebApp.Services;

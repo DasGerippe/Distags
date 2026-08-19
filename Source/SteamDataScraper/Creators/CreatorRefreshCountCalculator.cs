@@ -1,4 +1,4 @@
-﻿using Distags.Core;
+using Distags.Core;
 using Distags.Core.Queries.CreatorCount;
 using Microsoft.Extensions.Logging;
 

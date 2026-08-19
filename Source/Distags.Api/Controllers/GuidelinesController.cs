@@ -1,4 +1,4 @@
-﻿using Distags.Api.Contracts.Guidelines;
+using Distags.Api.Contracts.Guidelines;
 using Microsoft.AspNetCore.Mvc;
 using System.Text.Json;
 

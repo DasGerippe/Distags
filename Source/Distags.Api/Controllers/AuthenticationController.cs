@@ -1,4 +1,4 @@
-﻿using AspNet.Security.OpenId.Steam;
+using AspNet.Security.OpenId.Steam;
 using Distags.Api.Contracts;
 using Distags.Api.Contracts.Authentication;
 using Distags.Api.Security;

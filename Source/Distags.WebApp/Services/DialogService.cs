@@ -1,4 +1,4 @@
-﻿using Distags.WebApp.Components.Dialogs;
+using Distags.WebApp.Components.Dialogs;
 
 namespace Distags.WebApp.Services;
 

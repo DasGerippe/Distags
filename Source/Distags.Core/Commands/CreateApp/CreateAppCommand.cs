@@ -1,4 +1,4 @@
-﻿namespace Distags.Core.Commands.CreateApp;
+namespace Distags.Core.Commands.CreateApp;
 
 public class CreateAppCommand : ICommand
 {

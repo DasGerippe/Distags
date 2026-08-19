@@ -1,4 +1,4 @@
-﻿namespace Distags.Api.Contracts;
+namespace Distags.Api.Contracts;
 
 public class PatchValue<TValue>
 {

@@ -1,4 +1,4 @@
-﻿namespace Distags.Core.Commands.BanSteamId;
+namespace Distags.Core.Commands.BanSteamId;
 
 public class BanSteamIdCommand : ICommand
 {

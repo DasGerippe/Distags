@@ -1,4 +1,4 @@
-﻿namespace Distags.Core.Commands.DeleteApp;
+namespace Distags.Core.Commands.DeleteApp;
 
 public class DeleteAppCommand : ICommand
 {

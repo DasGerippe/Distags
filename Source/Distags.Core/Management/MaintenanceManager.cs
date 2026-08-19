@@ -1,4 +1,4 @@
-﻿namespace Distags.Core.Management;
+namespace Distags.Core.Management;
 
 public class MaintenanceManager : SettingManager<bool>
 {

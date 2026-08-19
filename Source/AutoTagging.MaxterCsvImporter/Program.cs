@@ -1,6 +1,6 @@
-using System.Net.Http.Json;
 using Distags.Contracts;
 using Microsoft.Extensions.Configuration;
+using System.Net.Http.Json;
 
 namespace AutoTagging.MaxterCsvImporter;
 

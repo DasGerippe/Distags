@@ -1,4 +1,4 @@
-﻿namespace Distags.Api.Contracts.Configuration;
+namespace Distags.Api.Contracts.Configuration;
 
 public class PatchConfigurationParameters
 {

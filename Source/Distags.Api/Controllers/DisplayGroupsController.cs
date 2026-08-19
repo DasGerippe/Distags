@@ -1,4 +1,4 @@
-﻿using Distags.Contracts;
+using Distags.Contracts;
 using Distags.Core;
 using Distags.Core.Queries.DisplayGroups;
 using Microsoft.AspNetCore.Authorization;

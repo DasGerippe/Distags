@@ -1,4 +1,4 @@
-﻿using Distags.Api.Hubs;
+using Distags.Api.Hubs;
 using Distags.Core.Events;
 using Microsoft.AspNetCore.SignalR;
 

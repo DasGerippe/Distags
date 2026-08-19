@@ -1,4 +1,4 @@
-﻿namespace Distags.Core.Commands.UpdateUserSettings;
+namespace Distags.Core.Commands.UpdateUserSettings;
 
 public class UpdateUserSettingsCommand : ICommand
 {

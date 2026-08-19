@@ -1,4 +1,4 @@
-﻿using Distags.Api.Contracts;
+using Distags.Api.Contracts;
 using Distags.Api.Contracts.Authentication;
 using Distags.WebApp.Services;
 using Microsoft.Extensions.Primitives;

@@ -1,4 +1,4 @@
-﻿namespace Distags.Core.Commands.UpdateUserSessionLastSeen;
+namespace Distags.Core.Commands.UpdateUserSessionLastSeen;
 
 public class UpdateUserSessionLastSeenCommand : ICommand
 {

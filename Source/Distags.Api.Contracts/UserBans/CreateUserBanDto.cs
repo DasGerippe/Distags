@@ -1,4 +1,4 @@
-﻿namespace Distags.Api.Contracts.UserBans;
+namespace Distags.Api.Contracts.UserBans;
 
 public class CreateUserBanDto
 {

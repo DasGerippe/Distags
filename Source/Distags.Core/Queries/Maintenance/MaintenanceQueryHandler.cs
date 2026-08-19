@@ -1,4 +1,4 @@
-﻿using Distags.Core.Management;
+using Distags.Core.Management;
 
 namespace Distags.Core.Queries.Maintenance;
 

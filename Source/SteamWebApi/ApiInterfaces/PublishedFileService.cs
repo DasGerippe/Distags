@@ -1,4 +1,4 @@
-﻿using HttpUtils;
+using HttpUtils;
 using Microsoft.Extensions.Logging;
 using SteamWebApi.Dtos.PublishedFileService;
 using System.Runtime.CompilerServices;

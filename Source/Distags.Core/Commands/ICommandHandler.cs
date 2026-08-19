@@ -1,4 +1,4 @@
-﻿namespace Distags.Core.Commands;
+namespace Distags.Core.Commands;
 
 public interface ICommandHandler<TCommand>
     where TCommand : ICommand

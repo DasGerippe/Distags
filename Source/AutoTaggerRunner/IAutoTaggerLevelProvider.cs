@@ -1,4 +1,4 @@
-﻿using Distags.Contracts;
+using Distags.Contracts;
 
 namespace AutoTaggerRunner;
 

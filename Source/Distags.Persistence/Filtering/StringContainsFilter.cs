@@ -1,4 +1,4 @@
-﻿using Distags.Core.Filtering;
+using Distags.Core.Filtering;
 using Microsoft.EntityFrameworkCore;
 using System.Linq.Expressions;
 using System.Reflection;

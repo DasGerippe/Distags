@@ -1,4 +1,4 @@
-﻿using Distags.Core.Entities;
+using Distags.Core.Entities;
 
 namespace Distags.Core.Filtering.Contributions;
 

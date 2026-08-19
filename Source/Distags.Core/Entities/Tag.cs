@@ -1,4 +1,4 @@
-﻿namespace Distags.Core.Entities;
+namespace Distags.Core.Entities;
 
 public class Tag
 {

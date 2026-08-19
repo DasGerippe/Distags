@@ -1,4 +1,4 @@
-﻿using AutoTagging.Abstractions;
+using AutoTagging.Abstractions;
 using Distags.Contracts;
 using Distags.Core;
 using Distags.Core.Filtering.Levels;

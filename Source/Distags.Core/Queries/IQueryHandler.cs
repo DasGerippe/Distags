@@ -1,4 +1,4 @@
-﻿namespace Distags.Core.Queries;
+namespace Distags.Core.Queries;
 
 public interface IQueryHandler<TQuery, TResult>
     where TQuery : IQuery<TResult>

@@ -1,4 +1,4 @@
-﻿namespace Distags.Api;
+namespace Distags.Api;
 
 internal static class Constants
 {

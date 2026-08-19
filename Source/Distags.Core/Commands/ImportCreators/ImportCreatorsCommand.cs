@@ -1,4 +1,4 @@
-﻿namespace Distags.Core.Commands.ImportCreators;
+namespace Distags.Core.Commands.ImportCreators;
 
 public class ImportCreatorsCommand : ICommand
 {

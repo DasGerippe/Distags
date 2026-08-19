@@ -1,4 +1,4 @@
-﻿using Distags.Api.Hubs;
+using Distags.Api.Hubs;
 using Distags.Contracts;
 using Distags.Core;
 using Distags.Core.Events;

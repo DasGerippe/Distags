@@ -1,4 +1,4 @@
-﻿namespace Distags.Contracts;
+namespace Distags.Contracts;
 
 public class TagDto
 {
