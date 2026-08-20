@@ -20,6 +20,10 @@
   </ItemGroup>
 
   <ItemGroup>
+    <InternalsVisibleTo Include="Distags.Api.IntegrationTests" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\Distags.Api.Contracts\Distags.Api.Contracts.csproj" />
     <ProjectReference Include="..\Distags.Contracts\Distags.Contracts.csproj" />
     <ProjectReference Include="..\Distags.Core\Distags.Core.csproj" />
