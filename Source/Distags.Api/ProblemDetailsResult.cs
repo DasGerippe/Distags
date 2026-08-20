@@ -144,6 +144,16 @@ public static class ProblemDetailsResult
         });
     }
 
+    public static ProblemDetails UnexpectedError()
+    {
+        return new ProblemDetails
+        {
+            Status = StatusCodes.Status500InternalServerError,
+            Title = "Unexpected Error",
+            Detail = "An unexpected error occurred.",
+        };
+    }
+
     private static ObjectResult ObjectResult(ProblemDetails problemDetails)
     {
         return new ObjectResult(problemDetails)
