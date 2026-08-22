@@ -1,5 +1,6 @@
 using BepInEx;
 using BepInEx.Configuration;
+using BepInEx.Logging;
 using Mod.DistagsHotkey.Properties;
 using System;
 using UnityEngine;
@@ -16,12 +17,20 @@ namespace Mod.DistagsHotkey
         private readonly UrlOpenerFactory _UrlOpenerFactory = new UrlOpenerFactory();
         private DistagsOpener _DistagsOpener;
 
+        private FocusedLevelProvider _FocusedLevelProvider;
+
+        internal new static ManualLogSource Logger { get; private set; }
+
         private void Awake()
         {
+            Logger = base.Logger;
+
             BindConfigEntries();
 
             IUrlOpener urlOpener = _UrlOpenerFactory.Create(_DistagsTargetConfigEntry.Value);
             _DistagsOpener = new DistagsOpener(_DistagsUrlConfigEntry.Value, urlOpener);
+
+            _FocusedLevelProvider = new FocusedLevelProvider();
 
             _DistagsUrlConfigEntry.SettingChanged += OnSettingChanged;
             _DistagsTargetConfigEntry.SettingChanged += OnSettingChanged;
@@ -58,6 +67,21 @@ namespace Mod.DistagsHotkey
 
             if (settingChangedArgs.ChangedSetting.Definition == _DistagsTargetConfigEntry.Definition)
                 _DistagsOpener.UrlOpener = _UrlOpenerFactory.Create(_DistagsTargetConfigEntry.Value);
+        }
+
+        private void Update()
+        {
+            if (!_DistagsShortcutConfigEntry.Value.IsUp())
+                return;
+
+            string focusedLevelPathRelative = _FocusedLevelProvider.GetFocusedLevelPathRelative();
+            if (string.IsNullOrEmpty(focusedLevelPathRelative))
+            {
+                Logger.LogWarning("Could not determine level to be opened in Distags.");
+                return;
+            }
+
+            _DistagsOpener.OpenDistagsLevel(focusedLevelPathRelative);
         }
     }
 }
