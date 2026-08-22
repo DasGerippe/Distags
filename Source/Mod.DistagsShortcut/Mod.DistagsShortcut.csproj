@@ -52,6 +52,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="DistagsOpener.cs" />
+    <Compile Include="FocusedLevelProvider.cs" />
     <Compile Include="IUrlOpener.cs" />
     <Compile Include="Plugin.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
