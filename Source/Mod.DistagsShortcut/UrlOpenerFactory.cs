@@ -1,6 +1,6 @@
 using System;
 
-namespace Mod.DistagsHotkey
+namespace Mod.DistagsShortcut
 {
     public class UrlOpenerFactory
     {

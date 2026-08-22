@@ -1,4 +1,4 @@
-namespace Mod.DistagsHotkey
+namespace Mod.DistagsShortcut
 {
     public enum UrlTarget
     {

@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace Mod.DistagsHotkey
+namespace Mod.DistagsShortcut
 {
     public class UrlDefaultBrowserOpener : IUrlOpener
     {

@@ -1,6 +1,6 @@
 using Steamworks;
 
-namespace Mod.DistagsHotkey
+namespace Mod.DistagsShortcut
 {
     public class UrlOverlayOpener : IUrlOpener
     {

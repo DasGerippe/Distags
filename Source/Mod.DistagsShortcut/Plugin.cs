@@ -1,11 +1,11 @@
 using BepInEx;
 using BepInEx.Configuration;
 using BepInEx.Logging;
-using Mod.DistagsHotkey.Properties;
+using Mod.DistagsShortcut.Properties;
 using System;
 using UnityEngine;
 
-namespace Mod.DistagsHotkey
+namespace Mod.DistagsShortcut
 {
     [BepInPlugin(ModInfo.Id, ModInfo.Name, ModInfo.Version)]
     public class Plugin : BaseUnityPlugin
