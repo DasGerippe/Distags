@@ -67,15 +67,26 @@ public class DistagsDbContext : Distags.Core.DistagsDbContext
     private void ConfigureLevelEntity(ModelBuilder modelBuilder)
     {
         modelBuilder.Entity<Level>()
-            .Property(level => level.Id)
-            .ValueGeneratedNever();
+            .HasDiscriminator(level => level.Type)
+            .HasValue<OfficialLevel>(LevelType.Official)
+            .HasValue<WorkshopLevel>(LevelType.Workshop);
+
+        modelBuilder.Entity<OfficialLevel>()
+            .HasIndex(level => level.Slug)
+            .HasFilter("slug IS NOT NULL")
+            .IsUnique();
+
+        modelBuilder.Entity<WorkshopLevel>()
+            .HasIndex(level => level.WorkshopId)
+            .HasFilter("workshop_id IS NOT NULL")
+            .IsUnique();
 
         modelBuilder.Entity<Level>()
             .HasMany(level => level.Tags)
             .WithMany(tag => tag.Levels)
             .UsingEntity<LevelTag>();
 
-        modelBuilder.Entity<Level>()
+        modelBuilder.Entity<WorkshopLevel>()
             .HasOne(level => level.Creator)
             .WithMany(user => user.CreatedLevels)
             .IsRequired(false);
