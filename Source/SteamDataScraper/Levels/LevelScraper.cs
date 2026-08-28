@@ -1,6 +1,6 @@
 using Distags.Core;
 using Distags.Core.Commands.ImportLevels;
-using Distags.Core.Queries.LatestLevelDate;
+using Distags.Core.Queries.LatestWorkshopLevelDate;
 using Microsoft.Extensions.Logging;
 using SteamWebApi;
 using SteamWebApi.ApiInterfaces;
@@ -36,7 +36,7 @@ public class LevelScraper
     {
         _Logger.LogDebug("Scraping levels from Steam web API...");
 
-        DateTimeOffset? cutOffDate = await _RequestDispatcher.DispatchAsync(new LatestLevelDateQuery()).ConfigureAwait(false);
+        DateTimeOffset? cutOffDate = await _RequestDispatcher.DispatchAsync(new LatestWorkshopLevelDateQuery()).ConfigureAwait(false);
 
         List<ScrapedLevel> scrapedLevels = await ScrapeNewLevelsAsync(cutOffDate, cancellationToken).ConfigureAwait(false);
 
