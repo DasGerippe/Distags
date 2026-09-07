@@ -2,32 +2,35 @@ using Distags.Core.Entities;
 using Distags.Core.Management;
 using Microsoft.EntityFrameworkCore;
 
-namespace Distags.Core.Commands.ImportLevels;
+namespace Distags.Core.Commands.ImportScrapedLevels;
 
-public class ImportLevelsCommandHandler : ICommandHandler<ImportLevelsCommand>
+public class ImportScrapedLevelsCommandHandler : ICommandHandler<ImportScrapedLevelsCommand>
 {
     private readonly DistagsDbContext _DbContext;
     private readonly FallbackTagProvider _FallbackTagProvider;
 
-    public ImportLevelsCommandHandler(DistagsDbContext dbContext, FallbackTagProvider fallbackTagProvider)
+    public ImportScrapedLevelsCommandHandler(DistagsDbContext dbContext, FallbackTagProvider fallbackTagProvider)
     {
         _DbContext = dbContext;
         _FallbackTagProvider = fallbackTagProvider;
     }
 
-    public async Task HandleAsync(ImportLevelsCommand command)
+    public async Task HandleAsync(ImportScrapedLevelsCommand command)
     {
-        IEnumerable<long> scrapedLevelIds = command.ScrapedLevels.Select(scrapedLevel => scrapedLevel.Id);
-        Dictionary<long, Level> existingLevels = await _DbContext.Set<Level>()
-            .Where(level => scrapedLevelIds.Contains(level.Id))
-            .ToDictionaryAsync(level => level.Id)
+        IEnumerable<long> scrapedWorkshopIds = command.ScrapedLevels.Select(scrapedLevel => scrapedLevel.WorkshopId);
+        Dictionary<long, WorkshopLevel> existingLevels = await _DbContext.Set<WorkshopLevel>()
+            .Where(level => scrapedWorkshopIds.Contains(level.WorkshopId))
+            .ToDictionaryAsync(level => level.WorkshopId)
             .ConfigureAwait(false);
 
         foreach (ScrapedLevel scrapedLevel in command.ScrapedLevels)
         {
-            if (!existingLevels.TryGetValue(scrapedLevel.Id, out Level? level))
+            if (!existingLevels.TryGetValue(scrapedLevel.WorkshopId, out WorkshopLevel? level))
             {
-                level = new Level { Id = scrapedLevel.Id };
+                level = new WorkshopLevel
+                {
+                    WorkshopId = scrapedLevel.WorkshopId,
+                };
                 level.Tags.AddRange(await _FallbackTagProvider.GetFallbackTagsAsync().ConfigureAwait(false));
                 _DbContext.Add(level);
             }
@@ -37,7 +40,7 @@ public class ImportLevelsCommandHandler : ICommandHandler<ImportLevelsCommand>
         await _DbContext.SaveChangesAsync().ConfigureAwait(false);
     }
 
-    private void SetLevelProperties(Level level, ScrapedLevel scrapedLevel)
+    private void SetLevelProperties(WorkshopLevel level, ScrapedLevel scrapedLevel)
     {
         level.Name = scrapedLevel.Name;
         level.FileName = scrapedLevel.FileName;

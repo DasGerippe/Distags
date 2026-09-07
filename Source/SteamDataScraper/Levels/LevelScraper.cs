@@ -1,5 +1,5 @@
 using Distags.Core;
-using Distags.Core.Commands.ImportLevels;
+using Distags.Core.Commands.ImportScrapedLevels;
 using Distags.Core.Queries.LatestWorkshopLevelDate;
 using Microsoft.Extensions.Logging;
 using SteamWebApi;
@@ -43,7 +43,7 @@ public class LevelScraper
         if (cutOffDate != null)
             scrapedLevels.AddRange(await ScrapeUpdatedLevelsAsync(cutOffDate.Value, cancellationToken).ConfigureAwait(false));
 
-        ImportLevelsCommand importLevelsCommand = new ImportLevelsCommand { ScrapedLevels = scrapedLevels };
+        ImportScrapedLevelsCommand importLevelsCommand = new ImportScrapedLevelsCommand { ScrapedLevels = scrapedLevels };
         await _RequestDispatcher.DispatchAsync(importLevelsCommand).ConfigureAwait(false);
 
         _Logger.LogDebug("Scraped levels from Steam web API.");
@@ -146,7 +146,7 @@ public class LevelScraper
     {
         return new ScrapedLevel
         {
-            Id = long.Parse(publishedFile.PublishedFileId),
+            WorkshopId = long.Parse(publishedFile.PublishedFileId),
             Name = publishedFile.Title,
             CreatorId = long.Parse(publishedFile.CreatorId),
             FileName = publishedFile.Filename,

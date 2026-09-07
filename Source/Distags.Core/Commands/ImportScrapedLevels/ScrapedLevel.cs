@@ -1,8 +1,8 @@
-namespace Distags.Core.Commands.ImportLevels;
+namespace Distags.Core.Commands.ImportScrapedLevels;
 
 public class ScrapedLevel
 {
-    public required long Id { get; set; }
+    public required long WorkshopId { get; set; }
 
     public required string Name { get; set; }
 
