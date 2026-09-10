@@ -13,14 +13,30 @@ public class ContributionMapper : IEntityMapper<Contribution, ContributionDto>
         Expression = contribution => new ContributionDto
         {
             Id = contribution.Id,
-            Level = new ContributionLevelDto
-            {
-                Id = contribution.Level.Id,
-                Name = contribution.Level.Name,
-                CreatorName = contribution.Level.Creator!.Name,
-                CreatorAvatarHash = contribution.Level.Creator!.AvatarHash,
-                ImageUrl = contribution.Level.ImageUrl,
-            },
+            Level = contribution.Level.Type == LevelType.Official
+                ? new OfficialLevelDto
+                {
+                    Slug = (contribution.Level as OfficialLevel)!.Slug,
+                    Name = contribution.Level.Name,
+                    CreatorName = (contribution.Level as OfficialLevel)!.CreatorName,
+                    GameModes = (contribution.Level as OfficialLevel)!.GameModes,
+                    Tags = contribution.Level.Tags.Select(tag => tag.Name).ToList(),
+                }
+                : new WorkshopLevelDto
+                {
+                    WorkshopId = (contribution.Level as WorkshopLevel)!.WorkshopId,
+                    Name = contribution.Level.Name,
+                    CreatorId = (contribution.Level as WorkshopLevel)!.CreatorId,
+                    CreatorName = (contribution.Level as WorkshopLevel)!.Creator!.Name,
+                    CreatorAvatarHash = (contribution.Level as WorkshopLevel)!.Creator!.AvatarHash,
+                    FileName = (contribution.Level as WorkshopLevel)!.FileName,
+                    FileUrl = (contribution.Level as WorkshopLevel)!.FileUrl,
+                    ImageUrl = (contribution.Level as WorkshopLevel)!.ImageUrl,
+                    CreatedOn = (contribution.Level as WorkshopLevel)!.CreatedOn,
+                    UpdatedOn = (contribution.Level as WorkshopLevel)!.UpdatedOn,
+                    WorkshopTags = (contribution.Level as WorkshopLevel)!.WorkshopTags,
+                    Tags = contribution.Level.Tags.Select(tag => tag.Name).ToList(),
+                },
             Changes = contribution.Changes
                 .Select(change => new TagChangeDto
                 {
