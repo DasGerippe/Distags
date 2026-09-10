@@ -64,7 +64,7 @@ public class ChangeLevelTagCommandHandler : ICommandHandler<ChangeLevelTagComman
             .Where(level => level.Id == levelId)
             .FirstOrDefaultAsync()
             .ConfigureAwait(false);
-        return level ?? throw new UnknownLevelException(levelId);
+        return level ?? throw new UnknownLevelException();
     }
 
     private async Task<Tag> GetTagAsync(string tagName)
