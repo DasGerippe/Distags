@@ -1,3 +1,5 @@
+using Distags.Contracts;
+
 namespace Distags.Core.Entities;
 
 public abstract class Level
