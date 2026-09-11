@@ -1,8 +1,9 @@
+using Distags.Contracts;
 using System.ComponentModel.DataAnnotations;
 
 namespace Distags.Api.Contracts.Levels;
 
-public class BrowseLevelsParameters
+public class BrowseLevelsRequest
 {
     public string? LevelName { get; set; }
 

@@ -6,4 +6,9 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\Distags.Contracts\Distags.Contracts.csproj" />
+    <ProjectReference Include="..\Distags.Core\Distags.Core.csproj" />
+  </ItemGroup>
+
 </Project>

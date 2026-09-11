@@ -1,6 +1,6 @@
 namespace Distags.Api.Contracts.Apps;
 
-public class CreateAppDto
+public class CreateAppRequest
 {
     public required string Name { get; set; }
 }

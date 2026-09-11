@@ -1,6 +1,6 @@
 namespace Distags.Api.Contracts.Contributions;
 
-public class RevertContributionsParameters
+public class RevertContributionsRequest
 {
     public long SteamId { get; set; }
 

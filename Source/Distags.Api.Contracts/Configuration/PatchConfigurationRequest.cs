@@ -1,6 +1,6 @@
 namespace Distags.Api.Contracts.Configuration;
 
-public class PatchConfigurationParameters
+public class PatchConfigurationRequest
 {
     public PatchValue<bool>? MaintenanceActive { get; set; }
 }

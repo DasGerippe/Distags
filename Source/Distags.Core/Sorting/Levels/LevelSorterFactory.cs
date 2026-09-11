@@ -1,3 +1,4 @@
+using Distags.Contracts;
 using Distags.Core.Entities;
 
 namespace Distags.Core.Sorting.Levels;

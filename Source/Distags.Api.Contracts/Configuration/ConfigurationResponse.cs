@@ -1,6 +1,6 @@
 namespace Distags.Api.Contracts.Configuration;
 
-public class ConfigurationDto
+public class ConfigurationResponse
 {
     public bool MaintenanceActive { get; set; }
 }

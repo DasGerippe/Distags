@@ -1,3 +1,4 @@
+using Distags.Contracts;
 using Distags.Core.Commands;
 using Distags.Core.Entities;
 using Distags.Core.Events;

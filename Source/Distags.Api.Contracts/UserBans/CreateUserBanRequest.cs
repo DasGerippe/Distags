@@ -1,6 +1,6 @@
 namespace Distags.Api.Contracts.UserBans;
 
-public class CreateUserBanDto
+public class CreateUserBanRequest
 {
     public long SteamId { get; set; }
 

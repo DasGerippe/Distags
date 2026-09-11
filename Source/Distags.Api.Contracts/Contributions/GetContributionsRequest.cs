@@ -2,7 +2,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace Distags.Api.Contracts.Contributions;
 
-public class GetContributionsParameters
+public class GetContributionsRequest
 {
     public long? UserSteamId { get; set; }
 

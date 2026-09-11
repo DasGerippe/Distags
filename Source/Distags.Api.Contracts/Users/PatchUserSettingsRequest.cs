@@ -1,6 +1,6 @@
 namespace Distags.Api.Contracts.Users;
 
-public class PatchUserSettingsParameters
+public class PatchUserSettingsRequest
 {
     public PatchValue<bool>? AcceptsGuidelines { get; set; }
 

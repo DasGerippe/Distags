@@ -1,6 +1,6 @@
 namespace Distags.Api.Contracts.Guidelines;
 
-public class GuidelineDto
+public class GuidelineResponse
 {
     public required string Title { get; set; }
 

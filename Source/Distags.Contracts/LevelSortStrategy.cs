@@ -1,4 +1,4 @@
-namespace Distags.Core.Sorting.Levels;
+namespace Distags.Contracts;
 
 public enum LevelSortStrategy
 {
