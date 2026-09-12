@@ -1,4 +1,5 @@
 using Distags.Api.Contracts.Users;
+using Distags.Api.Mapping;
 using Distags.Api.Security;
 using Distags.Contracts;
 using Distags.Core;
@@ -20,22 +21,25 @@ public class UsersController : ControllerBase
 {
     [HttpGet("me")]
     [Authorize(AuthenticationSchemes = Constants.Authentication.SessionTokenScheme.Name)]
-    public async Task<ActionResult<UserDto>> GetMe(
+    public async Task<ActionResult<UserResponse>> GetMe(
         [FromServices] IRequestDispatcher requestDispatcher)
     {
         UserBySteamIdQuery query = new UserBySteamIdQuery
         {
             SteamId = User.FindFirstValue<long>(Constants.Claims.SteamId)!.Value,
         };
-        UserDto? user = await requestDispatcher.DispatchAsync(query);
-        return user == null
-            ? Unauthorized()
-            : Ok(user);
+        UserDto? userDto = await requestDispatcher.DispatchAsync(query);
+        if (userDto == null)
+            return Unauthorized();
+
+        UserResponse userResponse = UserMapper.Map(userDto);
+        return Ok(userResponse);
     }
 
     [HttpPatch("me/settings")]
     [Authorize(AuthenticationSchemes = Constants.Authentication.SessionTokenScheme.Name)]
-    public async Task<IActionResult> PatchSettings([FromBody] PatchUserSettingsParameters parameters,
+    public async Task<IActionResult> PatchSettings(
+        [FromBody] PatchUserSettingsRequest request,
         [FromServices] IRequestDispatcher requestDispatcher)
     {
         try
@@ -43,8 +47,8 @@ public class UsersController : ControllerBase
             UpdateUserSettingsCommand command = new UpdateUserSettingsCommand
             {
                 SteamId = User.FindFirstValue<long>(Constants.Claims.SteamId)!.Value,
-                AcceptsGuidelines = parameters.AcceptsGuidelines?.Value ?? default(UpdateValue<bool>),
-                IsAnonymous = parameters.IsAnonymous?.Value ?? default(UpdateValue<bool>),
+                AcceptsGuidelines = request.AcceptsGuidelines?.Value ?? default(UpdateValue<bool>),
+                IsAnonymous = request.IsAnonymous?.Value ?? default(UpdateValue<bool>),
             };
 
             await requestDispatcher.DispatchAsync(command);
@@ -59,19 +63,24 @@ public class UsersController : ControllerBase
 
     [HttpGet("{userSteamId:long}")]
     [Authorize(Roles = UserRoles.Administrator)]
-    public async Task<IActionResult> GetUser(long userSteamId,
+    public async Task<ActionResult<UserResponse>> GetUser(
+        long userSteamId,
         [FromServices] IRequestDispatcher requestDispatcher)
     {
         UserBySteamIdQuery query = new UserBySteamIdQuery { SteamId = userSteamId };
-        UserDto? user = await requestDispatcher.DispatchAsync(query);
-        return user != null
-            ? Ok(user)
-            : ProblemDetailsResult.UserNotFound(userSteamId);
+        UserDto? userDto = await requestDispatcher.DispatchAsync(query);
+        if (userDto == null)
+            return ProblemDetailsResult.UserNotFound(userSteamId);
+
+        UserResponse userResponse = UserMapper.Map(userDto);
+        return Ok(userResponse);
     }
 
     [HttpPut("{userSteamId:long}/roles/{role}")]
     [Authorize(Roles = UserRoles.Administrator)]
-    public async Task<IActionResult> AddUserRole(long userSteamId, string role,
+    public async Task<IActionResult> AddUserRole(
+        long userSteamId,
+        string role,
         [FromServices] IRequestDispatcher requestDispatcher)
     {
         try
@@ -92,7 +101,9 @@ public class UsersController : ControllerBase
 
     [HttpDelete("{userSteamId:long}/roles/{role}")]
     [Authorize(Roles = UserRoles.Administrator)]
-    public async Task<IActionResult> RemoveUserRole(long userSteamId, string role,
+    public async Task<IActionResult> RemoveUserRole(
+        long userSteamId,
+        string role,
         [FromServices] IRequestDispatcher requestDispatcher)
     {
         try

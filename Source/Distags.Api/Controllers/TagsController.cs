@@ -1,3 +1,5 @@
+using Distags.Api.Contracts.Tags;
+using Distags.Api.Mapping;
 using Distags.Contracts;
 using Distags.Core;
 using Distags.Core.Queries.Tags;
@@ -12,10 +14,13 @@ public class TagsController : ControllerBase
 {
     [HttpGet]
     [AllowAnonymous]
-    public async Task<ActionResult<IEnumerable<TagDto>>> GetTagsAsync(
+    public async Task<ActionResult<List<TagResponse>>> GetTagsAsync(
         [FromServices] IRequestDispatcher requestDispatcher)
     {
         List<TagDto> tagDtos = await requestDispatcher.DispatchAsync(new TagsQuery());
-        return Ok(tagDtos);
+        List<TagResponse> tagResponses = tagDtos
+            .Select(TagMapper.Map)
+            .ToList();
+        return Ok(tagResponses);
     }
 }

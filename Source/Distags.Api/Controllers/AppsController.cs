@@ -1,4 +1,6 @@
 using Distags.Api.Contracts.Apps;
+using Distags.Api.Mapping;
+using Distags.Contracts;
 using Distags.Core;
 using Distags.Core.Commands.CreateApp;
 using Distags.Core.Commands.DeleteApp;
@@ -8,7 +10,6 @@ using Distags.Core.Queries.Apps;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using static Distags.Contracts.Constants;
-using AppDto = Distags.Contracts.AppDto;
 
 namespace Distags.Api.Controllers;
 
@@ -18,23 +19,28 @@ public class AppsController : ControllerBase
 {
     [HttpGet]
     [Authorize(Roles = UserRoles.Administrator)]
-    public async Task<ActionResult<List<AppDto>>> GetApps(
+    public async Task<ActionResult<List<AppResponse>>> GetApps(
         [FromServices] IRequestDispatcher requestDispatcher)
     {
         List<AppDto> appDtos = await requestDispatcher.DispatchAsync(new AppsQuery());
-        return Ok(appDtos);
+        List<AppResponse> appResponses = appDtos
+            .Select(AppMapper.Map)
+            .ToList();
+        return Ok(appResponses);
     }
 
     [HttpGet("{appName}")]
     [Authorize(Roles = UserRoles.Administrator)]
-    public async Task<ActionResult<List<AppDto>>> GetApp(string appName,
+    public async Task<ActionResult<AppResponse>> GetApp(
+        string appName,
         [FromServices] IRequestDispatcher requestDispatcher)
     {
         try
         {
             AppByNameQuery query = new AppByNameQuery { AppName = appName };
             AppDto appDto = await requestDispatcher.DispatchAsync(query);
-            return Ok(appDto);
+            AppResponse appResponse = AppMapper.Map(appDto);
+            return Ok(appResponse);
         }
         catch (UnknownAppNameException)
         {
@@ -44,7 +50,8 @@ public class AppsController : ControllerBase
 
     [HttpPost]
     [Authorize(Roles = UserRoles.Administrator)]
-    public async Task<ActionResult<AppDto>> CreateApp([FromBody] CreateAppDto createAppDto,
+    public async Task<IActionResult> CreateApp(
+        [FromBody] CreateAppRequest createAppDto,
         [FromServices] IRequestDispatcher requestDispatcher)
     {
         try
@@ -61,7 +68,8 @@ public class AppsController : ControllerBase
 
     [HttpDelete("{appName}")]
     [Authorize(Roles = UserRoles.Administrator)]
-    public async Task<IActionResult> DeleteApiKey(string appName,
+    public async Task<IActionResult> DeleteApp(
+        string appName,
         [FromServices] IRequestDispatcher requestDispatcher)
     {
         try

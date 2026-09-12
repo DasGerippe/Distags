@@ -1,4 +1,5 @@
 using Distags.Api.Contracts.Contributions;
+using Distags.Api.Mapping;
 using Distags.Contracts;
 using Distags.Core;
 using Distags.Core.Commands.RevertContributions;
@@ -14,35 +15,37 @@ namespace Distags.Api.Controllers;
 public class ContributionsController : ControllerBase
 {
     [HttpGet]
-    public async Task<ActionResult<ContributionsPage>> GetContributions([FromQuery] GetContributionsParameters parameters,
+    public async Task<ActionResult<ContributionsPageResponse>> GetContributions(
+        [FromQuery] GetContributionsRequest request,
         [FromServices] IRequestDispatcher requestDispatcher)
     {
         ContributionsQuery query = new ContributionsQuery
         {
             IgnoreAnonymity = User.IsInRole(UserRoles.Moderator),
-            UserSteamId = parameters.UserSteamId,
-            AppName = parameters.AppName,
-            LevelId = parameters.LevelId,
-            TagName = parameters.TagName,
-            ContributedAfter = parameters.ContributedAfter,
-            ContributedBefore = parameters.ContributedBefore,
-            DescendingOrder = parameters.DescendingOrder,
-            Limit = parameters.Limit,
+            UserSteamId = request.UserSteamId,
+            AppName = request.AppName,
+            LevelId = request.LevelId,
+            TagName = request.TagName,
+            ContributedAfter = request.ContributedAfter,
+            ContributedBefore = request.ContributedBefore,
+            DescendingOrder = request.DescendingOrder,
+            Limit = request.Limit,
         };
         ContributionsPage contributionsPage = await requestDispatcher.DispatchAsync(query);
-        return Ok(contributionsPage);
+        ContributionsPageResponse contributionsPageResponse = ContributionsPageMapper.Map(contributionsPage);
+        return Ok(contributionsPageResponse);
     }
 
     [HttpPost("revert")]
     [Authorize(Roles = UserRoles.Moderator)]
     public async Task<IActionResult> RevertContributions(
-        [FromBody] RevertContributionsParameters parameters,
+        [FromBody] RevertContributionsRequest request,
         [FromServices] IRequestDispatcher requestDispatcher)
     {
         RevertContributionsCommand command = new RevertContributionsCommand
         {
-            UserSteamId = parameters.SteamId,
-            RevertStartDate = parameters.RevertStartDate,
+            UserSteamId = request.SteamId,
+            RevertStartDate = request.RevertStartDate,
         };
         await requestDispatcher.DispatchAsync(command);
         return NoContent();

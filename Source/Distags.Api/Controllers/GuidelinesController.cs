@@ -9,10 +9,10 @@ namespace Distags.Api.Controllers;
 public class GuidelinesController : ControllerBase
 {
     [HttpGet]
-    public async Task<ActionResult<GuidelinesDto?>> GetContributionGuidelines()
+    public async Task<ActionResult<GuidelinesResponse?>> GetContributionGuidelines()
     {
         await using Stream fileStream = new FileStream("contribution-guidelines.json", FileMode.Open, FileAccess.Read);
-        GuidelinesDto? guidelinesDto = await JsonSerializer.DeserializeAsync<GuidelinesDto>(fileStream);
+        GuidelinesResponse? guidelinesDto = await JsonSerializer.DeserializeAsync<GuidelinesResponse>(fileStream);
         return Ok(guidelinesDto);
     }
 }
