@@ -55,7 +55,8 @@ public class ContributionsQueryHandler : IQueryHandler<ContributionsQuery, Contr
         {
             UserSteamId = query.UserSteamId,
             AppName = query.AppName,
-            LevelId = query.LevelId,
+            LevelSlug = query.LevelSlug,
+            LevelWorkshopId = query.LevelWorkshopId,
             TagName = query.TagName,
             ContributedAfter = query.ContributedAfter,
             ContributedBefore = query.ContributedBefore,
