@@ -11,5 +11,7 @@ public abstract class LevelResponse
 
     public string Name { get; set; } = string.Empty;
 
+    public string Key { get; set; } = string.Empty;
+
     public List<string>? Tags { get; set; }
 }

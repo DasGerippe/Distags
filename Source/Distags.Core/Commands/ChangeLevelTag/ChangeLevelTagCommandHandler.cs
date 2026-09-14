@@ -5,6 +5,7 @@ using Distags.Core.Exceptions;
 using Distags.Core.Interfaces;
 using Distags.Core.Logic;
 using Distags.Core.Management;
+using Distags.Core.Mapping;
 using Microsoft.EntityFrameworkCore;
 
 namespace Distags.Core.Commands.ChangeLevelTag;
@@ -158,14 +159,6 @@ public abstract class ChangeLevelTagCommandHandler
     private void EnqueueEvents(Contribution contribution)
     {
         _AppEventQueue.Enqueue(new ContributionCreatedEvent(contribution.Id));
-
-        List<TagChangeDto> changeDtos = contribution.Changes
-            .Select(change => new TagChangeDto
-            {
-                Action = change.Action,
-                TagName = change.TagName,
-            })
-            .ToList();
-        _AppEventQueue.Enqueue(new LevelTagsChangedEvent(contribution.LevelId, changeDtos));
+        _AppEventQueue.Enqueue(new LevelTagsChangedEvent(contribution.Level, contribution.Changes));
     }
 }

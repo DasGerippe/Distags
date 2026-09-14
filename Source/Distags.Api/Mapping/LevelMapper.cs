@@ -11,9 +11,16 @@ public static partial class LevelMapper
     [MapDerivedType<WorkshopLevelDto, WorkshopLevelResponse>]
     public static partial LevelResponse Map(LevelDto level);
 
+    [MapPropertyFromSource(nameof(LevelResponse.Key), Use = nameof(GetKey))]
     [MapperIgnoreTarget(nameof(LevelResponse.Tags))]
     public static partial OfficialLevelResponse Map(OfficialLevelDto officialLevel);
 
+    [MapPropertyFromSource(nameof(LevelResponse.Key), Use = nameof(GetKey))]
     [MapperIgnoreTarget(nameof(LevelResponse.Tags))]
     public static partial WorkshopLevelResponse Map(WorkshopLevelDto workshopLevel);
+
+    private static string GetKey(LevelDto level)
+    {
+        return LevelKeyGenerator.GetKey(level);
+    }
 }

@@ -1,8 +1,8 @@
-using Distags.Contracts;
+using Distags.Api.Contracts.Tags;
 
 namespace Distags.Api.Hubs;
 
 public interface ILevelHubClient
 {
-    Task TagsChanged(IReadOnlyCollection<TagChangeDto> tagChanges);
+    Task TagsChanged(IReadOnlyCollection<TagChangeResponse> tagChanges);
 }
