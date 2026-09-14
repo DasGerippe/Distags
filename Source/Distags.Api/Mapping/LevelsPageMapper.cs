@@ -9,6 +9,4 @@ namespace Distags.Api.Mapping;
 public static partial class LevelsPageMapper
 {
     public static partial LevelsPageResponse Map(LevelsPage levelsPage);
-
-    public static partial LevelsPageResponse ToApiDto(this LevelsPage levelsPage);
 }

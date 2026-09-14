@@ -1,6 +1,6 @@
 using Distags.Contracts;
 using Distags.Core.Entities;
-using Distags.Core.Mapping;
+using Distags.Core.Projection;
 using Microsoft.EntityFrameworkCore;
 
 namespace Distags.Core.Queries.UserBanBySteamId;
@@ -18,7 +18,7 @@ public class UserBanBySteamIdQueryHandler : IQueryHandler<UserBanBySteamIdQuery,
     {
         return await _DbContext.Set<UserBan>()
             .Where(userBan => userBan.SteamId == query.SteamId)
-            .Select(new UserBanMapper().Expression)
+            .SelectDto()
             .FirstOrDefaultAsync()
             .ConfigureAwait(false);
     }

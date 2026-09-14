@@ -1,6 +1,6 @@
 using Distags.Contracts;
 using Distags.Core.Entities;
-using Distags.Core.Mapping;
+using Distags.Core.Projection;
 using Microsoft.EntityFrameworkCore;
 
 namespace Distags.Core.Queries.AppByApiKey;
@@ -18,7 +18,7 @@ public class AppByApiKeyQueryHandler : IQueryHandler<AppByApiKeyQuery, AppDto?>
     {
         AppDto? appDto = await _DbContext.Set<App>()
             .Where(app => app.ApiKey == query.ApiKey)
-            .Select(new AppMapper().Expression)
+            .SelectDto()
             .FirstOrDefaultAsync()
             .ConfigureAwait(false);
 

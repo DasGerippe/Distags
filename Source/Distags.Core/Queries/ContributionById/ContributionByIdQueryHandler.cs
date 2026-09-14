@@ -1,6 +1,6 @@
 using Distags.Contracts;
 using Distags.Core.Entities;
-using Distags.Core.Mapping;
+using Distags.Core.Projection;
 using Microsoft.EntityFrameworkCore;
 
 namespace Distags.Core.Queries.ContributionById;
@@ -16,11 +16,14 @@ public class ContributionByIdQueryHandler : IQueryHandler<ContributionByIdQuery,
 
     public async Task<ContributionDto?> HandleAsync(ContributionByIdQuery query)
     {
-        ContributionMapper mapper = new ContributionMapper(query.IgnoreAnonymity);
-        ContributionDto? contributionDto = await _DbContext.Set<Contribution>()
-            .Where(contribution => contribution.Id == query.ContributionId)
-            .Select(mapper.Expression)
-            .FirstOrDefaultAsync().ConfigureAwait(false);
+        IQueryable<Contribution> contributions = _DbContext.Set<Contribution>()
+            .Where(contribution => contribution.Id == query.ContributionId);
+
+        IQueryable<ContributionDto> contributionDtos = query.IgnoreAnonymity
+            ? contributions.SelectDto()
+            : contributions.SelectAnonymizedDto();
+
+        ContributionDto? contributionDto = await contributionDtos.FirstOrDefaultAsync().ConfigureAwait(false);
         return contributionDto;
     }
 }

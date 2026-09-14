@@ -1,7 +1,7 @@
 using Distags.Contracts;
 using Distags.Core.Entities;
 using Distags.Core.Exceptions;
-using Distags.Core.Mapping;
+using Distags.Core.Projection;
 using Microsoft.EntityFrameworkCore;
 
 namespace Distags.Core.Queries.WorkshopLevelById;
@@ -17,13 +17,12 @@ public class WorkshopLevelByIdQueryHandler : IQueryHandler<WorkshopLevelByIdQuer
 
     public async Task<WorkshopLevelDto> HandleAsync(WorkshopLevelByIdQuery query)
     {
-        LevelMapper levelProjector = new LevelMapper();
-        LevelDto? levelDto = await _DbContext.Set<WorkshopLevel>()
+        WorkshopLevelDto? levelDto = await _DbContext.Set<WorkshopLevel>()
             .Where(level => level.WorkshopId == query.WorkshopId)
-            .Select(levelProjector.Expression)
+            .SelectDto()
             .FirstOrDefaultAsync()
             .ConfigureAwait(false);
 
-        return levelDto as WorkshopLevelDto ?? throw new UnknownLevelException();
+        return levelDto ?? throw new UnknownLevelException();
     }
 }

@@ -1,7 +1,7 @@
 using Distags.Contracts;
 using Distags.Core.Entities;
 using Distags.Core.Exceptions;
-using Distags.Core.Mapping;
+using Distags.Core.Projection;
 using Microsoft.EntityFrameworkCore;
 
 namespace Distags.Core.Queries.AppByName;
@@ -19,7 +19,7 @@ public class AppByNameQueryHandler : IQueryHandler<AppByNameQuery, AppDto>
     {
         AppDto? appDto = await _DbContext.Set<App>()
             .Where(app => app.Name == query.AppName)
-            .Select(new AppMapper().Expression)
+            .SelectDto()
             .FirstOrDefaultAsync()
             .ConfigureAwait(false);
 

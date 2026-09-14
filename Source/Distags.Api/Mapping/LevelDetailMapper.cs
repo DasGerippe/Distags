@@ -10,4 +10,8 @@ public static partial class LevelDetailMapper
     [MapDerivedType<OfficialLevelDto, OfficialLevelResponse>]
     [MapDerivedType<WorkshopLevelDto, WorkshopLevelResponse>]
     public static partial LevelResponse Map(LevelDto level);
+
+    public static partial OfficialLevelResponse Map(OfficialLevelDto officialLevel);
+
+    public static partial WorkshopLevelResponse Map(WorkshopLevelDto workshopLevel);
 }

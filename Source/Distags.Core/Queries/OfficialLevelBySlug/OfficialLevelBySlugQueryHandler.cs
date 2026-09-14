@@ -1,7 +1,7 @@
 using Distags.Contracts;
 using Distags.Core.Entities;
 using Distags.Core.Exceptions;
-using Distags.Core.Mapping;
+using Distags.Core.Projection;
 using Microsoft.EntityFrameworkCore;
 
 namespace Distags.Core.Queries.OfficialLevelBySlug;
@@ -17,13 +17,12 @@ public class OfficialLevelBySlugQueryHandler : IQueryHandler<OfficialLevelBySlug
 
     public async Task<OfficialLevelDto> HandleAsync(OfficialLevelBySlugQuery query)
     {
-        LevelMapper levelProjector = new LevelMapper();
-        LevelDto? levelDto = await _DbContext.Set<OfficialLevel>()
+        OfficialLevelDto? levelDto = await _DbContext.Set<OfficialLevel>()
             .Where(level => level.Slug == query.Slug)
-            .Select(levelProjector.Expression)
+            .SelectDto()
             .FirstOrDefaultAsync()
             .ConfigureAwait(false);
 
-        return levelDto as OfficialLevelDto ?? throw new UnknownLevelException();
+        return levelDto ?? throw new UnknownLevelException();
     }
 }

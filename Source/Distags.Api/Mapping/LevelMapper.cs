@@ -9,10 +9,11 @@ public static partial class LevelMapper
 {
     [MapDerivedType<OfficialLevelDto, OfficialLevelResponse>]
     [MapDerivedType<WorkshopLevelDto, WorkshopLevelResponse>]
-    [MapperIgnoreTarget(nameof(LevelResponse.Tags))]
     public static partial LevelResponse Map(LevelDto level);
 
+    [MapperIgnoreTarget(nameof(LevelResponse.Tags))]
     public static partial OfficialLevelResponse Map(OfficialLevelDto officialLevel);
 
+    [MapperIgnoreTarget(nameof(LevelResponse.Tags))]
     public static partial WorkshopLevelResponse Map(WorkshopLevelDto workshopLevel);
 }
