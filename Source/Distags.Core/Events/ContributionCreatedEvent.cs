@@ -1,11 +1,18 @@
+using Distags.Contracts;
+using Distags.Core.Entities;
+using Distags.Core.Mapping;
+
 namespace Distags.Core.Events;
 
 public class ContributionCreatedEvent : IAppEvent
 {
-    public long ContributionId { get; }
+    public ContributionDto Contribution { get; }
 
-    public ContributionCreatedEvent(long contributionId)
+    public ContributionDto AnonymizedContribution { get; }
+
+    public ContributionCreatedEvent(Contribution contribution)
     {
-        ContributionId = contributionId;
+        Contribution = ContributionMapper.Map(contribution);
+        AnonymizedContribution = ContributionAnonymizedMapper.Map(contribution);
     }
 }
