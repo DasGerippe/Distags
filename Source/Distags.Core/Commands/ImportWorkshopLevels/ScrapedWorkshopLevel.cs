@@ -1,6 +1,6 @@
-namespace Distags.Core.Commands.ImportScrapedLevels;
+namespace Distags.Core.Commands.ImportWorkshopLevels;
 
-public class ScrapedLevel
+public class ScrapedWorkshopLevel
 {
     public required long WorkshopId { get; set; }
 

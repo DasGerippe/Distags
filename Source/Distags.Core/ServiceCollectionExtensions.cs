@@ -13,6 +13,7 @@ using Distags.Core.Sorting;
 using Distags.Core.Sorting.Levels;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
+using Slugify;
 
 namespace Distags.Core;
 
@@ -23,11 +24,13 @@ public static class ServiceCollectionExtensions
         configSectionPath ??= $"{nameof(Distags)}:{nameof(Core)}";
         services.AddValidatedConfigOptions<DistagsCoreSettings>(configSectionPath);
 
+        services.AddTransient<ISlugHelper, SlugHelper>();
         services.AddTransient<TokenGenerator>();
 
         services.AddTransient<ContributionManager>();
         services.AddTransient<TagChangeManager>();
         services.AddTransient<ContributionReplayer>();
+        services.AddTransient<LevelFactory>();
         services.AddTransient<LevelTagAdder>();
         services.AddTransient<LevelTagRemover>();
 
