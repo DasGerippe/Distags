@@ -1,9 +1,8 @@
-﻿@page "/contributions"
+@page "/contributions"
 @rendermode InteractiveServer
 
 @using Distags.Api.Contracts
 @using Distags.Api.Contracts.Contributions
-@using Distags.Contracts
 @using Distags.WebApp.Collections
 @using Distags.WebApp.Components.Contribution
 @using Distags.WebApp.Security
@@ -17,132 +16,132 @@
 @inject DistagsApiClient DistagsApi
 
 @if (!_IsInitialized)
-	return;
+    return;
 
 <PageTitle>@Resource.PageTitle_Contributions</PageTitle>
 
 <div class="container-fluid content my-3">
-	<div class="d-flex flex-column gap-3 gap-md-2">
-		@foreach (ContributionInfo contributionInfo in _Contributions)
-		{
-			<div class="@GetAnimationClass(contributionInfo.State)" @key="contributionInfo.Contribution.Id">
-				<ContributionDisplay Contribution="contributionInfo.Contribution" />
-			</div>
+    <div class="d-flex flex-column gap-3 gap-md-2">
+        @foreach (ContributionInfo contributionInfo in _Contributions)
+        {
+            <div class="@GetAnimationClass(contributionInfo.State)" @key="contributionInfo.Contribution.Id">
+                <ContributionDisplay Contribution="contributionInfo.Contribution" />
+            </div>
 
-			if (contributionInfo.State == ContributionState.Add)
-				contributionInfo.State = ContributionState.Unchanged;
-		}
-	</div>
+            if (contributionInfo.State == ContributionState.Add)
+                contributionInfo.State = ContributionState.Unchanged;
+        }
+    </div>
 </div>
 
 @code {
 
-	private bool _IsInitialized;
+    private bool _IsInitialized;
 
-	private readonly FeedBuffer<ContributionInfo> _Contributions = new FeedBuffer<ContributionInfo>(101);
+    private readonly FeedBuffer<ContributionInfo> _Contributions = new FeedBuffer<ContributionInfo>(101);
 
-	private HubConnection? _ContributionsHubConnection;
+    private HubConnection? _ContributionsHubConnection;
 
-	private bool _Disposed;
+    private bool _Disposed;
 
-	protected override async Task OnInitializedAsync()
-	{
-		await InitializeContributions();
-		_IsInitialized = true;
-	}
+    protected override async Task OnInitializedAsync()
+    {
+        await InitializeContributions();
+        _IsInitialized = true;
+    }
 
-	protected override async Task OnAfterRenderAsync(bool firstRender)
-	{
-		if (firstRender)
-		{
-			await SetUpHubConnection();
-		}
-	}
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await SetUpHubConnection();
+        }
+    }
 
-	private async Task InitializeContributions()
-	{
-		GetContributionsParameters parameters = new GetContributionsParameters
-		{
-			Limit = 100,
-		};
-		ContributionsPage contributionsPage = await DistagsApi.GetContributionsAsync(parameters);
-		int startIndex = Math.Min(_Contributions.Capacity, contributionsPage.Contributions.Count) - 1;
-		for (int i = startIndex; i >= 0; i--)
-		{
-			ContributionDto contribution = contributionsPage.Contributions[i];
-			_Contributions.Push(new ContributionInfo(contribution));
-		}
-	}
+    private async Task InitializeContributions()
+    {
+        GetContributionsRequest request = new GetContributionsRequest
+        {
+            Limit = 100,
+        };
+        ContributionsPageResponse contributionsPage = await DistagsApi.GetContributionsAsync(request);
+        int startIndex = Math.Min(_Contributions.Capacity, contributionsPage.Contributions.Count) - 1;
+        for (int i = startIndex; i >= 0; i--)
+        {
+            ContributionResponse contribution = contributionsPage.Contributions[i];
+            _Contributions.Push(new ContributionInfo(contribution));
+        }
+    }
 
-	private async Task SetUpHubConnection()
-	{
-		_ContributionsHubConnection = new HubConnectionBuilder()
-			.WithUrl(DistagsApi.ContributionHubEndpoint, options =>
-			{
-				options.Headers.Add(
-					HeaderNames.Authorization,
-					$"{DistagsApiConstants.AuthorizationHeaderSchemes.SessionToken} {SessionTokenProvider.SessionToken}");
-			})
-			.WithAutomaticReconnect()
-			.Build();
+    private async Task SetUpHubConnection()
+    {
+        _ContributionsHubConnection = new HubConnectionBuilder()
+            .WithUrl(DistagsApi.ContributionHubEndpoint, options =>
+            {
+                options.Headers.Add(
+                    HeaderNames.Authorization,
+                    $"{DistagsApiConstants.AuthorizationHeaderSchemes.SessionToken} {SessionTokenProvider.SessionToken}");
+            })
+            .WithAutomaticReconnect()
+            .Build();
 
-		_ContributionsHubConnection.On<ContributionDto>("NewContribution", ProcessNewContribution);
+        _ContributionsHubConnection.On<ContributionResponse>("NewContribution", ProcessNewContribution);
 
-		await _ContributionsHubConnection.StartAsync();
-	}
+        await _ContributionsHubConnection.StartAsync();
+    }
 
-	private async Task ProcessNewContribution(ContributionDto contribution)
-	{
-		await InvokeAsync(() =>
-		{
-			ContributionInfo contributionInfo = new ContributionInfo(contribution, ContributionState.Add);
-			_Contributions.Push(contributionInfo);
-			if (_Contributions.Count == _Contributions.Capacity)
-				_Contributions.LastOrDefault()!.State = ContributionState.Remove;
+    private async Task ProcessNewContribution(ContributionResponse contribution)
+    {
+        await InvokeAsync(() =>
+        {
+            ContributionInfo contributionInfo = new ContributionInfo(contribution, ContributionState.Add);
+            _Contributions.Push(contributionInfo);
+            if (_Contributions.Count == _Contributions.Capacity)
+                _Contributions.LastOrDefault()!.State = ContributionState.Remove;
 
-			StateHasChanged();
-		});
-	}
+            StateHasChanged();
+        });
+    }
 
-	private string GetAnimationClass(ContributionState contributionState)
-	{
-		return contributionState switch
-		{
-			ContributionState.Add => "slide-in",
-			ContributionState.Remove => "slide-out",
-			_ => string.Empty,
-		};
-	}
+    private string GetAnimationClass(ContributionState contributionState)
+    {
+        return contributionState switch
+        {
+            ContributionState.Add => "slide-in",
+            ContributionState.Remove => "slide-out",
+            _ => string.Empty,
+        };
+    }
 
-	public async ValueTask DisposeAsync()
-	{
-		if (_Disposed)
-			return;
+    public async ValueTask DisposeAsync()
+    {
+        if (_Disposed)
+            return;
 
-		if (_ContributionsHubConnection != null)
-			await _ContributionsHubConnection.DisposeAsync();
+        if (_ContributionsHubConnection != null)
+            await _ContributionsHubConnection.DisposeAsync();
 
-		_Disposed = true;
-	}
+        _Disposed = true;
+    }
 
-	private class ContributionInfo
-	{
-		public ContributionDto Contribution { get; }
+    private class ContributionInfo
+    {
+        public ContributionResponse Contribution { get; }
 
-		public ContributionState State { get; set; }
+        public ContributionState State { get; set; }
 
-		public ContributionInfo(ContributionDto contribution, ContributionState state = ContributionState.Unchanged)
-		{
-			Contribution = contribution;
-			State = state;
-		}
-	}
+        public ContributionInfo(ContributionResponse contribution, ContributionState state = ContributionState.Unchanged)
+        {
+            Contribution = contribution;
+            State = state;
+        }
+    }
 
-	private enum ContributionState
-	{
-		Add,
-		Unchanged,
-		Remove,
-	}
+    private enum ContributionState
+    {
+        Add,
+        Unchanged,
+        Remove,
+    }
 
 }

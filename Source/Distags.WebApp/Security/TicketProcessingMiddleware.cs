@@ -16,7 +16,7 @@ public class TicketProcessingMiddleware
         _Logger = logger;
     }
 
-    public async Task InvokeAsync(HttpContext httpContext, DistagsApiClient levelTagApi)
+    public async Task InvokeAsync(HttpContext httpContext, DistagsApiClient distagsApi)
     {
         if (!httpContext.Request.Query.TryGetValue(DistagsApiConstants.TicketQueryParameterName, out StringValues ticketValue))
         {
@@ -27,7 +27,7 @@ public class TicketProcessingMiddleware
         try
         {
             string ticket = ticketValue.ToString();
-            SessionResponse sessionResponse = await levelTagApi.PostRedeemTicketAsync(ticket);
+            SessionResponse sessionResponse = await distagsApi.PostRedeemTicketAsync(ticket);
 
             httpContext.Response.Cookies.Append(Constants.SessionTokenCookieName, sessionResponse.Token, new CookieOptions
             {

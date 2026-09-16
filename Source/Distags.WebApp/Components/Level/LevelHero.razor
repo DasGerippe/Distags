@@ -1,33 +1,49 @@
-﻿@using Distags.Contracts
+@using Distags.Api.Contracts.Levels
+@using Distags.WebApp.Services
+
+@inject LevelUrlProvider LevelUrlProvider
+@inject LevelCreatorNameProvider LevelCreatorNameProvider
 
 <div class="hero shadow py-3">
-	<div class="hero-background" style="background-image: url('@Level.ImageUrl');"></div>
-	<div class="container-fluid content-wide">
-		<div class="d-flex flex-column align-items-center">
+    <div class="hero-background" style="background-image: url('@_LevelImageUrl');"></div>
+    <div class="container-fluid content-wide">
+        <div class="d-flex flex-column align-items-center">
 
-			<img src="@Level.ImageUrl"
-			     alt="Level Preview Image"
-			     class="img-fluid w-100 rounded-4 shadow mb-3"
-			     style="max-width:480px;"/>
+            <img src="@_LevelImageUrl"
+                 alt="Level Preview Image"
+                 class="img-fluid w-100 rounded-4 shadow mb-3"
+                 style="max-width:480px;"/>
 
-			<div class="d-flex align-items-baseline w-100 display-6 justify-content-center">
-				<h1 class="fw-bold text-truncate">@Level.Name</h1>
-				<a class="ms-2" href="https://steamcommunity.com/sharedfiles/filedetails/?id=@Level.Id">
-					<svg style="color: #1e3050; width: 1.5em; height: 1.5em;">
-						<use href="icons.svg#steam-solid"/>
-					</svg>
-				</a>
-			</div>
+            <div class="d-flex align-items-baseline w-100 display-6 justify-content-center">
+                <h1 class="fw-bold text-truncate">@Level.Name</h1>
+                @if (Level is WorkshopLevelResponse workshopLevel)
+                {
+                    <a class="ms-2" href="https://steamcommunity.com/sharedfiles/filedetails/?id=@(workshopLevel.WorkshopId)">
+                        <svg style="color: #1e3050; width: 1.5em; height: 1.5em;">
+                            <use href="icons.svg#steam-solid"/>
+                        </svg>
+                    </a>
+                }
+            </div>
 
-			<p class="lead text-muted mb-0">@Level.CreatorName</p>
+            <p class="lead text-muted mb-0">@_CreatorName</p>
 
-		</div>
-	</div>
+        </div>
+    </div>
 </div>
 
 @code {
-	
-	[Parameter]
-	public required LevelDto Level { get; set; }
+
+    private string _LevelImageUrl = string.Empty;
+    private string _CreatorName = string.Empty;
+
+    [Parameter]
+    public required LevelResponse Level { get; set; }
+
+    protected override void OnParametersSet()
+    {
+        _LevelImageUrl = LevelUrlProvider.GetLevelImageUrl(Level);
+        _CreatorName = LevelCreatorNameProvider.GetCreatorName(Level);
+    }
 
 }

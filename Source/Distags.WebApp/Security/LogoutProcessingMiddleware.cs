@@ -15,7 +15,7 @@ public class LogoutProcessingMiddleware
         _Logger = logger;
     }
 
-    public async Task InvokeAsync(HttpContext httpContext, DistagsApiClient levelTagApi)
+    public async Task InvokeAsync(HttpContext httpContext, DistagsApiClient distagsApi)
     {
         if (!httpContext.Request.Query.TryGetValue(Constants.LogoutQueryParameterName, out StringValues logoutValue))
         {
@@ -25,7 +25,7 @@ public class LogoutProcessingMiddleware
 
         try
         {
-            await PerformLogout(levelTagApi, logoutValue.ToString());
+            await PerformLogout(distagsApi, logoutValue.ToString());
             DeleteSessionTokenCookie(httpContext);
         }
         catch (HttpRequestException httpRequestEx) when (httpRequestEx.StatusCode == HttpStatusCode.Unauthorized)
@@ -44,12 +44,12 @@ public class LogoutProcessingMiddleware
         httpContext.Response.Redirect(redirectUrl);
     }
 
-    private Task PerformLogout(DistagsApiClient levelTagApi, string logoutValue)
+    private Task PerformLogout(DistagsApiClient distagsApi, string logoutValue)
     {
         return logoutValue switch
         {
-            Constants.LogoutAllQueryParameterValue => levelTagApi.PostLogoutAll(),
-            _ => levelTagApi.PostLogout(),
+            Constants.LogoutAllQueryParameterValue => distagsApi.PostLogoutAllAsync(),
+            _ => distagsApi.PostLogoutAsync(),
         };
     }
 

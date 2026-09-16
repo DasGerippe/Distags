@@ -29,14 +29,16 @@ public class Program
 
             builder.Services.AddHttpClient<DistagsApiClient>(httpClient =>
             {
-                string levelTagApiUri = builder.Configuration["DistagsWebApp:DistagsApiUri"]!;
-                httpClient.BaseAddress = new Uri(levelTagApiUri);
+                string distagsApiUri = builder.Configuration["DistagsWebApp:DistagsApiUri"]!;
+                httpClient.BaseAddress = new Uri(distagsApiUri);
             });
 
             builder.Services.AddLocalization();
             builder.Services.AddHttpContextAccessor();
 
             builder.Services.AddTransient<HistoryManager>();
+            builder.Services.AddTransient<LevelUrlProvider>();
+            builder.Services.AddTransient<LevelCreatorNameProvider>();
 
             builder.Services.AddScoped<CircuitHandler, CircuitSessionTokenInitializer>();
             builder.Services.AddScoped<ISessionTokenProvider, SessionTokenProvider>();

@@ -1,75 +1,75 @@
-﻿<nav>
-	<ul class="pagination pagination-sm justify-content-center py-3">
-		<li class="page-item @GetPageItemClass(CurrentPage - 1)">
-			<button class="page-link" @onclick="() => OnPageLinkClicked(CurrentPage - 1)">
-				<svg style="width: 1rem; height: 1rem;">
-					<use href="icons.svg#angle-left"/>
-				</svg>
-			</button>
-		</li>
+<nav>
+    <ul class="pagination pagination-sm justify-content-center py-3">
+        <li class="page-item @GetPageItemClass(CurrentPage - 1)">
+            <button class="page-link" @onclick="() => OnPageLinkClicked(CurrentPage - 1)">
+                <svg style="width: 1rem; height: 1rem;">
+                    <use href="icons.svg#angle-left"/>
+                </svg>
+            </button>
+        </li>
 
-		@{
-			bool lowerGapCreated = false;
-			bool upperGapCreated = false;
-		}
+        @{
+            bool lowerGapCreated = false;
+            bool upperGapCreated = false;
+        }
 
-		@for (int i = 1; i <= PageCount; i++)
-		{
-			if (i == 1 || i == PageCount || Math.Abs(CurrentPage - i) <= 1)
-			{
-				int pageNumber = i;
+        @for (int i = 1; i <= PageCount; i++)
+        {
+            if (i == 1 || i == PageCount || Math.Abs(CurrentPage - i) <= 1)
+            {
+                int pageNumber = i;
 
-				<li class="page-item @GetPageItemClass(i)">
-					<button class="page-link" @onclick="() => OnPageLinkClicked(pageNumber)">@i</button>
-				</li>
-			}
-			else if (i < CurrentPage && !lowerGapCreated || i > CurrentPage && !upperGapCreated)
-			{
-				<li class="page-item"><span class="page-link" style="cursor:default;">...</span></li>
+                <li class="page-item @GetPageItemClass(i)">
+                    <button class="page-link" @onclick="() => OnPageLinkClicked(pageNumber)">@i</button>
+                </li>
+            }
+            else if (i < CurrentPage && !lowerGapCreated || i > CurrentPage && !upperGapCreated)
+            {
+                <li class="page-item"><span class="page-link" style="cursor:default;">...</span></li>
 
-				@if (i < CurrentPage)
-					lowerGapCreated = true;
-				else
-					upperGapCreated = true;
-			}
-		}
+                @if (i < CurrentPage)
+                    lowerGapCreated = true;
+                else
+                    upperGapCreated = true;
+            }
+        }
 
-		<li class="page-item @GetPageItemClass(CurrentPage + 1)">
-			<button class="page-link" @onclick="() => OnPageLinkClicked(CurrentPage + 1)">
-				<svg style="width: 1rem; height: 1rem;">
-					<use href="icons.svg#angle-right" />
-				</svg>
-			</button>
-		</li>
-	</ul>
+        <li class="page-item @GetPageItemClass(CurrentPage + 1)">
+            <button class="page-link" @onclick="() => OnPageLinkClicked(CurrentPage + 1)">
+                <svg style="width: 1rem; height: 1rem;">
+                    <use href="icons.svg#angle-right" />
+                </svg>
+            </button>
+        </li>
+    </ul>
 </nav>
 
 @code {
 
-	[Parameter]
-	public int PageCount { get; set; } = 1;
+    [Parameter]
+    public int PageCount { get; set; } = 1;
 
-	[Parameter]
-	public int CurrentPage { get; set; } = 1;
+    [Parameter]
+    public int CurrentPage { get; set; } = 1;
 
-	[Parameter]
-	public EventCallback<int> CurrentPageChanged { get; set; }
+    [Parameter]
+    public EventCallback<int> CurrentPageChanged { get; set; }
 
-	private string GetPageItemClass(int page)
-	{
-		if (page == CurrentPage)
-			return "active";
+    private string GetPageItemClass(int page)
+    {
+        if (page == CurrentPage)
+            return "active";
 
-		if (page < 1 || page > PageCount)
-			return "disabled";
+        if (page < 1 || page > PageCount)
+            return "disabled";
 
-		return string.Empty;
-	}
+        return string.Empty;
+    }
 
-	private async Task OnPageLinkClicked(int page)
-	{
-		CurrentPage = page;
-		await CurrentPageChanged.InvokeAsync(page);
-	}
+    private async Task OnPageLinkClicked(int page)
+    {
+        CurrentPage = page;
+        await CurrentPageChanged.InvokeAsync(page);
+    }
 
 }

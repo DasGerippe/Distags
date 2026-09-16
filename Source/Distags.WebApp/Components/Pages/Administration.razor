@@ -1,14 +1,14 @@
-﻿@page "/admin"
+@page "/admin"
 @rendermode InteractiveServer
 
 @using Distags.Api.Contracts.Configuration
-@using Distags.Contracts
+@using Distags.Api.Contracts.Users
 @using Distags.WebApp.Security
 @using Distags.WebApp.Services
 
 @inject IUserInfoProvider UserInfoProvider
 @inject NavigationManager NavigationManager
-@inject DistagsApiClient LevelTagApi
+@inject DistagsApiClient DistagsApi
 
 <PageTitle>@Resource.PageTitle_Administration</PageTitle>
 
@@ -33,7 +33,7 @@
 
 @code {
 
-    private UserDto? _User;
+    private UserResponse? _User;
 
     private bool _MaintenanceActive;
 
@@ -46,7 +46,7 @@
             return;
         }
 
-        ConfigurationDto configuration = await LevelTagApi.GetApiStateAsync();
+        ConfigurationResponse configuration = await DistagsApi.GetApiStateAsync();
         _MaintenanceActive = configuration.MaintenanceActive;
     }
 
@@ -55,11 +55,11 @@
         if (args.Value is not bool maintenanceActive)
             return;
 
-        PatchConfigurationParameters parameters = new PatchConfigurationParameters
+        PatchConfigurationRequest request = new PatchConfigurationRequest
         {
             MaintenanceActive = maintenanceActive,
         };
-        await LevelTagApi.PatchConfigurationAsync(parameters);
+        await DistagsApi.PatchConfigurationAsync(request);
         _MaintenanceActive = maintenanceActive;
     }
 

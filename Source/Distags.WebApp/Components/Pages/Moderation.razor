@@ -1,7 +1,7 @@
-﻿@page "/moderation"
+@page "/moderation"
 @rendermode InteractiveServer
 
-@using Distags.Contracts
+@using Distags.Api.Contracts.Users
 @using Distags.WebApp.Components.Contribution
 @using Distags.WebApp.Components.Dialogs
 @using Distags.WebApp.Security
@@ -22,7 +22,7 @@
 
 @code {
 
-    private UserDto? _User;
+    private UserResponse? _User;
 
     protected override async Task OnInitializedAsync()
     {

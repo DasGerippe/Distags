@@ -1,6 +1,6 @@
-﻿@using Distags.Api.Contracts
+@using Distags.Api.Contracts
 @using Distags.Api.Contracts.Contributions
-@using Distags.Contracts
+@using Distags.Api.Contracts.Levels
 @using Distags.WebApp.Components.Dialogs
 @using Distags.WebApp.Security
 @using Distags.WebApp.Services
@@ -13,7 +13,7 @@
 @inject IDialogService DialogService
 
 <InfiniteScrollContainer OnScrolledToEnd="OnScrolledToEnd" class="d-flex flex-column gap-3 gap-md-2 py-3">
-    @foreach (ContributionDto contribution in Contributions)
+    @foreach (ContributionResponse contribution in Contributions)
     {
         <ContributionDisplay @key="contribution.Id"
                              Contribution="contribution"
@@ -30,17 +30,17 @@
     private bool _IsLoadingNextBatch;
     private bool _CachedAllContributions;
 
-    private readonly List<ContributionDto> _LiveContributions = [];
-    private readonly List<ContributionDto> _CachedContributions = [];
+    private readonly List<ContributionResponse> _LiveContributions = [];
+    private readonly List<ContributionResponse> _CachedContributions = [];
 
-    private ContributionLevelDto? _LevelFilter;
-    private ContributionUserDto? _UserFilter;
+    private LevelResponse? _LevelFilter;
+    private ContributionUserResponse? _UserFilter;
 
     private HubConnection? _ContributionsHubConnection;
 
     private bool _Disposed;
 
-    private IEnumerable<ContributionDto> Contributions
+    private IEnumerable<ContributionResponse> Contributions
     {
         get
         {
@@ -49,7 +49,7 @@
                 yield return _LiveContributions[i];
             }
 
-            foreach (ContributionDto cachedContribution in _CachedContributions)
+            foreach (ContributionResponse cachedContribution in _CachedContributions)
             {
                 yield return cachedContribution;
             }
@@ -120,16 +120,16 @@
             .WithAutomaticReconnect()
             .Build();
 
-        _ContributionsHubConnection.On<ContributionDto>("NewContribution", ProcessNewContribution);
+        _ContributionsHubConnection.On<ContributionResponse>("NewContribution", ProcessNewContribution);
 
         await _ContributionsHubConnection.StartAsync();
     }
 
-    private async Task ProcessNewContribution(ContributionDto contribution)
+    private async Task ProcessNewContribution(ContributionResponse contribution)
     {
         await InvokeAsync(() =>
         {
-            if ((_LevelFilter != null && _LevelFilter.Id != contribution.Level.Id) ||
+            if ((_LevelFilter != null && _LevelFilter.Key != contribution.Level.Key) ||
                 (_UserFilter != null && _UserFilter.SteamId != contribution.User?.SteamId))
                 return;
 
@@ -151,14 +151,15 @@
             : null;
 
         const int batchSize = 100;
-        GetContributionsParameters parameters = new GetContributionsParameters
+        GetContributionsRequest request = new GetContributionsRequest
         {
             Limit = batchSize,
             ContributedBefore = contributedBeforeFilter,
-            LevelId = _LevelFilter?.Id,
+            LevelSlug = (_LevelFilter as OfficialLevelResponse)?.Slug,
+            LevelWorkshopId = (_LevelFilter as WorkshopLevelResponse)?.WorkshopId,
             UserSteamId = _UserFilter?.SteamId,
         };
-        ContributionsPage contributionsPage = await DistagsApi.GetContributionsAsync(parameters);
+        ContributionsPageResponse contributionsPage = await DistagsApi.GetContributionsAsync(request);
 
         _CachedContributions.AddRange(contributionsPage.Contributions);
         if (contributionsPage.Contributions.Count < batchSize)
@@ -168,13 +169,13 @@
         await InvokeAsync(StateHasChanged);
     }
 
-    private Task ContributionDisplayOnLevelFilterClicked(ContributionLevelDto level)
+    private Task ContributionDisplayOnLevelFilterClicked(LevelResponse level)
     {
-        _LevelFilter = _LevelFilter?.Id != level.Id ? level : null;
+        _LevelFilter = _LevelFilter?.Key != level.Key ? level : null;
         return ResetContributions();
     }
 
-    private Task ContributionDisplayOnUserFilterClicked(ContributionUserDto user)
+    private Task ContributionDisplayOnUserFilterClicked(ContributionUserResponse user)
     {
         _UserFilter = _UserFilter?.SteamId != user.SteamId ? user : null;
         return ResetContributions();

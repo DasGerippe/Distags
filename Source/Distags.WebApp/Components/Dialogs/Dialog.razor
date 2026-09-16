@@ -1,31 +1,31 @@
-﻿<div class="modal fade" id="@Id" tabindex="-1" aria-hidden="true">
-	<div class="modal-dialog modal-dialog-centered">
-		<div class="modal-content">
-			<div class="modal-header">
-				@Header
-			</div>
-			<div class="modal-body">
-				@Body
-			</div>
-			<div class="modal-footer">
-				@Footer
-			</div>
-		</div>
-	</div>
+<div class="modal fade" id="@Id" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                @Header
+            </div>
+            <div class="modal-body">
+                @Body
+            </div>
+            <div class="modal-footer">
+                @Footer
+            </div>
+        </div>
+    </div>
 </div>
 
 @code {
-	
-	[Parameter]
-	public required string Id { get; set; }
+    
+    [Parameter]
+    public required string Id { get; set; }
 
-	[Parameter]
-	public required RenderFragment Header { get; set; }
+    [Parameter]
+    public required RenderFragment Header { get; set; }
 
-	[Parameter]
-	public required RenderFragment Body { get; set; }
+    [Parameter]
+    public required RenderFragment Body { get; set; }
 
-	[Parameter]
-	public required RenderFragment Footer { get; set; }
+    [Parameter]
+    public required RenderFragment Footer { get; set; }
 
 }

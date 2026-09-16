@@ -1,51 +1,69 @@
-﻿@using Distags.Contracts
+@using Distags.Api.Contracts.Levels
+@using Distags.WebApp.Services
+
+@inject LevelUrlProvider LevelUrlProvider
+@inject LevelCreatorNameProvider LevelCreatorNameProvider
 
 <div class="d-flex align-items-center rounded-2 shadow-sm text-truncate" style="background-color: #ccdffb;">
 
     <!-- Level Image -->
     <div class="d-flex align-items-center justify-content-center rounded-2" style="min-width:160px;min-height:90px;">
-        <a href="level/@Level.Id">
-            <img src="@Level.ImageUrl" alt="Level Image" class="rounded-2" style="max-height:90px;" />
+        <a href="@_LevelUrlRelative">
+            <img src="@_LevelImageUrl" alt="Level Image" class="rounded-2" style="max-height:90px;" />
         </a>
     </div>
 
     <!-- Level Info -->
     <div class="d-flex flex-column w-100 p-2 text-truncate">
-        
+
         <!-- Name and Author -->
         <div class="d-flex flex-column text-truncate">
             <div class="text-truncate" style="font-size: 1.15rem;">@Level.Name</div>
-            <div class="text-truncate text-muted small">@Level.CreatorName</div>
+            <div class="text-truncate text-muted small">@_CreatorName</div>
         </div>
-        
-        <div class="d-flex justify-content-between align-items-end">
-            
-            <!-- Dates -->
-            <div class="d-flex flex-column flex-sm-row flex-md-column flex-lg-row gap-sm-3 gap-0 gap-md-0 gap-lg-3 text-truncate">
-                <div class="text-truncate small text-muted">
-                    <i class="bi bi-upload" style="font-size: 1rem;"></i>
-                    @Level.CreatedOn.ToApproximateString()
-                </div>
-                <div class="text-truncate small text-muted">
-                    <i class="bi bi-arrow-repeat" style="font-size: 1rem;"></i>
-                    @Level.UpdatedOn.ToApproximateString()
-                </div>
-            </div>
-            
-            <!-- Steam Link -->
-            <a href="https://steamcommunity.com/sharedfiles/filedetails/?id=@Level.Id" target="_blank" style="line-height: 0;">
-                <i class="bi bi-steam" style="font-size: 2rem; color: #080808;"></i>
-            </a>
 
-        </div>
+        @if (Level is WorkshopLevelResponse workshopLevel)
+        {
+            <div class="d-flex justify-content-between align-items-end">
+
+                <!-- Dates -->
+                <div class="d-flex flex-column flex-sm-row flex-md-column flex-lg-row gap-sm-3 gap-0 gap-md-0 gap-lg-3 text-truncate">
+                    <div class="text-truncate small text-muted">
+                        <i class="bi bi-upload" style="font-size: 1rem;"></i>
+                        @workshopLevel.CreatedOn.ToApproximateString()
+                    </div>
+                    <div class="text-truncate small text-muted">
+                        <i class="bi bi-arrow-repeat" style="font-size: 1rem;"></i>
+                        @workshopLevel.UpdatedOn.ToApproximateString()
+                    </div>
+                </div>
+
+                <!-- Steam Link -->
+                <a href="https://steamcommunity.com/sharedfiles/filedetails/?id=@(workshopLevel.WorkshopId)" target="_blank" style="line-height: 0;">
+                    <i class="bi bi-steam" style="font-size: 2rem; color: #080808;"></i>
+                </a>
+
+            </div>
+        }
 
     </div>
 
 </div>
 
 @code {
-    
+
+    private string _LevelUrlRelative = string.Empty;
+    private string _LevelImageUrl = string.Empty;
+    private string _CreatorName = string.Empty;
+
     [Parameter]
-    public required LevelDto Level { get; set; }
+    public required LevelResponse Level { get; set; }
+
+    protected override void OnParametersSet()
+    {
+        _LevelUrlRelative = LevelUrlProvider.GetLevelUrlRelative(Level);
+        _LevelImageUrl = LevelUrlProvider.GetLevelImageUrl(Level);
+        _CreatorName = LevelCreatorNameProvider.GetCreatorName(Level);
+    }
 
 }

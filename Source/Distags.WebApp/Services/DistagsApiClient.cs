@@ -2,11 +2,13 @@ using Distags.Api.Contracts;
 using Distags.Api.Contracts.Authentication;
 using Distags.Api.Contracts.Configuration;
 using Distags.Api.Contracts.Contributions;
+using Distags.Api.Contracts.DisplayGroups;
 using Distags.Api.Contracts.Guidelines;
 using Distags.Api.Contracts.Levels;
+using Distags.Api.Contracts.LogicGroups;
+using Distags.Api.Contracts.Tags;
 using Distags.Api.Contracts.UserBans;
 using Distags.Api.Contracts.Users;
-using Distags.Contracts;
 using Distags.WebApp.Security;
 using HttpUtils;
 using System.Net.Http.Headers;
@@ -62,56 +64,69 @@ public class DistagsApiClient : IDisposable
             : null;
     }
 
-    public async Task<List<DisplayGroupDto>> GetDisplayGroupsAsync(CancellationToken cancellationToken = default)
+    public async Task<List<DisplayGroupResponse>> GetDisplayGroupsAsync(CancellationToken cancellationToken = default)
     {
-        HttpResponseMessage responseMessage = await _HttpClient.GetAsync("DisplayGroups", cancellationToken).ConfigureAwait(false);
-        List<DisplayGroupDto> displayGroups = await GetContentAsync<List<DisplayGroupDto>>(responseMessage, cancellationToken).ConfigureAwait(false);
+        HttpResponseMessage responseMessage = await _HttpClient.GetAsync("displaygroups", cancellationToken).ConfigureAwait(false);
+        List<DisplayGroupResponse> displayGroups = await GetContentAsync<List<DisplayGroupResponse>>(responseMessage, cancellationToken).ConfigureAwait(false);
         return displayGroups;
     }
 
-    public async Task<List<LogicGroupDto>> GetLogicGroupsAsync(CancellationToken cancellationToken = default)
+    public async Task<List<LogicGroupResponse>> GetLogicGroupsAsync(CancellationToken cancellationToken = default)
     {
-        HttpResponseMessage responseMessage = await _HttpClient.GetAsync("LogicGroups", cancellationToken).ConfigureAwait(false);
-        List<LogicGroupDto> logicGroups = await GetContentAsync<List<LogicGroupDto>>(responseMessage, cancellationToken).ConfigureAwait(false);
+        HttpResponseMessage responseMessage = await _HttpClient.GetAsync("logicgroups", cancellationToken).ConfigureAwait(false);
+        List<LogicGroupResponse> logicGroups = await GetContentAsync<List<LogicGroupResponse>>(responseMessage, cancellationToken).ConfigureAwait(false);
         return logicGroups;
     }
 
-    public async Task<List<TagDto>> GetTagsAsync(CancellationToken cancellationToken = default)
+    public async Task<List<TagResponse>> GetTagsAsync(CancellationToken cancellationToken = default)
     {
-        HttpResponseMessage responseMessage = await _HttpClient.GetAsync("Tags", cancellationToken).ConfigureAwait(false);
-        List<TagDto> logicGroups = await GetContentAsync<List<TagDto>>(responseMessage, cancellationToken).ConfigureAwait(false);
-        return logicGroups;
+        HttpResponseMessage responseMessage = await _HttpClient.GetAsync("tags", cancellationToken).ConfigureAwait(false);
+        List<TagResponse> tags = await GetContentAsync<List<TagResponse>>(responseMessage, cancellationToken).ConfigureAwait(false);
+        return tags;
     }
 
-    public async Task<LevelsPage> BrowseLevelsAsync(
-        BrowseLevelsParameters parameters, CancellationToken cancellationToken = default)
+    public async Task<LevelsPageResponse> BrowseLevelsAsync(
+        BrowseLevelsRequest request, CancellationToken cancellationToken = default)
     {
-        string query = QueryBuilder.BuildQueryString(parameters);
+        string query = QueryBuilder.BuildQueryString(request);
         string requestUri = $"levels?{query}";
 
         HttpResponseMessage responseMessage = await _HttpClient.GetAsync(requestUri, cancellationToken).ConfigureAwait(false);
-        LevelsPage levelsResponse = await GetContentAsync<LevelsPage>(responseMessage, cancellationToken).ConfigureAwait(false);
-        return levelsResponse;
+        LevelsPageResponse levelsPage = await GetContentAsync<LevelsPageResponse>(responseMessage, cancellationToken).ConfigureAwait(false);
+        return levelsPage;
     }
 
-    public async Task<LevelDto?> GetLevelAsync(long levelId, CancellationToken cancellationToken = default)
+    public async Task<OfficialLevelResponse> GetOfficialLevelAsync(string levelSlug, CancellationToken cancellationToken = default)
     {
-        string requestUri = $"levels/{levelId}";
+        string requestUri = $"levels/official/{levelSlug}";
         HttpResponseMessage responseMessage = await _HttpClient.GetAsync(requestUri, cancellationToken).ConfigureAwait(false);
-        LevelDto level = await GetContentAsync<LevelDto>(responseMessage, cancellationToken).ConfigureAwait(false);
+        OfficialLevelResponse level = await GetContentAsync<OfficialLevelResponse>(responseMessage, cancellationToken).ConfigureAwait(false);
         return level;
     }
 
-    public Task PostLevelTag(long levelId, string tagName, CancellationToken cancellationToken = default)
+    public async Task<WorkshopLevelResponse> GetWorkshopLevelAsync(long levelWorkshopId, CancellationToken cancellationToken = default)
     {
-        string requestUri = $"levels/{levelId}/tags/{tagName}";
+        string requestUri = $"levels/workshop/{levelWorkshopId}";
+        HttpResponseMessage responseMessage = await _HttpClient.GetAsync(requestUri, cancellationToken).ConfigureAwait(false);
+        WorkshopLevelResponse level = await GetContentAsync<WorkshopLevelResponse>(responseMessage, cancellationToken).ConfigureAwait(false);
+        return level;
+    }
+
+    public Task PutLevelTagAsync(LevelResponse level, string tagName, CancellationToken cancellationToken = default)
+    {
+        string requestUri = GetLevelTagUri(level, tagName);
         return _HttpClient.PutAsync(requestUri, null, cancellationToken);
     }
 
-    public Task DeleteLevelTag(long levelId, string tagName, CancellationToken cancellationToken = default)
+    public Task DeleteLevelTagAsync(LevelResponse level, string tagName, CancellationToken cancellationToken = default)
     {
-        string requestUri = $"levels/{levelId}/tags/{tagName}";
+        string requestUri = GetLevelTagUri(level, tagName);
         return _HttpClient.DeleteAsync(requestUri, cancellationToken);
+    }
+
+    private string GetLevelTagUri(LevelResponse level, string tagName)
+    {
+        return $"levels/{level.Key}/tags/{tagName}";
     }
 
     public string GetSteamLoginEndpoint(string? returnUrl = null)
@@ -135,91 +150,91 @@ public class DistagsApiClient : IDisposable
         return sessionResponse;
     }
 
-    public async Task ValidateSession(CancellationToken cancellationToken = default)
+    public async Task ValidateSessionAsync(CancellationToken cancellationToken = default)
     {
         string requestUri = "authentication/validate-session";
         HttpResponseMessage responseMessage = await _HttpClient.GetAsync(requestUri, cancellationToken).ConfigureAwait(false);
         responseMessage.EnsureSuccessStatusCode();
     }
 
-    public async Task PostLogout(CancellationToken cancellationToken = default)
+    public async Task PostLogoutAsync(CancellationToken cancellationToken = default)
     {
         string requestUri = "authentication/logout";
         HttpResponseMessage responseMessage = await _HttpClient.PostAsync(requestUri, null, cancellationToken).ConfigureAwait(false);
         responseMessage.EnsureSuccessStatusCode();
     }
 
-    public async Task PostLogoutAll(CancellationToken cancellationToken = default)
+    public async Task PostLogoutAllAsync(CancellationToken cancellationToken = default)
     {
         string requestUri = "authentication/logout-all";
         HttpResponseMessage responseMessage = await _HttpClient.PostAsync(requestUri, null, cancellationToken).ConfigureAwait(false);
         responseMessage.EnsureSuccessStatusCode();
     }
 
-    public async Task<UserDto> GetMe(CancellationToken cancellationToken = default)
+    public async Task<UserResponse> GetMeAsync(CancellationToken cancellationToken = default)
     {
         HttpResponseMessage responseMessage = await _HttpClient.GetAsync("users/me", cancellationToken).ConfigureAwait(false);
-        UserDto user = await GetContentAsync<UserDto>(responseMessage, cancellationToken).ConfigureAwait(false);
+        UserResponse user = await GetContentAsync<UserResponse>(responseMessage, cancellationToken).ConfigureAwait(false);
         return user;
     }
 
-    public async Task PatchUserSettingsAsync(PatchUserSettingsParameters parameters, CancellationToken cancellationToken = default)
+    public async Task PatchUserSettingsAsync(PatchUserSettingsRequest request, CancellationToken cancellationToken = default)
     {
         string requestUri = "users/me/settings";
         HttpResponseMessage responseMessage =
-            await _HttpClient.PatchAsJsonAsync(requestUri, parameters, _JsonOptions, cancellationToken).ConfigureAwait(false);
+            await _HttpClient.PatchAsJsonAsync(requestUri, request, _JsonOptions, cancellationToken).ConfigureAwait(false);
         responseMessage.EnsureSuccessStatusCode();
     }
 
-    public async Task<ContributionsPage> GetContributionsAsync(
-        GetContributionsParameters parameters, CancellationToken cancellationToken = default)
+    public async Task<ContributionsPageResponse> GetContributionsAsync(
+        GetContributionsRequest request, CancellationToken cancellationToken = default)
     {
-        string query = QueryBuilder.BuildQueryString(parameters);
+        string query = QueryBuilder.BuildQueryString(request);
         string requestUri = $"contributions?{query}";
 
         HttpResponseMessage responseMessage = await _HttpClient.GetAsync(requestUri, cancellationToken).ConfigureAwait(false);
-        ContributionsPage response = await GetContentAsync<ContributionsPage>(responseMessage, cancellationToken).ConfigureAwait(false);
+        ContributionsPageResponse response = await GetContentAsync<ContributionsPageResponse>(responseMessage, cancellationToken).ConfigureAwait(false);
         return response;
     }
 
-    public async Task<HttpResponseMessage> PostUserBan(
-        CreateUserBanDto createUserBanDto, CancellationToken cancellationToken = default)
+    public async Task<HttpResponseMessage> PostUserBanAsync(
+        CreateUserBanRequest request, CancellationToken cancellationToken = default)
     {
-        return await _HttpClient.PostAsJsonAsync("userbans", createUserBanDto, _JsonOptions, cancellationToken).ConfigureAwait(false);
+        return await _HttpClient.PostAsJsonAsync("userbans", request, _JsonOptions, cancellationToken).ConfigureAwait(false);
     }
 
     public async Task<HttpResponseMessage> RevertContributionsAsync(
-        RevertContributionsParameters parameters, CancellationToken cancellationToken = default)
+        RevertContributionsRequest request, CancellationToken cancellationToken = default)
     {
         string requestUri = "contributions/revert";
 
         HttpResponseMessage responseMessage =
-            await _HttpClient.PostAsJsonAsync(requestUri, parameters, _JsonOptions, cancellationToken).ConfigureAwait(false);
+            await _HttpClient.PostAsJsonAsync(requestUri, request, _JsonOptions, cancellationToken).ConfigureAwait(false);
 
         return responseMessage;
     }
 
-    public async Task<GuidelinesDto> GetContributionGuidelinesAsync(CancellationToken cancellationToken = default)
+    public async Task<GuidelinesResponse> GetContributionGuidelinesAsync(CancellationToken cancellationToken = default)
     {
         string requestUri = "guidelines";
         HttpResponseMessage responseMessage = await _HttpClient.GetAsync(requestUri, cancellationToken).ConfigureAwait(false);
-        GuidelinesDto response = await GetContentAsync<GuidelinesDto>(responseMessage, cancellationToken).ConfigureAwait(false);
+        GuidelinesResponse response = await GetContentAsync<GuidelinesResponse>(responseMessage, cancellationToken).ConfigureAwait(false);
         return response;
     }
 
-    public async Task<ConfigurationDto> GetApiStateAsync(CancellationToken cancellationToken = default)
+    public async Task<ConfigurationResponse> GetApiStateAsync(CancellationToken cancellationToken = default)
     {
         string requestUri = "configuration";
         HttpResponseMessage responseMessage = await _HttpClient.GetAsync(requestUri, cancellationToken).ConfigureAwait(false);
-        ConfigurationDto response = await GetContentAsync<ConfigurationDto>(responseMessage, cancellationToken).ConfigureAwait(false);
+        ConfigurationResponse response = await GetContentAsync<ConfigurationResponse>(responseMessage, cancellationToken).ConfigureAwait(false);
         return response;
     }
 
-    public async Task PatchConfigurationAsync(PatchConfigurationParameters parameters, CancellationToken cancellationToken = default)
+    public async Task PatchConfigurationAsync(PatchConfigurationRequest request, CancellationToken cancellationToken = default)
     {
         string requestUri = "configuration";
         HttpResponseMessage responseMessage =
-            await _HttpClient.PatchAsJsonAsync(requestUri, parameters, _JsonOptions, cancellationToken).ConfigureAwait(false);
+            await _HttpClient.PatchAsJsonAsync(requestUri, request, _JsonOptions, cancellationToken).ConfigureAwait(false);
         responseMessage.EnsureSuccessStatusCode();
     }
 
