@@ -3,6 +3,7 @@ using Distags.Core.Interfaces;
 using Distags.Persistence.Filtering;
 using Distags.Persistence.Implementations;
 using Distags.Persistence.Seeding;
+using Distags.Persistence.Seeding.OfficialLevels;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.Extensions.DependencyInjection;
@@ -26,6 +27,7 @@ public static class ServiceCollectionExtensions
         serviceCollection.AddTransient<IStringContainsFilterFactory, StringContainsFilterFactory>();
 
         serviceCollection.AddTransient<DefaultTagProvider>();
+        serviceCollection.AddTransient<OfficialLevelsProvider>();
         serviceCollection.AddTransient<DataSeeder>();
 
         return serviceCollection;

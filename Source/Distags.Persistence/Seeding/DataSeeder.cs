@@ -1,5 +1,8 @@
+using Distags.Core;
+using Distags.Core.Commands.ImportOfficialLevels;
 using Distags.Core.Entities;
 using Distags.Core.Management;
+using Distags.Persistence.Seeding.OfficialLevels;
 using Microsoft.EntityFrameworkCore;
 
 namespace Distags.Persistence.Seeding;
@@ -8,11 +11,19 @@ internal class DataSeeder
 {
     private readonly DefaultTagProvider _DefaultTagProvider;
     private readonly FallbackTagProvider _FallbackTagProvider;
+    private readonly OfficialLevelsProvider _OfficialLevelsProvider;
+    private readonly IRequestDispatcher _RequestDispatcher;
 
-    public DataSeeder(DefaultTagProvider defaultTagProvider, FallbackTagProvider fallbackTagProvider)
+    public DataSeeder(
+        DefaultTagProvider defaultTagProvider,
+        FallbackTagProvider fallbackTagProvider,
+        OfficialLevelsProvider officialLevelsProvider,
+        IRequestDispatcher requestDispatcher)
     {
         _DefaultTagProvider = defaultTagProvider;
         _FallbackTagProvider = fallbackTagProvider;
+        _OfficialLevelsProvider = officialLevelsProvider;
+        _RequestDispatcher = requestDispatcher;
     }
 
     public void Seed(DbContext context, bool dataStoreChanged)
@@ -24,6 +35,7 @@ internal class DataSeeder
     {
         await SeedDefaultGroupsAndTags(context, cancellationToken).ConfigureAwait(false);
         await SeedLevelFallbackTags(context, cancellationToken).ConfigureAwait(false);
+        await SeedOfficialLevelsAsync().ConfigureAwait(false);
     }
 
     private async Task SeedDefaultGroupsAndTags(DbContext context, CancellationToken cancellationToken)
@@ -57,5 +69,14 @@ internal class DataSeeder
         }
 
         await context.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+    }
+
+    private async Task SeedOfficialLevelsAsync()
+    {
+        ImportOfficialLevelsCommand importOfficialLevelsCommand = new ImportOfficialLevelsCommand
+        {
+            ScrapedOfficialLevels = _OfficialLevelsProvider.GetOfficialLevels(),
+        };
+        await _RequestDispatcher.DispatchAsync(importOfficialLevelsCommand).ConfigureAwait(false);
     }
 }
