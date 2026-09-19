@@ -15,6 +15,9 @@ public class LevelFilterFactory : IQueryableFilterFactory<Level, LevelFilterPara
     {
         FilterGroup<Level> levelFilterGroup = new FilterGroup<Level>();
 
+        if (filterParams.Type != null)
+            levelFilterGroup.AddFilter(new SimpleFilter<Level>(level => level.Type == filterParams.Type));
+
         if (filterParams.LevelName != null)
             levelFilterGroup.AddFilter(
                 _StringContainsFilterFactory.CreateFilter<Level>(level => level.Name, filterParams.LevelName));
