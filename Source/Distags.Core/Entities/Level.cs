@@ -10,6 +10,10 @@ public abstract class Level
 
     public LevelType Type { get; private set; }
 
+    public DateTimeOffset RecordCreatedOn { get; set; }
+
+    public DateTimeOffset RecordUpdatedOn { get; set; }
+
     public List<Tag> Tags { get; } = [];
 
     public List<LevelTag> LevelTags { get; } = [];

@@ -2,6 +2,7 @@ using Distags.Core.Filtering;
 using Distags.Core.Interfaces;
 using Distags.Persistence.Filtering;
 using Distags.Persistence.Implementations;
+using Distags.Persistence.Interceptors;
 using Distags.Persistence.Seeding;
 using Distags.Persistence.Seeding.OfficialLevels;
 using Microsoft.EntityFrameworkCore;
@@ -43,6 +44,7 @@ public static class ServiceCollectionExtensions
             options
                 .UseNpgsql(connectionString, ConfigureNpgsqlOptions(npgsqlOptionsAction))
                 .UseSnakeCaseNamingConvention()
+                .AddInterceptors(new LevelAuditInterceptor())
                 .UseSeeding((dbContext, dataStoreChanged) =>
                 {
                     DataSeeder dataSeeder = dbContext.GetService<DataSeeder>();

@@ -202,6 +202,14 @@ namespace Distags.Persistence.Dev
                         .HasColumnType("text")
                         .HasColumnName("name");
 
+                    b.Property<DateTimeOffset>("RecordCreatedOn")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("record_created_on");
+
+                    b.Property<DateTimeOffset>("RecordUpdatedOn")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("record_updated_on");
+
                     b.Property<int>("Type")
                         .HasColumnType("integer")
                         .HasColumnName("type");
