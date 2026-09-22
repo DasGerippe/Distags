@@ -26,6 +26,7 @@ public static class ServiceCollectionExtensions
         serviceCollection.AddTransient<ISequentialLevelActionExecutor, SequentialLevelActionExecutor>();
 
         serviceCollection.AddTransient<IStringContainsFilterFactory, StringContainsFilterFactory>();
+        serviceCollection.AddTransient<IRelationalFilterFactory, RelationalFilterFactory>();
 
         serviceCollection.AddTransient<DefaultTagProvider>();
         serviceCollection.AddTransient<OfficialLevelsProvider>();
