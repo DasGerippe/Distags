@@ -10,10 +10,6 @@ public class LevelFilterParameters
 
     public string? CreatorName { get; set; }
 
-    public DateTimeOffset? CreatedAfter { get; set; }
-
-    public DateTimeOffset? UpdatedAfter { get; set; }
-
     public List<string> IncludeTags { get; set; } = [];
 
     public List<string> ExcludeTags { get; set; } = [];
