@@ -1,4 +1,3 @@
-using Distags.Contracts;
 using System.ComponentModel.DataAnnotations;
 
 namespace Distags.Api.Contracts.Levels;

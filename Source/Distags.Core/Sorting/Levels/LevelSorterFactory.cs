@@ -17,6 +17,10 @@ public class LevelSorterFactory : IQueryableSorterFactory<Level, LevelSortStrate
             LevelSortStrategy.NameDesc => new LevelNameSorter(SortOrder.Descending),
             LevelSortStrategy.CreatorAsc => new LevelCreatorSorter(SortOrder.Ascending),
             LevelSortStrategy.CreatorDesc => new LevelCreatorSorter(SortOrder.Descending),
+            LevelSortStrategy.RecordCreatedAsc => new LevelRecordCreatedOnSorter(SortOrder.Ascending),
+            LevelSortStrategy.RecordCreatedDesc => new LevelRecordCreatedOnSorter(SortOrder.Descending),
+            LevelSortStrategy.RecordUpdatedAsc => new LevelRecordUpdatedOnSorter(SortOrder.Ascending),
+            LevelSortStrategy.RecordUpdatedDesc => new LevelRecordUpdatedOnSorter(SortOrder.Descending),
             _ => throw new ArgumentOutOfRangeException(nameof(sortProperty), sortProperty, null),
         };
     }

@@ -10,4 +10,8 @@ public enum LevelSortStrategy
     NameDesc,
     CreatorAsc,
     CreatorDesc,
+    RecordCreatedAsc,
+    RecordCreatedDesc,
+    RecordUpdatedAsc,
+    RecordUpdatedDesc,
 }

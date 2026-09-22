@@ -25,33 +25,10 @@ public class LevelsController : ControllerBase
         [FromQuery] BrowseLevelsRequest request,
         [FromServices] IRequestDispatcher dispatcher)
     {
-        BrowseLevelsQuery query = new BrowseLevelsQuery
-        {
-            FilterParameters = new LevelFilterParameters
-            {
-                LevelName = request.LevelName,
-                CreatorName = request.CreatorName,
-                IncludeTags = GetNormalizedTagNames(request.IncludeTags),
-                ExcludeTags = GetNormalizedTagNames(request.ExcludeTags),
-            },
-            SortStrategy = request.SortStrategy,
-            PageNumber = request.PageNumber,
-            PageSize = request.PageSize,
-        };
-
+        BrowseLevelsQuery query = BrowseLevelsMapper.Map(request);
         LevelsPage levelsPage = await dispatcher.DispatchAsync(query);
         LevelsPageResponse levelsPageResponse = LevelsPageMapper.Map(levelsPage);
         return Ok(levelsPageResponse);
-    }
-
-    private List<string> GetNormalizedTagNames(string? commaSeparatedTags)
-    {
-        if (string.IsNullOrEmpty(commaSeparatedTags))
-            return [];
-
-        string[] tagNames = commaSeparatedTags.Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
-        List<string> normalizedTagNames = tagNames.Select(tag => tag.ToLowerInvariant()).ToList();
-        return normalizedTagNames;
     }
 
     [HttpGet("official/{levelSlug}")]
