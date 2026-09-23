@@ -40,6 +40,7 @@ public static class ServiceCollectionExtensions
 
         services.AddTransient<IQueryableFilterFactory<Contribution, ContributionFilterParameters>, ContributionFilterFactory>();
         services.AddTransient<IQueryableFilterFactory<Level, LevelFilterParameters>, LevelFilterFactory>();
+        services.AddTransient<IQueryableCursorFilterFactory<Level, LevelSortStrategy>, LevelCursorFilterFactory>();
 
         services.AddTransient<IQueryableSorterFactory<Level, LevelSortStrategy>, LevelSorterFactory>();
 
