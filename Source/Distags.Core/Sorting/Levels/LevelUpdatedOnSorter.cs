@@ -1,16 +1,12 @@
 using Distags.Core.Entities;
-using System.Linq.Expressions;
+using Distags.Core.Expressions;
 
 namespace Distags.Core.Sorting.Levels;
 
-public class LevelUpdatedOnSorter : PropertyQueryableSorter<Level>
+public class LevelUpdatedOnSorter : PropertyQueryableSorter<Level, DateTimeOffset?>
 {
-#nullable disable
-    private static readonly Expression<Func<Level, object>> UpdatedOnSelector =
-        level => level is WorkshopLevel ? ((WorkshopLevel)level).UpdatedOn : default;
-#nullable enable
-
-    public LevelUpdatedOnSorter(SortOrder sortOrder) : base(UpdatedOnSelector, sortOrder)
+    public LevelUpdatedOnSorter(SortOrder sortOrder)
+        : base(LevelExpressions.UpdatedOnSelector, sortOrder)
     {
     }
 }

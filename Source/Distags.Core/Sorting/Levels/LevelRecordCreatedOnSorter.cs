@@ -2,9 +2,10 @@ using Distags.Core.Entities;
 
 namespace Distags.Core.Sorting.Levels;
 
-public class LevelRecordCreatedOnSorter : PropertyQueryableSorter<Level>
+public class LevelRecordCreatedOnSorter : PropertyQueryableSorter<Level, DateTimeOffset>
 {
-    public LevelRecordCreatedOnSorter(SortOrder sortOrder) : base(level => level.RecordCreatedOn, sortOrder)
+    public LevelRecordCreatedOnSorter(SortOrder sortOrder)
+        : base(level => level.RecordCreatedOn, sortOrder)
     {
     }
 

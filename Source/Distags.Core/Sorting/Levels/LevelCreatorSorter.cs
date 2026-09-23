@@ -1,18 +1,12 @@
 using Distags.Core.Entities;
-using System.Linq.Expressions;
+using Distags.Core.Expressions;
 
 namespace Distags.Core.Sorting.Levels;
 
-public class LevelCreatorSorter : PropertyQueryableSorter<Level>
+public class LevelCreatorSorter : PropertyQueryableSorter<Level, string>
 {
-#nullable disable
-    private static readonly Expression<Func<Level, object>> CreatorNameSelector = level =>
-        level is OfficialLevel ? ((OfficialLevel)level).CreatorName
-        : level is WorkshopLevel ? ((WorkshopLevel)level).Creator.Name
-        : null;
-#nullable enable
-
-    public LevelCreatorSorter(SortOrder sortOrder) : base(CreatorNameSelector, sortOrder)
+    public LevelCreatorSorter(SortOrder sortOrder)
+        : base(LevelExpressions.CreatorNameSelector, sortOrder)
     {
     }
 
