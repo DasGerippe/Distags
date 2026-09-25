@@ -6,16 +6,16 @@
         "DOTNET_ENVIRONMENT": "Development"
       }
     },
-    "Run GameMode, MissingLevel": {
+    "Run MaxterCsvImporter": {
       "commandName": "Project",
-      "commandLineArgs": "GameMode MissingLevel",
+      "commandLineArgs": "MaxterCsvImporter",
       "environmentVariables": {
         "DOTNET_ENVIRONMENT": "Development"
       }
     },
-    "Run MaxterCsvImporter": {
+    "Run LevelType, GameMode, MissingLevel": {
       "commandName": "Project",
-      "commandLineArgs": "MaxterCsvImporter",
+      "commandLineArgs": "LevelType GameMode MissingLevel",
       "environmentVariables": {
         "DOTNET_ENVIRONMENT": "Development"
       }
