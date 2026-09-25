@@ -7,8 +7,8 @@
     <ProjectGuid>{521AE58A-10CE-4646-818F-90DCAB8708F4}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Mod.OfficialLevelExport</RootNamespace>
-    <AssemblyName>Mod.OfficialLevelExport</AssemblyName>
+    <RootNamespace>OfficialLevelExport</RootNamespace>
+    <AssemblyName>OfficialLevelExport</AssemblyName>
     <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <Deterministic>true</Deterministic>

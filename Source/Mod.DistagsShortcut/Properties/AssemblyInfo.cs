@@ -1,4 +1,4 @@
-using Mod.DistagsShortcut.Properties;
+using DistagsShortcut.Properties;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;

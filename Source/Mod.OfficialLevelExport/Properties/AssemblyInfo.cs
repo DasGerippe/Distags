@@ -1,4 +1,4 @@
-using Mod.OfficialLevelExport.Properties;
+﻿using OfficialLevelExport.Properties;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;

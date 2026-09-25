@@ -2,7 +2,7 @@ using HarmonyLib;
 using System.Reflection;
 using UnityEngine;
 
-namespace Mod.DistagsShortcut
+namespace DistagsShortcut
 {
     public class FocusedLevelProvider
     {

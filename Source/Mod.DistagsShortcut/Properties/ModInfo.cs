@@ -1,4 +1,4 @@
-namespace Mod.DistagsShortcut.Properties
+namespace DistagsShortcut.Properties
 {
     internal class ModInfo
     {

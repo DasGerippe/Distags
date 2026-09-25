@@ -1,8 +1,8 @@
-using System.Globalization;
+﻿using System.Globalization;
 using System.Text;
 using System.Text.RegularExpressions;
 
-namespace Mod.DistagsShortcut
+namespace DistagsShortcut
 {
     public static class SlugHelper
     {

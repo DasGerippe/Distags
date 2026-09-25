@@ -1,6 +1,6 @@
 using System;
 
-namespace Mod.DistagsShortcut
+namespace DistagsShortcut
 {
     public class UrlOpenerFactory
     {

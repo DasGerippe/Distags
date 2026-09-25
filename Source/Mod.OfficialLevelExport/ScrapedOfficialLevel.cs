@@ -1,4 +1,4 @@
-namespace Mod.OfficialLevelExport
+namespace OfficialLevelExport
 {
     public class ScrapedOfficialLevel
     {

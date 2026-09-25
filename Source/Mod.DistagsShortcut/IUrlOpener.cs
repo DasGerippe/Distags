@@ -1,4 +1,4 @@
-namespace Mod.DistagsShortcut
+namespace DistagsShortcut
 {
     public interface IUrlOpener
     {

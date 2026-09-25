@@ -1,14 +1,14 @@
 using BepInEx;
 using BepInEx.Configuration;
 using BepInEx.Logging;
-using Mod.OfficialLevelExport.Properties;
+using OfficialLevelExport.Properties;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using UnityEngine;
 
-namespace Mod.OfficialLevelExport
+namespace OfficialLevelExport
 {
     [BepInPlugin(ModInfo.Id, ModInfo.Name, ModInfo.Version)]
     public class Plugin : BaseUnityPlugin

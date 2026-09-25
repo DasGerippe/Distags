@@ -1,4 +1,4 @@
-namespace Mod.OfficialLevelExport.Properties
+namespace OfficialLevelExport.Properties
 {
     public class ModInfo
     {
