@@ -53,6 +53,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Mods", "Mods", "{476BA8A1-E
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mod.OfficialLevelExport", "Mod.OfficialLevelExport\Mod.OfficialLevelExport.csproj", "{521AE58A-10CE-4646-818F-90DCAB8708F4}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mod.DistagsShortcut", "Mod.DistagsShortcut\Mod.DistagsShortcut.csproj", "{EE6CBE79-E196-407E-9222-E4BCB1B7976E}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -143,6 +145,10 @@ Global
 		{521AE58A-10CE-4646-818F-90DCAB8708F4}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{521AE58A-10CE-4646-818F-90DCAB8708F4}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{521AE58A-10CE-4646-818F-90DCAB8708F4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{EE6CBE79-E196-407E-9222-E4BCB1B7976E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EE6CBE79-E196-407E-9222-E4BCB1B7976E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EE6CBE79-E196-407E-9222-E4BCB1B7976E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EE6CBE79-E196-407E-9222-E4BCB1B7976E}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -153,6 +159,7 @@ Global
 		{AAD5C861-11E0-4CEE-9B53-40072861A222} = {02EA681E-C7D8-13C7-8484-4AC65E1B71E8}
 		{0ADCCC78-A01F-494C-B38E-38CB1CAF061A} = {02EA681E-C7D8-13C7-8484-4AC65E1B71E8}
 		{521AE58A-10CE-4646-818F-90DCAB8708F4} = {476BA8A1-EB77-4960-9CDB-7F9088D39A4B}
+		{EE6CBE79-E196-407E-9222-E4BCB1B7976E} = {476BA8A1-EB77-4960-9CDB-7F9088D39A4B}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {AA7EDBC3-335C-4567-BF43-795798227B77}

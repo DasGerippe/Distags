@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using System.IO;
 
-namespace Mod.OfficialLevelExport
+namespace OfficialLevelExport
 {
     public class OfficialLevelExporter
     {
