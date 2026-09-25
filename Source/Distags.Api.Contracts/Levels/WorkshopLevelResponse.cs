@@ -1,9 +1,11 @@
 using Distags.Contracts;
+using System.Text.Json.Serialization;
 
 namespace Distags.Api.Contracts.Levels;
 
 public class WorkshopLevelResponse : LevelResponse
 {
+    [JsonIgnore]
     public override LevelType Type => LevelType.Workshop;
 
     public long WorkshopId { get; set; }

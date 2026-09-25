@@ -7,6 +7,7 @@ namespace Distags.Api.Contracts.Levels;
 [JsonDerivedType(typeof(WorkshopLevelResponse), "workshop")]
 public abstract class LevelResponse
 {
+    [JsonIgnore]
     public abstract LevelType Type { get; }
 
     public string Name { get; set; } = string.Empty;
