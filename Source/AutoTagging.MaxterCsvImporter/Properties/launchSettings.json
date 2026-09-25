@@ -1,0 +1,14 @@
+{
+  "profiles": {
+    "AutoTagging.MaxterCsvImporter": {
+      "commandName": "Project"
+    },
+    "Generate Mapping File": {
+      "commandName": "Project",
+      "commandLineArgs": "generate-mapping",
+      "environmentVariables": {
+        "DOTNET_ENVIRONMENT": "Development"
+      }
+    }
+  }
+}

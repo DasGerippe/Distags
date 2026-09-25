@@ -1,5 +1,7 @@
 using CsvHelper;
 using CsvHelper.Configuration;
+using Distags.Contracts;
+using Microsoft.Extensions.Logging;
 using System.Globalization;
 
 namespace AutoTagging.MaxterCsvImporter;
@@ -7,57 +9,83 @@ namespace AutoTagging.MaxterCsvImporter;
 public class MaxterCsvRepository
 {
     private readonly string _CsvPath;
-    private readonly Lazy<IReadOnlyDictionary<long, MaxterCsvRow>> _Rows;
+    private readonly ILogger<MaxterCsvRepository> _Logger;
 
-    public MaxterCsvRepository(string csvPath)
+    private bool _IsInitialized;
+    private Dictionary<string, MaxterCsvRow> _OfficialRows = [];
+    private Dictionary<long, MaxterCsvRow> _WorkshopRows = [];
+
+    public MaxterCsvRepository(string csvPath, ILogger<MaxterCsvRepository> logger)
     {
         _CsvPath = csvPath;
-        _Rows = new Lazy<IReadOnlyDictionary<long, MaxterCsvRow>>(LoadRows);
+        _Logger = logger;
     }
 
-    public MaxterCsvRow? FindRow(long levelId)
+    public MaxterCsvRow? FindRow(LevelDto level)
     {
-        return _Rows.Value.GetValueOrDefault(levelId);
-    }
+        if (!_IsInitialized)
+            InitializeRowDictionaries();
 
-    public IReadOnlyCollection<MaxterCsvRow> GetAllRows()
-    {
-        return _Rows.Value.Values.ToList();
-    }
-
-    private IReadOnlyDictionary<long, MaxterCsvRow> LoadRows()
-    {
-        if (!File.Exists(_CsvPath))
+        return level switch
         {
-            Console.WriteLine($"[MaxterCsvImporter] CSV file not found at '{_CsvPath}'.");
-            return new Dictionary<long, MaxterCsvRow>();
-        }
-
-        using StreamReader streamReader = new StreamReader(_CsvPath);
-        // Row 1 of the sheet is a blank spacer row; row 2 is the real header.
-        streamReader.ReadLine();
-
-        CsvConfiguration config = new CsvConfiguration(CultureInfo.InvariantCulture)
-        {
-            MissingFieldFound = null,
-            HeaderValidated = null,
+            OfficialLevelDto officialLevel => _OfficialRows.GetValueOrDefault(officialLevel.Name),
+            WorkshopLevelDto workshopLevel => _WorkshopRows.GetValueOrDefault(workshopLevel.WorkshopId),
+            _ => throw new ArgumentOutOfRangeException(nameof(level)),
         };
+    }
 
-        using CsvReader csv = new CsvReader(streamReader, config);
-        List<MaxterCsvRow> allRows = csv.GetRecords<MaxterCsvRow>().ToList();
+    public IEnumerable<MaxterCsvRow> GetAllRows()
+    {
+        return _OfficialRows.Values.Concat(_WorkshopRows.Values);
+    }
 
-        Dictionary<long, MaxterCsvRow> merged = new Dictionary<long, MaxterCsvRow>();
-        foreach (MaxterCsvRow row in allRows)
+    private void InitializeRowDictionaries()
+    {
+        Dictionary<string, MaxterCsvRow> officialRows = [];
+        Dictionary<long, MaxterCsvRow> workshopRows = [];
+        try
         {
-            if (row.WorkshopId is not long workshopId)
-                continue;
+            if (!File.Exists(_CsvPath))
+            {
+                _Logger.LogWarning("CSV file not found at '{filePath}'.", _CsvPath);
+                return;
+            }
 
-            merged[workshopId] = merged.TryGetValue(workshopId, out MaxterCsvRow? existing)
-                ? MergeRows(existing, row)
-                : row;
+            using StreamReader streamReader = new StreamReader(_CsvPath);
+            // Row 1 of the sheet is a blank spacer row; row 2 is the real header.
+            streamReader.ReadLine();
+
+            CsvConfiguration config = new CsvConfiguration(CultureInfo.InvariantCulture)
+            {
+                MissingFieldFound = null,
+                HeaderValidated = null,
+            };
+
+            using CsvReader csv = new CsvReader(streamReader, config);
+            List<MaxterCsvRow> allRows = csv.GetRecords<MaxterCsvRow>().ToList();
+
+            foreach (MaxterCsvRow row in allRows)
+            {
+                if (row.WorkshopId == null && row.MapName != null)
+                {
+                    officialRows[row.MapName] = officialRows.TryGetValue(row.MapName, out MaxterCsvRow? existingRow)
+                        ? MergeRows(existingRow, row)
+                        : row;
+                }
+                else if (row.WorkshopId != null)
+                {
+                    workshopRows[row.WorkshopId.Value] = workshopRows.TryGetValue(row.WorkshopId.Value, out MaxterCsvRow? existingRow)
+                        ? MergeRows(existingRow, row)
+                        : row;
+                }
+            }
         }
-
-        return merged;
+        finally
+        {
+            _OfficialRows = officialRows;
+            _WorkshopRows = workshopRows;
+            _IsInitialized = true;
+        }
     }
 
     private static MaxterCsvRow MergeRows(MaxterCsvRow first, MaxterCsvRow second)

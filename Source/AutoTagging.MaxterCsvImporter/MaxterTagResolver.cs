@@ -1,10 +1,18 @@
+using Microsoft.Extensions.Logging;
 using System.Globalization;
 
 namespace AutoTagging.MaxterCsvImporter;
 
-public static class MaxterTagResolver
+public class MaxterTagResolver
 {
-    public static HashSet<string> ResolveDesiredTags(MaxterCsvRow row, MaxterTagMappingData mapping)
+    private readonly ILogger<MaxterTagResolver> _Logger;
+
+    public MaxterTagResolver(ILogger<MaxterTagResolver> logger)
+    {
+        _Logger = logger;
+    }
+
+    public HashSet<string> ResolveDesiredTags(MaxterCsvRow row, MaxterTagMappingData mapping)
     {
         HashSet<string> desired = new HashSet<string>();
 
@@ -24,13 +32,13 @@ public static class MaxterTagResolver
         return desired;
     }
 
-    private static void AddMapped(HashSet<string> desired, string? cellValue, IReadOnlyDictionary<string, string?> table)
+    private void AddMapped(HashSet<string> desired, string? cellValue, IReadOnlyDictionary<string, string?> table)
     {
         foreach (string token in SplitTokens(cellValue))
         {
             if (!table.TryGetValue(token, out string? tagName))
             {
-                Console.WriteLine($"[MaxterCsvImporter] Unmapped token '{token}' - run 'generate-mapping' and fill it in. Skipping.");
+                _Logger.LogWarning("Unmapped token '{token}' - run 'generate-mapping' and fill it in. Skipping.", token);
                 continue;
             }
 
@@ -39,7 +47,7 @@ public static class MaxterTagResolver
         }
     }
 
-    private static void AddCarAbilities(HashSet<string> desired, string? cellValue, IReadOnlyDictionary<string, MaxterAbilityTagNames> abilities)
+    private void AddCarAbilities(HashSet<string> desired, string? cellValue, IReadOnlyDictionary<string, MaxterAbilityTagNames> abilities)
     {
         List<string> tokens = SplitTokens(cellValue).ToList();
         if (tokens.Count == 0)
@@ -58,7 +66,7 @@ public static class MaxterTagResolver
         }
     }
 
-    private static void AddLengthBucket(HashSet<string> desired, string? cellValue, IReadOnlyList<MaxterLengthBucket> buckets)
+    private void AddLengthBucket(HashSet<string> desired, string? cellValue, IReadOnlyList<MaxterLengthBucket> buckets)
     {
         if (buckets.Count == 0)
             return;
@@ -82,7 +90,7 @@ public static class MaxterTagResolver
             desired.Add(bucket.Tag);
     }
 
-    private static double? TryParseMinutes(string token)
+    private double? TryParseMinutes(string token)
     {
         string normalized = token.Trim().ToLowerInvariant().Replace("+", string.Empty).Trim();
 
@@ -112,7 +120,7 @@ public static class MaxterTagResolver
             : null;
     }
 
-    private static IEnumerable<string> SplitTokens(string? cellValue)
+    private IEnumerable<string> SplitTokens(string? cellValue)
     {
         return string.IsNullOrWhiteSpace(cellValue)
             ? []

@@ -1,4 +1,5 @@
 using Distags.Contracts;
+using Microsoft.Extensions.Logging;
 
 namespace AutoTagging.MaxterCsvImporter;
 
@@ -7,9 +8,16 @@ namespace AutoTagging.MaxterCsvImporter;
 /// Tag when there's an unambiguous DisplayName match, otherwise leaving the value null for the user
 /// to fill in by hand. Never overwrites or removes an existing key, so hand-curated entries survive reruns.
 /// </summary>
-public static class MappingGenerator
+public class MappingGenerator
 {
-    public static void AddMissingTokens(MaxterTagMappingData mapping, IEnumerable<MaxterCsvRow> rows, IReadOnlyList<TagDto> tags)
+    private readonly ILogger<MappingGenerator> _Logger;
+
+    public MappingGenerator(ILogger<MappingGenerator> logger)
+    {
+        _Logger = logger;
+    }
+
+    public void AddMissingTokens(MaxterTagMappingData mapping, IEnumerable<MaxterCsvRow> rows, IReadOnlyList<TagDto> tags)
     {
         List<MaxterCsvRow> rowList = rows.ToList();
 
@@ -25,7 +33,7 @@ public static class MappingGenerator
         SeedLengthBucketsIfEmpty(mapping);
     }
 
-    private static void AddMissingTokensForColumn(
+    private void AddMissingTokensForColumn(
         Dictionary<string, string?> table,
         IEnumerable<string?> cellValues,
         IReadOnlyList<TagDto> tags)
@@ -45,13 +53,14 @@ public static class MappingGenerator
             TagDto? match = tags.FirstOrDefault(tag => string.Equals(tag.DisplayName, token, StringComparison.OrdinalIgnoreCase));
             table[token] = match?.Name;
 
-            Console.WriteLine(match == null
-                ? $"[generate-mapping] New unmapped token '{token}' - add it to the mapping file by hand."
-                : $"[generate-mapping] New token '{token}' auto-mapped to '{match.Name}'.");
+            if (match == null)
+                _Logger.LogInformation("New unmapped token '{token}' - add it to the mapping file by hand.", token);
+            else
+                _Logger.LogInformation("New token '{token}' auto-mapped to '{match.Name}'.", token, match.Name);
         }
     }
 
-    private static void ResolveCarAbilities(MaxterTagMappingData mapping, IReadOnlyList<TagDto> tags)
+    private void ResolveCarAbilities(MaxterTagMappingData mapping, IReadOnlyList<TagDto> tags)
     {
         HashSet<string> liveTagNames = tags.Select(tag => tag.Name).ToHashSet(StringComparer.OrdinalIgnoreCase);
 
@@ -68,16 +77,16 @@ public static class MappingGenerator
         }
     }
 
-    private static string? ResolveIfLiveTagExists(HashSet<string> liveTagNames, string candidateTagName)
+    private string? ResolveIfLiveTagExists(HashSet<string> liveTagNames, string candidateTagName)
     {
         if (liveTagNames.Contains(candidateTagName))
             return candidateTagName;
 
-        Console.WriteLine($"[generate-mapping] Tag '{candidateTagName}' does not exist on the server - leaving it unmapped.");
+        _Logger.LogDebug("Tag '{tagName}' does not exist on the server - leaving it unmapped.", candidateTagName);
         return null;
     }
 
-    private static void SeedLengthBucketsIfEmpty(MaxterTagMappingData mapping)
+    private void SeedLengthBucketsIfEmpty(MaxterTagMappingData mapping)
     {
         if (mapping.LengthBuckets.Count == 0)
             mapping.LengthBuckets = CreateDefaultBuckets(string.Empty);
@@ -86,7 +95,7 @@ public static class MappingGenerator
             mapping.WrLengthBuckets = CreateDefaultBuckets("wr-");
     }
 
-    private static List<MaxterLengthBucket> CreateDefaultBuckets(string prefix)
+    private List<MaxterLengthBucket> CreateDefaultBuckets(string prefix)
     {
         return
         [

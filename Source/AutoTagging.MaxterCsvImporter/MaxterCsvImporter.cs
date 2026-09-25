@@ -1,6 +1,7 @@
 using AutoTagging.Abstractions;
+using AutoTagging.Abstractions.TaggingStrategy;
 using Distags.Contracts;
-using Distags.Core.Mapping;
+using Microsoft.Extensions.Logging;
 
 namespace AutoTagging.MaxterCsvImporter;
 
@@ -10,30 +11,38 @@ public class MaxterCsvImporter : AutoTagger
         Path.GetDirectoryName(typeof(MaxterCsvImporter).Assembly.Location)
         ?? AppContext.BaseDirectory;
 
-    private readonly Lazy<MaxterCsvRepository> _CsvRepository = new Lazy<MaxterCsvRepository>(
-        () => new MaxterCsvRepository(Path.Combine(PluginDirectory, "maxter_tagging_all_levels.csv")));
+    private readonly MaxterCsvRepository _CsvRepository;
+    private readonly Lazy<MaxterTagMappingData> _TagMapping;
+    private readonly MaxterTagResolver _TagResolver;
+    private readonly AppliedTagsLedger _Ledger;
 
-    private readonly Lazy<MaxterTagMappingData> _Mapping = new Lazy<MaxterTagMappingData>(
-        () => MaxterTagMappingLoader.Load(Path.Combine(PluginDirectory, MaxterTagMappingLoader.MappingFileName)));
+    public override ITaggingStrategy TaggingStrategy { get; } = new AllLevelsTaggingStrategy();
 
-    private readonly Lazy<AppliedTagsLedger> _Ledger = new Lazy<AppliedTagsLedger>(
-        () => new AppliedTagsLedger(Path.Combine(PluginDirectory, $"{nameof(MaxterCsvImporter)}.AppliedTags.json")));
-
-    public override TaggingStrategy TaggingStrategy => TaggingStrategy.AllLevels;
-
-    public override LevelProjectionIncludes RequiredIncludes => LevelProjectionIncludes.Tags;
-
-    public override Task<TagDelta> CalculateTagDeltaAsync(LevelProjectionDto level, CancellationToken cancellationToken = default)
+    public MaxterCsvImporter(ILoggerFactory loggerFactory)
     {
-        if (level.Id == null || level.Tags == null)
-            throw new ArgumentException("Required properties of level not initialized.", nameof(level));
+        _CsvRepository = new MaxterCsvRepository(
+            Path.Combine(PluginDirectory, "maxter_tagging_all_levels.csv"),
+            loggerFactory.CreateLogger<MaxterCsvRepository>());
 
-        MaxterCsvRow? row = _CsvRepository.Value.FindRow(level.Id.Value);
+        MaxterTagMappingLoader tagMappingLoader = new MaxterTagMappingLoader(loggerFactory.CreateLogger<MaxterTagMappingLoader>());
+        _TagMapping = new Lazy<MaxterTagMappingData>(
+            tagMappingLoader.Load(Path.Combine(PluginDirectory, MaxterTagMappingLoader.MappingFileName)));
+
+        _TagResolver = new MaxterTagResolver(loggerFactory.CreateLogger<MaxterTagResolver>());
+
+        _Ledger = new AppliedTagsLedger(
+            Path.Combine(PluginDirectory, $"{nameof(MaxterCsvImporter)}.AppliedTags.json"),
+            loggerFactory.CreateLogger<AppliedTagsLedger>());
+    }
+
+    public override Task<TagDelta> CalculateTagDeltaAsync(LevelDto level, CancellationToken cancellationToken = default)
+    {
+        MaxterCsvRow? row = _CsvRepository.FindRow(level);
         if (row == null)
             return Task.FromResult(new TagDelta());
 
-        HashSet<string> desired = MaxterTagResolver.ResolveDesiredTags(row, _Mapping.Value);
-        IReadOnlyCollection<string> previouslyOurs = _Ledger.Value.GetPreviouslyApplied(level.Id.Value);
+        HashSet<string> desired = _TagResolver.ResolveDesiredTags(row, _TagMapping.Value);
+        IReadOnlyCollection<string> previouslyOurs = _Ledger.GetPreviouslyApplied(level);
         HashSet<string> current = level.Tags.ToHashSet();
 
         TagDelta tagDelta = new TagDelta
@@ -44,7 +53,7 @@ public class MaxterCsvImporter : AutoTagger
             RemoveTags = previouslyOurs.Except(desired).Intersect(current).ToList(),
         };
 
-        _Ledger.Value.SetCurrentlyApplied(level.Id.Value, desired);
+        _Ledger.SetCurrentlyApplied(level, desired);
 
         return Task.FromResult(tagDelta);
     }

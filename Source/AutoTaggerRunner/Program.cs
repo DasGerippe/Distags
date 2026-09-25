@@ -1,3 +1,5 @@
+using AutoTagging.Abstractions;
+using AutoTagging.Abstractions.Progress;
 using Distags.Core;
 using Distags.Persistence;
 using Microsoft.Extensions.Configuration;
@@ -12,7 +14,7 @@ namespace AutoTaggerRunner;
 
 internal class Program
 {
-    static async Task Main(string[] args)
+    private static async Task Main(string[] args)
     {
         Log.Logger = new LoggerConfiguration()
             .ConfigureConsoleAndFileSinks(nameof(AutoTaggerRunner))
@@ -27,6 +29,11 @@ internal class Program
             hostBuilder.ConfigureAppConfiguration((context, configBuilder) =>
             {
                 IHostEnvironment environment = context.HostingEnvironment;
+
+                configBuilder.AddInMemoryCollection(new Dictionary<string, string?>
+                {
+                    ["ProgressDirectoryPath"] = Constants.PluginsFolderName,
+                });
 
                 configBuilder.AddJsonFile("appsettings.json", optional: false);
                 configBuilder.AddJsonFile($"appsettings.{environment.EnvironmentName}.json", optional: true);
@@ -54,9 +61,9 @@ internal class Program
                     httpClient.BaseAddress = new Uri(distagsApiUri);
                 });
 
-                services.AddTransient<IAutoTaggerStateManager, AutoTaggerStateFileManager>();
-                services.AddTransient<IAutoTaggerLevelProviderFactory, AutoTaggerLevelProviderFactory>();
+                services.AddTransient<IAutoTaggerProgressManager, AutoTaggerProgressFileManager>();
 
+                services.AddTransient<AutoTaggerLoader>();
                 services.AddTransient<AutoTaggerRunner>();
                 services.AddTransient<Program>();
             });
@@ -74,8 +81,8 @@ internal class Program
             AsyncServiceScope scope = host.Services.CreateAsyncScope();
             await using ConfiguredAsyncDisposable _ = scope.ConfigureAwait(false);
 
-            AutoTaggerRunner autoTaggerRunner = scope.ServiceProvider.GetRequiredService<AutoTaggerRunner>();
-            await autoTaggerRunner.RunAutoTaggerPluginsAsync(args).ConfigureAwait(false);
+            Program program = scope.ServiceProvider.GetRequiredService<Program>();
+            await program.Run(args).ConfigureAwait(false);
         }
         catch (Exception ex)
         {
@@ -85,5 +92,26 @@ internal class Program
         {
             await Log.CloseAndFlushAsync().ConfigureAwait(false);
         }
+    }
+
+    private readonly AutoTaggerLoader _AutoTaggerLoader;
+    private readonly AutoTaggerRunner _AutoTaggerRunner;
+    private readonly ILogger<Program> _Logger;
+
+    public Program(AutoTaggerLoader autoTaggerLoader, AutoTaggerRunner autoTaggerRunner, ILogger<Program> logger)
+    {
+        _AutoTaggerLoader = autoTaggerLoader;
+        _AutoTaggerRunner = autoTaggerRunner;
+        _Logger = logger;
+    }
+
+    private async Task Run(string[] args)
+    {
+        _Logger.LogDebug("Starting application...");
+
+        List<AutoTagger> autoTaggers = _AutoTaggerLoader.LoadAutoTaggersFromDlls(args);
+        await _AutoTaggerRunner.TryRunAutoTaggersAsync(autoTaggers);
+
+        _Logger.LogDebug("End of application.");
     }
 }
