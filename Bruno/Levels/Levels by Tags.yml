@@ -1,17 +1,17 @@
 info:
   name: Levels by Tags
   type: http
-  seq: 4
+  seq: 6
 
 http:
   method: GET
-  url: "{{url}}/levels?includeTags=sprint&excludeTags=missing-level"
+  url: "{{url}}/levels?includeTags=laps&excludeTags=challenge"
   params:
     - name: includeTags
-      value: sprint
+      value: laps
       type: query
     - name: excludeTags
-      value: missing-level
+      value: challenge
       type: query
   auth: inherit
 
@@ -20,3 +20,4 @@ settings:
   timeout: 0
   followRedirects: true
   maxRedirects: 5
+  forwardAuthorizationHeader: true

@@ -1,7 +1,7 @@
 info:
   name: Levels by Name
   type: http
-  seq: 5
+  seq: 7
 
 http:
   method: GET
@@ -17,3 +17,4 @@ settings:
   timeout: 0
   followRedirects: true
   maxRedirects: 5
+  forwardAuthorizationHeader: true

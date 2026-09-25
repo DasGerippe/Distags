@@ -1,13 +1,13 @@
 info:
-  name: Remove Level Tag
+  name: Add Workshop Level Tag
   type: http
-  seq: 8
+  seq: 10
 
 http:
-  method: DELETE
-  url: "{{url}}/levels/:levelId/tags/:tagName"
+  method: PUT
+  url: "{{url}}/levels/workshop/:workshopId/tags/:tagName"
   params:
-    - name: levelId
+    - name: workshopId
       value: "3541661304"
       type: path
     - name: tagName
@@ -20,3 +20,4 @@ settings:
   timeout: 0
   followRedirects: true
   maxRedirects: 5
+  forwardAuthorizationHeader: true
