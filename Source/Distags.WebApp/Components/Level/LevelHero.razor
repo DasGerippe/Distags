@@ -4,9 +4,8 @@
 @inject LevelUrlProvider LevelUrlProvider
 @inject LevelCreatorNameProvider LevelCreatorNameProvider
 
-<div class="hero shadow py-3">
-    <div class="hero-background" style="background-image: url('@_LevelImageUrl');"></div>
-    <div class="container-fluid content-wide">
+<div class="hero shadow" style="--hero-background-image: url('@_LevelImageUrl');">
+    <div class="container-fluid content-wide py-3">
         <div class="d-flex flex-column align-items-center">
 
             <img src="@_LevelImageUrl"
@@ -14,19 +13,19 @@
                  class="img-fluid w-100 rounded-4 shadow mb-3"
                  style="max-width:480px;"/>
 
-            <div class="d-flex align-items-baseline w-100 display-6 justify-content-center">
-                <h1 class="fw-bold text-truncate">@Level.Name</h1>
-                @if (Level is WorkshopLevelResponse workshopLevel)
-                {
-                    <a class="ms-2" href="https://steamcommunity.com/sharedfiles/filedetails/?id=@(workshopLevel.WorkshopId)">
-                        <svg style="color: #1e3050; width: 1.5em; height: 1.5em;">
-                            <use href="icons.svg#steam-solid"/>
-                        </svg>
-                    </a>
-                }
-            </div>
+            <div class="hero-caption w-100 text-center text-break">
+                <h1 class="display-6 fw-bold">
+                    @Level.Name
+                    @if (Level is WorkshopLevelResponse workshopLevel)
+                    {
+                        <a class="ms-2" href="https://steamcommunity.com/sharedfiles/filedetails/?id=@(workshopLevel.WorkshopId)">
+                            <i class="bi bi-steam" style="color: #ddd;"></i>
+                        </a>
+                    }
+                </h1>
 
-            <p class="lead text-muted mb-0">@_CreatorName</p>
+                <p class="lead mb-0">@_CreatorName</p>
+            </div>
 
         </div>
     </div>
