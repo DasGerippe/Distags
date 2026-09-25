@@ -1,4 +1,4 @@
-using Distags.Contracts;
+using Distags.Api.Contracts.Users;
 using Distags.WebApp.Services;
 using System.Net;
 
@@ -6,19 +6,19 @@ namespace Distags.WebApp.Security;
 
 public class CachedUserInfoProvider : IUserInfoProvider
 {
-    private readonly DistagsApiClient _LevelTagApi;
+    private readonly DistagsApiClient _DistagsApi;
     private readonly ILogger<CachedUserInfoProvider> _Logger;
 
     private bool _IsInitialized;
-    private UserDto? _CachedUser;
+    private UserResponse? _CachedUser;
 
-    public CachedUserInfoProvider(DistagsApiClient levelTagApi, ILogger<CachedUserInfoProvider> logger)
+    public CachedUserInfoProvider(DistagsApiClient distagsApi, ILogger<CachedUserInfoProvider> logger)
     {
-        _LevelTagApi = levelTagApi;
+        _DistagsApi = distagsApi;
         _Logger = logger;
     }
 
-    public async Task<UserDto?> GetUserInfoAsync(CancellationToken cancellationToken = default)
+    public async Task<UserResponse?> GetUserInfoAsync(CancellationToken cancellationToken = default)
     {
         if (!_IsInitialized)
         {
@@ -29,12 +29,12 @@ public class CachedUserInfoProvider : IUserInfoProvider
         return _CachedUser;
     }
 
-    private async Task<UserDto?> TryGetUserInfo(CancellationToken cancellationToken = default)
+    private async Task<UserResponse?> TryGetUserInfo(CancellationToken cancellationToken = default)
     {
         _Logger.LogDebug("Trying to retrieve user info from API...");
         try
         {
-            UserDto user = await _LevelTagApi.GetMe(cancellationToken);
+            UserResponse user = await _DistagsApi.GetMeAsync(cancellationToken);
             _Logger.LogDebug("Retrieved user info.");
             return user;
         }

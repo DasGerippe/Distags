@@ -1,21 +1,15 @@
 using Distags.Contracts;
 using Distags.Core.Entities;
-using System.Linq.Expressions;
+using Riok.Mapperly.Abstractions;
 
 namespace Distags.Core.Mapping;
 
-public class LevelMapper : IEntityMapper<Level, LevelDto>
+[Mapper(RequiredMappingStrategy = RequiredMappingStrategy.Target)]
+public static partial class LevelMapper
 {
-    public Expression<Func<Level, LevelDto>> Expression => level => new LevelDto
-    {
-        Id = level.Id,
-        Name = level.Name,
-        ImageUrl = level.ImageUrl,
-        CreatorId = level.CreatorId,
-        CreatorName = level.Creator!.Name,
-        CreatorAvatarHash = level.Creator!.AvatarHash,
-        CreatedOn = level.CreatedOn,
-        UpdatedOn = level.UpdatedOn,
-        Tags = level.Tags.Select(t => t.Name).ToList(),
-    };
+    [MapDerivedType<OfficialLevel, OfficialLevelDto>]
+    [MapDerivedType<WorkshopLevel, WorkshopLevelDto>]
+    public static partial LevelDto Map(Level level);
+
+    private static string MapTag(Tag tag) => tag.Name;
 }

@@ -1,4 +1,4 @@
-﻿@using Distags.Contracts
+@using Distags.Api.Contracts.Contributions
 @using Distags.WebApp.Components.Dialogs
 @using Distags.WebApp.Services
 
@@ -11,7 +11,7 @@
 @code {
 
     [Parameter]
-    public required ContributionDto Contribution { get; set; }
+    public required ContributionResponse Contribution { get; set; }
 
     private string GetIconColor()
     {

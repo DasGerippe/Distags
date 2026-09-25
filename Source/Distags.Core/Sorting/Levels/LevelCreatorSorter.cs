@@ -1,10 +1,12 @@
 using Distags.Core.Entities;
+using Distags.Core.Expressions;
 
 namespace Distags.Core.Sorting.Levels;
 
-public class LevelCreatorSorter : PropertyQueryableSorter<Level>
+public class LevelCreatorSorter : PropertyQueryableSorter<Level, string>
 {
-    public LevelCreatorSorter(SortOrder sortOrder) : base(level => level.Creator!.Name, sortOrder)
+    public LevelCreatorSorter(SortOrder sortOrder)
+        : base(LevelExpressions.CreatorNameSelector, sortOrder)
     {
     }
 

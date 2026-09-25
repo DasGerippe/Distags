@@ -1,6 +1,6 @@
 using Distags.Contracts;
 using Distags.Core.Entities;
-using Distags.Core.Mapping;
+using Distags.Core.Projection;
 using Microsoft.EntityFrameworkCore;
 
 namespace Distags.Core.Queries.UserBySessionToken;
@@ -21,7 +21,7 @@ public class UserBySessionTokenQueryHandler : IQueryHandler<UserBySessionTokenQu
                 userSession.Token == query.SessionToken &&
                 userSession.User.SteamId != null)
             .Select(userSession => userSession.User)
-            .Select(new UserMapper().Expression)
+            .SelectDto()
             .FirstOrDefaultAsync()
             .ConfigureAwait(false);
 

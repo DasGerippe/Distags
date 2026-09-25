@@ -3,6 +3,7 @@ using Distags.Core.Entities;
 using Distags.Core.Events;
 using Distags.Core.Interfaces;
 using Distags.Core.Logic;
+using Distags.Core.Mapping;
 using Microsoft.EntityFrameworkCore;
 
 namespace Distags.Core.Management;
@@ -76,27 +77,29 @@ public class ContributionReplayer
 
         await _DbContext.SaveChangesAsync().ConfigureAwait(false);
 
-        EnqueueLevelTagsChangedEvent(level.Id, level.Tags.Except(originalTags), originalTags.Except(level.Tags));
+        EnqueueLevelTagsChangedEvent(level, originalTags);
     }
 
-    private void EnqueueLevelTagsChangedEvent(long levelId, IEnumerable<Tag> addedTags, IEnumerable<Tag> removedTags)
+    private void EnqueueLevelTagsChangedEvent(Level level, List<Tag> originalTags)
     {
-        List<TagChangeDto> addChanges = addedTags
+        IEnumerable<TagChangeDto> addChanges = level.Tags
+            .Except(originalTags)
             .Select(tag => new TagChangeDto
             {
                 Action = TagChangeAction.Add,
                 TagName = tag.Name,
-            })
-            .ToList();
+            });
 
-        List<TagChangeDto> removeChanges = removedTags
+        IEnumerable<TagChangeDto> removeChanges = originalTags
+            .Except(level.Tags)
             .Select(tag => new TagChangeDto
             {
                 Action = TagChangeAction.Remove,
                 TagName = tag.Name,
-            })
-            .ToList();
+            });
 
-        _EventQueue.Enqueue(new LevelTagsChangedEvent(levelId, addChanges.Concat(removeChanges).ToList()));
+        List<TagChangeDto> allChanges = addChanges.Concat(removeChanges).ToList();
+
+        _EventQueue.Enqueue(new LevelTagsChangedEvent(LevelMapper.Map(level), allChanges));
     }
 }

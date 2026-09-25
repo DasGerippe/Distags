@@ -1,20 +1,20 @@
-﻿<div class="col-12 col-sm-6 col-md-4 col-lg-3 col-xxl-2 my-2">
-	<div class="card h-100 shadow">
-		<div class="card-header bg-light fw-bold">
-			@Title
-		</div>
-		<div class="card-body overflow-auto" style="height: 250px;">
-			@ChildContent
-		</div>
-	</div>
+<div class="col-12 col-sm-6 col-md-4 col-lg-3 col-xxl-2 my-2">
+    <div class="card h-100 shadow">
+        <div class="card-header bg-light fw-bold">
+            @Title
+        </div>
+        <div class="card-body overflow-auto" style="height: 250px;">
+            @ChildContent
+        </div>
+    </div>
 </div>
 
 @code {
-	
-	[Parameter]
-	public required string Title { get; set; }
+    
+    [Parameter]
+    public required string Title { get; set; }
 
-	[Parameter]
-	public required RenderFragment ChildContent { get; set; }
+    [Parameter]
+    public required RenderFragment ChildContent { get; set; }
 
 }

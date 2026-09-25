@@ -1,6 +1,6 @@
 using AutoTagging.Abstractions;
+using AutoTagging.Abstractions.TaggingStrategy;
 using Distags.Contracts;
-using Distags.Core.Mapping;
 
 namespace AutoTagging.MissingLevel;
 
@@ -8,20 +8,15 @@ public class MissingLevelAutoTagger : AutoTagger
 {
     private const string MissingLevelTag = "missing-level";
 
-    public override TaggingStrategy TaggingStrategy => TaggingStrategy.NewLevels;
+    public override ITaggingStrategy TaggingStrategy { get; } = new NewWorkshopLevelsTaggingStrategy();
 
-    public override LevelProjectionIncludes RequiredIncludes =>
-        LevelProjectionIncludes.FileName |
-        LevelProjectionIncludes.Tags;
-
-    public override Task<TagDelta> CalculateTagDeltaAsync(LevelProjectionDto level, CancellationToken cancellationToken = default)
+    public override Task<TagDelta> CalculateTagDeltaAsync(LevelDto level, CancellationToken cancellationToken = default)
     {
-        if (level.FileName == null || level.Tags == null)
-            throw new ArgumentException("Required properties of level not initialized.", nameof(level));
-
         TagDelta tagDelta = new TagDelta();
+        if (level is not WorkshopLevelDto workshopLevel)
+            return Task.FromResult(tagDelta);
 
-        if (DistanceFileNameValidator.IsValidFileName(level.FileName))
+        if (DistanceFileNameValidator.IsValidFileName(workshopLevel.FileName))
         {
             if (level.Tags.Contains(MissingLevelTag))
                 tagDelta.RemoveTags.Add(MissingLevelTag);

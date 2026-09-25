@@ -142,6 +142,15 @@ namespace Distags.WebApp {
         }
         
         /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Unknown Creator ähnelt.
+        /// </summary>
+        internal static string Creator_UnknownUserName {
+            get {
+                return ResourceManager.GetString("Creator_UnknownUserName", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Sucht eine lokalisierte Zeichenfolge, die {0} days ago ähnelt.
         /// </summary>
         internal static string DateTimeDaysAgo {

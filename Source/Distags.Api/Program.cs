@@ -70,6 +70,8 @@ public class Program
 
             app.UseAuthorization();
 
+            app.MapStaticAssets();
+
             app.MapControllers();
 
             app.MapHub<LevelHub>("/hubs/levels");

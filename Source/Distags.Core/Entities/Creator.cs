@@ -10,5 +10,5 @@ public class Creator
 
     public DateTimeOffset CachedOn { get; set; }
 
-    public List<Level> CreatedLevels { get; set; } = [];
+    public List<WorkshopLevel> CreatedLevels { get; set; } = [];
 }

@@ -1,20 +1,35 @@
-@using Distags.Contracts
+@using Distags.Api.Contracts.Levels
+@using Distags.WebApp.Services
+
+@inject LevelUrlProvider LevelUrlProvider
+@inject LevelCreatorNameProvider LevelCreatorNameProvider
 
 <div class="d-flex align-items-center text-truncate">
     <div class="d-flex align-items-center justify-content-center" style="width:80px; height:45px;">
-        <a href="level/@Level.Id">
-            <img class="rounded-1 shadow-sm" src="@Level.ImageUrl" alt="Image" style="width:80px; height:45px;"/>
+        <a href="@_LevelUrlRelative">
+            <img class="rounded-1 shadow-sm" src="@_LevelImageUrl" alt="Image" style="width:80px; height:45px;" />
         </a>
     </div>
     <div class="d-flex flex-column text-truncate ps-2">
         <div class="text-truncate">@Level.Name</div>
-        <div class="text-truncate text-muted small fw-lighter">@Level.CreatorName</div>
+        <div class="text-truncate text-muted small fw-lighter">@_CreatorName</div>
     </div>
 </div>
 
 @code {
 
+    private string _LevelUrlRelative = string.Empty;
+    private string _LevelImageUrl = string.Empty;
+    private string _CreatorName = string.Empty;
+
     [Parameter]
-    public required ContributionLevelDto Level { get; set; }
+    public required LevelResponse Level { get; set; }
+
+    protected override void OnParametersSet()
+    {
+        _LevelUrlRelative = LevelUrlProvider.GetLevelUrlRelative(Level);
+        _LevelImageUrl = LevelUrlProvider.GetLevelImageUrl(Level);
+        _CreatorName = LevelCreatorNameProvider.GetCreatorName(Level);
+    }
 
 }

@@ -74,33 +74,63 @@ public static class ProblemDetailsResult
         });
     }
 
-    public static ObjectResult LevelNotFound(long levelId)
+    public static ObjectResult OfficialLevelNotFound(string levelSlug)
     {
         return ObjectResult(new ProblemDetails
         {
             Status = StatusCodes.Status404NotFound,
-            Title = "Level Not Found",
-            Detail = $"Could not find level with ID {levelId}.",
+            Title = "Official Level Not Found",
+            Detail = $"Could not find official level {levelSlug}.",
         });
     }
 
-    public static ObjectResult LevelTagNotFound(long levelId, string tagName)
+    public static ObjectResult WorkshopLevelNotFound(long levelWorkshopId)
+    {
+        return ObjectResult(new ProblemDetails
+        {
+            Status = StatusCodes.Status404NotFound,
+            Title = "Workshop Level Not Found",
+            Detail = $"Could not find workshop level {levelWorkshopId}.",
+        });
+    }
+
+    public static ObjectResult OfficialLevelTagNotFound(string levelSlug, string tagName)
     {
         return ObjectResult(new ProblemDetails
         {
             Status = StatusCodes.Status404NotFound,
             Title = "Level Tag Not Found",
-            Detail = $"Could not find tag '{tagName}' on level {levelId}.",
+            Detail = $"Could not find tag '{tagName}' on official level {levelSlug}.",
         });
     }
 
-    public static ObjectResult LevelTagConflict(long levelId, string tagName)
+    public static ObjectResult WorkshopLevelTagNotFound(long levelWorkshopId, string tagName)
+    {
+        return ObjectResult(new ProblemDetails
+        {
+            Status = StatusCodes.Status404NotFound,
+            Title = "Level Tag Not Found",
+            Detail = $"Could not find tag '{tagName}' on workshop level {levelWorkshopId}.",
+        });
+    }
+
+    public static ObjectResult OfficialLevelTagConflict(string levelSlug, string tagName)
     {
         return ObjectResult(new ProblemDetails
         {
             Status = StatusCodes.Status409Conflict,
             Title = "Level Tag Already Exists",
-            Detail = $"Could not add tag '{tagName}' to level {levelId} because it is already present.",
+            Detail = $"Could not add tag '{tagName}' to official level {levelSlug} because it is already present.",
+        });
+    }
+
+    public static ObjectResult WorkshopLevelTagConflict(long levelWorkshopId, string tagName)
+    {
+        return ObjectResult(new ProblemDetails
+        {
+            Status = StatusCodes.Status409Conflict,
+            Title = "Level Tag Already Exists",
+            Detail = $"Could not add tag '{tagName}' to workshop level {levelWorkshopId} because it is already present.",
         });
     }
 

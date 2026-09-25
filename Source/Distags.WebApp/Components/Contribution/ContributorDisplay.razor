@@ -1,4 +1,4 @@
-﻿@using Distags.Contracts
+@using Distags.Api.Contracts.Contributions
 
 <div class="d-flex column-gap-2 align-items-center overflow-hidden">
     @if (User?.SteamAvatarHash != null && (IgnoreAnonymity || !User.IsAnonymous))
@@ -20,10 +20,10 @@
 @code {
 
     [Parameter]
-    public required ContributionUserDto? User { get; set; }
+    public required ContributionUserResponse? User { get; set; }
 
     [Parameter]
-    public required ContributionAppDto? App { get; set; }
+    public required ContributionAppResponse? App { get; set; }
 
     [Parameter]
     public bool IgnoreAnonymity { get; set; }

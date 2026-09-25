@@ -2,7 +2,7 @@ using Distags.Contracts;
 using Distags.Core.Entities;
 using Distags.Core.Filtering;
 using Distags.Core.Filtering.Contributions;
-using Distags.Core.Mapping;
+using Distags.Core.Projection;
 using Microsoft.EntityFrameworkCore;
 
 namespace Distags.Core.Queries.Contributions;
@@ -35,11 +35,10 @@ public class ContributionsQueryHandler : IQueryHandler<ContributionsQuery, Contr
 
         contributions = contributions.Take(query.Limit);
 
-        ContributionMapper contributionProjector = new ContributionMapper(query.IgnoreAnonymity);
-        List<ContributionDto> contributionDtos = await contributions
-            .Select(contributionProjector.Expression)
-            .ToListAsync()
-            .ConfigureAwait(false);
+        List<ContributionDto> contributionDtos = await (query.IgnoreAnonymity
+            ? contributions.SelectDto()
+            : contributions.SelectAnonymizedDto())
+            .ToListAsync().ConfigureAwait(false);
 
         ContributionsPage contributionsPage = new ContributionsPage
         {
@@ -55,7 +54,8 @@ public class ContributionsQueryHandler : IQueryHandler<ContributionsQuery, Contr
         {
             UserSteamId = query.UserSteamId,
             AppName = query.AppName,
-            LevelId = query.LevelId,
+            LevelSlug = query.LevelSlug,
+            LevelWorkshopId = query.LevelWorkshopId,
             TagName = query.TagName,
             ContributedAfter = query.ContributedAfter,
             ContributedBefore = query.ContributedBefore,

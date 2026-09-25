@@ -1,0 +1,23 @@
+info:
+  name: Remove Workshop Level Tag
+  type: http
+  seq: 12
+
+http:
+  method: DELETE
+  url: "{{url}}/levels/workshop/:workshopId/tags/:tagName"
+  params:
+    - name: workshopId
+      value: "3541661304"
+      type: path
+    - name: tagName
+      value: laps
+      type: path
+  auth: inherit
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
+  forwardAuthorizationHeader: true

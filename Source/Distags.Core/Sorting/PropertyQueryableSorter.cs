@@ -2,12 +2,12 @@ using System.Linq.Expressions;
 
 namespace Distags.Core.Sorting;
 
-public class PropertyQueryableSorter<TEntity> : IQueryableSorter<TEntity>
+public class PropertyQueryableSorter<TEntity, TProperty> : IQueryableSorter<TEntity>
 {
-    private readonly Expression<Func<TEntity, object>> _PropertySelector;
+    private readonly Expression<Func<TEntity, TProperty?>> _PropertySelector;
     private readonly SortOrder _SortOrder;
 
-    public PropertyQueryableSorter(Expression<Func<TEntity, object>> propertySelector, SortOrder sortOrder)
+    public PropertyQueryableSorter(Expression<Func<TEntity, TProperty?>> propertySelector, SortOrder sortOrder)
     {
         _PropertySelector = propertySelector;
         _SortOrder = sortOrder;

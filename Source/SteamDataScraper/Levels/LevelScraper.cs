@@ -1,6 +1,6 @@
 using Distags.Core;
-using Distags.Core.Commands.ImportLevels;
-using Distags.Core.Queries.LatestLevelDate;
+using Distags.Core.Commands.ImportWorkshopLevels;
+using Distags.Core.Queries.LatestWorkshopLevelDate;
 using Microsoft.Extensions.Logging;
 using SteamWebApi;
 using SteamWebApi.ApiInterfaces;
@@ -36,24 +36,25 @@ public class LevelScraper
     {
         _Logger.LogDebug("Scraping levels from Steam web API...");
 
-        DateTimeOffset? cutOffDate = await _RequestDispatcher.DispatchAsync(new LatestLevelDateQuery()).ConfigureAwait(false);
+        DateTimeOffset? cutOffDate = await _RequestDispatcher.DispatchAsync(new LatestWorkshopLevelDateQuery()).ConfigureAwait(false);
 
-        List<ScrapedLevel> scrapedLevels = await ScrapeNewLevelsAsync(cutOffDate, cancellationToken).ConfigureAwait(false);
+        List<ScrapedWorkshopLevel> scrapedLevels = await ScrapeNewLevelsAsync(cutOffDate, cancellationToken).ConfigureAwait(false);
 
         if (cutOffDate != null)
             scrapedLevels.AddRange(await ScrapeUpdatedLevelsAsync(cutOffDate.Value, cancellationToken).ConfigureAwait(false));
 
-        ImportLevelsCommand importLevelsCommand = new ImportLevelsCommand { ScrapedLevels = scrapedLevels };
+        ImportWorkshopLevelsCommand importLevelsCommand = new ImportWorkshopLevelsCommand { ScrapedWorkshopLevels = scrapedLevels };
         await _RequestDispatcher.DispatchAsync(importLevelsCommand).ConfigureAwait(false);
 
         _Logger.LogDebug("Scraped levels from Steam web API.");
     }
 
-    private async Task<List<ScrapedLevel>> ScrapeNewLevelsAsync(DateTimeOffset? cutOffDate, CancellationToken cancellationToken = default)
+    private async Task<List<ScrapedWorkshopLevel>> ScrapeNewLevelsAsync(
+        DateTimeOffset? cutOffDate, CancellationToken cancellationToken = default)
     {
         int itemsPerPage = GetItemsPerPage(cutOffDate);
         QueryFileParameters queryParams = CreateQueryFileParameters(QueryType.RankedByPublicationDate, itemsPerPage);
-        List<ScrapedLevel> scrapedLevels = [];
+        List<ScrapedWorkshopLevel> scrapedLevels = [];
 
         _Logger.LogDebug("Scraping new levels...");
 
@@ -75,11 +76,12 @@ public class LevelScraper
         return scrapedLevels;
     }
 
-    private async Task<List<ScrapedLevel>> ScrapeUpdatedLevelsAsync(DateTimeOffset cutOffDate, CancellationToken cancellationToken = default)
+    private async Task<List<ScrapedWorkshopLevel>> ScrapeUpdatedLevelsAsync(
+        DateTimeOffset cutOffDate, CancellationToken cancellationToken = default)
     {
         int itemsPerPage = GetItemsPerPage(cutOffDate);
         QueryFileParameters queryParams = CreateQueryFileParameters(QueryType.RankedByLastUpdatedDate, itemsPerPage);
-        List<ScrapedLevel> scrapedLevels = [];
+        List<ScrapedWorkshopLevel> scrapedLevels = [];
 
         _Logger.LogDebug("Scraping updated levels...");
 
@@ -142,11 +144,11 @@ public class LevelScraper
         };
     }
 
-    private ScrapedLevel ToScrapedLevel(PublishedFileDetail publishedFile)
+    private ScrapedWorkshopLevel ToScrapedLevel(PublishedFileDetail publishedFile)
     {
-        return new ScrapedLevel
+        return new ScrapedWorkshopLevel
         {
-            Id = long.Parse(publishedFile.PublishedFileId),
+            WorkshopId = long.Parse(publishedFile.PublishedFileId),
             Name = publishedFile.Title,
             CreatorId = long.Parse(publishedFile.CreatorId),
             FileName = publishedFile.Filename,

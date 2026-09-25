@@ -12,10 +12,10 @@ namespace Distags.Api.Controllers;
 [Route("[controller]")]
 public class ConfigurationController : ControllerBase
 {
-    public async Task<ActionResult<ConfigurationDto>> GetConfiguration(
+    public async Task<ActionResult<ConfigurationResponse>> GetConfiguration(
         [FromServices] IRequestDispatcher requestDispatcher)
     {
-        ConfigurationDto configuration = new ConfigurationDto
+        ConfigurationResponse configuration = new ConfigurationResponse
         {
             MaintenanceActive = await requestDispatcher.DispatchAsync(new MaintenanceQuery()),
         };
@@ -25,7 +25,8 @@ public class ConfigurationController : ControllerBase
 
     [HttpPatch]
     [Authorize(Roles = UserRoles.Administrator)]
-    public async Task<IActionResult> PatchConfiguration([FromBody] PatchConfigurationParameters apiSettings,
+    public async Task<IActionResult> PatchConfiguration(
+        [FromBody] PatchConfigurationRequest apiSettings,
         [FromServices] IRequestDispatcher requestDispatcher)
     {
         if (apiSettings.MaintenanceActive != null)

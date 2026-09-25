@@ -14,7 +14,7 @@ public class UnknownCreatorsQueryHandler : IQueryHandler<UnknownCreatorsQuery, L
 
     public Task<List<long>> HandleAsync(UnknownCreatorsQuery query)
     {
-        return _DbContext.Set<Level>()
+        return _DbContext.Set<WorkshopLevel>()
             .Where(level => level.Creator == null)
             .Select(level => level.CreatorId)
             .Distinct()

@@ -6,7 +6,9 @@ public class ContributionFilterParameters
 
     public string? AppName { get; set; }
 
-    public long? LevelId { get; set; }
+    public string? LevelSlug { get; set; }
+
+    public long? LevelWorkshopId { get; set; }
 
     public string? TagName { get; set; }
 

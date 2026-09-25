@@ -1,5 +1,3 @@
-using System.Text.Json;
-
 namespace AutoTagging.MaxterCsvImporter;
 
 public class MaxterTagMappingData
@@ -37,33 +35,4 @@ public class MaxterLengthBucket
     public double MaxMinutes { get; set; }
 
     public string Tag { get; set; } = string.Empty;
-}
-
-public static class MaxterTagMappingLoader
-{
-    public const string MappingFileName = "maxter-tag-mapping.json";
-
-    private static readonly JsonSerializerOptions JsonOptions = new JsonSerializerOptions
-    {
-        PropertyNameCaseInsensitive = true,
-        WriteIndented = true,
-    };
-
-    public static MaxterTagMappingData Load(string path)
-    {
-        if (!File.Exists(path))
-        {
-            Console.WriteLine($"[MaxterCsvImporter] Mapping file not found at '{path}'. Run 'generate-mapping' first.");
-            return new MaxterTagMappingData();
-        }
-
-        string json = File.ReadAllText(path);
-        return JsonSerializer.Deserialize<MaxterTagMappingData>(json, JsonOptions) ?? new MaxterTagMappingData();
-    }
-
-    public static void Save(string path, MaxterTagMappingData data)
-    {
-        string json = JsonSerializer.Serialize(data, JsonOptions);
-        File.WriteAllText(path, json);
-    }
 }

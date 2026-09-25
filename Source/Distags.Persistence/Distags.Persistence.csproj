@@ -7,6 +7,19 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="Database\Triggers\CreateTriggerCreateLevelLock.sql" />
+    <None Remove="Database\Triggers\DropTriggerCreateLevelLock.sql" />
+    <None Remove="Data\OfficialLevels.csv" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="Database\Triggers\CreateTriggerCreateLevelLock.sql" />
+    <EmbeddedResource Include="Database\Triggers\DropTriggerCreateLevelLock.sql" />
+    <EmbeddedResource Include="Data\OfficialLevels.csv" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="CsvHelper" Version="33.0.1" />
     <PackageReference Include="EFCore.NamingConventions" Version="10.0.1" />
     <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="10.0.1" />
   </ItemGroup>

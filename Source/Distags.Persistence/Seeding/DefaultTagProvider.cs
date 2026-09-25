@@ -34,6 +34,7 @@ public class DefaultTagProvider
         CreateLogicGroup("gimmicks");
         CreateLogicGroup("readability", allExclusive: true);
         CreateLogicGroup("theme");
+        CreateLogicGroup("level-type", allExclusive: true);
         CreateLogicGroup("wr-difficulty", allExclusive: true);
         CreateLogicGroup("wr-length", allExclusive: true);
         CreateLogicGroup("wr-tech");
@@ -179,6 +180,8 @@ public class DefaultTagProvider
         CreateTag("theme", "theme", "Colorful");
         CreateTag("theme", "theme", "Monochromatic");
 
+        CreateTag("level-info", "level-type", "Official Level", name: "official", isAutoTag: true, isExclusive: true);
+        CreateTag("level-info", "level-type", "Workshop Level", name: "workshop", isAutoTag: true, isExclusive: true);
         CreateTag("level-info", null, "Medals");
         CreateTag("level-info", null, "Missing Level Bug", name: "missing-level", isAutoTag: true);
 

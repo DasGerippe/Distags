@@ -1,3 +1,4 @@
+using Distags.Contracts;
 using Distags.Core.Entities;
 using Distags.Persistence.Entities;
 using Microsoft.EntityFrameworkCore;
@@ -9,7 +10,6 @@ public class DistagsDbContext : Distags.Core.DistagsDbContext
     public DistagsDbContext(DbContextOptions<DistagsDbContext> options)
         : base(options)
     {
-        SavingChanges += DistagsDbContext_SavingChanges;
     }
 
     protected override void ConfigureConventions(ModelConfigurationBuilder configurationBuilder)
@@ -67,15 +67,26 @@ public class DistagsDbContext : Distags.Core.DistagsDbContext
     private void ConfigureLevelEntity(ModelBuilder modelBuilder)
     {
         modelBuilder.Entity<Level>()
-            .Property(level => level.Id)
-            .ValueGeneratedNever();
+            .HasDiscriminator(level => level.Type)
+            .HasValue<OfficialLevel>(LevelType.Official)
+            .HasValue<WorkshopLevel>(LevelType.Workshop);
+
+        modelBuilder.Entity<OfficialLevel>()
+            .HasIndex(level => level.Slug)
+            .HasFilter("slug IS NOT NULL")
+            .IsUnique();
+
+        modelBuilder.Entity<WorkshopLevel>()
+            .HasIndex(level => level.WorkshopId)
+            .HasFilter("workshop_id IS NOT NULL")
+            .IsUnique();
 
         modelBuilder.Entity<Level>()
             .HasMany(level => level.Tags)
             .WithMany(tag => tag.Levels)
             .UsingEntity<LevelTag>();
 
-        modelBuilder.Entity<Level>()
+        modelBuilder.Entity<WorkshopLevel>()
             .HasOne(level => level.Creator)
             .WithMany(user => user.CreatedLevels)
             .IsRequired(false);
@@ -132,15 +143,5 @@ public class DistagsDbContext : Distags.Core.DistagsDbContext
     {
         modelBuilder.Entity<UserSession>()
             .HasKey(session => session.Token);
-    }
-
-    private void DistagsDbContext_SavingChanges(object? sender, SavingChangesEventArgs e)
-    {
-        List<LevelLock> newLevelLocks = ChangeTracker.Entries<Level>()
-            .Where(entry => entry.State == EntityState.Added)
-            .Select(entry => new LevelLock { LevelId = entry.Entity.Id })
-            .ToList();
-
-        AddRange(newLevelLocks);
     }
 }

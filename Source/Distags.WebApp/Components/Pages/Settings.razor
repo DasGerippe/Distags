@@ -1,100 +1,95 @@
-﻿@page "/settings"
+@page "/settings"
 @rendermode InteractiveServer
 
 @using Distags.Api.Contracts.Guidelines
 @using Distags.Api.Contracts.Users
-@using Distags.Contracts
 @using Distags.WebApp.Security
 @using Distags.WebApp.Services
 
 @inject IUserInfoProvider UserInfoProvider
-@inject DistagsApiClient LevelTagApi
+@inject DistagsApiClient DistagsApi
 
 <PageTitle>@Resource.PageTitle_Settings</PageTitle>
 
 @if (_User == null)
-	return;
+    return;
 
 <div class="container-fluid content-narrow py-4">
 
-	<!-- Contribution guidelines -->
-	@if (_Guidelines != null)
-	{
-		<div class="mb-4">
-			<h2 class="mb-2">@Resource.Setting_ContributionGuidelines_Title</h2>
-			@foreach (GuidelineDto guideline in _Guidelines.Guidelines)
-			{
-				<p class="fw-bold mb-0">@guideline.Title</p>
-				<p>@guideline.Text</p>
-			}
+    <!-- Contribution guidelines -->
+    @if (_Guidelines != null)
+    {
+        <div class="mb-4">
+            <h2 class="mb-2">@Resource.Setting_ContributionGuidelines_Title</h2>
+            @foreach (GuidelineResponse guideline in _Guidelines.Guidelines)
+            {
+                <p class="fw-bold mb-0">@guideline.Title</p>
+                <p>@guideline.Text</p>
+            }
 
-			@if (!_User.AcceptsGuidelines)
-			{
-				<button class="btn btn-success" @onclick="AcceptContributionGuidelinesAsync">
-					@Resource.Setting_ContributionGuidelines_Accept
-				</button>
-			}
-			else
-			{
-				<p>
-					<svg class="text-success" style="width: 2rem; height: 2rem;"><use href="icons.svg#circle-check-solid" /></svg>
-					@Resource.Setting_ContributionGuidelines_Accepted
-				</p>
-			}
-		</div>
-	}
+            @if (!_User.AcceptsGuidelines)
+            {
+                <button class="btn btn-success" @onclick="AcceptContributionGuidelinesAsync">
+                    @Resource.Setting_ContributionGuidelines_Accept
+                </button>
+            }
+            else
+            {
+                <p>
+                    <svg class="text-success" style="width: 2rem; height: 2rem;"><use href="icons.svg#circle-check-solid" /></svg>
+                    @Resource.Setting_ContributionGuidelines_Accepted
+                </p>
+            }
+        </div>
+    }
 
-	<!-- Contribution Anonymity -->
-	<div class="mb-4">
-		<h2 class="mb-2">Contribution Settings</h2>
-		<div class="form-check form-switch">
-			<input type="checkbox" role="switch" id="anonymousCheckbox" class="form-check-input" checked="@_IsAnonymous"
-			       @onchange="OnAnonymousChangedAsync"/>
-			<div>
-				<label for="anonymousCheckbox" class="form-check-label fw-bold">@Resource.Setting_Anonymous_Title</label>
-				<p class="small fw-lighter my-0">
-					@string.Format(Resource.Setting_Anonymous_Text, Resource.Contributor_AnonymousUserName)
-				</p>
-			</div>
-		</div>
-	</div>
+    <!-- Contribution Anonymity -->
+    <div class="mb-4">
+        <h2 class="mb-2">Contribution Settings</h2>
+        <div class="form-check form-switch">
+            <input type="checkbox" role="switch" id="anonymousCheckbox" class="form-check-input" checked="@_IsAnonymous"
+                   @onchange="OnAnonymousChangedAsync"/>
+            <div>
+                <label for="anonymousCheckbox" class="form-check-label fw-bold">@Resource.Setting_Anonymous_Title</label>
+                <p class="small fw-lighter my-0">
+                    @string.Format(Resource.Setting_Anonymous_Text, Resource.Contributor_AnonymousUserName)
+                </p>
+            </div>
+        </div>
+    </div>
 
 </div>
 
 @code {
 
-	private UserDto? _User;
-	private bool _IsAnonymous;
+    private UserResponse? _User;
+    private bool _IsAnonymous;
 
-	private GuidelinesDto? _Guidelines;
+    private GuidelinesResponse? _Guidelines;
 
-	protected override async Task OnInitializedAsync()
-	{
-		_User = await UserInfoProvider.GetUserInfoAsync();
-		_IsAnonymous = _User?.IsAnonymous == true;
+    protected override async Task OnInitializedAsync()
+    {
+        _User = await UserInfoProvider.GetUserInfoAsync();
+        _IsAnonymous = _User?.IsAnonymous == true;
 
-		_Guidelines = await LevelTagApi.GetContributionGuidelinesAsync();
-	}
+        _Guidelines = await DistagsApi.GetContributionGuidelinesAsync();
+    }
 
-	private async Task AcceptContributionGuidelinesAsync()
-	{
-        PatchUserSettingsParameters parameters = new PatchUserSettingsParameters { AcceptsGuidelines = true };
-        await LevelTagApi.PatchUserSettingsAsync(parameters);
-		_User!.AcceptsGuidelines = true;
-	}
+    private async Task AcceptContributionGuidelinesAsync()
+    {
+        PatchUserSettingsRequest request = new PatchUserSettingsRequest { AcceptsGuidelines = true };
+        await DistagsApi.PatchUserSettingsAsync(request);
+        _User!.AcceptsGuidelines = true;
+    }
 
-	private async Task OnAnonymousChangedAsync(ChangeEventArgs args)
-	{
-		if (args.Value is not bool isAnonymous)
-			return;
+    private async Task OnAnonymousChangedAsync(ChangeEventArgs args)
+    {
+        if (args.Value is not bool isAnonymous)
+            return;
 
-		PatchUserSettingsParameters parameters = new PatchUserSettingsParameters
-		{
-			IsAnonymous = isAnonymous,
-		};
-		await LevelTagApi.PatchUserSettingsAsync(parameters);
-
-		_IsAnonymous = isAnonymous;
-	}
+        PatchUserSettingsRequest request = new PatchUserSettingsRequest { IsAnonymous = isAnonymous };
+        await DistagsApi.PatchUserSettingsAsync(request);
+        _IsAnonymous = isAnonymous;
+    }
 
 }

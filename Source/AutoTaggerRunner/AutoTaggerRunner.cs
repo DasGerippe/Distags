@@ -1,78 +1,42 @@
 using AutoTagging.Abstractions;
+using AutoTagging.Abstractions.Progress;
 using Distags.Contracts;
-using Distags.Core.Mapping;
+using Distags.Core;
+using Distags.Core.Queries.AutoTaggerLevels;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
-using System.Reflection;
+using Serilog;
+using System.Net;
 
 namespace AutoTaggerRunner;
 
 public class AutoTaggerRunner
 {
-    private readonly IAutoTaggerStateManager _StateManager;
-    private readonly IAutoTaggerLevelProviderFactory _LevelProviderFactory;
+    private readonly IAutoTaggerProgressManager _ProgressManager;
+    private readonly IRequestDispatcher _RequestDispatcher;
     private readonly DistagsApiClient _DistagsApiClient;
     private readonly IConfiguration _Configuration;
     private readonly ILogger<AutoTaggerRunner> _Logger;
 
     public AutoTaggerRunner(
-        IAutoTaggerStateManager stateManager,
-        IAutoTaggerLevelProviderFactory levelProviderFactory,
+        IAutoTaggerProgressManager progressManager,
+        IRequestDispatcher requestDispatcher,
         DistagsApiClient distagsApiClient,
         IConfiguration configuration,
         ILogger<AutoTaggerRunner> logger)
     {
-        _StateManager = stateManager;
-        _LevelProviderFactory = levelProviderFactory;
+        _ProgressManager = progressManager;
+        _RequestDispatcher = requestDispatcher;
         _DistagsApiClient = distagsApiClient;
         _Configuration = configuration;
         _Logger = logger;
     }
 
-    public async Task RunAutoTaggerPluginsAsync(string[] args)
+    public async Task TryRunAutoTaggersAsync(List<AutoTagger> autoTaggers)
     {
-        _Logger.LogDebug("Starting application...");
-
-        IEnumerable<string> dllFiles = Directory.EnumerateFiles(Constants.PluginsFolderName)
-            .Where(file => file.EndsWith(".dll"))
-            .Where(file => args.Length == 0 || args.Any(file.Contains));
-
-        foreach (string dllFile in dllFiles)
+        foreach (AutoTagger autoTagger in autoTaggers)
         {
-            await TryRunAutoTaggersAsync(dllFile).ConfigureAwait(false);
-        }
-
-        _Logger.LogDebug("End of application.");
-    }
-
-    private async Task TryRunAutoTaggersAsync(string pluginDll)
-    {
-        _Logger.LogDebug("Running {AutoTagger}s in {pluginDll}...", nameof(AutoTagger), pluginDll);
-
-        try
-        {
-            Assembly assembly = Assembly.LoadFrom(pluginDll);
-
-            List<AutoTagger> autoTaggers = assembly.GetTypes()
-                .Where(type => typeof(AutoTagger).IsAssignableFrom(type) && !type.IsAbstract)
-                .Select(pluginType => Activator.CreateInstance(pluginType))
-                .OfType<AutoTagger>()
-                .ToList();
-
-            if (autoTaggers.Count == 0)
-            {
-                _Logger.LogInformation("No {AutoTagger}s found in {pluginDll}.", nameof(AutoTagger), pluginDll);
-                return;
-            }
-
-            foreach (AutoTagger autoTagger in autoTaggers)
-            {
-                await TryRunAutoTaggerAsync(autoTagger).ConfigureAwait(false);
-            }
-        }
-        catch (Exception ex)
-        {
-            _Logger.LogError(ex, "An error occured while running {AutoTagger}s of DLL {dll}.", nameof(AutoTagger), pluginDll);
+            await TryRunAutoTaggerAsync(autoTagger);
         }
     }
 
@@ -80,22 +44,6 @@ public class AutoTaggerRunner
     {
         _Logger.LogDebug("Running {autoTagger}...", autoTagger.Name);
 
-        try
-        {
-            AutoTaggerState state = await _StateManager.LoadAutoTaggerStateAsync(autoTagger).ConfigureAwait(false);
-
-            await TryRunAutoTaggerAsync(autoTagger, state);
-
-            await _StateManager.SaveAutoTaggerStateAsync(autoTagger, state).ConfigureAwait(false);
-        }
-        catch (Exception ex)
-        {
-            _Logger.LogError(ex, "An error occurred while loading or saving state of {autoTagger}.", autoTagger.Name);
-        }
-    }
-
-    private async Task TryRunAutoTaggerAsync(AutoTagger autoTagger, AutoTaggerState state)
-    {
         try
         {
             IConfiguration autoTaggerConfig = CreateAutoTaggerConfiguration(autoTagger);
@@ -106,15 +54,29 @@ public class AutoTaggerRunner
                 return;
             }
 
-            LevelProjectionIncludes levelIncludes = EnrichLevelProjectionIncludes(autoTagger);
-            IAutoTaggerLevelProvider levelProvider = _LevelProviderFactory.CreateLevelProvider(autoTagger.TaggingStrategy, levelIncludes);
-            List<LevelProjectionDto> levels = await levelProvider.GetLevelsToTagAsync(state).ConfigureAwait(false);
+            IAutoTaggerProgress? progress = await _ProgressManager.LoadProgressAsync(autoTagger).ConfigureAwait(false);
 
+            List<LevelDto> levels = await QueryLevels(autoTagger, progress).ConfigureAwait(false);
+            progress = await TryRunAutoTaggerAsync(autoTagger, progress, levels, distagsApiKey);
+
+            await _ProgressManager.SaveProgressAsync(autoTagger, progress).ConfigureAwait(false);
+        }
+        catch (Exception ex)
+        {
+            _Logger.LogError(ex, "An error occurred while loading or saving state of {autoTagger}.", autoTagger.Name);
+        }
+    }
+
+    private async Task<IAutoTaggerProgress?> TryRunAutoTaggerAsync(AutoTagger autoTagger, IAutoTaggerProgress? progress, List<LevelDto> levels, string distagsApiKey)
+    {
+        try
+        {
             _Logger.LogDebug("Got {levelCount} levels to tag.", levels.Count);
 
-            foreach (LevelProjectionDto level in levels)
+            foreach (LevelDto level in levels)
             {
-                _Logger.LogDebug("Calculating tag delta for level {levelId} with {autoTagger}...", level.Id, autoTagger.Name);
+                _Logger.LogDebug("Calculating tag delta for {levelType} level {levelName} with {autoTagger}...",
+                    level.Type, level.Name, autoTagger.Name);
 
                 TagDelta tagDelta = await autoTagger.CalculateTagDeltaAsync(level).ConfigureAwait(false);
 
@@ -122,20 +84,22 @@ public class AutoTaggerRunner
                 {
                     _Logger.LogDebug("Calculated tag delta: +{tagsToAdd}; -{tagsToRemove}", tagDelta.AddTags, tagDelta.RemoveTags);
 
-                    await SendTagChangesToApiAsync(level.Id!.Value, tagDelta, distagsApiKey).ConfigureAwait(false);
+                    await SendTagChangesToApiAsync(level, tagDelta, distagsApiKey).ConfigureAwait(false);
                 }
                 else
                 {
                     _Logger.LogDebug("Calculated tag delta is empty.");
                 }
 
-                UpdateAutoTaggerState(state, level, autoTagger.TaggingStrategy);
+                progress = autoTagger.TaggingStrategy.UpdateProgress(progress, level);
             }
         }
         catch (Exception ex)
         {
             _Logger.LogError(ex, "An error occurred while running {autoTagger}.", autoTagger.Name);
         }
+
+        return progress;
     }
 
     private IConfiguration CreateAutoTaggerConfiguration(AutoTagger autoTagger)
@@ -147,48 +111,39 @@ public class AutoTaggerRunner
             .Build();
     }
 
-    private LevelProjectionIncludes EnrichLevelProjectionIncludes(AutoTagger autoTagger)
+    private async Task<List<LevelDto>> QueryLevels(AutoTagger autoTagger, IAutoTaggerProgress? progress)
     {
-        LevelProjectionIncludes includes = autoTagger.RequiredIncludes | LevelProjectionIncludes.Id;
-
-        switch (autoTagger.TaggingStrategy)
-        {
-            case TaggingStrategy.NewLevels:
-                includes |= LevelProjectionIncludes.CreatedOn;
-                break;
-            case TaggingStrategy.NewAndUpdatedLevels:
-                includes |= LevelProjectionIncludes.UpdatedOn;
-                break;
-            case TaggingStrategy.AllLevels:
-                break;
-        }
-
-        return includes;
+        AutoTaggerLevelsQuery query = autoTagger.TaggingStrategy.GetLevelsQuery(progress);
+        List<LevelDto> levels = await _RequestDispatcher.DispatchAsync(query);
+        return levels;
     }
 
-    private async Task SendTagChangesToApiAsync(long levelId, TagDelta tagDelta, string distagsApiKey)
+    private async Task SendTagChangesToApiAsync(LevelDto level, TagDelta tagDelta, string distagsApiKey)
     {
         _Logger.LogDebug("Sending tag updates to API...");
 
         foreach (string tagToAdd in tagDelta.AddTags)
         {
-            await _DistagsApiClient.PutLevelTagAsync(levelId, tagToAdd, distagsApiKey).ConfigureAwait(false);
+            try
+            {
+                await _DistagsApiClient.PutLevelTagAsync(level, tagToAdd, distagsApiKey).ConfigureAwait(false);
+            }
+            catch (HttpRequestException httpEx) when (httpEx.StatusCode == HttpStatusCode.Conflict)
+            {
+                Log.Warning("Could not add tag '{tagName}' to level because it was already present.", tagToAdd);
+            }
         }
 
         foreach (string tagToRemove in tagDelta.RemoveTags)
         {
-            await _DistagsApiClient.DeleteLevelTagAsync(levelId, tagToRemove, distagsApiKey).ConfigureAwait(false);
+            try
+            {
+                await _DistagsApiClient.DeleteLevelTagAsync(level, tagToRemove, distagsApiKey).ConfigureAwait(false);
+            }
+            catch (HttpRequestException httpEx) when (httpEx.StatusCode == HttpStatusCode.NotFound)
+            {
+                Log.Warning("Could not remove tag '{tagName}' from level because it wasn't present.", tagToRemove);
+            }
         }
-    }
-
-    private void UpdateAutoTaggerState(AutoTaggerState state, LevelProjectionDto level, TaggingStrategy strategy)
-    {
-        state.LastAutoTagging = strategy switch
-        {
-            TaggingStrategy.NewLevels => level.CreatedOn!.Value,
-            TaggingStrategy.NewAndUpdatedLevels => level.UpdatedOn!.Value,
-            TaggingStrategy.AllLevels => DateTime.UtcNow,
-            _ => throw new ArgumentOutOfRangeException(nameof(strategy), strategy, null),
-        };
     }
 }

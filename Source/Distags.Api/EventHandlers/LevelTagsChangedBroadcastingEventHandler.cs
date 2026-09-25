@@ -1,4 +1,6 @@
+using Distags.Api.Contracts.Tags;
 using Distags.Api.Hubs;
+using Distags.Api.Mapping;
 using Distags.Core.Events;
 using Microsoft.AspNetCore.SignalR;
 
@@ -15,6 +17,8 @@ public class LevelTagsChangedBroadcastingEventHandler : IAppEventHandler<LevelTa
 
     public async Task HandleAsync(LevelTagsChangedEvent appEvent)
     {
-        await _LevelHub.Clients.Group(appEvent.LevelId.ToString()).TagsChanged(appEvent.Changes);
+        string levelGroupName = LevelKeyGenerator.GetKey(appEvent.Level);
+        List<TagChangeResponse> changes = TagChangeMapper.Map(appEvent.Changes);
+        await _LevelHub.Clients.Group(levelGroupName).TagsChanged(changes);
     }
 }

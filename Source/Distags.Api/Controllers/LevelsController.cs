@@ -1,4 +1,5 @@
 using Distags.Api.Contracts.Levels;
+using Distags.Api.Mapping;
 using Distags.Api.Security;
 using Distags.Contracts;
 using Distags.Core;
@@ -6,12 +7,11 @@ using Distags.Core.Commands.ChangeLevelTag;
 using Distags.Core.Exceptions;
 using Distags.Core.Filtering.Levels;
 using Distags.Core.Queries.BrowseLevels;
-using Distags.Core.Queries.LevelById;
-using Distags.Core.Queries.LevelTags;
+using Distags.Core.Queries.OfficialLevelBySlug;
+using Distags.Core.Queries.WorkshopLevelById;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
-using LevelSortStrategy = Distags.Core.Sorting.Levels.LevelSortStrategy;
 
 namespace Distags.Api.Controllers;
 
@@ -21,80 +21,104 @@ public class LevelsController : ControllerBase
 {
     [HttpGet]
     [AllowAnonymous]
-    public async Task<ActionResult<LevelsPage>> BrowseLevels(
-        [FromQuery] BrowseLevelsParameters parameters,
+    public async Task<ActionResult<LevelsPageResponse>> BrowseLevels(
+        [FromQuery] BrowseLevelsRequest request,
         [FromServices] IRequestDispatcher dispatcher)
     {
-        BrowseLevelsQuery query = new BrowseLevelsQuery
-        {
-            FilterParameters = new LevelFilterParameters
-            {
-                LevelName = parameters.LevelName,
-                CreatorName = parameters.CreatorName,
-                IncludeTags = GetNormalizedTagNames(parameters.IncludeTags),
-                ExcludeTags = GetNormalizedTagNames(parameters.ExcludeTags),
-            },
-            SortStrategy = (LevelSortStrategy)parameters.SortStrategy,
-            PageNumber = parameters.PageNumber,
-            PageSize = parameters.PageSize,
-        };
-
+        BrowseLevelsQuery query = BrowseLevelsMapper.Map(request);
         LevelsPage levelsPage = await dispatcher.DispatchAsync(query);
-        return Ok(levelsPage);
+        LevelsPageResponse levelsPageResponse = LevelsPageMapper.Map(levelsPage);
+        return Ok(levelsPageResponse);
     }
 
-    private List<string> GetNormalizedTagNames(string? commaSeparatedTags)
-    {
-        if (string.IsNullOrEmpty(commaSeparatedTags))
-            return [];
-
-        string[] tagNames = commaSeparatedTags.Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
-        List<string> normalizedTagNames = tagNames.Select(tag => tag.ToLowerInvariant()).ToList();
-        return normalizedTagNames;
-    }
-
-    [HttpGet("{levelId:long}")]
+    [HttpGet("official/{levelSlug}")]
     [AllowAnonymous]
-    public async Task<ActionResult<LevelDto>> GetLevel(long levelId,
+    public async Task<ActionResult<OfficialLevelResponse>> GetOfficialLevel(
+        string levelSlug,
         [FromServices] IRequestDispatcher requestDispatcher)
     {
         try
         {
-            LevelDto levelDto = await requestDispatcher.DispatchAsync(new LevelByIdQuery { LevelId = levelId });
-            return Ok(levelDto);
+            OfficialLevelBySlugQuery query = new OfficialLevelBySlugQuery { Slug = levelSlug };
+            OfficialLevelDto levelDto = await requestDispatcher.DispatchAsync(query);
+            OfficialLevelResponse levelResponse = LevelDetailMapper.Map(levelDto);
+            return Ok(levelResponse);
         }
         catch (UnknownLevelException)
         {
-            return ProblemDetailsResult.LevelNotFound(levelId);
+            return ProblemDetailsResult.OfficialLevelNotFound(levelSlug);
         }
     }
 
-    [HttpGet("{levelId:long}/tags")]
+    [HttpGet("workshop/{levelWorkshopId:long}")]
     [AllowAnonymous]
-    public async Task<ActionResult<IEnumerable<string>>> GetLevelTags(long levelId,
+    public async Task<ActionResult<WorkshopLevelResponse>> GetWorkshopLevel(
+        long levelWorkshopId,
         [FromServices] IRequestDispatcher requestDispatcher)
     {
         try
         {
-            List<string> tags = await requestDispatcher.DispatchAsync(new LevelTagsQuery { LevelId = levelId });
+            WorkshopLevelByIdQuery query = new WorkshopLevelByIdQuery { WorkshopId = levelWorkshopId };
+            WorkshopLevelDto levelDto = await requestDispatcher.DispatchAsync(query);
+            WorkshopLevelResponse levelResponse = LevelDetailMapper.Map(levelDto);
+            return Ok(levelResponse);
+        }
+        catch (UnknownLevelException)
+        {
+            return ProblemDetailsResult.WorkshopLevelNotFound(levelWorkshopId);
+        }
+    }
+
+    [HttpGet("official/{levelSlug}/tags")]
+    [AllowAnonymous]
+    public async Task<ActionResult<IEnumerable<string>>> GetOfficialLevelTags(
+        string levelSlug,
+        [FromServices] IRequestDispatcher requestDispatcher)
+    {
+        try
+        {
+            OfficialLevelBySlugQuery query = new OfficialLevelBySlugQuery { Slug = levelSlug };
+            OfficialLevelDto level = await requestDispatcher.DispatchAsync(query);
+            List<string> tags = level.Tags;
             return Ok(tags);
         }
         catch (UnknownLevelException)
         {
-            return ProblemDetailsResult.LevelNotFound(levelId);
+            return ProblemDetailsResult.OfficialLevelNotFound(levelSlug);
         }
     }
 
-    [HttpPut("{levelId:long}/tags/{tagName}")]
-    [Authorize(Roles = Constants.Roles.Contributor)]
-    public async Task<IActionResult> PutLevelTag(long levelId, string tagName,
+    [HttpGet("workshop/{levelWorkshopId:long}/tags")]
+    [AllowAnonymous]
+    public async Task<ActionResult<IEnumerable<string>>> GetWorkshopLevelTags(
+        long levelWorkshopId,
         [FromServices] IRequestDispatcher requestDispatcher)
     {
         try
         {
-            ChangeLevelTagCommand command = new ChangeLevelTagCommand
+            WorkshopLevelByIdQuery query = new WorkshopLevelByIdQuery { WorkshopId = levelWorkshopId };
+            WorkshopLevelDto level = await requestDispatcher.DispatchAsync(query);
+            List<string> tags = level.Tags;
+            return Ok(tags);
+        }
+        catch (UnknownLevelException)
+        {
+            return ProblemDetailsResult.WorkshopLevelNotFound(levelWorkshopId);
+        }
+    }
+
+    [HttpPut("official/{levelSlug}/tags/{tagName}")]
+    [Authorize(Roles = Constants.Roles.Contributor)]
+    public async Task<IActionResult> PutOfficialLevelTag(
+        string levelSlug,
+        string tagName,
+        [FromServices] IRequestDispatcher requestDispatcher)
+    {
+        try
+        {
+            ChangeOfficialLevelTagCommand command = new ChangeOfficialLevelTagCommand
             {
-                LevelId = levelId,
+                LevelSlug = levelSlug,
                 TagName = tagName,
                 UserSteamId = User.FindFirstValue<long>(Constants.Claims.SteamId),
                 AppName = User.FindFirstValue(Constants.Claims.AppName),
@@ -113,7 +137,7 @@ public class LevelsController : ControllerBase
         }
         catch (UnknownLevelException)
         {
-            return ProblemDetailsResult.LevelNotFound(levelId);
+            return ProblemDetailsResult.OfficialLevelNotFound(levelSlug);
         }
         catch (UnknownTagException)
         {
@@ -121,20 +145,64 @@ public class LevelsController : ControllerBase
         }
         catch (LevelTagExistsException)
         {
-            return ProblemDetailsResult.LevelTagConflict(levelId, tagName);
+            return ProblemDetailsResult.OfficialLevelTagConflict(levelSlug, tagName);
         }
     }
 
-    [HttpDelete("{levelId:long}/tags/{tagName}")]
+    [HttpPut("workshop/{levelWorkshopId:long}/tags/{tagName}")]
     [Authorize(Roles = Constants.Roles.Contributor)]
-    public async Task<IActionResult> DeleteLevelTag(long levelId, string tagName,
+    public async Task<IActionResult> PutWorkshopLevelTag(
+        long levelWorkshopId,
+        string tagName,
         [FromServices] IRequestDispatcher requestDispatcher)
     {
         try
         {
-            ChangeLevelTagCommand command = new ChangeLevelTagCommand
+            ChangeWorkshopLevelTagCommand command = new ChangeWorkshopLevelTagCommand
             {
-                LevelId = levelId,
+                LevelWorkshopId = levelWorkshopId,
+                TagName = tagName,
+                UserSteamId = User.FindFirstValue<long>(Constants.Claims.SteamId),
+                AppName = User.FindFirstValue(Constants.Claims.AppName),
+                Action = TagChangeAction.Add,
+            };
+            await requestDispatcher.DispatchAsync(command);
+            return Created();
+        }
+        catch (MaintenanceActiveException)
+        {
+            return ProblemDetailsResult.MaintenanceActive();
+        }
+        catch (CannotChangeAutoTagException)
+        {
+            return ProblemDetailsResult.ForbiddenChangeAutoTag(tagName);
+        }
+        catch (UnknownLevelException)
+        {
+            return ProblemDetailsResult.WorkshopLevelNotFound(levelWorkshopId);
+        }
+        catch (UnknownTagException)
+        {
+            return ProblemDetailsResult.TagNotFound(tagName);
+        }
+        catch (LevelTagExistsException)
+        {
+            return ProblemDetailsResult.WorkshopLevelTagConflict(levelWorkshopId, tagName);
+        }
+    }
+
+    [HttpDelete("official/{levelSlug}/tags/{tagName}")]
+    [Authorize(Roles = Constants.Roles.Contributor)]
+    public async Task<IActionResult> DeleteOfficialLevelTag(
+        string levelSlug,
+        string tagName,
+        [FromServices] IRequestDispatcher requestDispatcher)
+    {
+        try
+        {
+            ChangeOfficialLevelTagCommand command = new ChangeOfficialLevelTagCommand
+            {
+                LevelSlug = levelSlug,
                 TagName = tagName,
                 UserSteamId = User.FindFirstValue<long>(Constants.Claims.SteamId),
                 AppName = User.FindFirstValue(Constants.Claims.AppName),
@@ -153,7 +221,7 @@ public class LevelsController : ControllerBase
         }
         catch (UnknownLevelException)
         {
-            return ProblemDetailsResult.LevelNotFound(levelId);
+            return ProblemDetailsResult.OfficialLevelNotFound(levelSlug);
         }
         catch (UnknownTagException)
         {
@@ -161,7 +229,53 @@ public class LevelsController : ControllerBase
         }
         catch (LevelTagNotFoundException)
         {
-            return ProblemDetailsResult.LevelTagNotFound(levelId, tagName);
+            return ProblemDetailsResult.OfficialLevelTagNotFound(levelSlug, tagName);
+        }
+        catch (CannotRemoveFallbackTagException)
+        {
+            return ProblemDetailsResult.BadRequestRemoveFallbackTag(tagName);
+        }
+    }
+
+    [HttpDelete("workshop/{levelWorkshopId:long}/tags/{tagName}")]
+    [Authorize(Roles = Constants.Roles.Contributor)]
+    public async Task<IActionResult> DeleteWorkshopLevelTag(
+        long levelWorkshopId,
+        string tagName,
+        [FromServices] IRequestDispatcher requestDispatcher)
+    {
+        try
+        {
+            ChangeWorkshopLevelTagCommand command = new ChangeWorkshopLevelTagCommand
+            {
+                LevelWorkshopId = levelWorkshopId,
+                TagName = tagName,
+                UserSteamId = User.FindFirstValue<long>(Constants.Claims.SteamId),
+                AppName = User.FindFirstValue(Constants.Claims.AppName),
+                Action = TagChangeAction.Remove,
+            };
+            await requestDispatcher.DispatchAsync(command);
+            return NoContent();
+        }
+        catch (MaintenanceActiveException)
+        {
+            return ProblemDetailsResult.MaintenanceActive();
+        }
+        catch (CannotChangeAutoTagException)
+        {
+            return ProblemDetailsResult.ForbiddenChangeAutoTag(tagName);
+        }
+        catch (UnknownLevelException)
+        {
+            return ProblemDetailsResult.WorkshopLevelNotFound(levelWorkshopId);
+        }
+        catch (UnknownTagException)
+        {
+            return ProblemDetailsResult.TagNotFound(tagName);
+        }
+        catch (LevelTagNotFoundException)
+        {
+            return ProblemDetailsResult.WorkshopLevelTagNotFound(levelWorkshopId, tagName);
         }
         catch (CannotRemoveFallbackTagException)
         {

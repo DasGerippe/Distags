@@ -9,49 +9,47 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Distags.Core.Commands.ChangeLevelTag;
 
-public class ChangeLevelTagCommandHandler : ICommandHandler<ChangeLevelTagCommand>
+public abstract class ChangeLevelTagCommandHandler
 {
-    private readonly DistagsDbContext _DbContext;
     private readonly MaintenanceManager _MaintenanceManager;
     private readonly ISequentialLevelActionExecutor _SequentialLevelActionExecutor;
     private readonly LevelTagAdder _LevelTagAdder;
     private readonly LevelTagRemover _LevelTagRemover;
     private readonly ContributionManager _ContributionManager;
-    private readonly TagChangeManager _TagChangeManager;
     private readonly AppEventQueue _AppEventQueue;
 
-    public ChangeLevelTagCommandHandler(
+    protected DistagsDbContext DbContext { get; }
+
+    protected ChangeLevelTagCommandHandler(
         DistagsDbContext dbContext,
         MaintenanceManager maintenanceManager,
         ISequentialLevelActionExecutor sequentialLevelActionExecutor,
         LevelTagAdder levelTagAdder,
         LevelTagRemover levelTagRemover,
         ContributionManager contributionManager,
-        TagChangeManager tagChangeManager,
         AppEventQueue appEventQueue)
     {
-        _DbContext = dbContext;
+        DbContext = dbContext;
         _MaintenanceManager = maintenanceManager;
         _SequentialLevelActionExecutor = sequentialLevelActionExecutor;
         _LevelTagAdder = levelTagAdder;
         _LevelTagRemover = levelTagRemover;
         _ContributionManager = contributionManager;
-        _TagChangeManager = tagChangeManager;
         _AppEventQueue = appEventQueue;
     }
 
-    public async Task HandleAsync(ChangeLevelTagCommand command)
+    protected async Task HandleAsync(long levelId, string tagName, TagChangeAction action, long? userSteamId, string? appName)
     {
-        Tag tag = await GetTagAsync(command.TagName).ConfigureAwait(false);
-        User? user = await GetUserAsync(command.UserSteamId).ConfigureAwait(false);
-        App? app = await GetAppAsync(command.AppName).ConfigureAwait(false);
+        Tag tag = await GetTagAsync(tagName).ConfigureAwait(false);
+        User? user = await GetUserAsync(userSteamId).ConfigureAwait(false);
+        App? app = await GetAppAsync(appName).ConfigureAwait(false);
 
         await EnsureTagChangeAllowedAsync(user, app, tag).ConfigureAwait(false);
 
         Contribution contribution = await _SequentialLevelActionExecutor
             .ExecuteSequentialForLevelAsync(
-                command.LevelId,
-                () => ChangeLevelTagAsync(command.LevelId, tag, command.Action, user, app))
+                levelId,
+                () => ChangeLevelTagAsync(levelId, tag, action, user, app))
             .ConfigureAwait(false);
 
         EnqueueEvents(contribution);
@@ -59,17 +57,17 @@ public class ChangeLevelTagCommandHandler : ICommandHandler<ChangeLevelTagComman
 
     private async Task<Level> GetLevelAsync(long levelId)
     {
-        Level? level = await _DbContext.Set<Level>()
+        Level? level = await DbContext.Set<Level>()
             .Include(level => level.Tags)
             .Where(level => level.Id == levelId)
             .FirstOrDefaultAsync()
             .ConfigureAwait(false);
-        return level ?? throw new UnknownLevelException(levelId);
+        return level ?? throw new UnknownLevelException();
     }
 
     private async Task<Tag> GetTagAsync(string tagName)
     {
-        Tag? tag = await _DbContext.Set<Tag>()
+        Tag? tag = await DbContext.Set<Tag>()
             .Include(tag => tag.LogicGroup!.Tags)
             .FirstOrDefaultAsync(tag => tag.Name == tagName)
             .ConfigureAwait(false);
@@ -81,7 +79,7 @@ public class ChangeLevelTagCommandHandler : ICommandHandler<ChangeLevelTagComman
         if (userSteamId == null)
             return null;
 
-        User? user = await _DbContext.Set<User>()
+        User? user = await DbContext.Set<User>()
             .Where(user => user.SteamId == userSteamId)
             .FirstOrDefaultAsync()
             .ConfigureAwait(false);
@@ -94,7 +92,7 @@ public class ChangeLevelTagCommandHandler : ICommandHandler<ChangeLevelTagComman
         if (appName == null)
             return null;
 
-        App? app = await _DbContext.Set<App>()
+        App? app = await DbContext.Set<App>()
             .Where(app => app.Name == appName)
             .FirstOrDefaultAsync()
             .ConfigureAwait(false);
@@ -151,23 +149,15 @@ public class ChangeLevelTagCommandHandler : ICommandHandler<ChangeLevelTagComman
         Contribution contribution =
             _ContributionManager.CreateContribution(level, tag, user, app, action, changeResult.Value);
 
-        _DbContext.Add(contribution);
-        await _DbContext.SaveChangesAsync().ConfigureAwait(false);
+        DbContext.Add(contribution);
+        await DbContext.SaveChangesAsync().ConfigureAwait(false);
 
         return contribution;
     }
 
     private void EnqueueEvents(Contribution contribution)
     {
-        _AppEventQueue.Enqueue(new ContributionCreatedEvent(contribution.Id));
-
-        List<TagChangeDto> changeDtos = contribution.Changes
-            .Select(change => new TagChangeDto
-            {
-                Action = change.Action,
-                TagName = change.TagName,
-            })
-            .ToList();
-        _AppEventQueue.Enqueue(new LevelTagsChangedEvent(contribution.LevelId, changeDtos));
+        _AppEventQueue.Enqueue(new ContributionCreatedEvent(contribution));
+        _AppEventQueue.Enqueue(new LevelTagsChangedEvent(contribution.Level, contribution.Changes));
     }
 }

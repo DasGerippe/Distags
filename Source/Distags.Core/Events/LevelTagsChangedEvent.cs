@@ -1,17 +1,23 @@
 using Distags.Contracts;
-using System.Collections.ObjectModel;
+using Distags.Core.Entities;
+using Distags.Core.Mapping;
 
 namespace Distags.Core.Events;
 
 public class LevelTagsChangedEvent : IAppEvent
 {
-    public long LevelId { get; }
+    public LevelDto Level { get; }
 
     public IReadOnlyList<TagChangeDto> Changes { get; }
 
-    public LevelTagsChangedEvent(long levelId, List<TagChangeDto> changes)
+    public LevelTagsChangedEvent(Level level, IReadOnlyCollection<TagChange> changes)
+        : this(LevelMapper.Map(level), TagChangeMapper.Map(changes))
     {
-        LevelId = levelId;
-        Changes = new ReadOnlyCollection<TagChangeDto>(changes);
+    }
+
+    public LevelTagsChangedEvent(LevelDto level, List<TagChangeDto> changes)
+    {
+        Level = level;
+        Changes = changes;
     }
 }

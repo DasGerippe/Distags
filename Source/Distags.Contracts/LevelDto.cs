@@ -1,22 +1,16 @@
 namespace Distags.Contracts;
 
-public class LevelDto
+public abstract class LevelDto
 {
     public long Id { get; set; }
 
+    public abstract LevelType Type { get; }
+
     public string Name { get; set; } = string.Empty;
 
-    public string ImageUrl { get; set; } = string.Empty;
+    public DateTimeOffset RecordCreatedOn { get; set; }
 
-    public long CreatorId { get; set; }
-
-    public string? CreatorName { get; set; }
-
-    public string? CreatorAvatarHash { get; set; }
-
-    public DateTimeOffset CreatedOn { get; set; }
-
-    public DateTimeOffset UpdatedOn { get; set; }
+    public DateTimeOffset RecordUpdatedOn { get; set; }
 
     public List<string> Tags { get; set; } = [];
 }

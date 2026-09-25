@@ -1,3 +1,5 @@
+using Distags.Api.Contracts.LogicGroups;
+using Distags.Api.Mapping;
 using Distags.Contracts;
 using Distags.Core;
 using Distags.Core.Queries.LogicGroups;
@@ -8,14 +10,17 @@ namespace Distags.Api.Controllers;
 
 [ApiController]
 [Route("[controller]")]
-public class LogicGroupsController
+public class LogicGroupsController : ControllerBase
 {
     [HttpGet]
     [AllowAnonymous]
-    public async Task<List<LogicGroupDto>> GetLogicGroupsAsync(
+    public async Task<ActionResult<List<LogicGroupResponse>>> GetLogicGroupsAsync(
         [FromServices] IRequestDispatcher requestDispatcher)
     {
         List<LogicGroupDto> logicGroupDtos = await requestDispatcher.DispatchAsync(new LogicGroupsQuery());
-        return logicGroupDtos;
+        List<LogicGroupResponse> logicGroupResponses = logicGroupDtos
+            .Select(LogicGroupMapper.Map)
+            .ToList();
+        return Ok(logicGroupResponses);
     }
 }

@@ -1,6 +1,6 @@
 using Distags.Contracts;
 using Distags.Core.Entities;
-using Distags.Core.Mapping;
+using Distags.Core.Projection;
 using Microsoft.EntityFrameworkCore;
 
 namespace Distags.Core.Queries.UserBans;
@@ -18,7 +18,7 @@ public class UserBansQueryHandler : IQueryHandler<UserBansQuery, List<UserBanDto
     {
         return await _DbContext.Set<UserBan>()
             .OrderByDescending(userBan => userBan.BannedOn)
-            .Select(new UserBanMapper().Expression)
+            .SelectDto()
             .ToListAsync()
             .ConfigureAwait(false);
     }

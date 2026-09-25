@@ -2,9 +2,10 @@ using Distags.Core.Entities;
 
 namespace Distags.Core.Sorting.Levels;
 
-public class LevelNameSorter : PropertyQueryableSorter<Level>
+public class LevelNameSorter : PropertyQueryableSorter<Level, string>
 {
-    public LevelNameSorter(SortOrder sortOrder) : base(level => level.Name, sortOrder)
+    public LevelNameSorter(SortOrder sortOrder)
+        : base(level => level.Name, sortOrder)
     {
     }
 

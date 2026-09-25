@@ -2,15 +2,13 @@ using Distags.Contracts;
 
 namespace Distags.Core.Commands.ChangeLevelTag;
 
-public class ChangeLevelTagCommand : ICommand
+public abstract class ChangeLevelTagCommand : ICommand
 {
-    public long LevelId { get; set; }
-
     public string TagName { get; set; } = string.Empty;
+
+    public TagChangeAction Action { get; set; }
 
     public long? UserSteamId { get; set; }
 
     public string? AppName { get; set; }
-
-    public TagChangeAction Action { get; set; }
 }

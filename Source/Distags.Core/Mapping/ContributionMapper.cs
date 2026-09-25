@@ -1,46 +1,12 @@
 using Distags.Contracts;
 using Distags.Core.Entities;
-using System.Linq.Expressions;
+using Riok.Mapperly.Abstractions;
 
 namespace Distags.Core.Mapping;
 
-public class ContributionMapper : IEntityMapper<Contribution, ContributionDto>
+[Mapper(RequiredMappingStrategy = RequiredMappingStrategy.Target)]
+[UseStaticMapper(typeof(LevelMapper))]
+public static partial class ContributionMapper
 {
-    public Expression<Func<Contribution, ContributionDto>> Expression { get; }
-
-    public ContributionMapper(bool ignoreAnonymity)
-    {
-        Expression = contribution => new ContributionDto
-        {
-            Id = contribution.Id,
-            Level = new ContributionLevelDto
-            {
-                Id = contribution.Level.Id,
-                Name = contribution.Level.Name,
-                CreatorName = contribution.Level.Creator!.Name,
-                CreatorAvatarHash = contribution.Level.Creator!.AvatarHash,
-                ImageUrl = contribution.Level.ImageUrl,
-            },
-            Changes = contribution.Changes
-                .Select(change => new TagChangeDto
-                {
-                    Action = change.Action,
-                    TagName = change.TagName,
-                })
-                .ToList(),
-            User = contribution.User == null ? null : new ContributionUserDto
-            {
-                IsAnonymous = contribution.User!.IsAnonymous,
-                SteamId = ignoreAnonymity || !contribution.User.IsAnonymous ? contribution.User!.SteamId : null,
-                SteamName = ignoreAnonymity || !contribution.User.IsAnonymous ? contribution.User!.SteamName : null,
-                SteamAvatarHash = ignoreAnonymity || !contribution.User.IsAnonymous ? contribution.User!.SteamAvatarHash : null,
-                IsBanned = contribution.User!.IsBanned,
-            },
-            App = contribution.App == null ? null : new ContributionAppDto
-            {
-                Name = contribution.App!.Name,
-            },
-            ContributedOn = contribution.ContributedOn,
-        };
-    }
+    public static partial ContributionDto Map(Contribution contribution);
 }

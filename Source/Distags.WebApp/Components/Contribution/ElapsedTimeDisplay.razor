@@ -1,4 +1,4 @@
-﻿@using Distags.WebApp.Services
+@using Distags.WebApp.Services
 
 @implements IDisposable
 
@@ -8,26 +8,26 @@
 
 @code {
 
-	[Parameter]
-	public required DateTimeOffset Timestamp { get; set; }
+    [Parameter]
+    public required DateTimeOffset Timestamp { get; set; }
 
-	[Parameter(CaptureUnmatchedValues = true)]
-	public IDictionary<string, object>? AdditionalAttributes { get; set; }
+    [Parameter(CaptureUnmatchedValues = true)]
+    public IDictionary<string, object>? AdditionalAttributes { get; set; }
 
-	protected override void OnAfterRender(bool firstRender)
-	{
-		if (firstRender)
-			TimeRefreshService.OnTick += HandleTimeRefresh;
-	}
+    protected override void OnAfterRender(bool firstRender)
+    {
+        if (firstRender)
+            TimeRefreshService.OnTick += HandleTimeRefresh;
+    }
 
-	public void Dispose()
-	{
-		TimeRefreshService.OnTick -= HandleTimeRefresh;
-	}
+    public void Dispose()
+    {
+        TimeRefreshService.OnTick -= HandleTimeRefresh;
+    }
 
-	private void HandleTimeRefresh()
-	{
-		InvokeAsync(StateHasChanged);
-	}
+    private void HandleTimeRefresh()
+    {
+        InvokeAsync(StateHasChanged);
+    }
 
 }

@@ -4,13 +4,13 @@ namespace Distags.Api.Hubs;
 
 public class LevelHub : Hub<ILevelHubClient>
 {
-    public async Task JoinLevelGroup(long levelId)
+    public async Task JoinLevelGroup(string levelGroupName)
     {
-        await Groups.AddToGroupAsync(Context.ConnectionId, levelId.ToString());
+        await Groups.AddToGroupAsync(Context.ConnectionId, levelGroupName);
     }
 
-    public async Task LeaveLevelGroup(long levelId)
+    public async Task LeaveLevelGroup(string levelGroupName)
     {
-        await Groups.RemoveFromGroupAsync(Context.ConnectionId, levelId.ToString());
+        await Groups.RemoveFromGroupAsync(Context.ConnectionId, levelGroupName);
     }
 }

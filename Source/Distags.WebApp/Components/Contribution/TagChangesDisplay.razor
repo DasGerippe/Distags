@@ -1,7 +1,8 @@
-﻿@using Distags.Contracts
+@using Distags.Api.Contracts.Tags
+@using Distags.Contracts
 
 <div class="d-flex flex-column overflow-hidden">
-    @foreach (TagChangeDto tagChange in Changes)
+    @foreach (TagChangeResponse tagChange in Changes)
     {
         <div class="d-flex column-gap-1 align-items-center overflow-hidden">
             <svg class="flex-shrink-0" style="width:1rem; height:1rem;">
@@ -15,7 +16,7 @@
 @code {
     
     [Parameter]
-    public required List<TagChangeDto> Changes { get; set; }
+    public required List<TagChangeResponse> Changes { get; set; }
 
     private string GetActionIconId(TagChangeAction action)
     {

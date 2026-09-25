@@ -5,3 +5,4 @@ variables:
     value: https://localhost:7159
   - secret: true
     name: sessionToken
+    description: ""

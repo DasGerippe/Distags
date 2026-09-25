@@ -1,6 +1,6 @@
 using Distags.Contracts;
 using Distags.Core.Entities;
-using Distags.Core.Mapping;
+using Distags.Core.Projection;
 using Microsoft.EntityFrameworkCore;
 
 namespace Distags.Core.Queries.LogicGroups;
@@ -17,7 +17,7 @@ public class LogicGroupsQueryHandler : IQueryHandler<LogicGroupsQuery, List<Logi
     public async Task<List<LogicGroupDto>> HandleAsync(LogicGroupsQuery query)
     {
         return await _DbContext.Set<LogicGroup>()
-            .Select(new LogicGroupMapper().Expression)
+            .SelectDto()
             .ToListAsync()
             .ConfigureAwait(false);
     }

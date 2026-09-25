@@ -1,4 +1,5 @@
-using Distags.Contracts;
+using Distags.Api.Contracts.DisplayGroups;
+using Distags.Api.Contracts.Tags;
 using Distags.WebApp.Models;
 
 namespace Distags.WebApp.Services;
@@ -22,8 +23,8 @@ public class TagTreeProvider
 
     private async Task<List<DisplayGroupWithTags>> BuildTagTreeAsync()
     {
-        List<DisplayGroupDto> displayGroups = await _DistagsApiClient.GetDisplayGroupsAsync();
-        List<TagDto> tags = await _DistagsApiClient.GetTagsAsync();
+        List<DisplayGroupResponse> displayGroups = await _DistagsApiClient.GetDisplayGroupsAsync();
+        List<TagResponse> tags = await _DistagsApiClient.GetTagsAsync();
 
         List<DisplayGroupWithTags> tagTree = displayGroups
             .Select(displayGroup => new DisplayGroupWithTags(

@@ -191,53 +191,37 @@ namespace Distags.Persistence.Dev
             modelBuilder.Entity("Distags.Core.Entities.Level", b =>
                 {
                     b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("bigint")
                         .HasColumnName("id");
 
-                    b.Property<DateTimeOffset>("CreatedOn")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("created_on");
-
-                    b.Property<long>("CreatorId")
-                        .HasColumnType("bigint")
-                        .HasColumnName("creator_id");
-
-                    b.Property<string>("FileName")
-                        .IsRequired()
-                        .HasColumnType("text")
-                        .HasColumnName("file_name");
-
-                    b.Property<string>("FileUrl")
-                        .IsRequired()
-                        .HasColumnType("text")
-                        .HasColumnName("file_url");
-
-                    b.Property<string>("ImageUrl")
-                        .IsRequired()
-                        .HasColumnType("text")
-                        .HasColumnName("image_url");
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
 
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("text")
                         .HasColumnName("name");
 
-                    b.Property<DateTimeOffset>("UpdatedOn")
+                    b.Property<DateTimeOffset>("RecordCreatedOn")
                         .HasColumnType("timestamp with time zone")
-                        .HasColumnName("updated_on");
+                        .HasColumnName("record_created_on");
 
-                    b.PrimitiveCollection<List<string>>("WorkshopTags")
-                        .IsRequired()
-                        .HasColumnType("text[]")
-                        .HasColumnName("workshop_tags");
+                    b.Property<DateTimeOffset>("RecordUpdatedOn")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("record_updated_on");
+
+                    b.Property<int>("Type")
+                        .HasColumnType("integer")
+                        .HasColumnName("type");
 
                     b.HasKey("Id")
                         .HasName("pk_levels");
 
-                    b.HasIndex("CreatorId")
-                        .HasDatabaseName("ix_levels_creator_id");
-
                     b.ToTable("levels", (string)null);
+
+                    b.HasDiscriminator<int>("Type");
+
+                    b.UseTphMappingStrategy();
                 });
 
             modelBuilder.Entity("Distags.Core.Entities.LevelTag", b =>
@@ -484,6 +468,88 @@ namespace Distags.Persistence.Dev
                     b.ToTable("level_locks", (string)null);
                 });
 
+            modelBuilder.Entity("Distags.Core.Entities.OfficialLevel", b =>
+                {
+                    b.HasBaseType("Distags.Core.Entities.Level");
+
+                    b.Property<string>("CreatorName")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("creator_name");
+
+                    b.PrimitiveCollection<List<string>>("GameModes")
+                        .IsRequired()
+                        .HasColumnType("text[]")
+                        .HasColumnName("game_modes");
+
+                    b.Property<string>("Slug")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("slug");
+
+                    b.HasIndex("Slug")
+                        .IsUnique()
+                        .HasDatabaseName("ix_levels_slug")
+                        .HasFilter("slug IS NOT NULL");
+
+                    b.ToTable("levels", (string)null);
+
+                    b.HasDiscriminator().HasValue(0);
+                });
+
+            modelBuilder.Entity("Distags.Core.Entities.WorkshopLevel", b =>
+                {
+                    b.HasBaseType("Distags.Core.Entities.Level");
+
+                    b.Property<DateTimeOffset>("CreatedOn")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("created_on");
+
+                    b.Property<long>("CreatorId")
+                        .HasColumnType("bigint")
+                        .HasColumnName("creator_id");
+
+                    b.Property<string>("FileName")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("file_name");
+
+                    b.Property<string>("FileUrl")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("file_url");
+
+                    b.Property<string>("ImageUrl")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("image_url");
+
+                    b.Property<DateTimeOffset>("UpdatedOn")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("updated_on");
+
+                    b.Property<long>("WorkshopId")
+                        .HasColumnType("bigint")
+                        .HasColumnName("workshop_id");
+
+                    b.PrimitiveCollection<List<string>>("WorkshopTags")
+                        .IsRequired()
+                        .HasColumnType("text[]")
+                        .HasColumnName("workshop_tags");
+
+                    b.HasIndex("CreatorId")
+                        .HasDatabaseName("ix_levels_creator_id");
+
+                    b.HasIndex("WorkshopId")
+                        .IsUnique()
+                        .HasDatabaseName("ix_levels_workshop_id")
+                        .HasFilter("workshop_id IS NOT NULL");
+
+                    b.ToTable("levels", (string)null);
+
+                    b.HasDiscriminator().HasValue(1);
+                });
+
             modelBuilder.Entity("Distags.Core.Entities.Contribution", b =>
                 {
                     b.HasOne("Distags.Core.Entities.App", "App")
@@ -517,16 +583,6 @@ namespace Distags.Persistence.Dev
                     b.Navigation("Tag");
 
                     b.Navigation("User");
-                });
-
-            modelBuilder.Entity("Distags.Core.Entities.Level", b =>
-                {
-                    b.HasOne("Distags.Core.Entities.Creator", "Creator")
-                        .WithMany("CreatedLevels")
-                        .HasForeignKey("CreatorId")
-                        .HasConstraintName("fk_levels_creators_creator_id");
-
-                    b.Navigation("Creator");
                 });
 
             modelBuilder.Entity("Distags.Core.Entities.LevelTag", b =>
@@ -598,6 +654,16 @@ namespace Distags.Persistence.Dev
                         .HasConstraintName("fk_user_sessions_users_user_id");
 
                     b.Navigation("User");
+                });
+
+            modelBuilder.Entity("Distags.Core.Entities.WorkshopLevel", b =>
+                {
+                    b.HasOne("Distags.Core.Entities.Creator", "Creator")
+                        .WithMany("CreatedLevels")
+                        .HasForeignKey("CreatorId")
+                        .HasConstraintName("fk_levels_creators_creator_id");
+
+                    b.Navigation("Creator");
                 });
 
             modelBuilder.Entity("Distags.Core.Entities.Creator", b =>

@@ -1,4 +1,6 @@
-﻿@using Distags.Contracts
+@using Distags.Api.Contracts.Contributions
+@using Distags.Api.Contracts.Levels
+@using Distags.Contracts
 @using Distags.WebApp.Components.Inputs
 @using Distags.WebApp.Components.Level
 
@@ -45,7 +47,7 @@
 @code {
 
     [Parameter]
-    public required ContributionDto Contribution { get; set; }
+    public required ContributionResponse Contribution { get; set; }
 
     [Parameter]
     public bool EnableModeration { get; set; }
@@ -57,10 +59,10 @@
     public bool UserFilterActive { get; set; }
 
     [Parameter]
-    public EventCallback<ContributionLevelDto> LevelFilterClicked { get; set; }
+    public EventCallback<LevelResponse> LevelFilterClicked { get; set; }
 
     [Parameter]
-    public EventCallback<ContributionUserDto> UserFilterClicked { get; set; }
+    public EventCallback<ContributionUserResponse> UserFilterClicked { get; set; }
 
     private string GetContainerClass()
     {

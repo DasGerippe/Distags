@@ -4,6 +4,13 @@ namespace Distags.Core.Filtering.Contributions;
 
 public class ContributionFilterFactory : IQueryableFilterFactory<Contribution, ContributionFilterParameters>
 {
+    private readonly IStringContainsFilterFactory _StringContainsFilterFactory;
+
+    public ContributionFilterFactory(IStringContainsFilterFactory stringContainsFilterFactory)
+    {
+        _StringContainsFilterFactory = stringContainsFilterFactory;
+    }
+
     public IQueryableFilter<Contribution> GetQueryableFilter(ContributionFilterParameters filterParams)
     {
         FilterGroup<Contribution> filterGroup = new FilterGroup<Contribution>();
@@ -14,8 +21,13 @@ public class ContributionFilterFactory : IQueryableFilterFactory<Contribution, C
         if (filterParams.AppName != null)
             filterGroup.AddFilter(new AppFilter(filterParams.AppName));
 
-        if (filterParams.LevelId != null)
-            filterGroup.AddFilter(new LevelFilter(filterParams.LevelId.Value));
+        if (filterParams.LevelSlug != null)
+            filterGroup.AddFilter(_StringContainsFilterFactory.CreateFilter<Contribution>(
+                contribution => (contribution.Level as OfficialLevel)!.Slug,
+                filterParams.LevelSlug));
+
+        if (filterParams.LevelWorkshopId != null)
+            filterGroup.AddFilter(new WorkshopLevelFilter(filterParams.LevelWorkshopId.Value));
 
         if (filterParams.TagName != null)
             filterGroup.AddFilter(new ChangedTagFilter(filterParams.TagName));

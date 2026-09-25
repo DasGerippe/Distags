@@ -1,6 +1,6 @@
 using Distags.Contracts;
 using Distags.Core.Entities;
-using Distags.Core.Mapping;
+using Distags.Core.Projection;
 using Microsoft.EntityFrameworkCore;
 
 namespace Distags.Core.Queries.UserBySteamId;
@@ -18,7 +18,7 @@ public class UserBySteamIdQueryHandler : IQueryHandler<UserBySteamIdQuery, UserD
     {
         return await _DbContext.Set<User>()
             .Where(user => user.SteamId == query.SteamId)
-            .Select(new UserMapper().Expression)
+            .SelectDto()
             .FirstOrDefaultAsync()
             .ConfigureAwait(false);
     }

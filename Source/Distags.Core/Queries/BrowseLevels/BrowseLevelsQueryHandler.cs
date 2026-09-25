@@ -2,9 +2,8 @@ using Distags.Contracts;
 using Distags.Core.Entities;
 using Distags.Core.Filtering;
 using Distags.Core.Filtering.Levels;
-using Distags.Core.Mapping;
+using Distags.Core.Projection;
 using Distags.Core.Sorting;
-using Distags.Core.Sorting.Levels;
 using Microsoft.EntityFrameworkCore;
 
 namespace Distags.Core.Queries.BrowseLevels;
@@ -56,7 +55,7 @@ public class BrowseLevelsQueryHandler : IQueryHandler<BrowseLevelsQuery, LevelsP
             levels = levels.Take(query.PageSize);
 
         List<LevelDto> levelDtos = await levels
-            .Select(new LevelMapper().Expression)
+            .SelectDto()
             .ToListAsync()
             .ConfigureAwait(false);
 

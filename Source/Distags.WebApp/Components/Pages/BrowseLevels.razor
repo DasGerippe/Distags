@@ -1,8 +1,8 @@
-﻿@page "/browse"
+@page "/browse"
 @rendermode InteractiveServer
 
 @using Distags.Api.Contracts.Levels
-@using Distags.Contracts
+@using Distags.Api.Contracts.Tags
 @using Distags.WebApp.Components.Inputs
 @using Distags.WebApp.Components.Level
 @using Distags.WebApp.Models
@@ -14,7 +14,7 @@
 @inject IStringLocalizer<Resource> Localizer
 @inject HistoryManager History
 @inject NavigationManager Navigation
-@inject DistagsApiClient LevelTagApi
+@inject DistagsApiClient DistagsApi
 @inject TagTreeProvider TagTreeProvider
 
 <PageTitle>@Resource.PageTitle_BrowseLevels</PageTitle>
@@ -29,7 +29,7 @@
             @foreach (DisplayGroupWithTags tagGroup in _TagTree)
             {
                 <TagGroupColumnCard Title="@tagGroup.DisplayGroup.DisplayName">
-                    @foreach (TagDto tag in tagGroup.Tags)
+                    @foreach (TagResponse tag in tagGroup.Tags)
                     {
                         TagFilter tagFilter = _TagFilters[tag.Name];
                         <IconCheckbox TState="TagFilterState"
@@ -84,7 +84,7 @@
         <Paginator CurrentPageChanged="OnPageChanged" CurrentPage="Page" PageCount="_PageCount" />
 
         <div class="row gy-3">
-            @foreach (LevelDto level in _Levels)
+            @foreach (LevelResponse level in _Levels)
             {
                 <div class="col-12 col-md-6">
                     <LevelPanel Level="level" />
@@ -112,9 +112,9 @@
     private readonly ICheckboxIconProvider<TagFilterState> _TagFilterStateIconProvider = new TagFilterStateIconProvider();
 
     private readonly IGenericDropdownItemProvider<int> _PageSizeItemsProvider = new IntDropdownItemProvider(10, 20, 30, 50, 100);
-    private IGenericDropdownItemProvider<LevelSortStrategy>? _SortStrategyItemsProvider;
+    private IGenericDropdownItemProvider<LevelSortStrategy> _SortStrategyItemsProvider = null!;
 
-    private List<LevelDto> _Levels = [];
+    private List<LevelResponse> _Levels = [];
     private int _PageCount;
 
     private string LevelFilter { get; set; } = string.Empty;
@@ -230,7 +230,7 @@
     {
         _BrowseClicked = true;
 
-        BrowseLevelsParameters parameters = new BrowseLevelsParameters
+        BrowseLevelsRequest request = new BrowseLevelsRequest
         {
             LevelName = GetFilterTermOrNullIfEmpty(LevelFilter),
             CreatorName = GetFilterTermOrNullIfEmpty(CreatorFilter),
@@ -240,7 +240,7 @@
             PageNumber = page,
             SortStrategy = SortStrategy,
         };
-        LevelsPage levelsPage = await LevelTagApi.BrowseLevelsAsync(parameters);
+        LevelsPageResponse levelsPage = await DistagsApi.BrowseLevelsAsync(request);
         Page = page;
         _PageCount = (int)Math.Ceiling((double)levelsPage.TotalLevels / PageSize);
         _Levels = levelsPage.Levels;
@@ -263,10 +263,10 @@
 
     private class TagFilter
     {
-        public TagDto Tag { get; }
+        public TagResponse Tag { get; }
         public TagFilterState State { get; set; } = TagFilterState.Neutral;
 
-        public TagFilter(TagDto tag)
+        public TagFilter(TagResponse tag)
         {
             Tag = tag;
         }

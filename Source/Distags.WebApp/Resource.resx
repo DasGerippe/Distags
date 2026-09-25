@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <root>
   <!-- 
     Microsoft ResX Schema 
@@ -251,5 +251,8 @@
   </data>
   <data name="BrowseLevels_NoLevelsFound" xml:space="preserve">
     <value>No Levels Found</value>
+  </data>
+  <data name="Creator_UnknownUserName" xml:space="preserve">
+    <value>Unknown Creator</value>
   </data>
 </root>

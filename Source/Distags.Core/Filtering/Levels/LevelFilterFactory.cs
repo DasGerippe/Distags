@@ -15,19 +15,18 @@ public class LevelFilterFactory : IQueryableFilterFactory<Level, LevelFilterPara
     {
         FilterGroup<Level> levelFilterGroup = new FilterGroup<Level>();
 
+        if (filterParams.Type != null)
+            levelFilterGroup.AddFilter(new SimpleFilter<Level>(level => level.Type == filterParams.Type));
+
         if (filterParams.LevelName != null)
             levelFilterGroup.AddFilter(
                 _StringContainsFilterFactory.CreateFilter<Level>(level => level.Name, filterParams.LevelName));
 
         if (filterParams.CreatorName != null)
             levelFilterGroup.AddFilter(
-                _StringContainsFilterFactory.CreateFilter<Level>(level => level.Creator!.Name, filterParams.CreatorName));
-
-        if (filterParams.CreatedAfter != null)
-            levelFilterGroup.AddFilter(new SimpleFilter<Level>(level => level.CreatedOn >= filterParams.CreatedAfter));
-
-        if (filterParams.UpdatedAfter != null)
-            levelFilterGroup.AddFilter(new SimpleFilter<Level>(level => level.UpdatedOn >= filterParams.UpdatedAfter));
+                _StringContainsFilterFactory.CreateFilter<Level>(
+                    level => (level as OfficialLevel)!.CreatorName ?? (level as WorkshopLevel)!.Creator!.Name,
+                    filterParams.CreatorName));
 
         if (filterParams.IncludeTags.Count > 0)
             levelFilterGroup.AddFilter(new LevelIncludeTagsFilter(filterParams.IncludeTags));

@@ -1,3 +1,5 @@
+using Distags.Contracts;
+using Microsoft.Extensions.Logging;
 using System.Text.Json;
 
 namespace AutoTagging.MaxterCsvImporter;
@@ -10,43 +12,46 @@ public class AppliedTagsLedger
 {
     private static readonly JsonSerializerOptions JsonOptions = new JsonSerializerOptions { WriteIndented = true };
 
-    private readonly string _Path;
+    private readonly string _FilePath;
+    private readonly ILogger<AppliedTagsLedger> _Logger;
+
     private readonly Lazy<Dictionary<long, List<string>>> _Entries;
 
-    public AppliedTagsLedger(string path)
+    public AppliedTagsLedger(string filePath, ILogger<AppliedTagsLedger> logger)
     {
-        _Path = path;
+        _FilePath = filePath;
+        _Logger = logger;
         _Entries = new Lazy<Dictionary<long, List<string>>>(Load);
     }
 
-    public IReadOnlyCollection<string> GetPreviouslyApplied(long levelId)
+    public IReadOnlyCollection<string> GetPreviouslyApplied(LevelDto level)
     {
-        return _Entries.Value.TryGetValue(levelId, out List<string>? tags) ? tags : Array.Empty<string>();
+        return _Entries.Value.TryGetValue(level.Id, out List<string>? tags) ? tags : [];
     }
 
-    public void SetCurrentlyApplied(long levelId, IReadOnlyCollection<string> tags)
+    public void SetCurrentlyApplied(LevelDto level, IReadOnlyCollection<string> tags)
     {
         if (tags.Count == 0)
-            _Entries.Value.Remove(levelId);
+            _Entries.Value.Remove(level.Id);
         else
-            _Entries.Value[levelId] = tags.ToList();
+            _Entries.Value[level.Id] = tags.ToList();
 
         Save();
     }
 
     private Dictionary<long, List<string>> Load()
     {
-        if (!File.Exists(_Path))
+        if (!File.Exists(_FilePath))
             return new Dictionary<long, List<string>>();
 
         try
         {
-            string json = File.ReadAllText(_Path);
+            string json = File.ReadAllText(_FilePath);
             return JsonSerializer.Deserialize<Dictionary<long, List<string>>>(json) ?? new Dictionary<long, List<string>>();
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"[MaxterCsvImporter] Could not read applied-tags ledger at '{_Path}', starting fresh: {ex.Message}");
+            _Logger.LogError(ex, "Could not read applied-tags ledger at '{filePath}'. Starting fresh.", _FilePath);
             return new Dictionary<long, List<string>>();
         }
     }
@@ -54,6 +59,6 @@ public class AppliedTagsLedger
     private void Save()
     {
         string json = JsonSerializer.Serialize(_Entries.Value, JsonOptions);
-        File.WriteAllText(_Path, json);
+        File.WriteAllText(_FilePath, json);
     }
 }

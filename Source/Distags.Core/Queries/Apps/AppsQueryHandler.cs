@@ -1,6 +1,6 @@
 using Distags.Contracts;
 using Distags.Core.Entities;
-using Distags.Core.Mapping;
+using Distags.Core.Projection;
 using Microsoft.EntityFrameworkCore;
 
 namespace Distags.Core.Queries.Apps;
@@ -17,7 +17,7 @@ public class AppsQueryHandler : IQueryHandler<AppsQuery, List<AppDto>>
     public async Task<List<AppDto>> HandleAsync(AppsQuery query)
     {
         return await _DbContext.Set<App>()
-            .Select(new AppMapper().Expression)
+            .SelectDto()
             .ToListAsync()
             .ConfigureAwait(false);
     }
