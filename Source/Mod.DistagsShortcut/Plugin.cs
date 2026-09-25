@@ -78,10 +78,12 @@ namespace Mod.DistagsShortcut
             if (string.IsNullOrEmpty(focusedLevelPathRelative))
             {
                 Logger.LogWarning("Could not determine level to be opened in Distags.");
-                return;
+                _DistagsOpener.OpenDistags();
             }
-
-            _DistagsOpener.OpenDistagsLevel(focusedLevelPathRelative);
+            else
+            {
+                _DistagsOpener.OpenDistagsLevel(focusedLevelPathRelative);
+            }
         }
     }
 }

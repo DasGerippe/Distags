@@ -20,7 +20,7 @@ namespace Mod.DistagsShortcut
 
         public void OpenDistags()
         {
-            UrlOpener.OpenUrl(DistagsUrl);
+            OpenDistags(string.Empty);
         }
 
         public void OpenDistagsLevel(string levelPathRelative)
@@ -50,14 +50,21 @@ namespace Mod.DistagsShortcut
 
         public void OpenDistagsOfficialLevel(string levelSlug)
         {
-            string levelUrl = $"{DistagsUrl}/level/official/{levelSlug}";
-            UrlOpener.OpenUrl(levelUrl);
+            string levelPath = $"{DistagsUrl}/level/official/{levelSlug}";
+            OpenDistags(levelPath);
         }
 
         public void OpenDistagsWorkshopLevel(long levelWorkshopId)
         {
-            string levelUrl = $"{DistagsUrl}/level/workshop/{levelWorkshopId}";
-            UrlOpener.OpenUrl(levelUrl);
+            string levelPath = $"{DistagsUrl}/level/workshop/{levelWorkshopId}";
+            OpenDistags(levelPath);
+        }
+
+        private void OpenDistags(string resourcePath)
+        {
+            string url = $"{DistagsUrl}{resourcePath}";
+            Plugin.Logger.LogDebug($"Opening '{url}'.");
+            UrlOpener.OpenUrl(url);
         }
     }
 }
