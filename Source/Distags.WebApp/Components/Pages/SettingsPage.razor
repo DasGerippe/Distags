@@ -3,15 +3,15 @@
 
 @using Distags.Api.Contracts.Guidelines
 @using Distags.Api.Contracts.Users
+@using Distags.WebApp.DistagsApi
 @using Distags.WebApp.Security
-@using Distags.WebApp.Services
 
 @inject IUserInfoProvider UserInfoProvider
 @inject DistagsApiClient DistagsApi
 
 <PageTitle>@Resource.PageTitle_Settings</PageTitle>
 
-@if (_User == null)
+@if (!_LoggedIn)
     return;
 
 <div class="container-fluid content-narrow py-4">
@@ -27,9 +27,9 @@
                 <p>@guideline.Text</p>
             }
 
-            @if (!_User.AcceptsGuidelines)
+            @if (!_AcceptsGuidelines)
             {
-                <button class="btn btn-success" @onclick="AcceptContributionGuidelinesAsync">
+                <button class="btn btn-success" disabled="@(_Guidelines == null)" @onclick="AcceptContributionGuidelinesAsync">
                     @Resource.Setting_ContributionGuidelines_Accept
                 </button>
             }
@@ -62,24 +62,32 @@
 
 @code {
 
-    private UserResponse? _User;
+    private bool _LoggedIn;
+    private bool _AcceptsGuidelines;
     private bool _IsAnonymous;
 
     private GuidelinesResponse? _Guidelines;
 
     protected override async Task OnInitializedAsync()
     {
-        _User = await UserInfoProvider.GetUserInfoAsync();
-        _IsAnonymous = _User?.IsAnonymous == true;
+        UserResponse? user = await UserInfoProvider.GetUserInfoAsync();
+        if (user == null)
+            return;
 
-        _Guidelines = await DistagsApi.GetContributionGuidelinesAsync();
+        _LoggedIn = true;
+        _AcceptsGuidelines = user.AcceptsGuidelines;
+        _IsAnonymous = user.IsAnonymous;
+
+        ApiResult<GuidelinesResponse> apiResult = await DistagsApi.GetContributionGuidelinesAsync();
+        _Guidelines = apiResult.Value;
     }
 
     private async Task AcceptContributionGuidelinesAsync()
     {
         PatchUserSettingsRequest request = new PatchUserSettingsRequest { AcceptsGuidelines = true };
-        await DistagsApi.PatchUserSettingsAsync(request);
-        _User!.AcceptsGuidelines = true;
+        ApiResult apiResult = await DistagsApi.PatchUserSettingsAsync(request);
+        if (apiResult.IsSuccess)
+            _AcceptsGuidelines = true;
     }
 
     private async Task OnAnonymousChangedAsync(ChangeEventArgs args)
@@ -88,8 +96,9 @@
             return;
 
         PatchUserSettingsRequest request = new PatchUserSettingsRequest { IsAnonymous = isAnonymous };
-        await DistagsApi.PatchUserSettingsAsync(request);
-        _IsAnonymous = isAnonymous;
+        ApiResult apiResult = await DistagsApi.PatchUserSettingsAsync(request);
+        if (apiResult.IsSuccess)
+            _IsAnonymous = isAnonymous;
     }
 
 }
