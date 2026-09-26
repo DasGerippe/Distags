@@ -2,7 +2,7 @@ namespace Distags.Api.Contracts.Contributions;
 
 public class RevertContributionsRequest
 {
-    public long SteamId { get; set; }
+    public long SteamId { get; init; }
 
-    public DateTimeOffset? RevertStartDate { get; set; }
+    public DateTimeOffset? RevertStartDate { get; init; }
 }

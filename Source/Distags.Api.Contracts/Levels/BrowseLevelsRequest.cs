@@ -4,19 +4,19 @@ namespace Distags.Api.Contracts.Levels;
 
 public class BrowseLevelsRequest
 {
-    public string? LevelName { get; set; }
+    public string? LevelName { get; init; }
 
-    public string? CreatorName { get; set; }
+    public string? CreatorName { get; init; }
 
-    public string? IncludeTags { get; set; }
+    public string? IncludeTags { get; init; }
 
-    public string? ExcludeTags { get; set; }
+    public string? ExcludeTags { get; init; }
 
-    public LevelSortStrategy SortStrategy { get; set; } = LevelSortStrategy.CreatedDesc;
+    public LevelSortStrategy SortStrategy { get; init; } = LevelSortStrategy.CreatedDesc;
 
     [Range(1, int.MaxValue, ErrorMessage = "PageNumber must be at least 1.")]
-    public int PageNumber { get; set; } = 1;
+    public int PageNumber { get; init; } = 1;
 
     [Range(1, 100, ErrorMessage = "PageSize must be between 1 and 100.")]
-    public int PageSize { get; set; } = 25;
+    public int PageSize { get; init; } = 25;
 }

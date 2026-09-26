@@ -2,5 +2,5 @@ namespace Distags.Api.Contracts.Contributions;
 
 public class ContributionsPageResponse
 {
-    public List<ContributionResponse> Contributions { get; set; } = [];
+    public List<ContributionResponse> Contributions { get; init; } = [];
 }

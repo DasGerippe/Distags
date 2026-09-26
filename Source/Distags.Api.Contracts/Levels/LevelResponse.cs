@@ -10,9 +10,9 @@ public abstract class LevelResponse
     [JsonIgnore]
     public abstract LevelType Type { get; }
 
-    public string Name { get; set; } = string.Empty;
+    public string Name { get; init; } = string.Empty;
 
-    public string Key { get; set; } = string.Empty;
+    public string Key { get; init; } = string.Empty;
 
-    public List<string>? Tags { get; set; }
+    public List<string>? Tags { get; init; }
 }
