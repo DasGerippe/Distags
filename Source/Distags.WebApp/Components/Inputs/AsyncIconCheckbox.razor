@@ -3,7 +3,7 @@
 @typeparam TState
 
 <div class="custom-checkbox d-flex align-items-start gap-2"
-     @onclick="ReadOnly ? null : HandleClick">
+     @onclick="ReadOnly ? default : new EventCallback(this, HandleClick)">
     
      @if (_IsInAsyncOperation)
      {
