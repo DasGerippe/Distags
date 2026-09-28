@@ -5,8 +5,8 @@
 @using Distags.Api.Contracts.Contributions
 @using Distags.WebApp.Collections
 @using Distags.WebApp.Components.Contribution
+@using Distags.WebApp.DistagsApi
 @using Distags.WebApp.Security
-@using Distags.WebApp.Services
 @using Microsoft.AspNetCore.SignalR.Client
 @using Microsoft.Net.Http.Headers
 
@@ -64,7 +64,11 @@
         {
             Limit = 100,
         };
-        ContributionsPageResponse contributionsPage = await DistagsApi.GetContributionsAsync(request);
+        ApiResult<ContributionsPageResponse> apiResult = await DistagsApi.GetContributionsAsync(request);
+        if (!apiResult.IsSuccess)
+            return;
+
+        ContributionsPageResponse contributionsPage = apiResult.Value;
         int startIndex = Math.Min(_Contributions.Capacity, contributionsPage.Contributions.Count) - 1;
         for (int i = startIndex; i >= 0; i--)
         {
