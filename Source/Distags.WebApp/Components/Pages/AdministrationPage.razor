@@ -3,8 +3,8 @@
 
 @using Distags.Api.Contracts.Configuration
 @using Distags.Api.Contracts.Users
+@using Distags.WebApp.DistagsApi
 @using Distags.WebApp.Security
-@using Distags.WebApp.Services
 
 @inject IUserInfoProvider UserInfoProvider
 @inject NavigationManager NavigationManager
@@ -46,8 +46,9 @@
             return;
         }
 
-        ConfigurationResponse configuration = await DistagsApi.GetApiStateAsync();
-        _MaintenanceActive = configuration.MaintenanceActive;
+        ApiResult<ConfigurationResponse> apiResult = await DistagsApi.GetApiStateAsync();
+        apiResult.EnsureSuccess();
+        _MaintenanceActive = apiResult.Value.MaintenanceActive;
     }
 
     private async Task OnMaintenanceChanged(ChangeEventArgs args)
