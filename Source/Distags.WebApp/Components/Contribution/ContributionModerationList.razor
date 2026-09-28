@@ -163,8 +163,11 @@
             LevelWorkshopId = (_LevelFilter as WorkshopLevelResponse)?.WorkshopId,
             UserSteamId = _UserFilter?.SteamId,
         };
-        ContributionsPageResponse contributionsPage = await DistagsApi.GetContributionsAsync(request);
+        ApiResult<ContributionsPageResponse> apiResult = await DistagsApi.GetContributionsAsync(request);
+        if (!apiResult.IsSuccess)
+            return;
 
+        ContributionsPageResponse contributionsPage = apiResult.Value;
         _CachedContributions.AddRange(contributionsPage.Contributions);
         if (contributionsPage.Contributions.Count < batchSize)
             _CachedAllContributions = true;
@@ -189,6 +192,7 @@
     {
         _CachedContributions.Clear();
         _LiveContributions.Clear();
+        _CachedAllContributions = false;
         return LoadNextContributionBatch();
     }
 
