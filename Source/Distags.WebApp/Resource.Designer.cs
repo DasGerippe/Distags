@@ -394,6 +394,15 @@ namespace Distags.WebApp {
         }
         
         /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Problem Details ähnelt.
+        /// </summary>
+        internal static string ProblemDetailsDisplay_Header {
+            get {
+                return ResourceManager.GetString("ProblemDetailsDisplay_Header", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Sucht eine lokalisierte Zeichenfolge, die Profile ähnelt.
         /// </summary>
         internal static string ProfileDropdown_FallbackText {

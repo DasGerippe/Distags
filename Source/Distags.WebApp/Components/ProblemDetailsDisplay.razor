@@ -1,0 +1,45 @@
+@using Microsoft.AspNetCore.Mvc
+
+<table class="table">
+    <thead>
+        <tr>
+            <th colspan="2">@Resource.ProblemDetailsDisplay_Header</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (KeyValuePair<string, object?> extension in GetProblemDetails())
+        {
+            if (extension.Value == null && !DisplayNullValues)
+                continue;
+
+            <tr>
+                <td>@extension.Key</td>
+                <td>@extension.Value</td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+@code {
+
+    [Parameter]
+    public required ProblemDetails ProblemDetails { get; set; }
+
+    [Parameter]
+    public bool DisplayNullValues { get; set; }
+
+    private IEnumerable<KeyValuePair<string, object?>> GetProblemDetails()
+    {
+        yield return new KeyValuePair<string, object?>(nameof(ProblemDetails.Status), ProblemDetails.Status);
+        yield return new KeyValuePair<string, object?>(nameof(ProblemDetails.Type), ProblemDetails.Type);
+        yield return new KeyValuePair<string, object?>(nameof(ProblemDetails.Title), ProblemDetails.Title);
+        yield return new KeyValuePair<string, object?>(nameof(ProblemDetails.Detail), ProblemDetails.Detail);
+        yield return new KeyValuePair<string, object?>(nameof(ProblemDetails.Instance), ProblemDetails.Instance);
+
+        foreach (KeyValuePair<string, object?> extension in ProblemDetails.Extensions)
+        {
+            yield return extension;
+        }
+    }
+
+}

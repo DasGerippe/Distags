@@ -255,4 +255,7 @@
   <data name="Creator_UnknownUserName" xml:space="preserve">
     <value>Unknown Creator</value>
   </data>
+  <data name="ProblemDetailsDisplay_Header" xml:space="preserve">
+    <value>Problem Details</value>
+  </data>
 </root>
