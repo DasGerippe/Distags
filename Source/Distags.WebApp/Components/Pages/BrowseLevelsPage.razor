@@ -5,6 +5,7 @@
 @using Distags.Api.Contracts.Tags
 @using Distags.WebApp.Components.Inputs
 @using Distags.WebApp.Components.Level
+@using Distags.WebApp.DistagsApi
 @using Distags.WebApp.Models
 @using Distags.WebApp.Services
 @using Microsoft.AspNetCore.WebUtilities
@@ -240,7 +241,11 @@
             PageNumber = page,
             SortStrategy = SortStrategy,
         };
-        LevelsPageResponse levelsPage = await DistagsApi.BrowseLevelsAsync(request);
+        ApiResult<LevelsPageResponse> apiResult = await DistagsApi.BrowseLevelsAsync(request);
+        if (!apiResult.IsSuccess)
+            return;
+
+        LevelsPageResponse levelsPage = apiResult.Value;
         Page = page;
         _PageCount = (int)Math.Ceiling((double)levelsPage.TotalLevels / PageSize);
         _Levels = levelsPage.Levels;
