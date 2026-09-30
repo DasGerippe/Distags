@@ -34,7 +34,7 @@ public class TicketProcessingMiddleware
                 {
                     Secure = true,
                     HttpOnly = true,
-                    SameSite = SameSiteMode.Strict,
+                    SameSite = SameSiteMode.Lax,
                 });
             }
         }
