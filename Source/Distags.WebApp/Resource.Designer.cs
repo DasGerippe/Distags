@@ -257,7 +257,29 @@ namespace Distags.WebApp {
                 return ResourceManager.GetString("Enum_LevelSortStrategy_UpdatedDesc", resourceCulture);
             }
         }
-        
+
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Loading Level ähnelt.
+        /// </summary>
+        internal static string Level_Loading
+        {
+            get
+            {
+                return ResourceManager.GetString("Level_Loading", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Could not load level. ähnelt.
+        /// </summary>
+        internal static string Level_NotLoaded
+        {
+            get
+            {
+                return ResourceManager.GetString("Level_NotLoaded", resourceCulture);
+            }
+        }
+
         /// <summary>
         ///   Sucht eine lokalisierte Zeichenfolge, die Administration ähnelt.
         /// </summary>
@@ -354,6 +376,15 @@ namespace Distags.WebApp {
         internal static string PageTitle_Level {
             get {
                 return ResourceManager.GetString("PageTitle_Level", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Level &lt;Error&gt; ähnelt.
+        /// </summary>
+        internal static string PageTitle_Level_Error {
+            get {
+                return ResourceManager.GetString("PageTitle_Level_Error", resourceCulture);
             }
         }
         

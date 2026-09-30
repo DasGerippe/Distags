@@ -1,16 +1,17 @@
-@page "/level/official/{officialLevelSlug}"
-@page "/level/workshop/{workshopLevelId:long}"
+@page "/level/official/{officialSlug}"
+@page "/level/workshop/{workshopId:long}"
 @rendermode InteractiveServer
 
 @using Distags.Api.Contracts.Levels
 @using Distags.Api.Contracts.Tags
-@using Distags.Api.Contracts.Users
 @using Distags.Contracts
 @using Distags.WebApp.Components.Inputs
 @using Distags.WebApp.Components.Level
+@using Distags.WebApp.DistagsApi
 @using Distags.WebApp.Models
 @using Distags.WebApp.Security
 @using Distags.WebApp.Services
+@using Microsoft.AspNetCore.Mvc
 @using Microsoft.AspNetCore.SignalR.Client
 @using System.Net
 
@@ -20,38 +21,44 @@
 @inject TagTreeProvider TagTreeProvider
 @inject IUserInfoProvider UserInfoProvider
 
-@if (_IsLoadingData)
+@if (_IsLoading)
 {
     <PageTitle>@Resource.PageTitle_Level_Loading</PageTitle>
-
-    <div class="d-flex justify-content-center align-items-center">
+    <div class="d-flex align-items-center justify-content-center h-100">
         <div class="spinner-border" style="width: 4rem; height: 4rem;" role="status">
-            <span class="visually-hidden">Loading level...</span>
+            <span class="visually-hidden">@Resource.Level_Loading</span>
         </div>
     </div>
     return;
 }
 
-@if (_Level == null)
+@if (ProblemDetails != null)
 {
-    <PageTitle>@Resource.PageTitle_Level_Unknown</PageTitle>
-
-    <div class="d-flex flex-column align-items-center text-center">
-        <h1 class="display-4 fw-bold text-danger">404</h1>
-        <p class="text-danger-emphasis">@GetLevelNullErrorText()</p>
+    <PageTitle>@Resource.PageTitle_Level_Error</PageTitle>
+    <div class="container-fluid content-narrow">
+        <div class="d-flex flex-column align-items-center p-4">
+            <h3 class="text-danger"><strong>@Resource.Level_NotLoaded</strong></h3>
+            <ProblemDetailsDisplay ProblemDetails="ProblemDetails" />
+        </div>
     </div>
     return;
 }
 
-<PageTitle>@string.Format(Resource.PageTitle_Level, _Level.Name)</PageTitle>
+@if (Level == null)
+{
+    <PageTitle>@Resource.PageTitle_Level_Unknown</PageTitle>
+    return;
+}
 
-<LevelHero Level="_Level" />
+<PageTitle>@string.Format(Resource.PageTitle_Level, Level.Name)</PageTitle>
 
-<ContributionPrerequisitesBanner/>
+<LevelHero Level="Level" />
+
+<ContributionPrerequisitesBanner />
 
 <div class="container-fluid content-wide">
     <div class="row">
-        @foreach (DisplayGroupWithTags tagGroup in _TagTree!)
+        @foreach (DisplayGroupWithTags tagGroup in _TagTree)
         {
             <TagGroupColumnCard Title="@tagGroup.DisplayGroup.DisplayName">
                 @{
@@ -68,7 +75,7 @@
                                            ReadOnly="_IsReadOnly || tag.IsAutoTag"
                                            Label="@tag.DisplayName"
                                            @bind-State="_TagStates[tag.Name].State"
-                                           AsyncOperation="state => TryChangeTagState(tag.Name, state)"
+                                           AsyncOperation="state => ChangeTagState(tag.Name, state)"
                                            IconProvider="_CheckboxIconProvider" />
 
                         previousLogicGroupName = tag.LogicGroupName;
@@ -82,80 +89,113 @@
 
 @code {
 
-    private bool _IsLoadingData = true;
-    private bool _IsReadOnly;
-
-    private LevelResponse? _Level;
-    private IReadOnlyCollection<DisplayGroupWithTags>? _TagTree;
+    private bool _IsLoading = true;
 
     private readonly ICheckboxIconProvider<bool> _CheckboxIconProvider = new BoolCheckboxIconProvider();
 
-    private readonly Dictionary<string, TagState> _TagStates = new Dictionary<string, TagState>();
+    private bool _IsReadOnly;
+    private IReadOnlyCollection<DisplayGroupWithTags> _TagTree = [];
+    private readonly Dictionary<string, TagState> _TagStates = [];
 
     private HubConnection? _LevelHubConnection;
+    private string? _CurrentLevelHubGroupName;
 
     [Parameter]
-    public string? OfficialLevelSlug { get; set; }
+    public string? OfficialSlug { get; set; }
 
     [Parameter]
-    public long? WorkshopLevelId { get; set; }
+    public long? WorkshopId { get; set; }
+
+    [PersistentState]
+    public LevelResponse? Level { get; set; }
+
+    [PersistentState]
+    public ProblemDetails? ProblemDetails { get; set; }
 
     protected override async Task OnInitializedAsync()
     {
+        List<Task> tasks =
+        [
+            InitializeIsReadOnlyAsync(),
+            InitializeTagTreeAsync(),
+        ];
+
+        if (RendererInfo.IsInteractive)
+        {
+            SetUpLevelHubConnection();
+            tasks.Add(_LevelHubConnection!.StartAsync());
+        }
+
+        await Task.WhenAll(tasks);
+    }
+
+    private async Task InitializeIsReadOnlyAsync()
+    {
+        _IsReadOnly = (await UserInfoProvider.GetUserInfoAsync())?.AcceptsGuidelines != true;
+    }
+
+    private async Task InitializeTagTreeAsync()
+    {
+        _TagTree = await TagTreeProvider.GetTagTreeAsync();
+    }
+
+    protected override async Task OnParametersSetAsync()
+    {
+        _IsLoading = true;
         try
         {
-            if (OfficialLevelSlug != null)
-                _Level = await DistagsApi.GetOfficialLevelAsync(OfficialLevelSlug);
-            else if (WorkshopLevelId != null)
-                _Level = await DistagsApi.GetWorkshopLevelAsync(WorkshopLevelId.Value);
-            else
-                return;
-        }
-        catch (HttpRequestException httpRequestException) when (httpRequestException.StatusCode == HttpStatusCode.NotFound)
-        {
-            // This page will handle invalid slugs or workshop IDs.
-            return;
+            if (OfficialSlug != null && OfficialSlug != (Level as OfficialLevelResponse)?.Slug)
+                SetValuesFromApiResponse(await DistagsApi.GetOfficialLevelAsync(OfficialSlug));
+            else if (WorkshopId != null && WorkshopId != (Level as WorkshopLevelResponse)?.WorkshopId)
+                SetValuesFromApiResponse(await DistagsApi.GetWorkshopLevelAsync(WorkshopId.Value));
+
+            bool switchGroup = RendererInfo.IsInteractive && _CurrentLevelHubGroupName != Level?.Key;
+
+            if (switchGroup && _CurrentLevelHubGroupName != null)
+                await LeaveLevelHubGroup(_CurrentLevelHubGroupName);
+
+            InitializeTagStates();
+
+            if (switchGroup && Level?.Key != null)
+                await JoinLevelHubGroup(Level.Key);
         }
         finally
         {
-            _IsLoadingData = false;
+            _IsLoading = false;
         }
-
-        UserResponse? user = await UserInfoProvider.GetUserInfoAsync();
-        _IsReadOnly = user?.AcceptsGuidelines != true;
-
-        _TagTree = await TagTreeProvider.GetTagTreeAsync();
-        InitializeTagStates();
-
-        _IsLoadingData = false;
     }
 
-    protected override async Task OnAfterRenderAsync(bool firstRender)
+    private void SetValuesFromApiResponse<TLevel>(ApiResult<TLevel> apiResult)
+        where TLevel : LevelResponse
     {
-        if (firstRender)
-            await SetUpLevelHubConnection();
+        Level = apiResult.Value;
+        ProblemDetails = apiResult.ProblemDetails;
     }
 
     private void InitializeTagStates()
     {
-        if (_Level == null || _TagTree == null)
+        _TagStates.Clear();
+
+        if (Level == null)
             return;
 
         foreach (TagResponse tag in _TagTree.SelectMany(tagGroup => tagGroup.Tags))
         {
             _TagStates[tag.Name] = new TagState
             {
-                State = _Level.Tags!.Contains(tag.Name),
+                State = Level.Tags!.Contains(tag.Name),
             };
         }
     }
 
-    private async Task SetUpLevelHubConnection()
+    private void SetUpLevelHubConnection()
     {
         _LevelHubConnection = new HubConnectionBuilder()
             .WithUrl(DistagsApi.LevelHubEndpoint)
             .WithAutomaticReconnect()
             .Build();
+
+        _LevelHubConnection.Reconnected += LevelHubConnectionOnReconnected;
 
         _LevelHubConnection.On<List<TagChangeResponse>>("TagsChanged", tagChanges =>
         {
@@ -166,28 +206,39 @@
             }
             InvokeAsync(StateHasChanged);
         });
-
-        await _LevelHubConnection.StartAsync();
-        await _LevelHubConnection.InvokeAsync("JoinLevelGroup", _Level!.Key);
     }
 
-    private async Task TryChangeTagState(string tagName, bool state)
+    private Task LevelHubConnectionOnReconnected(string? newConnectionId)
+    {
+        return Level != null ? JoinLevelHubGroup(Level.Key) : Task.CompletedTask;
+    }
+
+    private async Task JoinLevelHubGroup(string groupName)
+    {
+        await _LevelHubConnection!.InvokeAsync("JoinLevelGroup", groupName);
+        _CurrentLevelHubGroupName = groupName;
+    }
+
+    private async Task LeaveLevelHubGroup(string groupName)
+    {
+        await _LevelHubConnection!.InvokeAsync("LeaveLevelGroup", groupName);
+        _CurrentLevelHubGroupName = null;
+    }
+
+    private async Task ChangeTagState(string tagName, bool state)
     {
         if (state)
-            await DistagsApi.DeleteLevelTagAsync(_Level!, tagName);
+        {
+            ApiResult apiResult = await DistagsApi.DeleteLevelTagAsync(Level!, tagName);
+            if (apiResult.StatusCode == HttpStatusCode.NotFound)
+                _TagStates[tagName].State = false;
+        }
         else
-            await DistagsApi.PutLevelTagAsync(_Level!, tagName);
-    }
-
-    private string GetLevelNullErrorText()
-    {
-        if (OfficialLevelSlug != null)
-            return $"Could not find official level {OfficialLevelSlug}.";
-
-        if (WorkshopLevelId != null)
-            return $"Could not find workshop level with ID {WorkshopLevelId}.";
-
-        return "How did you even get here?";
+        {
+            ApiResult apiResult = await DistagsApi.PutLevelTagAsync(Level!, tagName);
+            if (apiResult.StatusCode == HttpStatusCode.Conflict)
+                _TagStates[tagName].State = true;
+        }
     }
 
     public async ValueTask DisposeAsync()

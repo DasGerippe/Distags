@@ -258,4 +258,13 @@
   <data name="ProblemDetailsDisplay_Header" xml:space="preserve">
     <value>Problem Details</value>
   </data>
+  <data name="PageTitle_Level_Error" xml:space="preserve">
+    <value>Level &lt;Error&gt;</value>
+  </data>
+  <data name="Level_Loading" xml:space="preserve">
+    <value>Loading Level</value>
+  </data>
+  <data name="Level_NotLoaded" xml:space="preserve">
+    <value>Could not load level.</value>
+  </data>
 </root>
