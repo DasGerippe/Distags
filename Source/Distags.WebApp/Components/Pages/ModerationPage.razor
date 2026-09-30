@@ -3,9 +3,7 @@
 @using Distags.Api.Contracts.Users
 @using Distags.WebApp.Components.Contribution
 @using Distags.WebApp.Components.Dialogs
-@using Distags.WebApp.Security
 
-@inject IUserInfoProvider UserInfoProvider
 @inject NavigationManager NavigationManager
 
 <PageTitle>@Resource.PageTitle_Moderation</PageTitle>
@@ -21,16 +19,13 @@
 
 @code {
 
-    private UserResponse? _User;
+    [CascadingParameter]
+    public UserResponse? User { get; set; }
 
-    protected override async Task OnInitializedAsync()
+    protected override void OnParametersSet()
     {
-        _User = await UserInfoProvider.GetUserInfoAsync();
-        if (_User?.Roles.Contains("Moderator") != true)
-        {
+        if (User?.Roles.Contains("Moderator") != true)
             NavigationManager.NotFound();
-            return;
-        }
     }
 
 }

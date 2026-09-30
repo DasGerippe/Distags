@@ -3,12 +3,12 @@
 
 @using Distags.Api.Contracts.Levels
 @using Distags.Api.Contracts.Tags
+@using Distags.Api.Contracts.Users
 @using Distags.Contracts
 @using Distags.WebApp.Components.Inputs
 @using Distags.WebApp.Components.Level
 @using Distags.WebApp.DistagsApi
 @using Distags.WebApp.Models
-@using Distags.WebApp.Security
 @using Distags.WebApp.Services
 @using Microsoft.AspNetCore.Mvc
 @using Microsoft.AspNetCore.SignalR.Client
@@ -18,7 +18,6 @@
 
 @inject DistagsApiClient DistagsApi
 @inject TagTreeProvider TagTreeProvider
-@inject IUserInfoProvider UserInfoProvider
 
 @if (_IsLoading)
 {
@@ -111,11 +110,13 @@
     [PersistentState]
     public ProblemDetails? ProblemDetails { get; set; }
 
+    [CascadingParameter]
+    public UserResponse? User { get; set; }
+
     protected override async Task OnInitializedAsync()
     {
         List<Task> tasks =
         [
-            InitializeIsReadOnlyAsync(),
             InitializeTagTreeAsync(),
         ];
 
@@ -128,14 +129,14 @@
         await Task.WhenAll(tasks);
     }
 
-    private async Task InitializeIsReadOnlyAsync()
-    {
-        _IsReadOnly = (await UserInfoProvider.GetUserInfoAsync())?.AcceptsGuidelines != true;
-    }
-
     private async Task InitializeTagTreeAsync()
     {
         _TagTree = await TagTreeProvider.GetTagTreeAsync();
+    }
+
+    protected override void OnParametersSet()
+    {
+        _IsReadOnly = User?.AcceptsGuidelines != true;
     }
 
     protected override async Task OnParametersSetAsync()

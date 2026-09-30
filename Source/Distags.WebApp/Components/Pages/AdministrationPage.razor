@@ -3,9 +3,7 @@
 @using Distags.Api.Contracts.Configuration
 @using Distags.Api.Contracts.Users
 @using Distags.WebApp.DistagsApi
-@using Distags.WebApp.Security
 
-@inject IUserInfoProvider UserInfoProvider
 @inject NavigationManager NavigationManager
 @inject DistagsApiClient DistagsApi
 
@@ -32,22 +30,25 @@
 
 @code {
 
-    private UserResponse? _User;
-
     private bool _MaintenanceActive;
+
+    [CascadingParameter]
+    public UserResponse? User { get; set; }
 
     protected override async Task OnInitializedAsync()
     {
-        _User = await UserInfoProvider.GetUserInfoAsync();
-        if (_User?.Roles.Contains("Administrator") != true)
-        {
-            NavigationManager.NotFound();
+        if (User == null)
             return;
-        }
 
         ApiResult<ConfigurationResponse> apiResult = await DistagsApi.GetApiStateAsync();
         apiResult.EnsureSuccess();
         _MaintenanceActive = apiResult.Value.MaintenanceActive;
+    }
+
+    protected override void OnParametersSet()
+    {
+        if (User?.Roles.Contains("Administrator") != true)
+            NavigationManager.NotFound();
     }
 
     private async Task OnMaintenanceChanged(ChangeEventArgs args)

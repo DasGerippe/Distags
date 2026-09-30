@@ -1,12 +1,10 @@
 @using Constants = Distags.WebApp.Constants;
 @using Distags.Api.Contracts.Users
 @using Distags.WebApp.DistagsApi
-@using Distags.WebApp.Security
 @using Microsoft.AspNetCore.WebUtilities
 
 @inject NavigationManager NavigationManager
 @inject DistagsApiClient DistagsApi
-@inject IUserInfoProvider UserInfoProvider
 
 <nav class="navbar navbar-expand-md shadow">
     <div class="container-fluid">
@@ -35,13 +33,13 @@
                 <li class="nav-item">
                     <NavLink class="nav-link" href="contributions">@Resource.NavLink_Contributions</NavLink>
                 </li>
-                @if (_UserInfo?.Roles.Contains("Moderator") == true)
+                @if (User?.Roles.Contains("Moderator") == true)
                 {
                     <li class="nav-item">
                         <NavLink class="nav-link" href="moderation">@Resource.NavLink_Moderation</NavLink>
                     </li>
                 }
-                @if (_UserInfo?.Roles.Contains("Administrator") == true)
+                @if (User?.Roles.Contains("Administrator") == true)
                 {
                     <li class="nav-item">
                         <NavLink class="nav-link" href="admin">@Resource.NavLink_Administration</NavLink>
@@ -51,7 +49,7 @@
 
             <!-- Profile Section -->
             <ul class="navbar-nav">
-                @if (_UserInfo == null)
+                @if (User == null)
                 {
                     <!-- Steam Login Button -->
                     <li class="nav-item">
@@ -66,18 +64,18 @@
                     <li class="nav-item dropdown">
                         <a id="userDropdown" class="nav-link dropdown-toggle d-flex align-items-center"
                            href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                            @if (_UserInfo.SteamAvatarHash == null)
+                            @if (User.SteamAvatarHash == null)
                             {
                                 <svg style="width: 2rem; height: 2rem;"><use href="icons.svg#user-solid" /></svg>
                             }
                             else
                             {
-                                <img src="https://avatars.steamstatic.com/@(_UserInfo.SteamAvatarHash).jpg" alt="User Avatar" />
+                                <img src="https://avatars.steamstatic.com/@(User.SteamAvatarHash).jpg" alt="User Avatar" />
                             }
                             <span class="ps-2">
-                                @(string.IsNullOrEmpty(_UserInfo.SteamName)
+                                @(string.IsNullOrEmpty(User.SteamName)
                                     ? Resource.ProfileDropdown_FallbackText
-                                    : _UserInfo.SteamName)
+                                    : User.SteamName)
                             </span>
                         </a>
                         <ul class="dropdown-menu dropdown-menu-end shadow" aria-labelledby="userDropdown">
@@ -95,12 +93,8 @@
 
 @code {
 
-    private UserResponse? _UserInfo;
-
-    protected override async Task OnInitializedAsync()
-    {
-        _UserInfo = await UserInfoProvider.GetUserInfoAsync();
-    }
+    [CascadingParameter]
+    public UserResponse? User { get; set; }
 
     private void Logout(bool logoutEverywhere)
     {

@@ -3,14 +3,12 @@
 @using Distags.Api.Contracts.Guidelines
 @using Distags.Api.Contracts.Users
 @using Distags.WebApp.DistagsApi
-@using Distags.WebApp.Security
 
-@inject IUserInfoProvider UserInfoProvider
 @inject DistagsApiClient DistagsApi
 
 <PageTitle>@Resource.PageTitle_Settings</PageTitle>
 
-@if (!_LoggedIn)
+@if (User == null)
     return;
 
 <div class="container-fluid content-narrow py-4">
@@ -61,24 +59,27 @@
 
 @code {
 
-    private bool _LoggedIn;
     private bool _AcceptsGuidelines;
     private bool _IsAnonymous;
 
     private GuidelinesResponse? _Guidelines;
 
+    [CascadingParameter]
+    public UserResponse? User { get; set; }
+
     protected override async Task OnInitializedAsync()
     {
-        UserResponse? user = await UserInfoProvider.GetUserInfoAsync();
-        if (user == null)
+        if (User == null)
             return;
-
-        _LoggedIn = true;
-        _AcceptsGuidelines = user.AcceptsGuidelines;
-        _IsAnonymous = user.IsAnonymous;
 
         ApiResult<GuidelinesResponse> apiResult = await DistagsApi.GetContributionGuidelinesAsync();
         _Guidelines = apiResult.Value;
+    }
+
+    protected override void OnParametersSet()
+    {
+        _AcceptsGuidelines = User?.AcceptsGuidelines == true;
+        _IsAnonymous = User?.IsAnonymous == true;
     }
 
     private async Task AcceptContributionGuidelinesAsync()

@@ -1,7 +1,4 @@
 @using Distags.Api.Contracts.Users
-@using Distags.WebApp.Security
-
-@inject IUserInfoProvider UserInfoProvider
 
 @if (string.IsNullOrEmpty(_Text))
     return;
@@ -18,13 +15,14 @@
 
     private string? _Text;
 
-    protected override async Task OnInitializedAsync()
-    {
-        UserResponse? user = await UserInfoProvider.GetUserInfoAsync();
+    [CascadingParameter]
+    public UserResponse? User { get; set; }
 
-        if (user == null)
+    protected override void OnParametersSet()
+    {
+        if (User == null)
             _Text = Resource.ContributionPrerequisiteLoginText;
-        else if (!user.AcceptsGuidelines)
+        else if (!User.AcceptsGuidelines)
             _Text = Resource.ContributionPrerequisiteGuidelinesText;
     }
 
