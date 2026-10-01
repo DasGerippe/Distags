@@ -1,0 +1,18 @@
+<div class="p-4">
+    <h1 class="text-danger">@Resource.ErrorTitle</h1>
+    <p class="text-danger">@ErrorMessage</p>
+    @if (!string.IsNullOrEmpty(ErrorId))
+    {
+        <p class="text-danger"><strong>@(Resource.ErrorId):</strong> <code>@ErrorId</code></p>
+    }
+</div>
+
+@code {
+
+    [Parameter]
+    public string ErrorMessage { get; set; } = Resource.ErrorMessage_Unspecified;
+
+    [Parameter]
+    public string? ErrorId { get; set; }
+
+}

@@ -267,4 +267,19 @@
   <data name="Level_NotLoaded" xml:space="preserve">
     <value>Could not load level.</value>
   </data>
+  <data name="ErrorMessage_Unspecified" xml:space="preserve">
+    <value>An unexpected error occurred.</value>
+  </data>
+  <data name="ErrorMessage_Request" xml:space="preserve">
+    <value>An unexpected error occurred while executing your request.</value>
+  </data>
+  <data name="ErrorMessage_Rendering" xml:space="preserve">
+    <value>An unexpected error occurred while rendering.</value>
+  </data>
+  <data name="ErrorTitle" xml:space="preserve">
+    <value>Error</value>
+  </data>
+  <data name="ErrorId" xml:space="preserve">
+    <value>Error ID</value>
+  </data>
 </root>

@@ -281,6 +281,51 @@ namespace Distags.WebApp {
         }
 
         /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Error ID ähnelt.
+        /// </summary>
+        internal static string ErrorId {
+            get {
+                return ResourceManager.GetString("ErrorId", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die An unexpected error occurred while rendering. ähnelt.
+        /// </summary>
+        internal static string ErrorMessage_Rendering {
+            get {
+                return ResourceManager.GetString("ErrorMessage_Rendering", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die An unexpected error occurred while executing your request. ähnelt.
+        /// </summary>
+        internal static string ErrorMessage_Request {
+            get {
+                return ResourceManager.GetString("ErrorMessage_Request", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die An unexpected error occurred. ähnelt.
+        /// </summary>
+        internal static string ErrorMessage_Unspecified {
+            get {
+                return ResourceManager.GetString("ErrorMessage_Unspecified", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Error ähnelt.
+        /// </summary>
+        internal static string ErrorTitle {
+            get {
+                return ResourceManager.GetString("ErrorTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Sucht eine lokalisierte Zeichenfolge, die Administration ähnelt.
         /// </summary>
         internal static string NavLink_Administration {
