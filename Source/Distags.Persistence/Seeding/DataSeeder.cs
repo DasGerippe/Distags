@@ -1,7 +1,6 @@
 using Distags.Core;
 using Distags.Core.Commands.ImportOfficialLevels;
 using Distags.Core.Entities;
-using Distags.Core.Management;
 using Distags.Persistence.Seeding.OfficialLevels;
 using Microsoft.EntityFrameworkCore;
 
@@ -10,18 +9,15 @@ namespace Distags.Persistence.Seeding;
 internal class DataSeeder
 {
     private readonly DefaultTagProvider _DefaultTagProvider;
-    private readonly FallbackTagProvider _FallbackTagProvider;
     private readonly OfficialLevelsProvider _OfficialLevelsProvider;
     private readonly IRequestDispatcher _RequestDispatcher;
 
     public DataSeeder(
         DefaultTagProvider defaultTagProvider,
-        FallbackTagProvider fallbackTagProvider,
         OfficialLevelsProvider officialLevelsProvider,
         IRequestDispatcher requestDispatcher)
     {
         _DefaultTagProvider = defaultTagProvider;
-        _FallbackTagProvider = fallbackTagProvider;
         _OfficialLevelsProvider = officialLevelsProvider;
         _RequestDispatcher = requestDispatcher;
     }
@@ -34,7 +30,6 @@ internal class DataSeeder
     public async Task SeedAsync(DbContext context, bool dataStoreChanged, CancellationToken cancellationToken)
     {
         await SeedDefaultGroupsAndTags(context, cancellationToken).ConfigureAwait(false);
-        await SeedLevelFallbackTags(context, cancellationToken).ConfigureAwait(false);
         await SeedOfficialLevelsAsync().ConfigureAwait(false);
     }
 
@@ -51,22 +46,6 @@ internal class DataSeeder
         context.AddRange(_DefaultTagProvider.GetDefaultDisplayGroups());
         context.AddRange(_DefaultTagProvider.GetDefaultLogicGroups());
         context.AddRange(_DefaultTagProvider.GetDefaultTags());
-
-        await context.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
-    }
-
-    private async Task SeedLevelFallbackTags(DbContext context, CancellationToken cancellationToken)
-    {
-        bool shouldInitializeLevelFallbackTags = !await context.Set<LevelTag>().AnyAsync(cancellationToken).ConfigureAwait(false);
-        if (!shouldInitializeLevelFallbackTags)
-            return;
-
-        List<Level> levels = await context.Set<Level>().ToListAsync(cancellationToken).ConfigureAwait(false);
-        IReadOnlyCollection<Tag> fallbackTags = await _FallbackTagProvider.GetFallbackTagsAsync().ConfigureAwait(false);
-        foreach (Level level in levels)
-        {
-            level.Tags.AddRange(fallbackTags);
-        }
 
         await context.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
     }
