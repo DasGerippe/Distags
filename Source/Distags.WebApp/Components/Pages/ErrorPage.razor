@@ -1,0 +1,28 @@
+@page "/Error"
+
+@using System.Diagnostics
+
+@inject ILogger<ErrorPage> Logger
+
+<PageTitle>@Resource.PageTitle_Error</PageTitle>
+
+<div class="container-fluid content-narrow">
+    <ErrorDisplay ErrorMessage="@Resource.ErrorMessage_Request" ErrorId="@_ErrorId" />
+</div>
+
+@code {
+
+    private string? _ErrorId;
+
+    protected override void OnInitialized()
+    {
+        _ErrorId = Activity.Current?.TraceId.ToString();
+
+        if (_ErrorId == null)
+        {
+            _ErrorId = Guid.NewGuid().ToString("N");
+            Logger.LogError("Could not get current trace ID. Using Error ID={errorId} instead.", _ErrorId);
+        }
+    }
+
+}

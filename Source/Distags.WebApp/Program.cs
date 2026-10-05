@@ -1,4 +1,5 @@
 using Distags.WebApp.Components;
+using Distags.WebApp.DistagsApi;
 using Distags.WebApp.Security;
 using Distags.WebApp.Services;
 using Microsoft.AspNetCore.Components.Server.Circuits;
@@ -12,7 +13,7 @@ public class Program
     public static void Main(string[] args)
     {
         Log.Logger = new LoggerConfiguration()
-            .ConfigureConsoleAndFileSinks($"{nameof(Distags)}.{nameof(WebApp)}")
+            .ConfigureConsoleAndFileSinks<Program>(OutputTemplates.Web)
             .CreateBootstrapLogger();
 
         try
@@ -21,7 +22,7 @@ public class Program
 
             builder.Services.AddSerilog(loggerConfig => loggerConfig
                 .ReadFrom.Configuration(builder.Configuration)
-                .ConfigureConsoleAndFileSinks($"{nameof(Distags)}.{nameof(WebApp)}"));
+                .ConfigureConsoleAndFileSinks<Program>(OutputTemplates.Web));
 
             // Add services to the container.
             builder.Services.AddRazorComponents()
@@ -42,7 +43,6 @@ public class Program
 
             builder.Services.AddScoped<CircuitHandler, CircuitSessionTokenInitializer>();
             builder.Services.AddScoped<ISessionTokenProvider, SessionTokenProvider>();
-            builder.Services.AddScoped<IUserInfoProvider, CachedUserInfoProvider>();
             builder.Services.AddScoped<IDialogService, DialogService>();
             builder.Services.AddScoped<TagTreeProvider>();
 

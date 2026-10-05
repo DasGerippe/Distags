@@ -1,0 +1,34 @@
+@using Distags.Api.Contracts.Users
+@using Distags.WebApp.DistagsApi
+
+@inject DistagsApiClient DistagsApi
+
+@if (!IsInitialized)
+    return;
+
+<CascadingValue Value="User">
+    @ChildContent
+</CascadingValue>
+
+@code {
+
+    [Parameter]
+    public RenderFragment? ChildContent { get; set; }
+
+    [PersistentState]
+    public bool IsInitialized { get; set; }
+
+    [PersistentState]
+    public UserResponse? User { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (IsInitialized)
+            return;
+
+        ApiResult<UserResponse> apiResult = await DistagsApi.GetMeAsync();
+        User = apiResult.Value;
+        IsInitialized = true;
+    }
+
+}

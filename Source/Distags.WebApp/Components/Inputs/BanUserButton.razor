@@ -3,7 +3,7 @@
 
 @inject IDialogService DialogService
 
-<button class="icon-button" @onclick="OnBanUserButtonClicked">
+<button class="icon-button" @onclick="OnBanUserButtonClicked" disabled="@(UserSteamId == null)">
     <svg style="width:1.5rem; height:1.5rem; color: @GetIconColor();"><use href="icons.svg#ban-solid" /></svg>
 </button>
 

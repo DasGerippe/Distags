@@ -4,7 +4,7 @@
 
 @inject IDialogService DialogService
 
-<button class="icon-button" @onclick="OnRevertContributionClicked">
+<button class="icon-button" @onclick="OnRevertContributionClicked" disabled="@(Contribution.User == null)">
     <svg style="width:1.5rem; height:1.5rem; color:@GetIconColor();"><use href="icons.svg#rotate-left-solid" /></svg>
 </button>
 

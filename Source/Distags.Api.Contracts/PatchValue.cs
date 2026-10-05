@@ -2,7 +2,7 @@ namespace Distags.Api.Contracts;
 
 public class PatchValue<TValue>
 {
-    public TValue? Value { get; set; }
+    public TValue? Value { get; init; }
 
     public static implicit operator PatchValue<TValue?>(TValue? value)
     {

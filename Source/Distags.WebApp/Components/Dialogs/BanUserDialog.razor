@@ -1,5 +1,5 @@
 @using Distags.Api.Contracts.UserBans
-@using Distags.WebApp.Services
+@using Distags.WebApp.DistagsApi
 
 @inherits DialogBase
 
@@ -35,7 +35,7 @@
 
     protected override string ModalId => "banUserModal";
 
-    public event EventHandler<HttpResponseMessage>? UserBanPosted;
+    public event EventHandler<ApiResult>? UserBanPosted;
 
     public async ValueTask ShowAsync(long steamId, string? steamName)
     {
@@ -61,11 +61,11 @@
             SteamId = _SteamId!.Value,
             Reason = _Reason,
         };
-        HttpResponseMessage responseMessage = await DistagsApi.PostUserBanAsync(createUserBanRequest);
+        ApiResult apiResult = await DistagsApi.PostUserBanAsync(createUserBanRequest);
 
         await HideAsync();
 
-        UserBanPosted?.Invoke(this, responseMessage);
+        UserBanPosted?.Invoke(this, apiResult);
     }
 
 }

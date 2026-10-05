@@ -1,5 +1,5 @@
 @using Distags.Api.Contracts.Contributions
-@using Distags.WebApp.Services
+@using Distags.WebApp.DistagsApi
 
 @inherits DialogBase
 
@@ -45,7 +45,7 @@
 
     protected override string ModalId => "revertContributionsModal";
 
-    public event EventHandler<HttpResponseMessage>? ContributionsReverted;
+    public event EventHandler<ApiResult>? ContributionsReverted;
 
     public async ValueTask ShowAsync(ContributionResponse contribution)
     {
@@ -73,11 +73,11 @@
             SteamId = _RevertUserSteamId.Value,
             RevertStartDate = _RevertAllUserContributions ? null : _RevertDateTime,
         };
-        HttpResponseMessage responseMessage = await DistagsApi.RevertContributionsAsync(request);
+        ApiResult apiResult = await DistagsApi.RevertContributionsAsync(request);
 
         await HideAsync();
 
-        ContributionsReverted?.Invoke(this, responseMessage);
+        ContributionsReverted?.Invoke(this, apiResult);
     }
 
 }

@@ -1,18 +1,27 @@
-﻿.hero {
+.hero {
     position: relative;
     overflow: hidden;
 }
 
-.hero-background {
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background-size: cover;
-    background-position: center;
-    background-repeat: no-repeat;
-    filter: opacity(50%) blur(16px);
-    transform: scale(1.1);
-    z-index: -1;
+    .hero::before {
+        content: "";
+        position: absolute;
+        background: var(--hero-background-image) center / cover no-repeat;
+        filter: contrast(80%) blur(8px);
+        inset: -16px;
+        z-index: -2;
+    }
+
+    .hero::after {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.2);
+        z-index: -1;
+    }
+
+.hero-caption {
+    color: #ddd;
+    text-shadow: 0 1px 5px black;
+    text-wrap: balance;
 }

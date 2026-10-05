@@ -257,6 +257,73 @@ namespace Distags.WebApp {
                 return ResourceManager.GetString("Enum_LevelSortStrategy_UpdatedDesc", resourceCulture);
             }
         }
+
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Loading Level ähnelt.
+        /// </summary>
+        internal static string Level_Loading
+        {
+            get
+            {
+                return ResourceManager.GetString("Level_Loading", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Could not load level. ähnelt.
+        /// </summary>
+        internal static string Level_NotLoaded
+        {
+            get
+            {
+                return ResourceManager.GetString("Level_NotLoaded", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Error ID ähnelt.
+        /// </summary>
+        internal static string ErrorId {
+            get {
+                return ResourceManager.GetString("ErrorId", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die An unexpected error occurred while rendering. ähnelt.
+        /// </summary>
+        internal static string ErrorMessage_Rendering {
+            get {
+                return ResourceManager.GetString("ErrorMessage_Rendering", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die An unexpected error occurred while executing your request. ähnelt.
+        /// </summary>
+        internal static string ErrorMessage_Request {
+            get {
+                return ResourceManager.GetString("ErrorMessage_Request", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die An unexpected error occurred. ähnelt.
+        /// </summary>
+        internal static string ErrorMessage_Unspecified {
+            get {
+                return ResourceManager.GetString("ErrorMessage_Unspecified", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Error ähnelt.
+        /// </summary>
+        internal static string ErrorTitle {
+            get {
+                return ResourceManager.GetString("ErrorTitle", resourceCulture);
+            }
+        }
         
         /// <summary>
         ///   Sucht eine lokalisierte Zeichenfolge, die Administration ähnelt.
@@ -358,6 +425,15 @@ namespace Distags.WebApp {
         }
         
         /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Level &lt;Error&gt; ähnelt.
+        /// </summary>
+        internal static string PageTitle_Level_Error {
+            get {
+                return ResourceManager.GetString("PageTitle_Level_Error", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Sucht eine lokalisierte Zeichenfolge, die Loading Level ähnelt.
         /// </summary>
         internal static string PageTitle_Level_Loading {
@@ -390,6 +466,15 @@ namespace Distags.WebApp {
         internal static string PageTitle_Settings {
             get {
                 return ResourceManager.GetString("PageTitle_Settings", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Problem Details ähnelt.
+        /// </summary>
+        internal static string ProblemDetailsDisplay_Header {
+            get {
+                return ResourceManager.GetString("ProblemDetailsDisplay_Header", resourceCulture);
             }
         }
         

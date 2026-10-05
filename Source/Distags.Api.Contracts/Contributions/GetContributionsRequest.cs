@@ -4,22 +4,22 @@ namespace Distags.Api.Contracts.Contributions;
 
 public class GetContributionsRequest
 {
-    public long? UserSteamId { get; set; }
+    public long? UserSteamId { get; init; }
 
-    public string? AppName { get; set; }
+    public string? AppName { get; init; }
 
-    public string? LevelSlug { get; set; }
+    public string? LevelSlug { get; init; }
 
-    public long? LevelWorkshopId { get; set; }
+    public long? LevelWorkshopId { get; init; }
 
-    public string? TagName { get; set; }
+    public string? TagName { get; init; }
 
-    public DateTimeOffset? ContributedAfter { get; set; }
+    public DateTimeOffset? ContributedAfter { get; init; }
 
-    public DateTimeOffset? ContributedBefore { get; set; }
+    public DateTimeOffset? ContributedBefore { get; init; }
 
-    public bool DescendingOrder { get; set; } = true;
+    public bool DescendingOrder { get; init; } = true;
 
     [Range(1, 100, ErrorMessage = $"{nameof(Limit)} must be between 1 and 100.")]
-    public int Limit { get; set; } = 100;
+    public int Limit { get; init; } = 100;
 }

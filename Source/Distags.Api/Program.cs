@@ -18,7 +18,7 @@ public class Program
     public static void Main(string[] args)
     {
         Log.Logger = new LoggerConfiguration()
-            .ConfigureConsoleAndFileSinks($"{nameof(Distags)}.{nameof(Api)}")
+            .ConfigureConsoleAndFileSinks<Program>(OutputTemplates.Web)
             .CreateBootstrapLogger();
 
         try
@@ -27,7 +27,7 @@ public class Program
 
             builder.Services.AddSerilog(loggerConfig => loggerConfig
                 .ReadFrom.Configuration(builder.Configuration)
-                .ConfigureConsoleAndFileSinks($"{nameof(Distags)}.{nameof(Api)}"));
+                .ConfigureConsoleAndFileSinks<Program>(OutputTemplates.Web));
 
             AddAuthentication(builder);
 

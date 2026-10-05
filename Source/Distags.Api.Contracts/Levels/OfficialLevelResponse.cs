@@ -8,7 +8,7 @@ public class OfficialLevelResponse : LevelResponse
     [JsonIgnore]
     public override LevelType Type => LevelType.Official;
 
-    public string Slug { get; set; } = string.Empty;
+    public string Slug { get; init; } = string.Empty;
 
-    public string CreatorName { get; set; } = string.Empty;
+    public string CreatorName { get; init; } = string.Empty;
 }

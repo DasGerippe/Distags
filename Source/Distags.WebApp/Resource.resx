@@ -255,4 +255,31 @@
   <data name="Creator_UnknownUserName" xml:space="preserve">
     <value>Unknown Creator</value>
   </data>
+  <data name="ProblemDetailsDisplay_Header" xml:space="preserve">
+    <value>Problem Details</value>
+  </data>
+  <data name="PageTitle_Level_Error" xml:space="preserve">
+    <value>Level &lt;Error&gt;</value>
+  </data>
+  <data name="Level_Loading" xml:space="preserve">
+    <value>Loading Level</value>
+  </data>
+  <data name="Level_NotLoaded" xml:space="preserve">
+    <value>Could not load level.</value>
+  </data>
+  <data name="ErrorMessage_Unspecified" xml:space="preserve">
+    <value>An unexpected error occurred.</value>
+  </data>
+  <data name="ErrorMessage_Request" xml:space="preserve">
+    <value>An unexpected error occurred while executing your request.</value>
+  </data>
+  <data name="ErrorMessage_Rendering" xml:space="preserve">
+    <value>An unexpected error occurred while rendering.</value>
+  </data>
+  <data name="ErrorTitle" xml:space="preserve">
+    <value>Error</value>
+  </data>
+  <data name="ErrorId" xml:space="preserve">
+    <value>Error ID</value>
+  </data>
 </root>

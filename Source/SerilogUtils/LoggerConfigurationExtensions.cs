@@ -4,16 +4,25 @@ namespace SerilogUtils;
 
 public static class LoggerConfigurationExtensions
 {
-    private const string DefaultOutputTemplate =
-        "{Timestamp:HH:mm:ss.fff} [{Level}] [{SourceContext}]{NewLine}{Message:lj}{NewLine}{Exception}";
-
-    public static LoggerConfiguration ConfigureConsoleAndFileSinks(this LoggerConfiguration loggerConfiguration, string appName)
+    public static LoggerConfiguration ConfigureConsoleAndFileSinks(
+        this LoggerConfiguration loggerConfiguration,
+        string appName,
+        string outputTemplate = OutputTemplates.Default)
     {
         return loggerConfiguration
-            .WriteTo.Console(outputTemplate: DefaultOutputTemplate)
+            .WriteTo.Console(outputTemplate: outputTemplate)
             .WriteTo.File(
                 path: $"logs/{appName}.txt",
                 rollingInterval: RollingInterval.Day,
-                outputTemplate: DefaultOutputTemplate);
+                fileSizeLimitBytes: 100_000_000,
+                rollOnFileSizeLimit: true,
+                outputTemplate: outputTemplate);
+    }
+
+    public static LoggerConfiguration ConfigureConsoleAndFileSinks<TProgram>(
+        this LoggerConfiguration loggerConfiguration,
+        string outputTemplate = OutputTemplates.Default)
+    {
+        return loggerConfiguration.ConfigureConsoleAndFileSinks(typeof(TProgram).Namespace!, outputTemplate);
     }
 }

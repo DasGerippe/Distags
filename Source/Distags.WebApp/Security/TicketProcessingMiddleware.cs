@@ -1,6 +1,6 @@
 using Distags.Api.Contracts;
 using Distags.Api.Contracts.Authentication;
-using Distags.WebApp.Services;
+using Distags.WebApp.DistagsApi;
 using Microsoft.Extensions.Primitives;
 
 namespace Distags.WebApp.Security;
@@ -27,14 +27,16 @@ public class TicketProcessingMiddleware
         try
         {
             string ticket = ticketValue.ToString();
-            SessionResponse sessionResponse = await distagsApi.PostRedeemTicketAsync(ticket);
-
-            httpContext.Response.Cookies.Append(Constants.SessionTokenCookieName, sessionResponse.Token, new CookieOptions
+            ApiResult<SessionResponse> apiResult = await distagsApi.PostRedeemTicketAsync(ticket);
+            if (apiResult.IsSuccess)
             {
-                Secure = true,
-                HttpOnly = true,
-                SameSite = SameSiteMode.Strict,
-            });
+                httpContext.Response.Cookies.Append(Constants.SessionTokenCookieName, apiResult.Value.Token, new CookieOptions
+                {
+                    Secure = true,
+                    HttpOnly = true,
+                    SameSite = SameSiteMode.Lax,
+                });
+            }
         }
         catch (Exception ex)
         {

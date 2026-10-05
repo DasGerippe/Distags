@@ -2,6 +2,7 @@
 @using Distags.Api.Contracts.Contributions
 @using Distags.Api.Contracts.Levels
 @using Distags.WebApp.Components.Dialogs
+@using Distags.WebApp.DistagsApi
 @using Distags.WebApp.Security
 @using Distags.WebApp.Services
 @using Microsoft.AspNetCore.Mvc
@@ -73,20 +74,23 @@
         }
     }
 
-    private async void OnUserBanPosted(object? sender, HttpResponseMessage response)
+    private async void OnUserBanPosted(object? sender, ApiResult apiResult)
     {
         try
         {
-            if (response.IsSuccessStatusCode)
+            if (apiResult.IsSuccess)
                 return;
 
             InfoDialog? infoDialog = DialogService.Get<InfoDialog>();
             if (infoDialog == null)
                 return;
 
-            ProblemDetails? problem = await response.Content.ReadFromJsonAsync<ProblemDetails>();
-            string message = problem?.Detail ?? "The user could not be banned.";
-            await infoDialog.ShowAsync("Could not ban user", message);
+            ProblemDetails? problem = apiResult.ProblemDetails;
+            string title = string.IsNullOrEmpty(problem?.Title)
+                ? $"{problem?.Status} Could not ban user"
+                : $"{problem?.Status} {problem?.Title}";
+            string message = apiResult.ProblemDetails?.Detail ?? "The user could not be banned.";
+            await infoDialog.ShowAsync(title, message);
         }
         catch
         {
@@ -94,7 +98,7 @@
         }
     }
 
-    private async void OnContributionsReverted(object? sender, HttpResponseMessage responseMessage)
+    private async void OnContributionsReverted(object? sender, ApiResult responseMessage)
     {
         try
         {
@@ -159,8 +163,11 @@
             LevelWorkshopId = (_LevelFilter as WorkshopLevelResponse)?.WorkshopId,
             UserSteamId = _UserFilter?.SteamId,
         };
-        ContributionsPageResponse contributionsPage = await DistagsApi.GetContributionsAsync(request);
+        ApiResult<ContributionsPageResponse> apiResult = await DistagsApi.GetContributionsAsync(request);
+        if (!apiResult.IsSuccess)
+            return;
 
+        ContributionsPageResponse contributionsPage = apiResult.Value;
         _CachedContributions.AddRange(contributionsPage.Contributions);
         if (contributionsPage.Contributions.Count < batchSize)
             _CachedAllContributions = true;
@@ -185,6 +192,7 @@
     {
         _CachedContributions.Clear();
         _LiveContributions.Clear();
+        _CachedAllContributions = false;
         return LoadNextContributionBatch();
     }
 

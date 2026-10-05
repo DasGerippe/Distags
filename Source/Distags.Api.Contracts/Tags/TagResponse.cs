@@ -2,21 +2,21 @@ namespace Distags.Api.Contracts.Tags;
 
 public class TagResponse
 {
-    public string Name { get; set; } = string.Empty;
+    public string Name { get; init; } = string.Empty;
 
-    public string DisplayName { get; set; } = string.Empty;
+    public string DisplayName { get; init; } = string.Empty;
 
-    public string Description { get; set; } = string.Empty;
+    public string Description { get; init; } = string.Empty;
 
-    public string DisplayGroupName { get; set; } = string.Empty;
+    public string DisplayGroupName { get; init; } = string.Empty;
 
-    public int Position { get; set; }
+    public int Position { get; init; }
 
-    public string? LogicGroupName { get; set; } = string.Empty;
+    public string? LogicGroupName { get; init; } = string.Empty;
 
-    public bool IsExclusive { get; set; }
+    public bool IsExclusive { get; init; }
 
-    public bool IsFallback { get; set; }
+    public bool IsFallback { get; init; }
 
-    public bool IsAutoTag { get; set; }
+    public bool IsAutoTag { get; init; }
 }

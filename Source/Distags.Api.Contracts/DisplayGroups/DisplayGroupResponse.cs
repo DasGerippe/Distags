@@ -2,11 +2,11 @@ namespace Distags.Api.Contracts.DisplayGroups;
 
 public class DisplayGroupResponse
 {
-    public string Name { get; set; } = string.Empty;
+    public string Name { get; init; } = string.Empty;
 
-    public string DisplayName { get; set; } = string.Empty;
+    public string DisplayName { get; init; } = string.Empty;
 
-    public string Description { get; set; } = string.Empty;
+    public string Description { get; init; } = string.Empty;
 
-    public int Position { get; set; }
+    public int Position { get; init; }
 }
