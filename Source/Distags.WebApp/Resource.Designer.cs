@@ -257,29 +257,7 @@ namespace Distags.WebApp {
                 return ResourceManager.GetString("Enum_LevelSortStrategy_UpdatedDesc", resourceCulture);
             }
         }
-
-        /// <summary>
-        ///   Sucht eine lokalisierte Zeichenfolge, die Loading Level ähnelt.
-        /// </summary>
-        internal static string Level_Loading
-        {
-            get
-            {
-                return ResourceManager.GetString("Level_Loading", resourceCulture);
-            }
-        }
-
-        /// <summary>
-        ///   Sucht eine lokalisierte Zeichenfolge, die Could not load level. ähnelt.
-        /// </summary>
-        internal static string Level_NotLoaded
-        {
-            get
-            {
-                return ResourceManager.GetString("Level_NotLoaded", resourceCulture);
-            }
-        }
-
+        
         /// <summary>
         ///   Sucht eine lokalisierte Zeichenfolge, die Error ID ähnelt.
         /// </summary>
@@ -322,6 +300,47 @@ namespace Distags.WebApp {
         internal static string ErrorTitle {
             get {
                 return ResourceManager.GetString("ErrorTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Distance Level Tagging ähnelt.
+        /// </summary>
+        internal static string Homepage_FallbackText {
+            get {
+                return ResourceManager.GetString("Homepage_FallbackText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Tracking {0} tags
+        ///across {1} Distance levels
+        ///with {2} contributions
+        ///from {3} users
+        ///and {4} contributions
+        ///from {5} auto taggers ähnelt.
+        /// </summary>
+        internal static string Homepage_StatsSummaryText {
+            get {
+                return ResourceManager.GetString("Homepage_StatsSummaryText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Loading Level ähnelt.
+        /// </summary>
+        internal static string Level_Loading {
+            get {
+                return ResourceManager.GetString("Level_Loading", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Could not load level. ähnelt.
+        /// </summary>
+        internal static string Level_NotLoaded {
+            get {
+                return ResourceManager.GetString("Level_NotLoaded", resourceCulture);
             }
         }
         

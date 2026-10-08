@@ -282,4 +282,15 @@
   <data name="ErrorId" xml:space="preserve">
     <value>Error ID</value>
   </data>
+  <data name="Homepage_FallbackText" xml:space="preserve">
+    <value>Distance Level Tagging</value>
+  </data>
+  <data name="Homepage_StatsSummaryText" xml:space="preserve">
+    <value>Tracking {0} tags
+across {1} Distance levels
+with {2} contributions
+from {3} users
+and {4} contributions
+from {5} auto taggers</value>
+  </data>
 </root>
