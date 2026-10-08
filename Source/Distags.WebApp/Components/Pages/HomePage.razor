@@ -1,8 +1,52 @@
 @page "/"
 
+@using Distags.Api.Contracts.Stats
+@using Distags.WebApp.DistagsApi
+
+@inject DistagsApiClient DistagsApiClient
+
 <PageTitle>@Resource.PageTitle_Home</PageTitle>
 
-<div class="container-fluid h-100 d-flex flex-column align-items-center justify-content-center">
+<div class="container-fluid h-100 d-flex flex-column align-items-center justify-content-center gap-4">
     <img class="img-fluid w-100" style="max-width:640px;" src="Distags_Light.svg" alt="Distags" />
-    <p class="lead text-center">Tagging Distance levels since 2025</p>
+
+    @if (StatsSummary == null)
+    {
+        <p class="lead text-center">
+            @Resource.Homepage_FallbackText
+        </p>
+    }
+    else
+    {
+        <p class="text-center" style="white-space: pre-line;">
+            @((MarkupString)string.Format(Resource.Homepage_StatsSummaryText,
+                WithStrongMarkup(StatsSummary.LevelTagCount),
+                WithStrongMarkup(StatsSummary.LevelCount),
+                WithStrongMarkup(StatsSummary.UserContributionCount),
+                WithStrongMarkup(StatsSummary.ContributingUserCount),
+                WithStrongMarkup(StatsSummary.AutoTaggerContributionCount),
+                WithStrongMarkup(StatsSummary.ContributingAutoTaggerCount)))
+        </p>
+    }
 </div>
+
+@code {
+
+    [PersistentState]
+    public StatsSummaryResponse? StatsSummary { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (StatsSummary == null)
+        {
+            ApiResult<StatsSummaryResponse> response = await DistagsApiClient.GetStatsSummaryAsync();
+            StatsSummary = response.Value;
+        }
+    }
+
+    private static string WithStrongMarkup(int number)
+    {
+        return $"<strong>{number:N0}</strong>";
+    }
+
+}

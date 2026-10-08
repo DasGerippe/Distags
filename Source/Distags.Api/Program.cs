@@ -1,3 +1,4 @@
+using Distags.Api.Caching;
 using Distags.Api.Contracts;
 using Distags.Api.Hubs;
 using Distags.Api.Security;
@@ -30,6 +31,7 @@ public class Program
                 .ConfigureConsoleAndFileSinks<Program>(OutputTemplates.Web));
 
             AddAuthentication(builder);
+            AddOutputCaching(builder);
 
             builder.Services.AddControllers()
                 .AddJsonOptions(options => options.JsonSerializerOptions.Converters.Add(new PatchValueConverterFactory()));
@@ -69,6 +71,7 @@ public class Program
             app.UseHttpsRedirection();
 
             app.UseAuthorization();
+            app.UseOutputCache();
 
             app.MapStaticAssets();
 
@@ -144,5 +147,15 @@ public class Program
             {
                 options.SignInScheme = steamLoginCookieScheme;
             });
+    }
+
+    private static void AddOutputCaching(WebApplicationBuilder builder)
+    {
+        builder.Services.AddOutputCache(options => options
+            .AddPolicy(
+                Constants.Cache.IgnoreAuthPolicyName,
+                policyBuilder => policyBuilder
+                    .AddPolicy<IgnoreAuthCachePolicy>(),
+                excludeDefaultPolicy: true));
     }
 }

@@ -6,6 +6,7 @@ using Distags.Api.Contracts.DisplayGroups;
 using Distags.Api.Contracts.Guidelines;
 using Distags.Api.Contracts.Levels;
 using Distags.Api.Contracts.LogicGroups;
+using Distags.Api.Contracts.Stats;
 using Distags.Api.Contracts.Tags;
 using Distags.Api.Contracts.UserBans;
 using Distags.Api.Contracts.Users;
@@ -205,5 +206,11 @@ public class DistagsApiClient : IDisposable
     {
         return _HttpClient.PatchAsJsonAsync("configuration", request, _JsonOptions, cancellationToken)
             .ToApiResultAsync(cancellationToken);
+    }
+
+    public Task<ApiResult<StatsSummaryResponse>> GetStatsSummaryAsync(CancellationToken cancellationToken = default)
+    {
+        return _HttpClient.GetAsync("stats/summary", cancellationToken)
+            .ToApiResultAsync<StatsSummaryResponse>(cancellationToken);
     }
 }
