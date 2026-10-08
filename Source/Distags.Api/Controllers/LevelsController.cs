@@ -5,7 +5,6 @@ using Distags.Contracts;
 using Distags.Core;
 using Distags.Core.Commands.ChangeLevelTag;
 using Distags.Core.Exceptions;
-using Distags.Core.Filtering.Levels;
 using Distags.Core.Queries.BrowseLevels;
 using Distags.Core.Queries.OfficialLevelBySlug;
 using Distags.Core.Queries.WorkshopLevelById;
