@@ -5,6 +5,7 @@ using Distags.Core;
 using Distags.Core.Queries.StatsSummary;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.OutputCaching;
 
 namespace Distags.Api.Controllers;
 
@@ -21,6 +22,7 @@ public class StatsController : ControllerBase
 
     [HttpGet("summary")]
     [AllowAnonymous]
+    [OutputCache(PolicyName = Constants.Cache.IgnoreAuthPolicyName)]
     public async Task<ActionResult<StatsSummaryResponse>> GetStatsSummary()
     {
         StatsSummaryDto statsSummaryDto = await _RequestDispatcher.DispatchAsync(new StatsSummaryQuery());

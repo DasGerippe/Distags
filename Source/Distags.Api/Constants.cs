@@ -17,6 +17,11 @@ internal static class Constants
         }
     }
 
+    internal static class Cache
+    {
+        internal const string IgnoreAuthPolicyName = "IgnoreAuth";
+    }
+
     internal static class Roles
     {
         internal const string Contributor = "Contributor";
