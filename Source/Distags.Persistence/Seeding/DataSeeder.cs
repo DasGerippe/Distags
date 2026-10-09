@@ -1,23 +1,23 @@
 using Distags.Core;
 using Distags.Core.Commands.ImportOfficialLevels;
-using Distags.Core.Entities;
 using Distags.Persistence.Seeding.OfficialLevels;
+using Distags.Persistence.Seeding.Tags;
 using Microsoft.EntityFrameworkCore;
 
 namespace Distags.Persistence.Seeding;
 
 internal class DataSeeder
 {
-    private readonly DefaultTagProvider _DefaultTagProvider;
+    private readonly TagSeeder _TagSeeder;
     private readonly OfficialLevelsProvider _OfficialLevelsProvider;
     private readonly IRequestDispatcher _RequestDispatcher;
 
     public DataSeeder(
-        DefaultTagProvider defaultTagProvider,
+        TagSeeder tagSeeder,
         OfficialLevelsProvider officialLevelsProvider,
         IRequestDispatcher requestDispatcher)
     {
-        _DefaultTagProvider = defaultTagProvider;
+        _TagSeeder = tagSeeder;
         _OfficialLevelsProvider = officialLevelsProvider;
         _RequestDispatcher = requestDispatcher;
     }
@@ -29,25 +29,8 @@ internal class DataSeeder
 
     public async Task SeedAsync(DbContext context, bool dataStoreChanged, CancellationToken cancellationToken)
     {
-        await SeedDefaultGroupsAndTags(context, cancellationToken).ConfigureAwait(false);
+        await _TagSeeder.SeedGroupsAndTagsAsync(context, cancellationToken).ConfigureAwait(false);
         await SeedOfficialLevelsAsync().ConfigureAwait(false);
-    }
-
-    private async Task SeedDefaultGroupsAndTags(DbContext context, CancellationToken cancellationToken)
-    {
-        bool shouldCreateDefaultTagsAndGroups =
-            !await context.Set<DisplayGroup>().AnyAsync(cancellationToken).ConfigureAwait(false) &&
-            !await context.Set<LogicGroup>().AnyAsync(cancellationToken).ConfigureAwait(false) &&
-            !await context.Set<Tag>().AnyAsync(cancellationToken).ConfigureAwait(false);
-
-        if (!shouldCreateDefaultTagsAndGroups)
-            return;
-
-        context.AddRange(_DefaultTagProvider.GetDefaultDisplayGroups());
-        context.AddRange(_DefaultTagProvider.GetDefaultLogicGroups());
-        context.AddRange(_DefaultTagProvider.GetDefaultTags());
-
-        await context.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
     }
 
     private async Task SeedOfficialLevelsAsync()
