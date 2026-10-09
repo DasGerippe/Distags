@@ -1,0 +1,170 @@
+Name;DisplayName;DisplayGroupName;LogicGroupName;IsExclusive;IsFallback;IsAutoTag;Description
+sprint;Sprint;game-mode;;False;False;True;The level can be played in Sprint mode.
+challenge;Challenge;game-mode;;False;False;True;The level can be played in Challenge mode.
+stunt;Stunt;game-mode;;False;False;True;The level can be played in Stunt mode.
+reverse-tag;Reverse Tag;game-mode;;False;False;True;The level can be played in Reverse Tag mode.
+main-menu;Main Menu;game-mode;;False;False;True;The level can be used as a Main Menu.
+difficulty-unspecified;Unspecified;difficulty;difficulty;True;True;False;Difficulty has not been specified yet.
+casual;Casual;difficulty;difficulty;True;False;False;Minimal amounts of obstacles with little to no chance of death.
+normal;Normal;difficulty;difficulty;True;False;False;Minimal transfers and some obstacles. Early Arcade.
+advanced;Advanced;difficulty;difficulty;True;False;False;Standard Distance gameplay with moderate amounts of obstacles and transfers. (End of Adventure, Nexus)
+expert;Expert;difficulty;difficulty;True;False;False;Increasing amount of transfers and obstacles and/or faster paced gameplay. (Around Lost To Echoes)
+nightmare;Nightmare;difficulty;difficulty;True;False;False;Entry level of advanced mechanics like gripflight and Kinix-transfers/dual-axis transfers. (Zenith, Inferno, etc.)
+brutal;Brutal;difficulty;difficulty;True;False;False;Refined advanced mechanics and car control. (Levels ~2-10 Pred air control playlist?)
+lunatic;Lunatic;difficulty;difficulty;True;False;False;Precise advanced mechanics. (Levels ~11-20 Pred air control playlist?)
+insane;Insane;difficulty;difficulty;True;False;False;Anything even more difficult. (Levels ~21+ Pred air control playlist?)
+impossible;Impossible;difficulty;difficulty;True;False;False;The level cannot be completed (for various reasons).
+length-unspecified;Unspecified;length;length;True;True;False;Length has not been specified yet.
+30-sec;~30 Seconds;length;length;True;False;False;Very short levels lasting about 30 seconds or less.
+1-min;~1 Minute;length;length;True;False;False;Short levels lasting about 1 minute.
+2-min;~2 Minutes;length;length;True;False;False;Average levels lasting about 2 minutes.
+3-min;~3 Minutes;length;length;True;False;False;Slightly longer levels lasting about 3 minutes.
+5-min;~5 Minutes;length;length;True;False;False;Longer levels lasting about 5 minutes.
+8-min;~8 Minutes;length;length;True;False;False;Considerably longer levels lasting about 8 minutes.
+15-min;10+ Minutes;length;length;True;False;False;Levels lasting between 10 and 30 minutes.
+45-min;30+ Minutes;length;length;True;False;False;Levels lasting between 30 and 60 minutes.
+hours;1+ Hour;length;length;True;False;False;Levels lasting longer than an hour.
+boost-unspecified;Boost Unspecified;abilities;boost;True;True;False;Boost has not been specified yet.
+boost-enabled;Boost Enabled;abilities;boost;True;False;False;Boost is enabled throughout the level.
+boost-toggling;Boost Toggling;abilities;boost;True;False;False;Boost is toggling throughout the level.
+boost-disabled;Boost Disabled;abilities;boost;True;False;False;Boost is disabled throughout the level.
+jump-unspecified;Jump Unspecified;abilities;jump;True;True;False;Jump has not been specified yet.
+jump-enabled;Jump Enabled;abilities;jump;True;False;False;Jump is enabled throughout the level.
+jump-toggling;Jump Toggling;abilities;jump;True;False;False;Jump is toggling throughout the level.
+jump-disabled;Jump Disabled;abilities;jump;True;False;False;Jump is disabled throughout the level.
+grip-unspecified;Grip Unspecified;abilities;grip;True;True;False;Grip has not been specified yet.
+grip-enabled;Grip Enabled;abilities;grip;True;False;False;Grip is enabled throughout the level.
+grip-toggling;Grip Toggling;abilities;grip;True;False;False;Grip is toggling throughout the level.
+grip-disabled;Grip Disabled;abilities;grip;True;False;False;Grip is disabled throughout the level.
+wings-unspecified;Wings Unspecified;abilities;wings;True;True;False;Wings have not been specified yet.
+wings-enabled;Wings Enabled;abilities;wings;True;False;False;Wings are enabled throughout the level.
+wings-toggling;Wings Toggling;abilities;wings;True;False;False;Wings are toggling throughout the level.
+wings-disabled;Wings Disabled;abilities;wings;True;False;False;Wings are disabled throughout the level.
+cooldown-unspecified;Cooldown Unspecified;abilities;cooldown;True;True;False;Cooldown has not been specified yet.
+cooldown-enabled;Cooldown Enabled;abilities;cooldown;True;False;False;Cooldown (overheating) is enabled throughout the level.
+cooldown-toggling;Cooldown Toggling;abilities;cooldown;True;False;False;Cooldown (overheating) is toggling throughout the level.
+cooldown-disabled;Cooldown Disabled;abilities;cooldown;True;False;False;Cooldown (overheating) is disabled throughout the level.
+gameplay-unspecified;Unspecified;gameplay;gameplay;True;True;False;Gameplay hasn't been specified yet.
+standard;Standard;gameplay;gameplay;False;False;False;Normal Distance gameplay with obstacles, jumps and transfers. Basically anything from Adventure.
+flat-driving;Flat Driving;gameplay;gameplay;False;False;False;No jumps or transfers.
+obstacles;Obstacles;gameplay;gameplay;False;False;False;Considerable amount of obstacles.
+transfers;Transfers;gameplay;gameplay;False;False;False;Considerable amount of transfers.
+wing-flight;Wing Flight;gameplay;gameplay;False;False;False;Sections that intended for the player to fly with wings.
+grip-flight;Grip Flight;gameplay;gameplay;False;False;False;Sections that require gripflight to clear.
+low-drag;Low Drag;gameplay;gameplay;False;False;False;Lower drag resulting in higher car speed.
+climbing;Climbing;gameplay;gameplay;False;False;False;"The level progresses upwards with a lot of gaps in the road, requiring the player to ""climb"" upwards using their abilities."
+downhill;Downhill;gameplay;gameplay;False;False;False;The level progresses downwards at an angle.
+freefall;Freefall;gameplay;gameplay;False;False;False;The level progresses straight down with a lot of gaps between driveable geometry, causing the player to freefall.
+precision;Precision;gameplay;gameplay;False;False;False;Precise inputs required to navigate or complete the level.
+tech;Tech;gameplay;gameplay;False;False;False;Focus on advanced mechanics and skill expression.
+jank;Jank;gameplay;gameplay;False;False;False;Saw boosts, bomb boosts, weird physics, etc.
+boat;Boat;gameplay;gameplay;False;False;False;"Upside down ""boating"". Basically gripflight with water force zones keeping you afloat."
+minigame;Minigame;gameplay;gameplay;False;False;False;The level has its own rules or objectives instead of the standard race to finish.
+puzzle;Puzzle;gameplay;gameplay;False;False;False;Sections that require puzzle solving to progress.
+maze;Maze;gameplay;gameplay;False;False;False;Maze-like sections where the player needs to figure out the correct path to progress.
+low-input;Low Input;gameplay;gameplay;False;False;False;Little to no inputs required to complete the level. Mostly holding gas.
+gameplay-other;Other;gameplay;gameplay;False;False;False;Gameplay that can't be described by any of the other tags.
+gimmicks-unspecified;Unspecified;gimmicks;gimmicks;True;True;False;Gimmicks have not been specified yet.
+gimmicks-none;None;gimmicks;gimmicks;True;False;False;The level has none of the available gimmicks.
+teleports;Teleports;gimmicks;gimmicks;False;False;False;Teleporters exist within the level and therefore may influence routing.
+multi-path;Multi-Path;gimmicks;gimmicks;False;False;False;Multiple different paths (not just symmetrical roads).
+hidden-path;Hidden Path;gimmicks;gimmicks;False;False;False;Hidden alternative paths or portals.
+laps;Laps;gimmicks;gimmicks;False;False;False;The level needs to be completed multiple times in a row.
+boosters;Boosters;gimmicks;gimmicks;False;False;False;Boost pads or power-ups that increase the car's speed.
+jump-pads;Jump Pads;gimmicks;gimmicks;False;False;False;Jump pads that launch the car up and/or forwards when driven over them.
+force-zones;Force Zones;gimmicks;gimmicks;False;False;False;Zones that influence the cars travel direction. Similar to boost pads though generally larger in size and not always in the direction of the car.
+rails;Rails;gimmicks;gimmicks;False;False;False;Grind rails that the car follows on its own. (Biotec 4)
+gravity;Gravity;gimmicks;gimmicks;False;False;False;The level has non-standard, changing, or in other ways unusual gravity.
+moving-floor;Moving Floor;gimmicks;gimmicks;False;False;False;Driving on moving roads/objects.
+forced-camera;Forced Camera;gimmicks;gimmicks;False;False;False;Some form of locked or forced camera perspective. (Variant Blue)
+animation;Animation;gimmicks;gimmicks;False;False;False;The level has notable animations.
+distortion;Distortion;gimmicks;gimmicks;False;False;False;The level adds some form of visual distortion to the camera, impacting visibility/driving clarity.
+required-checkpoints;Required Checkpoints;gimmicks;gimmicks;False;False;False;Some checkpoints or triggers are required to complete the level.
+collectibles;Collectibles;gimmicks;gimmicks;False;False;False;The level requires the collection of a certain number of items to complete.
+discoverables;Discoverables;gimmicks;gimmicks;False;False;False;Secrets, Easter Eggs, etc.
+readability-unspecified;Unspecified;readability;readability;True;True;False;Readability has not been specified yet.
+very-readable;Very Readable;readability;readability;True;False;False;Very clear where to go and what to do.
+mostly-readable;Mostly Readable;readability;readability;True;False;False;Not sure where/how to land after a jump. Obstacles that need quick reactions.
+poorly-readable;Poorly Readable;readability;readability;True;False;False;Not sure where the next section is. Obstacles that are hard to react to.
+unreadable;Unreadable;readability;readability;True;False;False;Where am I? Where is the road? Where is anything? Where did that obstacle come from?
+theme-unspecified;Unspecified;theme;theme;True;True;False;Themes have not been specified yet.
+theme-other;Other;theme;theme;False;False;False;Theme that can't be described by any of the other tags.
+distance;Distance;theme;theme;False;False;False;The level resembles the look and feel of Distance's official levels, primarily from the Adventure campaign.
+lost-to-echoes;Lost To Echoes;theme;theme;False;False;False;The level resembles the look and feel of the Lost To Echoes campaign.
+halloween;Halloween;theme;theme;False;False;False;The level is themed around Halloween.
+christmas;Christmas;theme;theme;False;False;False;The level is themed around Christmas.
+plants;Plants;theme;theme;False;False;False;The level is themed around plants, trees, forests or nature.
+desert;Desert;theme;theme;False;False;False;The level is themed around deserts or sand.
+fire;Fire;theme;theme;False;False;False;The level is themed around fire.
+lava;Lava;theme;theme;False;False;False;The level is themed around lava or volcanoes.
+water;Water;theme;theme;False;False;False;The level is themed around water, oceans or underwater areas.
+snow;Snow;theme;theme;False;False;False;The level is themed around snow or ice.
+sky;Sky;theme;theme;False;False;False;The level is set in the sky, among clouds or high above the ground.
+space;Space;theme;theme;False;False;False;The level is themed around outer space.
+toy-box;Toy Box;theme;theme;False;False;False;The level is themed around toys and playrooms.
+industrial;Industrial;theme;theme;False;False;False;The level is themed around factories, machinery or industrial settings.
+cityscape;Cityscape;theme;theme;False;False;False;The level is set in a city or urban environment.
+corridor;Corridor;theme;theme;False;False;False;The level is set in enclosed corridor-like or tunnel-like spaces.
+cave;Cave;theme;theme;False;False;False;The level is set in caves or underground areas.
+corn;Corn;theme;theme;False;False;False;The level is themed around corn.
+food;Food;theme;theme;False;False;False;The level is themed around food or drinks.
+broken-symmetry;Broken Symmetry;theme;theme;False;False;False;The level is themed around or a modification of the official Broken Symmetry level.
+acceleracers;Acceleracers;theme;theme;False;False;False;The level is themed around Hot Wheels Acceleracers Realms.
+spooky;Spooky;theme;theme;False;False;False;The level has a spooky or eerie atmosphere.
+evil;Evil;theme;theme;False;False;False;The level has a evil, menacing or sinister atmosphere.
+silly;Silly;theme;theme;False;False;False;The level has a silly or humorous atmosphere.
+spectacular;Spectacular;theme;theme;False;False;False;The level has an impressive, grand or cinematic presentation. 
+corrupted;Corrupted;theme;theme;False;False;False;The level looks corrupted or infected.
+geometric;Geometric;theme;theme;False;False;False;The level has a lot of geometric shapes or objects.
+abstract;Abstract;theme;theme;False;False;False;The level uses abstract visuals without a recognizeable setting.
+media-reference;Video Game/Movie;theme;theme;False;False;False;The level references a video game, moovie or other media.
+meme;Meme;theme;theme;False;False;False;The level references a Distance or internet meme.
+first-level;First Level;theme;theme;False;False;False;The level looks like someone's first level.
+vertical;Vertical;theme;theme;False;False;False;The level extends maily upwards or downwards instead of forwards.
+spaghetti;Spaghetti;theme;theme;False;False;False;The level has tangled, crossing or overlapping roads.
+variety;Variety;theme;theme;False;False;False;The level changes its look and style between sections.
+clutter;Clutter;theme;theme;False;False;False;The level is filled with a lot of objects or overall visually busy.
+bland;Bland;theme;theme;False;False;False;The level is visually plain, with little decoration or detail.
+terrain;Terrain;theme;theme;False;False;False;The level has notable terrain, such as hills, landscapes or generally uneven ground.
+assets;Assets;theme;theme;False;False;False;The level contains custom assets.
+dark;Dark;theme;theme;False;False;False;The level is dark.
+dim;Dim;theme;theme;False;False;False;The level is neither bright nor dark.
+bright;Bright;theme;theme;False;False;False;The level is bright.
+neon;Neon;theme;theme;False;False;False;The level uses neon or glowing colors or lights.
+flashy;Flashy;theme;theme;False;False;False;The level has flashing or fast-changing visual effects.
+contrast;High Contrast;theme;theme;False;False;False;The level has high contrast between light and dark or between colors.
+colorful;Colorful;theme;theme;False;False;False;The level uses a wide range of colors.
+monochromatic;Monochromatic;theme;theme;False;False;False;The level only uses one color or only a few shades.
+official;Official Level;level-info;level-type;True;False;True;An official level that ships with the base game.
+workshop;Workshop Level;level-info;level-type;True;False;True;A workshop level that needs to be subscribed to/downloaded.
+medals;Medals;level-info;;False;False;False;The level supports medals.
+missing-level;Missing Level Bug;level-info;;False;False;True;"The level cannot be downloaded with the newest game version and causes the ""Missing Level"" error in Multiplayer."
+wr-difficulty-unspecified;Unspecified;wr-difficulty;wr-difficulty;True;True;False;World record difficulty has not been specified yet.
+wr-casual;Casual;wr-difficulty;wr-difficulty;True;False;False;The world record route has minimal obstacles and little to no chance of death.
+wr-normal;Normal;wr-difficulty;wr-difficulty;True;False;False;The world record route has minimal transfers and some obstacles.
+wr-advanced;Advanced;wr-difficulty;wr-difficulty;True;False;False;The world record route has moderate amounts of obstacles and transfers.
+wr-expert;Expert;wr-difficulty;wr-difficulty;True;False;False;The world record route has an increasing amount of transfers and obstacles and/or is faster paced.
+wr-nightmare;Nightmare;wr-difficulty;wr-difficulty;True;False;False;The world record route requires entry-level advanced mechanics like gripflight and Kinix/dual-axis transfers.
+wr-brutal;Brutal;wr-difficulty;wr-difficulty;True;False;False;The world record route requires refined advanced mechanics and car control.
+wr-lunatic;Lunatic;wr-difficulty;wr-difficulty;True;False;False;The world record route requires precise advanced mechanics.
+wr-insane;Insane;wr-difficulty;wr-difficulty;True;False;False;The world record route is even more difficult than Lunatic.
+wr-length-unspecified;Unspecified;wr-length;wr-length;True;True;False;World record length has not been specified yet.
+wr-30-sec;~30 Seconds;wr-length;wr-length;True;False;False;The world record run lasts about 30 seconds or less.
+wr-1-min;~1 Minute;wr-length;wr-length;True;False;False;The world record run lasts about 1 minute.
+wr-2-min;~2 Minutes;wr-length;wr-length;True;False;False;The world record run lasts about 2 minutes.
+wr-3-min;~3 Minutes;wr-length;wr-length;True;False;False;The world record run lasts about 3 minutes.
+wr-5-min;~5 Minutes;wr-length;wr-length;True;False;False;The world record run lasts about 5 minutes.
+wr-8-min;~8 Minutes;wr-length;wr-length;True;False;False;The world record run lasts about 8 minutes.
+wr-15-min;10+ Minutes;wr-length;wr-length;True;False;False;The world record run lasts between 10 and 30 minutes.
+wr-45-min;30+ Minutes;wr-length;wr-length;True;False;False;The world record run lasts between 30 and 60 minutes.
+wr-hours;1+ Hour;wr-length;wr-length;True;False;False;The world record run lasts longer than an hour.
+wr-tech-unspecified;Unspecified;wr-tech;wr-tech;True;True;False;World record tech has not been specified yet.
+wr-tech-none;None;wr-tech;wr-tech;True;False;False;The level has none of the available world record tech.
+saw-boost;Saw Boost;wr-tech;wr-tech;False;False;False;Getting launched by a saw or grinder.
+wheelie-boost;Wheelie Boost;wr-tech;wr-tech;False;False;False;Wheelie boosting is used in the current world record or is effective on the world record route.
+thruster-reset;Thruster Reset;wr-tech;wr-tech;False;False;False;Thruster resets are used in the current world record or are reasonably viable.
+bounce;Bounce;wr-tech;wr-tech;False;False;False;Usually a thing on levels without grip or jump where there is an element of luck or precision to landing smoothly or getting up a railing/wall. (COAT Speedway, Past)
+bomb-boost;Bomb Boost;wr-tech;wr-tech;False;False;False;Launching the car with a bomb.
+sliced;Sliced;wr-tech;wr-tech;False;False;False;Slicing the car, usually with a laser, to allow it to fit somewhere a full car wouldn't. (It Was Supposed To Be Perfect)
+mp-reset-bug;MP Reset Bug;wr-tech;wr-tech;False;False;False;Bug that resets the car to its last spawn point.
+broken-wr;Broken WR;wr-tech;wr-tech;False;False;False;The world record route is impossible because the level has been updated, rendering the route impossible.

@@ -9,13 +9,19 @@
   <ItemGroup>
     <None Remove="Database\Triggers\CreateTriggerCreateLevelLock.sql" />
     <None Remove="Database\Triggers\DropTriggerCreateLevelLock.sql" />
+    <None Remove="Data\DisplayGroups.csv" />
+    <None Remove="Data\LogicGroups.csv" />
     <None Remove="Data\OfficialLevels.csv" />
+    <None Remove="Data\Tags.csv" />
   </ItemGroup>
 
   <ItemGroup>
     <EmbeddedResource Include="Database\Triggers\CreateTriggerCreateLevelLock.sql" />
     <EmbeddedResource Include="Database\Triggers\DropTriggerCreateLevelLock.sql" />
+    <EmbeddedResource Include="Data\DisplayGroups.csv" />
+    <EmbeddedResource Include="Data\LogicGroups.csv" />
     <EmbeddedResource Include="Data\OfficialLevels.csv" />
+    <EmbeddedResource Include="Data\Tags.csv" />
   </ItemGroup>
 
   <ItemGroup>
