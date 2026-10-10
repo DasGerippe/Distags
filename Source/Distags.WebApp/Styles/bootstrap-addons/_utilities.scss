@@ -1,0 +1,9 @@
+$utilities: map-merge(
+    $utilities,
+    (
+        "white-space": map-merge(
+            map-get($utilities, "white-space"),
+            (responsive: true)
+        )
+    )
+);
