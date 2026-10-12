@@ -205,7 +205,7 @@ Das Plugin selbst (ausgeführt über den `AutoTaggerRunner`) braucht einen API-K
 dotnet run --project AutoTagging.MaxterCsvImporter -- generate-mapping
 
 # 2. Bauen, damit die Plugin-DLL (+ Abhängigkeiten) in den Plugins/-Ordner des AutoTaggerRunner kopiert werden
-dotnet build LevelTagging.sln
+dotnet build Distags.slnx
 
 # 3. Nur diesen Auto-Tagger ausführen
 dotnet run --project AutoTaggerRunner -- MaxterCsvImporter
