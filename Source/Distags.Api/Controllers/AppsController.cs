@@ -44,7 +44,7 @@ public class AppsController : ControllerBase
         }
         catch (UnknownAppNameException)
         {
-            return ProblemDetailsResult.AppNotFound(appName);
+            return DistagsProblemResults.AppNotFound(appName);
         }
     }
 
@@ -62,7 +62,7 @@ public class AppsController : ControllerBase
         }
         catch (AppNameTakenException)
         {
-            return ProblemDetailsResult.AppConflict(createAppDto.Name);
+            return DistagsProblemResults.AppConflict(createAppDto.Name);
         }
     }
 
@@ -80,7 +80,7 @@ public class AppsController : ControllerBase
         }
         catch (UnknownAppNameException)
         {
-            return ProblemDetailsResult.AppNotFound(appName);
+            return DistagsProblemResults.AppNotFound(appName);
         }
     }
 }

@@ -45,7 +45,7 @@ public class LevelsController : ControllerBase
         }
         catch (UnknownLevelException)
         {
-            return ProblemDetailsResult.OfficialLevelNotFound(levelSlug);
+            return DistagsProblemResults.OfficialLevelNotFound(levelSlug);
         }
     }
 
@@ -64,7 +64,7 @@ public class LevelsController : ControllerBase
         }
         catch (UnknownLevelException)
         {
-            return ProblemDetailsResult.WorkshopLevelNotFound(levelWorkshopId);
+            return DistagsProblemResults.WorkshopLevelNotFound(levelWorkshopId);
         }
     }
 
@@ -83,7 +83,7 @@ public class LevelsController : ControllerBase
         }
         catch (UnknownLevelException)
         {
-            return ProblemDetailsResult.OfficialLevelNotFound(levelSlug);
+            return DistagsProblemResults.OfficialLevelNotFound(levelSlug);
         }
     }
 
@@ -102,7 +102,7 @@ public class LevelsController : ControllerBase
         }
         catch (UnknownLevelException)
         {
-            return ProblemDetailsResult.WorkshopLevelNotFound(levelWorkshopId);
+            return DistagsProblemResults.WorkshopLevelNotFound(levelWorkshopId);
         }
     }
 
@@ -128,23 +128,23 @@ public class LevelsController : ControllerBase
         }
         catch (MaintenanceActiveException)
         {
-            return ProblemDetailsResult.MaintenanceActive();
+            return DistagsProblemResults.MaintenanceActive();
         }
         catch (CannotChangeAutoTagException)
         {
-            return ProblemDetailsResult.ForbiddenChangeAutoTag(tagName);
+            return DistagsProblemResults.ForbiddenChangeAutoTag(tagName);
         }
         catch (UnknownLevelException)
         {
-            return ProblemDetailsResult.OfficialLevelNotFound(levelSlug);
+            return DistagsProblemResults.OfficialLevelNotFound(levelSlug);
         }
         catch (UnknownTagException)
         {
-            return ProblemDetailsResult.TagNotFound(tagName);
+            return DistagsProblemResults.TagNotFound(tagName);
         }
         catch (LevelTagExistsException)
         {
-            return ProblemDetailsResult.OfficialLevelTagConflict(levelSlug, tagName);
+            return DistagsProblemResults.OfficialLevelTagConflict(levelSlug, tagName);
         }
     }
 
@@ -170,23 +170,23 @@ public class LevelsController : ControllerBase
         }
         catch (MaintenanceActiveException)
         {
-            return ProblemDetailsResult.MaintenanceActive();
+            return DistagsProblemResults.MaintenanceActive();
         }
         catch (CannotChangeAutoTagException)
         {
-            return ProblemDetailsResult.ForbiddenChangeAutoTag(tagName);
+            return DistagsProblemResults.ForbiddenChangeAutoTag(tagName);
         }
         catch (UnknownLevelException)
         {
-            return ProblemDetailsResult.WorkshopLevelNotFound(levelWorkshopId);
+            return DistagsProblemResults.WorkshopLevelNotFound(levelWorkshopId);
         }
         catch (UnknownTagException)
         {
-            return ProblemDetailsResult.TagNotFound(tagName);
+            return DistagsProblemResults.TagNotFound(tagName);
         }
         catch (LevelTagExistsException)
         {
-            return ProblemDetailsResult.WorkshopLevelTagConflict(levelWorkshopId, tagName);
+            return DistagsProblemResults.WorkshopLevelTagConflict(levelWorkshopId, tagName);
         }
     }
 
@@ -212,27 +212,27 @@ public class LevelsController : ControllerBase
         }
         catch (MaintenanceActiveException)
         {
-            return ProblemDetailsResult.MaintenanceActive();
+            return DistagsProblemResults.MaintenanceActive();
         }
         catch (CannotChangeAutoTagException)
         {
-            return ProblemDetailsResult.ForbiddenChangeAutoTag(tagName);
+            return DistagsProblemResults.ForbiddenChangeAutoTag(tagName);
         }
         catch (UnknownLevelException)
         {
-            return ProblemDetailsResult.OfficialLevelNotFound(levelSlug);
+            return DistagsProblemResults.OfficialLevelNotFound(levelSlug);
         }
         catch (UnknownTagException)
         {
-            return ProblemDetailsResult.TagNotFound(tagName);
+            return DistagsProblemResults.TagNotFound(tagName);
         }
         catch (LevelTagNotFoundException)
         {
-            return ProblemDetailsResult.OfficialLevelTagNotFound(levelSlug, tagName);
+            return DistagsProblemResults.OfficialLevelTagNotFound(levelSlug, tagName);
         }
         catch (CannotRemoveFallbackTagException)
         {
-            return ProblemDetailsResult.BadRequestRemoveFallbackTag(tagName);
+            return DistagsProblemResults.BadRequestRemoveFallbackTag(tagName);
         }
     }
 
@@ -258,27 +258,27 @@ public class LevelsController : ControllerBase
         }
         catch (MaintenanceActiveException)
         {
-            return ProblemDetailsResult.MaintenanceActive();
+            return DistagsProblemResults.MaintenanceActive();
         }
         catch (CannotChangeAutoTagException)
         {
-            return ProblemDetailsResult.ForbiddenChangeAutoTag(tagName);
+            return DistagsProblemResults.ForbiddenChangeAutoTag(tagName);
         }
         catch (UnknownLevelException)
         {
-            return ProblemDetailsResult.WorkshopLevelNotFound(levelWorkshopId);
+            return DistagsProblemResults.WorkshopLevelNotFound(levelWorkshopId);
         }
         catch (UnknownTagException)
         {
-            return ProblemDetailsResult.TagNotFound(tagName);
+            return DistagsProblemResults.TagNotFound(tagName);
         }
         catch (LevelTagNotFoundException)
         {
-            return ProblemDetailsResult.WorkshopLevelTagNotFound(levelWorkshopId, tagName);
+            return DistagsProblemResults.WorkshopLevelTagNotFound(levelWorkshopId, tagName);
         }
         catch (CannotRemoveFallbackTagException)
         {
-            return ProblemDetailsResult.BadRequestRemoveFallbackTag(tagName);
+            return DistagsProblemResults.BadRequestRemoveFallbackTag(tagName);
         }
     }
 }

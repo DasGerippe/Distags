@@ -70,7 +70,7 @@ public class UsersController : ControllerBase
         UserBySteamIdQuery query = new UserBySteamIdQuery { SteamId = userSteamId };
         UserDto? userDto = await requestDispatcher.DispatchAsync(query);
         if (userDto == null)
-            return ProblemDetailsResult.UserNotFound(userSteamId);
+            return DistagsProblemResults.UserNotFound(userSteamId);
 
         UserResponse userResponse = UserMapper.Map(userDto);
         return Ok(userResponse);
@@ -95,7 +95,7 @@ public class UsersController : ControllerBase
         }
         catch (UnknownUserException)
         {
-            return ProblemDetailsResult.UserNotFound(userSteamId);
+            return DistagsProblemResults.UserNotFound(userSteamId);
         }
     }
 
@@ -118,7 +118,7 @@ public class UsersController : ControllerBase
         }
         catch
         {
-            return ProblemDetailsResult.UserNotFound(userSteamId);
+            return DistagsProblemResults.UserNotFound(userSteamId);
         }
     }
 }
