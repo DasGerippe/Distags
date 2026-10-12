@@ -33,6 +33,7 @@ public class Program
             AddAuthentication(builder);
             AddOutputCaching(builder);
 
+            builder.Services.AddProblemDetails();
             builder.Services.AddControllers()
                 .AddJsonOptions(options => options.JsonSerializerOptions.Converters.Add(new PatchValueConverterFactory()));
             builder.Services.AddHttpContextAccessor();
@@ -62,11 +63,11 @@ public class Program
 
             WebApplication app = builder.Build();
 
-            // Configure the HTTP request pipeline.
+            app.UseExceptionHandler();
+            app.UseStatusCodePages();
+
             if (app.Environment.IsDevelopment())
-            {
                 app.MapOpenApi();
-            }
 
             app.UseHttpsRedirection();
 
@@ -74,7 +75,6 @@ public class Program
             app.UseOutputCache();
 
             app.MapStaticAssets();
-
             app.MapControllers();
 
             app.MapHub<LevelHub>("/hubs/levels");
