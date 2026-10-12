@@ -6,6 +6,7 @@ using Distags.Core;
 using Distags.Core.Events;
 using Distags.Persistence;
 using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.Extensions.Options;
 using Serilog;
 using SerilogUtils;
@@ -32,8 +33,8 @@ public class Program
 
             AddAuthentication(builder);
             AddOutputCaching(builder);
+            AddProblemDetails(builder);
 
-            builder.Services.AddProblemDetails();
             builder.Services.AddControllers()
                 .AddJsonOptions(options => options.JsonSerializerOptions.Converters.Add(new PatchValueConverterFactory()));
             builder.Services.AddHttpContextAccessor();
@@ -157,5 +158,23 @@ public class Program
                 policyBuilder => policyBuilder
                     .AddPolicy<IgnoreAuthCachePolicy>(),
                 excludeDefaultPolicy: true));
+    }
+
+    private static void AddProblemDetails(WebApplicationBuilder builder)
+    {
+        builder.Services.AddProblemDetails();
+        if (builder.Environment.IsDevelopment())
+        {
+            builder.Services.Configure<ProblemDetailsOptions>(options => options.CustomizeProblemDetails += context =>
+            {
+                Exception? exception = context.HttpContext.Features.Get<IExceptionHandlerFeature>()?.Error;
+                if (exception == null)
+                    return;
+
+                context.ProblemDetails.Extensions["exceptionType"] = exception.GetType().FullName;
+                context.ProblemDetails.Extensions["exceptionMessage"] = exception.Message;
+                context.ProblemDetails.Extensions["exceptionStacktrace"] = exception.StackTrace;
+            });
+        }
     }
 }
