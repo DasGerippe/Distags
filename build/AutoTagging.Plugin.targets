@@ -1,6 +1,6 @@
 <Project>
 
-    <!--
+  <!--
     Shared post-build step for all AutoTagging.* plugin projects.
 
     AutoTaggerRunner needs plugins and loads them via Assembly.LoadFrom. The dependencies
@@ -10,29 +10,29 @@
 
     Favor msbuild copy task over xcopy (robocopy, blablacopy, ...) for OS compatibility
 
-    Paths are anchored at the directory holding LevelTagging.sln, not at this file's own location
-    and not at SolutionDir. SolutionDir is only defined when building through the .sln, so building
+    Paths are anchored at the directory holding Distags.slnx, not at this file's own location
+    and not at SolutionDir. SolutionDir is only defined when building through the .slnx, so building
     a plugin project on its own would copy the DLL to a wrong, working-directory-relative location.
-    Anchoring at the .sln instead of MSBuildThisFileDirectory keeps this file movable - relocating
+    Anchoring at the .slnx instead of MSBuildThisFileDirectory keeps this file movable - relocating
     it does not change where plugins end up.
   -->
 
-    <PropertyGroup>
-        <DistagsSolutionRoot>$([MSBuild]::EnsureTrailingSlash($([MSBuild]::GetDirectoryNameOfFileAbove($(MSBuildThisFileDirectory), 'LevelTagging.sln'))))</DistagsSolutionRoot>
-        <AutoTaggerRunnerPluginsDir>$(DistagsSolutionRoot)AutoTaggerRunner/bin/$(Configuration)/$(TargetFramework)/Plugins/</AutoTaggerRunnerPluginsDir>
-    </PropertyGroup>
+  <PropertyGroup>
+    <DistagsSolutionRoot>$([MSBuild]::EnsureTrailingSlash($([MSBuild]::GetDirectoryNameOfFileAbove($(MSBuildThisFileDirectory), 'Distags.slnx'))))</DistagsSolutionRoot>
+    <AutoTaggerRunnerPluginsDir>$(DistagsSolutionRoot)/src/AutoTaggerRunner/bin/$(Configuration)/$(TargetFramework)/Plugins/</AutoTaggerRunnerPluginsDir>
+  </PropertyGroup>
 
-    <Target Name="CopyToAutoTaggerRunnerPlugins" AfterTargets="Build">
-        <ItemGroup>
-            <PluginSharedOutput Include="@(ReferenceCopyLocalPaths->WithMetadataValue('ReferenceSourceTarget', 'ProjectReference')->'%(Filename)%(Extension)')" />
+  <Target Name="CopyToAutoTaggerRunnerPlugins" AfterTargets="Build">
+    <ItemGroup>
+      <PluginSharedOutput Include="@(ReferenceCopyLocalPaths->WithMetadataValue('ReferenceSourceTarget', 'ProjectReference')->'%(Filename)%(Extension)')" />
 
-            <PluginOutputFiles Include="$(TargetDir)**/*.*" />
-            <PluginOutputFiles Remove="@(PluginSharedOutput->'$(TargetDir)%(Identity)')" />
-        </ItemGroup>
+      <PluginOutputFiles Include="$(TargetDir)**/*.*" />
+      <PluginOutputFiles Remove="@(PluginSharedOutput->'$(TargetDir)%(Identity)')" />
+    </ItemGroup>
 
-        <Copy SourceFiles="@(PluginOutputFiles)"
-              DestinationFolder="$(AutoTaggerRunnerPluginsDir)%(RecursiveDir)"
-              SkipUnchangedFiles="true" />
-    </Target>
+    <Copy SourceFiles="@(PluginOutputFiles)"
+          DestinationFolder="$(AutoTaggerRunnerPluginsDir)%(RecursiveDir)"
+          SkipUnchangedFiles="true" />
+  </Target>
 
 </Project>

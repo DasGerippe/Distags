@@ -1,33 +1,35 @@
 <Solution>
   <Folder Name="/AutoTagging/">
-    <Project Path="Source/AutoTaggerRunner/AutoTaggerRunner.csproj">
-      <BuildDependency Project="Source/AutoTagging.GameMode/AutoTagging.GameMode.csproj" />
-      <BuildDependency Project="Source/AutoTagging.MissingLevel/AutoTagging.MissingLevel.csproj" />
+    <Project Path="src/AutoTaggerRunner/AutoTaggerRunner.csproj">
+      <BuildDependency Project="src/AutoTagging.GameMode/AutoTagging.GameMode.csproj" />
+      <BuildDependency Project="src/AutoTagging.LevelType/AutoTagging.LevelType.csproj" />
+      <BuildDependency Project="src/AutoTagging.MaxterCsvImporter/AutoTagging.MaxterCsvImporter.csproj" />
+      <BuildDependency Project="src/AutoTagging.MissingLevel/AutoTagging.MissingLevel.csproj" />
     </Project>
-    <Project Path="Source/AutoTagging.Abstractions/AutoTagging.Abstractions.csproj" />
-    <Project Path="Source/AutoTagging.GameMode/AutoTagging.GameMode.csproj" />
-    <Project Path="Source/AutoTagging.LevelType/AutoTagging.LevelType.csproj" />
-    <Project Path="Source/AutoTagging.MaxterCsvImporter/AutoTagging.MaxterCsvImporter.csproj" />
-    <Project Path="Source/AutoTagging.MissingLevel/AutoTagging.MissingLevel.csproj" />
+    <Project Path="src/AutoTagging.Abstractions/AutoTagging.Abstractions.csproj" />
+    <Project Path="src/AutoTagging.GameMode/AutoTagging.GameMode.csproj" />
+    <Project Path="src/AutoTagging.LevelType/AutoTagging.LevelType.csproj" />
+    <Project Path="src/AutoTagging.MaxterCsvImporter/AutoTagging.MaxterCsvImporter.csproj" />
+    <Project Path="src/AutoTagging.MissingLevel/AutoTagging.MissingLevel.csproj" />
   </Folder>
   <Folder Name="/Mods/">
-    <Project Path="Source/Mod.DistagsShortcut/Mod.DistagsShortcut.csproj" Id="ee6cbe79-e196-407e-9222-e4bcb1b7976e" />
-    <Project Path="Source/Mod.OfficialLevelExport/Mod.OfficialLevelExport.csproj" Id="521ae58a-10ce-4646-818f-90dcab8708f4" />
+    <Project Path="src/Mod.DistagsShortcut/Mod.DistagsShortcut.csproj" Id="ee6cbe79-e196-407e-9222-e4bcb1b7976e" />
+    <Project Path="src/Mod.OfficialLevelExport/Mod.OfficialLevelExport.csproj" Id="521ae58a-10ce-4646-818f-90dcab8708f4" />
   </Folder>
   <Folder Name="/Utils/">
-    <Project Path="Source/HttpUtils/HttpUtils.csproj" />
-    <Project Path="Source/SerilogUtils/SerilogUtils.csproj" />
+    <Project Path="src/HttpUtils/HttpUtils.csproj" />
+    <Project Path="src/SerilogUtils/SerilogUtils.csproj" />
   </Folder>
-  <Project Path="Source/Distags.Api.Contracts/Distags.Api.Contracts.csproj" />
-  <Project Path="Source/Distags.Api/Distags.Api.csproj" />
-  <Project Path="Source/Distags.Contracts/Distags.Contracts.csproj" />
-  <Project Path="Source/Distags.Core/Distags.Core.csproj" />
-  <Project Path="Source/Distags.Persistence.Dev/Distags.Persistence.Dev.csproj" />
-  <Project Path="Source/Distags.Persistence.Migrator/Distags.Persistence.Migrator.csproj" />
-  <Project Path="Source/Distags.Persistence/Distags.Persistence.csproj" />
-  <Project Path="Source/Distags.WebApp/Distags.WebApp.csproj" />
-  <Project Path="Source/SteamDataScraper/SteamDataScraper.csproj" />
-  <Project Path="Source/SteamWebApi.Contract/SteamWebApi.Contract.csproj" />
-  <Project Path="Source/SteamWebApi/SteamWebApi.csproj" />
-  <Project Path="Source/TestProject/TestProject.csproj" />
+  <Project Path="src/Distags.Api.Contracts/Distags.Api.Contracts.csproj" />
+  <Project Path="src/Distags.Api/Distags.Api.csproj" />
+  <Project Path="src/Distags.Contracts/Distags.Contracts.csproj" />
+  <Project Path="src/Distags.Core/Distags.Core.csproj" />
+  <Project Path="src/Distags.Persistence.Dev/Distags.Persistence.Dev.csproj" />
+  <Project Path="src/Distags.Persistence.Migrator/Distags.Persistence.Migrator.csproj" />
+  <Project Path="src/Distags.Persistence/Distags.Persistence.csproj" />
+  <Project Path="src/Distags.WebApp/Distags.WebApp.csproj" />
+  <Project Path="src/SteamDataScraper/SteamDataScraper.csproj" />
+  <Project Path="src/SteamWebApi.Contract/SteamWebApi.Contract.csproj" />
+  <Project Path="src/SteamWebApi/SteamWebApi.csproj" />
+  <Project Path="src/TestProject/TestProject.csproj" />
 </Solution>
