@@ -40,7 +40,7 @@ public class UserBansController : ControllerBase
         UserBanDto? userBanDto = await requestDispatcher.DispatchAsync(query);
 
         if (userBanDto == null)
-            return ProblemDetailsResult.UserBanNotFound(steamId);
+            return DistagsProblemResults.UserBanNotFound(steamId);
 
         UserBanResponse userBanResponse = UserBanMapper.Map(userBanDto);
         return Ok(userBanResponse);
@@ -70,15 +70,15 @@ public class UserBansController : ControllerBase
         }
         catch (CannotBanSelfException)
         {
-            return ProblemDetailsResult.ForbiddenBanSelf();
+            return DistagsProblemResults.ForbiddenBanSelf();
         }
         catch (CannotBanOtherUserException)
         {
-            return ProblemDetailsResult.ForbiddenBanOtherUser();
+            return DistagsProblemResults.ForbiddenBanOtherUser();
         }
         catch (SteamIdAlreadyBannedException)
         {
-            return ProblemDetailsResult.UserBanConflict(userBanDto.SteamId);
+            return DistagsProblemResults.UserBanConflict(userBanDto.SteamId);
         }
     }
 
@@ -96,7 +96,7 @@ public class UserBansController : ControllerBase
         }
         catch (SteamIdNotBannedException)
         {
-            return ProblemDetailsResult.UserBanNotFound(steamId);
+            return DistagsProblemResults.UserBanNotFound(steamId);
         }
     }
 }

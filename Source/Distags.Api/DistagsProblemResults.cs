@@ -2,11 +2,11 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Distags.Api;
 
-public static class ProblemDetailsResult
+public static class DistagsProblemResults
 {
-    public static ObjectResult ForbiddenChangeAutoTag(string autoTagName)
+    public static ProblemResult ForbiddenChangeAutoTag(string autoTagName)
     {
-        return ObjectResult(new ProblemDetails
+        return new ProblemResult(new ProblemDetails
         {
             Status = StatusCodes.Status403Forbidden,
             Title = "Cannot Change Auto-Applied Tag",
@@ -14,9 +14,9 @@ public static class ProblemDetailsResult
         });
     }
 
-    public static ObjectResult BadRequestRemoveFallbackTag(string fallbackTagName)
+    public static ProblemResult BadRequestRemoveFallbackTag(string fallbackTagName)
     {
-        return ObjectResult(new ProblemDetails
+        return new ProblemResult(new ProblemDetails
         {
             Status = StatusCodes.Status400BadRequest,
             Title = "Cannot Remove Fallback Tag",
@@ -24,19 +24,19 @@ public static class ProblemDetailsResult
         });
     }
 
-    public static ObjectResult ForbiddenBanSelf()
+    public static ProblemResult ForbiddenBanSelf()
     {
         return ForbiddenBan("You cannot ban yourself.");
     }
 
-    public static ObjectResult ForbiddenBanOtherUser()
+    public static ProblemResult ForbiddenBanOtherUser()
     {
         return ForbiddenBan("You cannot ban the user of that Steam ID.");
     }
 
-    private static ObjectResult ForbiddenBan(string detail)
+    private static ProblemResult ForbiddenBan(string detail)
     {
-        return ObjectResult(new ProblemDetails
+        return new ProblemResult(new ProblemDetails
         {
             Status = StatusCodes.Status403Forbidden,
             Title = "Cannot Ban Steam ID",
@@ -44,9 +44,9 @@ public static class ProblemDetailsResult
         });
     }
 
-    public static ObjectResult MaintenanceActive()
+    public static ProblemResult MaintenanceActive()
     {
-        return ObjectResult(new ProblemDetails
+        return new ProblemResult(new ProblemDetails
         {
             Status = StatusCodes.Status503ServiceUnavailable,
             Title = "Maintenance Active",
@@ -54,9 +54,9 @@ public static class ProblemDetailsResult
         });
     }
 
-    public static ObjectResult AppNotFound(string appName)
+    public static ProblemResult AppNotFound(string appName)
     {
-        return ObjectResult(new ProblemDetails
+        return new ProblemResult(new ProblemDetails
         {
             Status = StatusCodes.Status404NotFound,
             Title = "App Not Found",
@@ -64,9 +64,9 @@ public static class ProblemDetailsResult
         });
     }
 
-    public static ObjectResult AppConflict(string appName)
+    public static ProblemResult AppConflict(string appName)
     {
-        return ObjectResult(new ProblemDetails
+        return new ProblemResult(new ProblemDetails
         {
             Status = StatusCodes.Status409Conflict,
             Title = "App Already Exists",
@@ -74,9 +74,9 @@ public static class ProblemDetailsResult
         });
     }
 
-    public static ObjectResult OfficialLevelNotFound(string levelSlug)
+    public static ProblemResult OfficialLevelNotFound(string levelSlug)
     {
-        return ObjectResult(new ProblemDetails
+        return new ProblemResult(new ProblemDetails
         {
             Status = StatusCodes.Status404NotFound,
             Title = "Official Level Not Found",
@@ -84,9 +84,9 @@ public static class ProblemDetailsResult
         });
     }
 
-    public static ObjectResult WorkshopLevelNotFound(long levelWorkshopId)
+    public static ProblemResult WorkshopLevelNotFound(long levelWorkshopId)
     {
-        return ObjectResult(new ProblemDetails
+        return new ProblemResult(new ProblemDetails
         {
             Status = StatusCodes.Status404NotFound,
             Title = "Workshop Level Not Found",
@@ -94,9 +94,9 @@ public static class ProblemDetailsResult
         });
     }
 
-    public static ObjectResult OfficialLevelTagNotFound(string levelSlug, string tagName)
+    public static ProblemResult OfficialLevelTagNotFound(string levelSlug, string tagName)
     {
-        return ObjectResult(new ProblemDetails
+        return new ProblemResult(new ProblemDetails
         {
             Status = StatusCodes.Status404NotFound,
             Title = "Level Tag Not Found",
@@ -104,9 +104,9 @@ public static class ProblemDetailsResult
         });
     }
 
-    public static ObjectResult WorkshopLevelTagNotFound(long levelWorkshopId, string tagName)
+    public static ProblemResult WorkshopLevelTagNotFound(long levelWorkshopId, string tagName)
     {
-        return ObjectResult(new ProblemDetails
+        return new ProblemResult(new ProblemDetails
         {
             Status = StatusCodes.Status404NotFound,
             Title = "Level Tag Not Found",
@@ -114,9 +114,9 @@ public static class ProblemDetailsResult
         });
     }
 
-    public static ObjectResult OfficialLevelTagConflict(string levelSlug, string tagName)
+    public static ProblemResult OfficialLevelTagConflict(string levelSlug, string tagName)
     {
-        return ObjectResult(new ProblemDetails
+        return new ProblemResult(new ProblemDetails
         {
             Status = StatusCodes.Status409Conflict,
             Title = "Level Tag Already Exists",
@@ -124,9 +124,9 @@ public static class ProblemDetailsResult
         });
     }
 
-    public static ObjectResult WorkshopLevelTagConflict(long levelWorkshopId, string tagName)
+    public static ProblemResult WorkshopLevelTagConflict(long levelWorkshopId, string tagName)
     {
-        return ObjectResult(new ProblemDetails
+        return new ProblemResult(new ProblemDetails
         {
             Status = StatusCodes.Status409Conflict,
             Title = "Level Tag Already Exists",
@@ -134,9 +134,9 @@ public static class ProblemDetailsResult
         });
     }
 
-    public static ObjectResult TagNotFound(string tagName)
+    public static ProblemResult TagNotFound(string tagName)
     {
-        return ObjectResult(new ProblemDetails
+        return new ProblemResult(new ProblemDetails
         {
             Status = StatusCodes.Status404NotFound,
             Title = "Tag Not Found",
@@ -144,9 +144,9 @@ public static class ProblemDetailsResult
         });
     }
 
-    public static ObjectResult UserNotFound(long userSteamId)
+    public static ProblemResult UserNotFound(long userSteamId)
     {
-        return ObjectResult(new ProblemDetails
+        return new ProblemResult(new ProblemDetails
         {
             Status = StatusCodes.Status404NotFound,
             Title = "User Not Found",
@@ -154,9 +154,9 @@ public static class ProblemDetailsResult
         });
     }
 
-    public static ObjectResult UserBanNotFound(long steamId)
+    public static ProblemResult UserBanNotFound(long steamId)
     {
-        return ObjectResult(new ProblemDetails
+        return new ProblemResult(new ProblemDetails
         {
             Status = StatusCodes.Status404NotFound,
             Title = "User Ban Not Found",
@@ -164,9 +164,9 @@ public static class ProblemDetailsResult
         });
     }
 
-    public static ObjectResult UserBanConflict(long steamId)
+    public static ProblemResult UserBanConflict(long steamId)
     {
-        return ObjectResult(new ProblemDetails
+        return new ProblemResult(new ProblemDetails
         {
             Status = StatusCodes.Status409Conflict,
             Title = "Steam ID Already Banned",
