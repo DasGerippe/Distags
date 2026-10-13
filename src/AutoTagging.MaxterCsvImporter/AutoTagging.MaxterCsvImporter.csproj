@@ -33,6 +33,6 @@
       </None>
     </ItemGroup>
 
-    <Import Project="..\Build\AutoTagging.Plugin.targets" />
+    <Import Project="..\..\build\AutoTagging.Plugin.targets" />
 
 </Project>
