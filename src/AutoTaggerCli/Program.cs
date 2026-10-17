@@ -37,6 +37,7 @@ internal class Program
                     configBuilder.AddUserSecrets<Program>();
 
                 configBuilder.AddEnvironmentVariables();
+                configBuilder.AddKeyPerFile("/run/secrets", optional: true);
             });
 
             hostBuilder.ConfigureServices((context, services) =>

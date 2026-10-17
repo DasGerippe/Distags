@@ -19,6 +19,9 @@ internal class Program
 
             if (context.HostingEnvironment.IsDevelopment())
                 configBuilder.AddUserSecrets<Program>();
+
+            configBuilder.AddEnvironmentVariables();
+            configBuilder.AddKeyPerFile("/run/secrets", optional: true);
         });
 
         builder.ConfigureServices((context, services) =>

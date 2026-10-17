@@ -28,6 +28,8 @@ public class Program
         {
             WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
+            builder.Configuration.AddKeyPerFile("/run/secrets", optional: true);
+
             builder.Services.AddSerilog(loggerConfig => loggerConfig
                 .ReadFrom.Configuration(builder.Configuration)
                 .ConfigureConsoleAndFileSinks<Program>(OutputTemplates.Web));
