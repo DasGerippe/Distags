@@ -6,7 +6,7 @@
     "4. Expert": "expert",
     "6. Brutal": "brutal",
     "7. Lunacy": "lunatic",
-    "🚫 Impossible": "impossible"
+    "\uD83D\uDEAB Impossible": "impossible"
   },
   "WrRouteDif": {
     "1. Casual": "wr-casual",
@@ -18,7 +18,7 @@
     "7. Lunacy": "wr-lunatic"
   },
   "Theme": {
-    "🌽Corn": "corn",
+    "\uD83C\uDF3DCorn": "corn",
     "Abstract": "abstract",
     "Acceleracers": "acceleracers",
     "Ascent/Descent": "vertical",
@@ -51,7 +51,7 @@
     "Water": "water"
   },
   "DrivingStyle": {
-    "Awkward": null,
+    "Awkward": "awkward",
     "Flat Driving": "flat-driving",
     "Grip Flight": "grip-flight",
     "Jank": "jank",
@@ -82,7 +82,7 @@
     "Teleports": "teleports"
   },
   "WrTech": {
-    "🚫 Broken WR": "broken-wr",
+    "\uD83D\uDEAB Broken WR": "broken-wr",
     "Bounce": "bounce",
     "Broken WR": "broken-wr",
     "N/A": "wr-tech-none",
@@ -98,31 +98,97 @@
     "Total Guess": "unreadable"
   },
   "CarAbilities": {
-    "jump": { "Enabled": "jump-enabled", "Disabled": "jump-disabled" },
-    "wings": { "Enabled": "wings-enabled", "Disabled": "wings-disabled" },
-    "grip": { "Enabled": "grip-enabled", "Disabled": "grip-disabled" },
-    "boost": { "Enabled": "boost-enabled", "Disabled": "boost-disabled" }
+    "jump": {
+      "Enabled": "jump-enabled",
+      "Disabled": "jump-disabled"
+    },
+    "wings": {
+      "Enabled": "wings-enabled",
+      "Disabled": "wings-disabled"
+    },
+    "grip": {
+      "Enabled": "grip-enabled",
+      "Disabled": "grip-disabled"
+    },
+    "boost": {
+      "Enabled": "boost-enabled",
+      "Disabled": "boost-disabled"
+    }
   },
   "LengthBuckets": [
-    { "MaxMinutes": 0.5, "Tag": "30-sec" },
-    { "MaxMinutes": 1, "Tag": "1-min" },
-    { "MaxMinutes": 2, "Tag": "2-min" },
-    { "MaxMinutes": 3, "Tag": "3-min" },
-    { "MaxMinutes": 5, "Tag": "5-min" },
-    { "MaxMinutes": 8, "Tag": "8-min" },
-    { "MaxMinutes": 15, "Tag": "15-min" },
-    { "MaxMinutes": 45, "Tag": "45-min" },
-    { "MaxMinutes": 999999, "Tag": "hours" }
+    {
+      "MaxMinutes": 0.5,
+      "Tag": "30-sec"
+    },
+    {
+      "MaxMinutes": 1,
+      "Tag": "1-min"
+    },
+    {
+      "MaxMinutes": 2,
+      "Tag": "2-min"
+    },
+    {
+      "MaxMinutes": 3,
+      "Tag": "3-min"
+    },
+    {
+      "MaxMinutes": 5,
+      "Tag": "5-min"
+    },
+    {
+      "MaxMinutes": 8,
+      "Tag": "8-min"
+    },
+    {
+      "MaxMinutes": 15,
+      "Tag": "15-min"
+    },
+    {
+      "MaxMinutes": 45,
+      "Tag": "45-min"
+    },
+    {
+      "MaxMinutes": 999999,
+      "Tag": "hours"
+    }
   ],
   "WrLengthBuckets": [
-    { "MaxMinutes": 0.5, "Tag": "wr-30-sec" },
-    { "MaxMinutes": 1, "Tag": "wr-1-min" },
-    { "MaxMinutes": 2, "Tag": "wr-2-min" },
-    { "MaxMinutes": 3, "Tag": "wr-3-min" },
-    { "MaxMinutes": 5, "Tag": "wr-5-min" },
-    { "MaxMinutes": 8, "Tag": "wr-8-min" },
-    { "MaxMinutes": 15, "Tag": "wr-15-min" },
-    { "MaxMinutes": 45, "Tag": "wr-45-min" },
-    { "MaxMinutes": 999999, "Tag": "wr-hours" }
+    {
+      "MaxMinutes": 0.5,
+      "Tag": "wr-30-sec"
+    },
+    {
+      "MaxMinutes": 1,
+      "Tag": "wr-1-min"
+    },
+    {
+      "MaxMinutes": 2,
+      "Tag": "wr-2-min"
+    },
+    {
+      "MaxMinutes": 3,
+      "Tag": "wr-3-min"
+    },
+    {
+      "MaxMinutes": 5,
+      "Tag": "wr-5-min"
+    },
+    {
+      "MaxMinutes": 8,
+      "Tag": "wr-8-min"
+    },
+    {
+      "MaxMinutes": 15,
+      "Tag": "wr-15-min"
+    },
+    {
+      "MaxMinutes": 45,
+      "Tag": "wr-45-min"
+    },
+    {
+      "MaxMinutes": 999999,
+      "Tag": "wr-hours"
+    }
   ]
 }
