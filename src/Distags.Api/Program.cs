@@ -66,6 +66,8 @@ public class Program
             builder.Services.AddHostedService<SessionCleanupService>();
             builder.Services.AddAutoTaggerWorker();
 
+            builder.Services.AddHealthChecks();
+
             WebApplication app = builder.Build();
 
             app.UseExceptionHandler();
@@ -81,6 +83,8 @@ public class Program
 
             app.MapStaticAssets();
             app.MapControllers();
+
+            app.MapHealthChecks("/health");
 
             app.MapHub<LevelHub>("/hubs/levels");
             app.MapHub<ContributionHub>("/hubs/contributions");

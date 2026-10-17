@@ -1,7 +1,7 @@
 info:
   name: Guidelines
   type: folder
-  seq: 13
+  seq: 10
 
 request:
   auth: inherit
