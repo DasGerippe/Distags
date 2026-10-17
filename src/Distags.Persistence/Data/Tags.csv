@@ -57,8 +57,10 @@ downhill;Downhill;gameplay;gameplay;False;False;False;The level progresses downw
 freefall;Freefall;gameplay;gameplay;False;False;False;The level progresses straight down with a lot of gaps between driveable geometry, causing the player to freefall.
 precision;Precision;gameplay;gameplay;False;False;False;Precise inputs required to navigate or complete the level.
 tech;Tech;gameplay;gameplay;False;False;False;Focus on advanced mechanics and skill expression.
-jank;Jank;gameplay;gameplay;False;False;False;Saw boosts, bomb boosts, weird physics, etc.
+jank;Jank;gameplay;gameplay;False;False;False;Saw boosts, bomb boosts, weird physics, inherently random mechanics, etc.
+awkward;Awkward;gameplay;gameplay;False;False;False;Gameplay feels awkward/uncomfortable due to too many obstacle, bumpy road, too few cooldowns/checkpoints, invisible objects or killgrids, etc.
 boat;Boat;gameplay;gameplay;False;False;False;"Upside down ""boating"". Basically gripflight with water force zones keeping you afloat."
+boss;Boss Fight;gameplay;gameplay;False;False;False;The level has sections dedicated to fighting some form of boss.
 minigame;Minigame;gameplay;gameplay;False;False;False;The level has its own rules or objectives instead of the standard race to finish.
 puzzle;Puzzle;gameplay;gameplay;False;False;False;Sections that require puzzle solving to progress.
 maze;Maze;gameplay;gameplay;False;False;False;Maze-like sections where the player needs to figure out the correct path to progress.
@@ -71,8 +73,9 @@ multi-path;Multi-Path;gimmicks;gimmicks;False;False;False;Multiple different pat
 hidden-path;Hidden Path;gimmicks;gimmicks;False;False;False;Hidden alternative paths or portals.
 laps;Laps;gimmicks;gimmicks;False;False;False;The level needs to be completed multiple times in a row.
 boosters;Boosters;gimmicks;gimmicks;False;False;False;Boost pads or power-ups that increase the car's speed.
-jump-pads;Jump Pads;gimmicks;gimmicks;False;False;False;Jump pads that launch the car up and/or forwards when driven over them.
+jump-pads;Jump Pads;gimmicks;gimmicks;False;False;False;Jump pads that launch the car up and/or forwards when driving over them.
 force-zones;Force Zones;gimmicks;gimmicks;False;False;False;Zones that influence the cars travel direction. Similar to boost pads though generally larger in size and not always in the direction of the car.
+launcher;Launcher;gimmicks;gimmicks;False;False;False;Devices often looking like cannons that shoot the car with high speeds over a long distance.
 rails;Rails;gimmicks;gimmicks;False;False;False;Grind rails that the car follows on its own. (Biotec 4)
 gravity;Gravity;gimmicks;gimmicks;False;False;False;The level has non-standard, changing, or in other ways unusual gravity.
 moving-floor;Moving Floor;gimmicks;gimmicks;False;False;False;Driving on moving roads/objects.
