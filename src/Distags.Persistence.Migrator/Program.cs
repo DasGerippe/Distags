@@ -1,3 +1,4 @@
+using ConfigUtils;
 using Distags.Core;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -15,9 +16,12 @@ internal class Program
 
         builder.ConfigureAppConfiguration((context, configBuilder) =>
         {
-            configBuilder.AddJsonFile("appsettings.json", optional: false);
+            IHostEnvironment environment = context.HostingEnvironment;
 
-            if (context.HostingEnvironment.IsDevelopment())
+            configBuilder.AddJsonFile("appsettings.json", optional: true);
+            configBuilder.AddJsonFile($"appsettings.{environment.EnvironmentName}.json", optional: true);
+
+            if (environment.IsDevelopment())
                 configBuilder.AddUserSecrets<Program>();
 
             configBuilder.AddEnvironmentVariables();
@@ -26,12 +30,11 @@ internal class Program
 
         builder.ConfigureServices((context, services) =>
         {
-            string connectionString = context.Configuration.GetConnectionString("DistagsDatabase")
-                                      ?? throw new Exception("Connection string missing.");
+            string connectionString = context.Configuration.GetRequiredConnectionString("DistagsDatabase");
+            string migrationsAssemblyName = context.Configuration.GetRequiredValue("MigrationsAssemblyName");
             services.AddDistagsPersistence(
                 connectionString,
-                npgsqlOptionsAction: npgsqlOptions => npgsqlOptions
-                    .MigrationsAssembly($"{nameof(Distags)}.{nameof(Persistence)}.{nameof(Dev)}"));
+                npgsqlOptionsAction: npgsqlOptions => npgsqlOptions.MigrationsAssembly(migrationsAssemblyName));
             services.AddDistagsCore();
         });
         IHost host = builder.Build();

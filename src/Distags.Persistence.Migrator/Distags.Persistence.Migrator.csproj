@@ -18,6 +18,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\ConfigUtils\ConfigUtils.csproj" />
     <ProjectReference Include="..\Distags.Persistence.Dev\Distags.Persistence.Dev.csproj" />
     <ProjectReference Include="..\Distags.Persistence\Distags.Persistence.csproj" />
   </ItemGroup>
