@@ -18,8 +18,8 @@ public class ContributionFilterFactory : IQueryableFilterFactory<Contribution, C
         if (filterParams.UserSteamId != null)
             filterGroup.AddFilter(new UserFilter(filterParams.UserSteamId.Value, filterParams.IgnoreAnonymity));
 
-        if (filterParams.AppName != null)
-            filterGroup.AddFilter(new AppFilter(filterParams.AppName));
+        if (filterParams.AutoTaggerGuid != null)
+            filterGroup.AddFilter(new AutoTaggerFilter(filterParams.AutoTaggerGuid.Value));
 
         if (filterParams.LevelSlug != null)
             filterGroup.AddFilter(_StringContainsFilterFactory.CreateFilter<Contribution>(

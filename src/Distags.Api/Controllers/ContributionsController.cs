@@ -23,7 +23,7 @@ public class ContributionsController : ControllerBase
         {
             IgnoreAnonymity = User.IsInRole(UserRoles.Moderator),
             UserSteamId = request.UserSteamId,
-            AppName = request.AppName,
+            AutoTaggerGuid = request.AutoTaggerGuid,
             LevelSlug = request.LevelSlug,
             LevelWorkshopId = request.LevelWorkshopId,
             TagName = request.TagName,

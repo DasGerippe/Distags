@@ -12,9 +12,9 @@ public readonly struct UpdateValue<TValue>
         HasValue = hasValue;
     }
 
-    public static implicit operator UpdateValue<TValue?>(TValue? value)
+    public static implicit operator UpdateValue<TValue>(TValue value)
     {
-        return new UpdateValue<TValue?>(value, true);
+        return new UpdateValue<TValue>(value, true);
     }
 
     public static explicit operator TValue(UpdateValue<TValue> updateValue)

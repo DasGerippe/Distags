@@ -54,26 +54,6 @@ public static class DistagsProblemResults
         });
     }
 
-    public static ProblemResult AppNotFound(string appName)
-    {
-        return new ProblemResult(new ProblemDetails
-        {
-            Status = StatusCodes.Status404NotFound,
-            Title = "App Not Found",
-            Detail = $"Could not find app with name '{appName}'.",
-        });
-    }
-
-    public static ProblemResult AppConflict(string appName)
-    {
-        return new ProblemResult(new ProblemDetails
-        {
-            Status = StatusCodes.Status409Conflict,
-            Title = "App Already Exists",
-            Detail = $"An app with the name '{appName}' already exists.",
-        });
-    }
-
     public static ProblemResult OfficialLevelNotFound(string levelSlug)
     {
         return new ProblemResult(new ProblemDetails

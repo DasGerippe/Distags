@@ -13,7 +13,7 @@ public class ContributionResponse
 
     public required ContributionUserResponse? User { get; init; }
 
-    public required ContributionAppResponse? App { get; init; }
+    public required ContributionAutoTaggerResponse? AutoTagger { get; init; }
 
     public required DateTimeOffset ContributedOn { get; init; }
 }

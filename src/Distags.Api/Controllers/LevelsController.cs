@@ -120,7 +120,6 @@ public class LevelsController : ControllerBase
                 LevelSlug = levelSlug,
                 TagName = tagName,
                 UserSteamId = User.FindFirstValue<long>(Constants.Claims.SteamId),
-                AppName = User.FindFirstValue(Constants.Claims.AppName),
                 Action = TagChangeAction.Add,
             };
             await requestDispatcher.DispatchAsync(command);
@@ -162,7 +161,6 @@ public class LevelsController : ControllerBase
                 LevelWorkshopId = levelWorkshopId,
                 TagName = tagName,
                 UserSteamId = User.FindFirstValue<long>(Constants.Claims.SteamId),
-                AppName = User.FindFirstValue(Constants.Claims.AppName),
                 Action = TagChangeAction.Add,
             };
             await requestDispatcher.DispatchAsync(command);
@@ -204,7 +202,6 @@ public class LevelsController : ControllerBase
                 LevelSlug = levelSlug,
                 TagName = tagName,
                 UserSteamId = User.FindFirstValue<long>(Constants.Claims.SteamId),
-                AppName = User.FindFirstValue(Constants.Claims.AppName),
                 Action = TagChangeAction.Remove,
             };
             await requestDispatcher.DispatchAsync(command);
@@ -250,7 +247,6 @@ public class LevelsController : ControllerBase
                 LevelWorkshopId = levelWorkshopId,
                 TagName = tagName,
                 UserSteamId = User.FindFirstValue<long>(Constants.Claims.SteamId),
-                AppName = User.FindFirstValue(Constants.Claims.AppName),
                 Action = TagChangeAction.Remove,
             };
             await requestDispatcher.DispatchAsync(command);

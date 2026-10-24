@@ -127,7 +127,6 @@ public class Program
                     return authHeader?.Scheme switch
                     {
                         DistagsApiConstants.AuthorizationHeaderSchemes.SessionToken => Constants.Authentication.SessionTokenScheme.Name,
-                        DistagsApiConstants.AuthorizationHeaderSchemes.ApiKey => Constants.Authentication.ApiKeyScheme.Name,
                         _ => anonymousAuthScheme,
                     };
                 };
@@ -135,10 +134,6 @@ public class Program
             .AddScheme<AuthenticationSchemeOptions, SessionAuthenticationHandler>(
                 Constants.Authentication.SessionTokenScheme.Name,
                 Constants.Authentication.SessionTokenScheme.DisplayName,
-                _ => { })
-            .AddScheme<AuthenticationSchemeOptions, ApiKeyAuthenticationHandler>(
-                Constants.Authentication.ApiKeyScheme.Name,
-                Constants.Authentication.ApiKeyScheme.DisplayName,
                 _ => { })
             .AddScheme<AuthenticationSchemeOptions, AnonymousAuthenticationHandler>(
                 anonymousAuthScheme,

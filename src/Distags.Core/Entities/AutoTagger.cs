@@ -1,10 +1,12 @@
 namespace Distags.Core.Entities;
 
-public class App
+public class AutoTagger
 {
     public long Id { get; set; }
 
+    public Guid Guid { get; set; }
+
     public string Name { get; set; } = string.Empty;
 
-    public string? ApiKey { get; set; } = string.Empty;
+    public string? State { get; set; }
 }

@@ -18,9 +18,9 @@ public class Contribution
 
     public User? User { get; set; }
 
-    public long? AppId { get; set; }
+    public long? AutoTaggerId { get; set; }
 
-    public App? App { get; set; }
+    public AutoTagger? AutoTagger { get; set; }
 
     public TagChangeAction Action { get; set; }
 

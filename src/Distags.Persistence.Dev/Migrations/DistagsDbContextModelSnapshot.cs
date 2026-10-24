@@ -18,12 +18,12 @@ namespace Distags.Persistence.Dev
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "10.0.4")
+                .HasAnnotation("ProductVersion", "10.0.12")
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
-            modelBuilder.Entity("Distags.Core.Entities.App", b =>
+            modelBuilder.Entity("Distags.Core.Entities.AutoTagger", b =>
                 {
                     b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
@@ -32,27 +32,27 @@ namespace Distags.Persistence.Dev
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
 
-                    b.Property<string>("ApiKey")
-                        .HasColumnType("text")
-                        .HasColumnName("api_key");
+                    b.Property<Guid>("Guid")
+                        .HasColumnType("uuid")
+                        .HasColumnName("guid");
 
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("text")
                         .HasColumnName("name");
 
+                    b.Property<string>("State")
+                        .HasColumnType("jsonb")
+                        .HasColumnName("state");
+
                     b.HasKey("Id")
-                        .HasName("pk_apps");
+                        .HasName("pk_auto_taggers");
 
-                    b.HasIndex("ApiKey")
+                    b.HasIndex("Guid")
                         .IsUnique()
-                        .HasDatabaseName("ix_apps_api_key");
+                        .HasDatabaseName("ix_auto_taggers_guid");
 
-                    b.HasIndex("Name")
-                        .IsUnique()
-                        .HasDatabaseName("ix_apps_name");
-
-                    b.ToTable("apps", (string)null);
+                    b.ToTable("auto_taggers", (string)null);
                 });
 
             modelBuilder.Entity("Distags.Core.Entities.Contribution", b =>
@@ -68,9 +68,9 @@ namespace Distags.Persistence.Dev
                         .HasColumnType("integer")
                         .HasColumnName("action");
 
-                    b.Property<long?>("AppId")
+                    b.Property<long?>("AutoTaggerId")
                         .HasColumnType("bigint")
-                        .HasColumnName("app_id");
+                        .HasColumnName("auto_tagger_id");
 
                     b.Property<DateTimeOffset>("ContributedOn")
                         .HasColumnType("timestamp with time zone")
@@ -109,8 +109,8 @@ namespace Distags.Persistence.Dev
                     b.HasKey("Id")
                         .HasName("pk_contributions");
 
-                    b.HasIndex("AppId")
-                        .HasDatabaseName("ix_contributions_app_id");
+                    b.HasIndex("AutoTaggerId")
+                        .HasDatabaseName("ix_contributions_auto_tagger_id");
 
                     b.HasIndex("LevelId")
                         .HasDatabaseName("ix_contributions_level_id");
@@ -552,10 +552,10 @@ namespace Distags.Persistence.Dev
 
             modelBuilder.Entity("Distags.Core.Entities.Contribution", b =>
                 {
-                    b.HasOne("Distags.Core.Entities.App", "App")
+                    b.HasOne("Distags.Core.Entities.AutoTagger", "AutoTagger")
                         .WithMany()
-                        .HasForeignKey("AppId")
-                        .HasConstraintName("fk_contributions_apps_app_id");
+                        .HasForeignKey("AutoTaggerId")
+                        .HasConstraintName("fk_contributions_auto_taggers_auto_tagger_id");
 
                     b.HasOne("Distags.Core.Entities.Level", "Level")
                         .WithMany()
@@ -576,7 +576,7 @@ namespace Distags.Persistence.Dev
                         .HasForeignKey("UserId")
                         .HasConstraintName("fk_contributions_users_user_id");
 
-                    b.Navigation("App");
+                    b.Navigation("AutoTagger");
 
                     b.Navigation("Level");
 

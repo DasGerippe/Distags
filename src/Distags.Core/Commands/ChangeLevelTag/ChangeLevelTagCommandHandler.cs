@@ -38,18 +38,18 @@ public abstract class ChangeLevelTagCommandHandler
         _AppEventQueue = appEventQueue;
     }
 
-    protected async Task HandleAsync(long levelId, string tagName, TagChangeAction action, long? userSteamId, string? appName)
+    protected async Task HandleAsync(long levelId, string tagName, TagChangeAction action, long? userSteamId, Guid? autoTaggerGuid)
     {
         Tag tag = await GetTagAsync(tagName).ConfigureAwait(false);
         User? user = await GetUserAsync(userSteamId).ConfigureAwait(false);
-        App? app = await GetAppAsync(appName).ConfigureAwait(false);
+        AutoTagger? autoTagger = await GetAutoTaggerAsync(autoTaggerGuid).ConfigureAwait(false);
 
-        await EnsureTagChangeAllowedAsync(user, app, tag).ConfigureAwait(false);
+        await EnsureTagChangeAllowedAsync(user, autoTagger, tag).ConfigureAwait(false);
 
         Contribution contribution = await _SequentialLevelActionExecutor
             .ExecuteSequentialForLevelAsync(
                 levelId,
-                () => ChangeLevelTagAsync(levelId, tag, action, user, app))
+                () => ChangeLevelTagAsync(levelId, tag, action, user, autoTagger))
             .ConfigureAwait(false);
 
         EnqueueEvents(contribution);
@@ -87,20 +87,20 @@ public abstract class ChangeLevelTagCommandHandler
         return user ?? throw new UnknownUserException(userSteamId.Value);
     }
 
-    private async Task<App?> GetAppAsync(string? appName)
+    private async Task<AutoTagger?> GetAutoTaggerAsync(Guid? autoTaggerGuid)
     {
-        if (appName == null)
+        if (autoTaggerGuid == null)
             return null;
 
-        App? app = await DbContext.Set<App>()
-            .Where(app => app.Name == appName)
+        AutoTagger? autoTagger = await DbContext.Set<AutoTagger>()
+            .Where(autoTagger => autoTagger.Guid == autoTaggerGuid)
             .FirstOrDefaultAsync()
             .ConfigureAwait(false);
 
-        return app ?? throw new UnknownAppNameException(appName);
+        return autoTagger ?? throw new UnknownAutoTaggerException(autoTaggerGuid.Value);
     }
 
-    private async Task EnsureTagChangeAllowedAsync(User? user, App? app, Tag tag)
+    private async Task EnsureTagChangeAllowedAsync(User? user, AutoTagger? autoTagger, Tag tag)
     {
         if (user?.IsBanned == true)
             throw new UserBannedException();
@@ -108,7 +108,7 @@ public abstract class ChangeLevelTagCommandHandler
         if (user?.AcceptsGuidelines == false)
             throw new UserNotAllowedException();
 
-        if (tag.IsAutoTag && (app == null || user != null))
+        if (tag.IsAutoTag && (autoTagger == null || user != null))
             throw new CannotChangeAutoTagException();
 
         bool isMaintenanceAffectedUser =
@@ -123,7 +123,7 @@ public abstract class ChangeLevelTagCommandHandler
         }
     }
 
-    private async Task<Contribution> ChangeLevelTagAsync(long levelId, Tag tag, TagChangeAction action, User? user, App? app)
+    private async Task<Contribution> ChangeLevelTagAsync(long levelId, Tag tag, TagChangeAction action, User? user, AutoTagger? autoTagger)
     {
         Level level = await GetLevelAsync(levelId).ConfigureAwait(false);
 
@@ -147,7 +147,7 @@ public abstract class ChangeLevelTagCommandHandler
         }
 
         Contribution contribution =
-            _ContributionManager.CreateContribution(level, tag, user, app, action, changeResult.Value);
+            _ContributionManager.CreateContribution(level, tag, user, autoTagger, action, changeResult.Value);
 
         DbContext.Add(contribution);
         await DbContext.SaveChangesAsync().ConfigureAwait(false);
