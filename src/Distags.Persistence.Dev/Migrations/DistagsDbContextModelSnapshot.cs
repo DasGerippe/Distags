@@ -36,6 +36,10 @@ namespace Distags.Persistence.Dev
                         .HasColumnType("uuid")
                         .HasColumnName("guid");
 
+                    b.Property<DateTimeOffset?>("LastRunOn")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("last_run_on");
+
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("text")

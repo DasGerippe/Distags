@@ -8,5 +8,7 @@ public class AutoTagger
 
     public string Name { get; set; } = string.Empty;
 
+    public DateTimeOffset? LastRunOn { get; set; }
+
     public string? State { get; set; }
 }
