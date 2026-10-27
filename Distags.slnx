@@ -11,6 +11,7 @@
     <Project Path="src/AutoTagging.LevelType/AutoTagging.LevelType.csproj" />
     <Project Path="src/AutoTagging.MaxterCsvImporter/AutoTagging.MaxterCsvImporter.csproj" />
     <Project Path="src/AutoTagging.MissingLevel/AutoTagging.MissingLevel.csproj" />
+    <Project Path="src/AutoTagging/AutoTagging.csproj" />
   </Folder>
   <Folder Name="/Mods/">
     <Project Path="src/Mod.DistagsShortcut/Mod.DistagsShortcut.csproj" Id="ee6cbe79-e196-407e-9222-e4bcb1b7976e" />
