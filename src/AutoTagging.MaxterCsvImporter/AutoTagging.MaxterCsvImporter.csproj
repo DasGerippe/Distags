@@ -15,20 +15,14 @@
 
     <ItemGroup>
       <ProjectReference Include="..\AutoTagging.Abstractions\AutoTagging.Abstractions.csproj" />
-      <ProjectReference Include="..\Distags.Contracts\Distags.Contracts.csproj" />
+      <ProjectReference Include="..\Distags.Persistence\Distags.Persistence.csproj" />
     </ItemGroup>
 
     <ItemGroup>
-      <None Update="appsettings.Development.json">
-        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      </None>
-      <None Update="appsettings.json">
-        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      </None>
       <None Update="maxter_tagging_all_levels.csv">
         <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       </None>
-      <None Update="maxter-tag-mapping.json">
+      <None Update="maxter_tag_mapping.json">
         <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       </None>
     </ItemGroup>

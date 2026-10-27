@@ -1,38 +1,39 @@
 using AutoTagging.Abstractions;
 using AutoTagging.Abstractions.TaggingStrategy;
 using Distags.Contracts;
-using Microsoft.Extensions.Logging;
+using Distags.Core.Queries.AutoTaggerLevels;
 
 namespace AutoTagging.MaxterCsvImporter;
 
-public class MaxterCsvImporter : AutoTagger
+public class MaxterCsvImporter : AutoTagger<MaxterCsvImporterState>
 {
-    private static readonly string PluginDirectory =
-        Path.GetDirectoryName(typeof(MaxterCsvImporter).Assembly.Location)
-        ?? AppContext.BaseDirectory;
-
     private readonly MaxterCsvRepository _CsvRepository;
     private readonly Lazy<MaxterTagMappingData> _TagMapping;
     private readonly MaxterTagResolver _TagResolver;
-    private readonly AppliedTagsLedger _Ledger;
 
-    public override ITaggingStrategy TaggingStrategy { get; } = new AllLevelsTaggingStrategy();
+    private readonly string _BaseDirectory = Path.GetDirectoryName(typeof(MaxterCsvImporter).Assembly.Location) ?? AppContext.BaseDirectory;
 
-    public MaxterCsvImporter(ILoggerFactory loggerFactory)
+    public override Guid Guid { get; } = new Guid("7BD71F81-FF4E-4D41-9A3D-510B82E3E7AC");
+
+    public override TimeSpan? Interval => null;
+
+    public MaxterCsvImporter(
+        MaxterCsvRepositoryFactory maxterCsvRepositoryFactory,
+        MaxterTagMappingLoader tagMappingLoader,
+        MaxterTagResolver tagResolver)
     {
-        _CsvRepository = new MaxterCsvRepository(
-            Path.Combine(PluginDirectory, "maxter_tagging_all_levels.csv"),
-            loggerFactory.CreateLogger<MaxterCsvRepository>());
+        string csvFilePath = Path.Combine(_BaseDirectory, Constants.TaggingCsvFileName);
+        _CsvRepository = maxterCsvRepositoryFactory.CreateRepository(csvFilePath);
 
-        MaxterTagMappingLoader tagMappingLoader = new MaxterTagMappingLoader(loggerFactory.CreateLogger<MaxterTagMappingLoader>());
-        _TagMapping = new Lazy<MaxterTagMappingData>(
-            tagMappingLoader.Load(Path.Combine(PluginDirectory, MaxterTagMappingLoader.MappingFileName)));
+        string mappingFilePath = Path.Combine(_BaseDirectory, Constants.TagMappingJsonFileName);
+        _TagMapping = new Lazy<MaxterTagMappingData>(() => tagMappingLoader.Load(mappingFilePath));
 
-        _TagResolver = new MaxterTagResolver(loggerFactory.CreateLogger<MaxterTagResolver>());
+        _TagResolver = tagResolver;
+    }
 
-        _Ledger = new AppliedTagsLedger(
-            Path.Combine(PluginDirectory, $"{nameof(MaxterCsvImporter)}.AppliedTags.json"),
-            loggerFactory.CreateLogger<AppliedTagsLedger>());
+    public override AutoTaggerLevelsQuery GetLevelsQuery()
+    {
+        return TaggingStrategy.GetLevelsQuery(null);
     }
 
     public override Task<TagDelta> CalculateTagDeltaAsync(LevelDto level, CancellationToken cancellationToken = default)
@@ -42,7 +43,7 @@ public class MaxterCsvImporter : AutoTagger
             return Task.FromResult(new TagDelta());
 
         HashSet<string> desired = _TagResolver.ResolveDesiredTags(row, _TagMapping.Value);
-        IReadOnlyCollection<string> previouslyOurs = _Ledger.GetPreviouslyApplied(level);
+        List<string> previouslyAdded = State?.AppliedTagsLog.GetValueOrDefault(level.Id) ?? [];
         HashSet<string> current = level.Tags.ToHashSet();
 
         TagDelta tagDelta = new TagDelta
@@ -50,11 +51,26 @@ public class MaxterCsvImporter : AutoTagger
             // Only ever remove a tag this importer itself recorded adding before - never a tag
             // owned by another auto-tagger or set by a human curator, even if the name matches.
             AddTags = desired.Except(current).ToList(),
-            RemoveTags = previouslyOurs.Except(desired).Intersect(current).ToList(),
+            RemoveTags = current.Except(desired).Intersect(previouslyAdded).ToList(),
         };
 
-        _Ledger.SetCurrentlyApplied(level, desired);
-
         return Task.FromResult(tagDelta);
+    }
+
+    public override void UpdateState(LevelDto level, TagDelta tagDelta)
+    {
+        State ??= new MaxterCsvImporterState();
+
+        long levelId = level.Id;
+        List<string> oldAppliedLevelTags = State.AppliedTagsLog.GetValueOrDefault(levelId, []);
+        List<string> newAppliedLevelTags = oldAppliedLevelTags
+            .Except(tagDelta.RemoveTags)
+            .Concat(tagDelta.AddTags)
+            .ToList();
+
+        if (newAppliedLevelTags.Count == 0)
+            State.AppliedTagsLog.Remove(levelId);
+        else
+            State.AppliedTagsLog[levelId] = newAppliedLevelTags;
     }
 }
