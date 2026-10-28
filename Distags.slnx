@@ -6,6 +6,7 @@
       <BuildDependency Project="src/AutoTagging.MaxterCsvImporter/AutoTagging.MaxterCsvImporter.csproj" />
       <BuildDependency Project="src/AutoTagging.MissingLevel/AutoTagging.MissingLevel.csproj" />
     </Project>
+    <Project Path="src/AutoTaggerWorker/AutoTaggerWorker.csproj" />
     <Project Path="src/AutoTagging.Abstractions/AutoTagging.Abstractions.csproj" />
     <Project Path="src/AutoTagging.GameMode/AutoTagging.GameMode.csproj" />
     <Project Path="src/AutoTagging.LevelType/AutoTagging.LevelType.csproj" />
