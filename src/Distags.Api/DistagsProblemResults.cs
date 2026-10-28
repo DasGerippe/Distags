@@ -54,6 +54,26 @@ public static class DistagsProblemResults
         });
     }
 
+    public static ProblemResult AutoTaggerNotFound(string autoTaggerName)
+    {
+        return new ProblemResult(new ProblemDetails
+        {
+            Status = StatusCodes.Status404NotFound,
+            Title = "AutoTagger not found",
+            Detail = $"Could not find AutoTagger '{autoTaggerName}'.",
+        });
+    }
+
+    public static ProblemResult AutoTaggerAlreadyQueued(string autoTaggerName)
+    {
+        return new ProblemResult(new ProblemDetails
+        {
+            Status = StatusCodes.Status409Conflict,
+            Title = "AutoTagger already queued",
+            Detail = $"The AutoTagger '{autoTaggerName}' is already queued and should be run soon.",
+        });
+    }
+
     public static ProblemResult OfficialLevelNotFound(string levelSlug)
     {
         return new ProblemResult(new ProblemDetails

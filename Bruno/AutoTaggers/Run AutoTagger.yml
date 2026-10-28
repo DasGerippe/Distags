@@ -1,0 +1,20 @@
+info:
+  name: Run AutoTagger
+  type: http
+  seq: 2
+
+http:
+  method: POST
+  url: "{{url}}/autotaggers/:autoTaggerName/run"
+  params:
+    - name: autoTaggerName
+      value: LevelTypeAutoTagger
+      type: path
+  auth: inherit
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
+  forwardAuthorizationHeader: false

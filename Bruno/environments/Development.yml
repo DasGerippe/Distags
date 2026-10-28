@@ -3,6 +3,7 @@ color: "#2E8A54"
 variables:
   - name: url
     value: https://localhost:7159
+    description: ""
   - secret: true
     name: sessionToken
     description: ""
