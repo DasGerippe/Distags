@@ -5,20 +5,20 @@ using Distags.Core.Queries.AutoTaggerLevels;
 
 namespace AutoTagging.LevelType;
 
-public class LevelTypeAutoTagger : AutoTagger<ProgressState>
+public class LevelTypeAutoTagger : AutoTagger<TimestampLevelIdCursor>
 {
     private const string OfficialTagName = "official";
     private const string WorkshopTagName = "workshop";
+
+    private readonly NewLevelsTaggingStrategy _TaggingStrategy = new NewLevelsTaggingStrategy();
 
     public override Guid Guid { get; } = new Guid("2E6677C5-DF38-498A-843E-0468B21CFF94");
 
     public override TimeSpan? Interval { get; } = TimeSpan.FromMinutes(5);
 
-    public override ITaggingStrategy TaggingStrategy { get; } = new NewLevelsTaggingStrategy();
-
     public override AutoTaggerLevelsQuery GetLevelsQuery()
     {
-        return TaggingStrategy.GetLevelsQuery(State?.Progress);
+        return _TaggingStrategy.GetLevelsQuery(State);
     }
 
     public override Task<TagDelta> CalculateTagDeltaAsync(LevelDto level, CancellationToken cancellationToken = default)
@@ -40,7 +40,6 @@ public class LevelTypeAutoTagger : AutoTagger<ProgressState>
 
     public override void UpdateState(LevelDto level, TagDelta tagDelta)
     {
-        State ??= new ProgressState();
-        State.Progress = TaggingStrategy.UpdateProgress(State.Progress, level);
+        State = _TaggingStrategy.UpdateCursor(State, level);
     }
 }

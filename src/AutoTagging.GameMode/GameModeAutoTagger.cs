@@ -5,7 +5,7 @@ using Distags.Core.Queries.AutoTaggerLevels;
 
 namespace AutoTagging.GameMode;
 
-public class GameModeAutoTagger : AutoTagger<ProgressState>
+public class GameModeAutoTagger : AutoTagger<TimestampLevelIdCursor>
 {
     private static readonly Dictionary<string, string> GameModeTagNames = new Dictionary<string, string>
     {
@@ -16,15 +16,15 @@ public class GameModeAutoTagger : AutoTagger<ProgressState>
         { "Main Menu", "main-menu" },
     };
 
+    private readonly UpdatedLevelsTaggingStrategy _TaggingStrategy = new UpdatedLevelsTaggingStrategy();
+
     public override Guid Guid { get; } = new Guid("AD96F858-91F3-46E7-B2C2-19DAFBA0DFDF");
 
     public override TimeSpan? Interval { get; } = TimeSpan.FromMinutes(5);
 
-    public override ITaggingStrategy TaggingStrategy { get; } = new UpdatedLevelsTaggingStrategy();
-
     public override AutoTaggerLevelsQuery GetLevelsQuery()
     {
-        return TaggingStrategy.GetLevelsQuery(State?.Progress);
+        return _TaggingStrategy.GetLevelsQuery(State);
     }
 
     public override Task<TagDelta> CalculateTagDeltaAsync(LevelDto level, CancellationToken cancellationToken = default)
@@ -60,7 +60,6 @@ public class GameModeAutoTagger : AutoTagger<ProgressState>
 
     public override void UpdateState(LevelDto level, TagDelta tagDelta)
     {
-        State ??= new ProgressState();
-        State.Progress = TaggingStrategy.UpdateProgress(State.Progress, level);
+        State = _TaggingStrategy.UpdateCursor(State, level);
     }
 }

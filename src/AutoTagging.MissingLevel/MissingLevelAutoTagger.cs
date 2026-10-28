@@ -5,19 +5,19 @@ using Distags.Core.Queries.AutoTaggerLevels;
 
 namespace AutoTagging.MissingLevel;
 
-public class MissingLevelAutoTagger : AutoTagger<ProgressState>
+public class MissingLevelAutoTagger : AutoTagger<TimestampLevelIdCursor>
 {
     private const string MissingLevelTag = "missing-level";
+
+    private readonly NewWorkshopLevelsTaggingStrategy _TaggingStrategy = new NewWorkshopLevelsTaggingStrategy();
 
     public override Guid Guid { get; } = new Guid("074598C5-1C0A-4302-95C4-F93B5572E399");
 
     public override TimeSpan? Interval { get; } = TimeSpan.FromMinutes(5);
 
-    public override ITaggingStrategy TaggingStrategy { get; } = new NewWorkshopLevelsTaggingStrategy();
-
     public override AutoTaggerLevelsQuery GetLevelsQuery()
     {
-        return TaggingStrategy.GetLevelsQuery(State?.Progress);
+        return _TaggingStrategy.GetLevelsQuery(State);
     }
 
     public override Task<TagDelta> CalculateTagDeltaAsync(LevelDto level, CancellationToken cancellationToken = default)
@@ -42,7 +42,6 @@ public class MissingLevelAutoTagger : AutoTagger<ProgressState>
 
     public override void UpdateState(LevelDto level, TagDelta tagDelta)
     {
-        State ??= new ProgressState();
-        State.Progress = TaggingStrategy.UpdateProgress(State.Progress, level);
+        State = _TaggingStrategy.UpdateCursor(State, level);
     }
 }

@@ -1,4 +1,3 @@
-using AutoTagging.Abstractions.TaggingStrategy;
 using Distags.Contracts;
 using Distags.Core.Queries.AutoTaggerLevels;
 
@@ -11,8 +10,6 @@ public abstract class AutoTagger
     public virtual string Name => field ??= GetType().Name;
 
     public abstract TimeSpan? Interval { get; }
-
-    public abstract ITaggingStrategy TaggingStrategy { get; }
 
     public virtual object? State { get; set; }
 

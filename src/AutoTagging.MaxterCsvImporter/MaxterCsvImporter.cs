@@ -33,7 +33,7 @@ public class MaxterCsvImporter : AutoTagger<MaxterCsvImporterState>
 
     public override AutoTaggerLevelsQuery GetLevelsQuery()
     {
-        return TaggingStrategy.GetLevelsQuery(null);
+        return new AutoTaggerLevelsQuery();
     }
 
     public override Task<TagDelta> CalculateTagDeltaAsync(LevelDto level, CancellationToken cancellationToken = default)
