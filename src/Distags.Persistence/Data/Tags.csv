@@ -71,7 +71,7 @@ gimmicks-none;None;gimmicks;gimmicks;True;False;False;The level has none of the 
 teleports;Teleports;gimmicks;gimmicks;False;False;False;Teleporters exist within the level and therefore may influence routing.
 multi-path;Multi-Path;gimmicks;gimmicks;False;False;False;Multiple different paths (not just symmetrical roads).
 hidden-path;Hidden Path;gimmicks;gimmicks;False;False;False;Hidden alternative paths or portals.
-laps;Laps;gimmicks;gimmicks;False;False;False;The level needs to be completed multiple times in a row.
+laps;Laps;gimmicks;gimmicks;False;False;False;The level is a circuit (its end connects back to its start) or has to be completed multiple times in a row.
 boosters;Boosters;gimmicks;gimmicks;False;False;False;Boost pads or power-ups that increase the car's speed.
 jump-pads;Jump Pads;gimmicks;gimmicks;False;False;False;Jump pads that launch the car up and/or forwards when driving over them.
 force-zones;Force Zones;gimmicks;gimmicks;False;False;False;Zones that influence the cars travel direction. Similar to boost pads though generally larger in size and not always in the direction of the car.
@@ -121,7 +121,7 @@ corrupted;Corrupted;theme;theme;False;False;False;The level looks corrupted or i
 geometric;Geometric;theme;theme;False;False;False;The level has a lot of geometric shapes or objects.
 abstract;Abstract;theme;theme;False;False;False;The level uses abstract visuals without a recognizeable setting.
 media-reference;Video Game/Movie;theme;theme;False;False;False;The level references a video game, moovie or other media.
-meme;Meme;theme;theme;False;False;False;The level references a Distance or internet meme.
+meme;Meme;theme;theme;False;False;False;The level references meme.
 first-level;First Level;theme;theme;False;False;False;The level looks like someone's first level.
 vertical;Vertical;theme;theme;False;False;False;The level extends maily upwards or downwards instead of forwards.
 spaghetti;Spaghetti;theme;theme;False;False;False;The level has tangled, crossing or overlapping roads.
