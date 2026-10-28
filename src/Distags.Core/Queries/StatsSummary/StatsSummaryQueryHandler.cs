@@ -30,12 +30,12 @@ public class StatsSummaryQueryHandler : IQueryHandler<StatsSummaryQuery, StatsSu
 
     private Task<int> GetUserContributionCount()
     {
-        return _DbContext.Set<Contribution>().CountAsync(contribution => contribution.UserId != null);
+        return GetActiveContributions().CountAsync(contribution => contribution.UserId != null);
     }
 
     private Task<int> GetContributingUserCount()
     {
-        return _DbContext.Set<Contribution>()
+        return GetActiveContributions()
             .Where(contribution => contribution.UserId != null)
             .Select(contribution => contribution.UserId)
             .Distinct()
@@ -44,15 +44,20 @@ public class StatsSummaryQueryHandler : IQueryHandler<StatsSummaryQuery, StatsSu
 
     private Task<int> GetAutoTaggerContributionCount()
     {
-        return _DbContext.Set<Contribution>().CountAsync(contribution => contribution.AutoTaggerId != null);
+        return GetActiveContributions().CountAsync(contribution => contribution.AutoTaggerId != null);
     }
 
     private Task<int> GetContributingAutoTaggerCount()
     {
-        return _DbContext.Set<Contribution>()
+        return GetActiveContributions()
             .Where(contribution => contribution.AutoTaggerId != null)
             .Select(contribution => contribution.AutoTaggerId)
             .Distinct()
             .CountAsync();
+    }
+
+    private IQueryable<Contribution> GetActiveContributions()
+    {
+        return _DbContext.Set<Contribution>().Where(contribution => !contribution.IsReverted);
     }
 }
