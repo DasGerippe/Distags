@@ -10,7 +10,7 @@ public class ContributionDto
 
     public required ContributionUserDto? User { get; set; }
 
-    public required ContributionAppDto? App { get; set; }
+    public required ContributionAutoTaggerDto? AutoTagger { get; set; }
 
     public required DateTimeOffset ContributedOn { get; set; }
 }

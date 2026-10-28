@@ -10,6 +10,4 @@
     <ProjectReference Include="..\AutoTagging.Abstractions\AutoTagging.Abstractions.csproj" />
   </ItemGroup>
 
-  <Import Project="..\..\build\AutoTagging.Plugin.targets" />
-
 </Project>

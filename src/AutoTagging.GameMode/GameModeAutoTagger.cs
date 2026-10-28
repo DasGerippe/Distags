@@ -1,10 +1,11 @@
 using AutoTagging.Abstractions;
 using AutoTagging.Abstractions.TaggingStrategy;
 using Distags.Contracts;
+using Distags.Core.Queries.AutoTaggerLevels;
 
 namespace AutoTagging.GameMode;
 
-public class GameModeAutoTagger : AutoTagger
+public class GameModeAutoTagger : AutoTagger<TimestampLevelIdCursor>
 {
     private static readonly Dictionary<string, string> GameModeTagNames = new Dictionary<string, string>
     {
@@ -15,7 +16,16 @@ public class GameModeAutoTagger : AutoTagger
         { "Main Menu", "main-menu" },
     };
 
-    public override ITaggingStrategy TaggingStrategy { get; } = new UpdatedLevelsTaggingStrategy();
+    private readonly UpdatedLevelsTaggingStrategy _TaggingStrategy = new UpdatedLevelsTaggingStrategy();
+
+    public override Guid Guid { get; } = new Guid("AD96F858-91F3-46E7-B2C2-19DAFBA0DFDF");
+
+    public override TimeSpan? Interval { get; } = TimeSpan.FromMinutes(5);
+
+    public override AutoTaggerLevelsQuery GetLevelsQuery()
+    {
+        return _TaggingStrategy.GetLevelsQuery(State);
+    }
 
     public override Task<TagDelta> CalculateTagDeltaAsync(LevelDto level, CancellationToken cancellationToken = default)
     {
@@ -35,7 +45,7 @@ public class GameModeAutoTagger : AutoTagger
             .Join(
                 levelGameModeNames,
                 gameModeKvp => gameModeKvp.Key,
-                workshopTag => workshopTag,
+                levelGameModeName => levelGameModeName,
                 (gameModeKvp, _) => gameModeKvp.Value)
             .ToList();
 
@@ -46,5 +56,10 @@ public class GameModeAutoTagger : AutoTagger
         };
 
         return Task.FromResult(tagDelta);
+    }
+
+    public override void UpdateState(LevelDto level, TagDelta tagDelta)
+    {
+        State = _TaggingStrategy.UpdateCursor(State, level);
     }
 }

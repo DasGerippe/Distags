@@ -43,10 +43,10 @@ CREATE ROLE distags_manage_users NOLOGIN;
 GRANT distags_user TO distags_manage_users;
 GRANT SELECT, INSERT, UPDATE, DELETE ON TABLE users, user_sessions TO distags_manage_users;
 
-CREATE ROLE distags_manage_apps NOLOGIN;
-GRANT distags_user TO distags_manage_apps;
-GRANT SELECT, INSERT, UPDATE, DELETE ON TABLE apps TO distags_manage_apps;
-GRANT USAGE, SELECT, UPDATE ON SEQUENCE apps_id_seq TO distags_manage_apps;
+CREATE ROLE distags_manage_auto_taggers NOLOGIN;
+GRANT distags_user TO distags_manage_auto_taggers;
+GRANT SELECT, INSERT, UPDATE, DELETE ON TABLE auto_taggers TO distags_manage_auto_taggers;
+GRANT USAGE, SELECT, UPDATE ON SEQUENCE auto_taggers_id_seq TO distags_manage_auto_taggers;
 
 CREATE ROLE distags_manage_contributions NOLOGIN;
 GRANT distags_user TO distags_manage_contributions;
@@ -72,7 +72,7 @@ GRANT distags_use_level_locks TO distags_api;
 GRANT distags_manage_tags TO distags_api;
 GRANT distags_assign_tags TO distags_api;
 GRANT distags_manage_users TO distags_api;
-GRANT distags_manage_apps TO distags_api;
+GRANT distags_manage_auto_taggers TO distags_api;
 GRANT distags_manage_contributions TO distags_api;
 GRANT distags_manage_user_bans TO distags_api;
 GRANT distags_manage_settings TO distags_api;

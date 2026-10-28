@@ -6,7 +6,7 @@ public class GetContributionsRequest
 {
     public long? UserSteamId { get; init; }
 
-    public string? AppName { get; init; }
+    public Guid? AutoTaggerGuid { get; init; }
 
     public string? LevelSlug { get; init; }
 

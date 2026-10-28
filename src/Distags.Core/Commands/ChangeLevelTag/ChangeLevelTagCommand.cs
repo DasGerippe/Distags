@@ -10,5 +10,5 @@ public abstract class ChangeLevelTagCommand : ICommand
 
     public long? UserSteamId { get; set; }
 
-    public string? AppName { get; set; }
+    public Guid? AutoTaggerGuid { get; set; }
 }

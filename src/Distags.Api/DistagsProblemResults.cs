@@ -54,23 +54,23 @@ public static class DistagsProblemResults
         });
     }
 
-    public static ProblemResult AppNotFound(string appName)
+    public static ProblemResult AutoTaggerNotFound(string autoTaggerName)
     {
         return new ProblemResult(new ProblemDetails
         {
             Status = StatusCodes.Status404NotFound,
-            Title = "App Not Found",
-            Detail = $"Could not find app with name '{appName}'.",
+            Title = "AutoTagger not found",
+            Detail = $"Could not find AutoTagger '{autoTaggerName}'.",
         });
     }
 
-    public static ProblemResult AppConflict(string appName)
+    public static ProblemResult AutoTaggerAlreadyQueued(string autoTaggerName)
     {
         return new ProblemResult(new ProblemDetails
         {
             Status = StatusCodes.Status409Conflict,
-            Title = "App Already Exists",
-            Detail = $"An app with the name '{appName}' already exists.",
+            Title = "AutoTagger already queued",
+            Detail = $"The AutoTagger '{autoTaggerName}' is already queued and should be run soon.",
         });
     }
 

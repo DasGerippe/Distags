@@ -1,4 +1,4 @@
-using Distags.Contracts;
+using Distags.Persistence.Seeding.Tags;
 using Microsoft.Extensions.Logging;
 
 namespace AutoTagging.MaxterCsvImporter;
@@ -17,7 +17,7 @@ public class MappingGenerator
         _Logger = logger;
     }
 
-    public void AddMissingTokens(MaxterTagMappingData mapping, IEnumerable<MaxterCsvRow> rows, IReadOnlyList<TagDto> tags)
+    public void AddMissingTokens(MaxterTagMappingData mapping, IEnumerable<MaxterCsvRow> rows, IReadOnlyList<SeedTag> tags)
     {
         List<MaxterCsvRow> rowList = rows.ToList();
 
@@ -36,7 +36,7 @@ public class MappingGenerator
     private void AddMissingTokensForColumn(
         Dictionary<string, string?> table,
         IEnumerable<string?> cellValues,
-        IReadOnlyList<TagDto> tags)
+        IReadOnlyList<SeedTag> tags)
     {
         IEnumerable<string> distinctTokens = cellValues
             .Where(cell => !string.IsNullOrWhiteSpace(cell))
@@ -50,7 +50,7 @@ public class MappingGenerator
             if (table.ContainsKey(token))
                 continue;
 
-            TagDto? match = tags.FirstOrDefault(tag => string.Equals(tag.DisplayName, token, StringComparison.OrdinalIgnoreCase));
+            SeedTag? match = tags.FirstOrDefault(tag => string.Equals(tag.DisplayName, token, StringComparison.OrdinalIgnoreCase));
             table[token] = match?.Name;
 
             if (match == null)
@@ -60,29 +60,29 @@ public class MappingGenerator
         }
     }
 
-    private void ResolveCarAbilities(MaxterTagMappingData mapping, IReadOnlyList<TagDto> tags)
+    private void ResolveCarAbilities(MaxterTagMappingData mapping, IReadOnlyList<SeedTag> tags)
     {
-        HashSet<string> liveTagNames = tags.Select(tag => tag.Name).ToHashSet(StringComparer.OrdinalIgnoreCase);
+        HashSet<string> tagNames = tags.Select(tag => tag.Name).ToHashSet(StringComparer.OrdinalIgnoreCase);
 
         foreach (string ability in new[] { "jump", "wings", "grip", "boost" })
         {
-            if (!mapping.CarAbilities.TryGetValue(ability, out MaxterAbilityTagNames? tagNames))
+            if (!mapping.CarAbilities.TryGetValue(ability, out MaxterAbilityTagNames? abilityTagNames))
             {
-                tagNames = new MaxterAbilityTagNames();
-                mapping.CarAbilities[ability] = tagNames;
+                abilityTagNames = new MaxterAbilityTagNames();
+                mapping.CarAbilities[ability] = abilityTagNames;
             }
 
-            tagNames.Enabled = ResolveIfLiveTagExists(liveTagNames, $"{ability}-enabled");
-            tagNames.Disabled = ResolveIfLiveTagExists(liveTagNames, $"{ability}-disabled");
+            abilityTagNames.Enabled = ResolveIfTagExists(tagNames, $"{ability}-enabled");
+            abilityTagNames.Disabled = ResolveIfTagExists(tagNames, $"{ability}-disabled");
         }
     }
 
-    private string? ResolveIfLiveTagExists(HashSet<string> liveTagNames, string candidateTagName)
+    private string? ResolveIfTagExists(HashSet<string> tagNames, string candidateTagName)
     {
-        if (liveTagNames.Contains(candidateTagName))
+        if (tagNames.Contains(candidateTagName))
             return candidateTagName;
 
-        _Logger.LogDebug("Tag '{tagName}' does not exist on the server - leaving it unmapped.", candidateTagName);
+        _Logger.LogDebug("Tag '{tagName}' does not exist - leaving it unmapped.", candidateTagName);
         return null;
     }
 

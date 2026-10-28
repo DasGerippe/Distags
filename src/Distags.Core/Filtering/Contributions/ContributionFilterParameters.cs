@@ -4,7 +4,7 @@ public class ContributionFilterParameters
 {
     public long? UserSteamId { get; set; }
 
-    public string? AppName { get; set; }
+    public Guid? AutoTaggerGuid { get; set; }
 
     public string? LevelSlug { get; set; }
 

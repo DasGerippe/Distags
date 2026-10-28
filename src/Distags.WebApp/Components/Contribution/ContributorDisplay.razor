@@ -5,7 +5,7 @@
     {
         <img class="rounded-5" src="https://avatars.steamstatic.com/@(User.SteamAvatarHash).jpg" alt="Contributor Avatar" />
     }
-    else if (User != null || App == null)
+    else if (User != null || AutoTagger == null)
     {
         <svg style="width: 2rem; height: 2rem;"><use href="icons.svg#user-solid" /></svg>
     }
@@ -23,14 +23,14 @@
     public required ContributionUserResponse? User { get; set; }
 
     [Parameter]
-    public required ContributionAppResponse? App { get; set; }
+    public required ContributionAutoTaggerResponse? AutoTagger { get; set; }
 
     [Parameter]
     public bool IgnoreAnonymity { get; set; }
 
     private string GetContributorNameClass()
     {
-        if (App != null)
+        if (AutoTagger != null)
             return "fst-italic";
 
         if (User == null)
@@ -56,8 +56,8 @@
                 : User.SteamName ?? Resource.Contributor_UnknownUserName;
         }
 
-        if (App != null)
-            return App.Name;
+        if (AutoTagger != null)
+            return AutoTagger.Name;
 
         return Resource.Contributor_UnknownUserName;
     }

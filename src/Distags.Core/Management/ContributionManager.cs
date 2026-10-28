@@ -6,7 +6,7 @@ namespace Distags.Core.Management;
 public class ContributionManager
 {
     public Contribution CreateContribution(
-        Level level, Tag tag, User? user, App? app, TagChangeAction action, List<TagChange> changes)
+        Level level, Tag tag, User? user, AutoTagger? autoTagger, TagChangeAction action, List<TagChange> changes)
     {
         return new Contribution
         {
@@ -14,7 +14,7 @@ public class ContributionManager
             Tag = tag,
             Action = action,
             User = user,
-            App = app,
+            AutoTagger = autoTagger,
             ContributedOn = DateTimeOffset.UtcNow,
             Changes = changes,
         };

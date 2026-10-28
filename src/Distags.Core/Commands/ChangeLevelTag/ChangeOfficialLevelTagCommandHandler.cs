@@ -25,7 +25,7 @@ public class ChangeOfficialLevelTagCommandHandler : ChangeLevelTagCommandHandler
     public async Task HandleAsync(ChangeOfficialLevelTagCommand command)
     {
         long levelId = await GetLevelIdAsync(command.LevelSlug).ConfigureAwait(false);
-        await HandleAsync(levelId, command.TagName, command.Action, command.UserSteamId, command.AppName).ConfigureAwait(false);
+        await HandleAsync(levelId, command.TagName, command.Action, command.UserSteamId, command.AutoTaggerGuid).ConfigureAwait(false);
     }
 
     private async Task<long> GetLevelIdAsync(string slug)

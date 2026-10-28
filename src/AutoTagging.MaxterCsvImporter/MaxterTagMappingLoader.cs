@@ -5,14 +5,13 @@ namespace AutoTagging.MaxterCsvImporter;
 
 public class MaxterTagMappingLoader
 {
-    private readonly ILogger<MaxterTagMappingLoader> _Logger;
-    public const string MappingFileName = "maxter-tag-mapping.json";
-
-    private static readonly JsonSerializerOptions JsonOptions = new JsonSerializerOptions
+    private readonly JsonSerializerOptions _JsonOptions = new JsonSerializerOptions
     {
         PropertyNameCaseInsensitive = true,
         WriteIndented = true,
     };
+
+    private readonly ILogger<MaxterTagMappingLoader> _Logger;
 
     public MaxterTagMappingLoader(ILogger<MaxterTagMappingLoader> logger)
     {
@@ -27,13 +26,21 @@ public class MaxterTagMappingLoader
             return new MaxterTagMappingData();
         }
 
-        string json = File.ReadAllText(tagMappingFilePath);
-        return JsonSerializer.Deserialize<MaxterTagMappingData>(json, JsonOptions) ?? new MaxterTagMappingData();
+        using FileStream fileStream = new FileStream(tagMappingFilePath, FileMode.Open, FileAccess.Read);
+        MaxterTagMappingData? tagMapping = JsonSerializer.Deserialize<MaxterTagMappingData>(fileStream, _JsonOptions);
+
+        if (tagMapping == null)
+        {
+            _Logger.LogWarning("Could not deserialize content of '{filePath}'.", tagMappingFilePath);
+            return new MaxterTagMappingData();
+        }
+
+        return  tagMapping;
     }
 
-    public void Save(string path, MaxterTagMappingData data)
+    public void Save(string tagMappingFilePath, MaxterTagMappingData data)
     {
-        string json = JsonSerializer.Serialize(data, JsonOptions);
-        File.WriteAllText(path, json);
+        using FileStream fileStream = new FileStream(tagMappingFilePath, FileMode.Create, FileAccess.Write);
+        JsonSerializer.SerializeAsync(fileStream, data, _JsonOptions);
     }
 }

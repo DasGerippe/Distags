@@ -3,41 +3,11 @@
     "Name": "API, WebApp",
     "Projects": [
       {
-        "Path": "Distags.Api\\Distags.Api.csproj",
+        "Path": "src\\Distags.Api\\Distags.Api.csproj",
         "Action": "Start"
       },
       {
-        "Path": "Distags.WebApp\\Distags.WebApp.csproj",
-        "Action": "Start"
-      }
-    ]
-  },
-  {
-    "Name": "API, AutoTagger (All)",
-    "Projects": [
-      {
-        "Path": "AutoTaggerRunner\\AutoTaggerRunner.csproj",
-        "Action": "Start"
-      },
-      {
-        "Path": "Distags.Api\\Distags.Api.csproj",
-        "Action": "Start"
-      }
-    ]
-  },
-  {
-    "Name": "API, WebApp, AutoTagger (All)",
-    "Projects": [
-      {
-        "Path": "AutoTaggerRunner\\AutoTaggerRunner.csproj",
-        "Action": "Start"
-      },
-      {
-        "Path": "Distags.Api\\Distags.Api.csproj",
-        "Action": "Start"
-      },
-      {
-        "Path": "Distags.WebApp\\Distags.WebApp.csproj",
+        "Path": "src\\Distags.WebApp\\Distags.WebApp.csproj",
         "Action": "Start"
       }
     ]

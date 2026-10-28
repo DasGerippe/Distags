@@ -7,6 +7,5 @@ public static class DistagsApiConstants
     public static class AuthorizationHeaderSchemes
     {
         public const string SessionToken = "SessionToken";
-        public const string ApiKey = "ApiKey";
     }
 }

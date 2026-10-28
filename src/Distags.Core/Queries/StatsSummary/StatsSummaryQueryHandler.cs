@@ -44,14 +44,14 @@ public class StatsSummaryQueryHandler : IQueryHandler<StatsSummaryQuery, StatsSu
 
     private Task<int> GetAutoTaggerContributionCount()
     {
-        return _DbContext.Set<Contribution>().CountAsync(contribution => contribution.AppId != null);
+        return _DbContext.Set<Contribution>().CountAsync(contribution => contribution.AutoTaggerId != null);
     }
 
     private Task<int> GetContributingAutoTaggerCount()
     {
         return _DbContext.Set<Contribution>()
-            .Where(contribution => contribution.AppId != null)
-            .Select(contribution => contribution.AppId)
+            .Where(contribution => contribution.AutoTaggerId != null)
+            .Select(contribution => contribution.AutoTaggerId)
             .Distinct()
             .CountAsync();
     }

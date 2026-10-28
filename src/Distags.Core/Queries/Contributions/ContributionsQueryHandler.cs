@@ -53,7 +53,7 @@ public class ContributionsQueryHandler : IQueryHandler<ContributionsQuery, Contr
         return new ContributionFilterParameters
         {
             UserSteamId = query.UserSteamId,
-            AppName = query.AppName,
+            AutoTaggerGuid = query.AutoTaggerGuid,
             LevelSlug = query.LevelSlug,
             LevelWorkshopId = query.LevelWorkshopId,
             TagName = query.TagName,
