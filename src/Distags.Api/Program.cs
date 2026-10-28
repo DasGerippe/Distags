@@ -1,3 +1,4 @@
+using AutoTaggerWorker;
 using Distags.Api.Caching;
 using Distags.Api.Contracts;
 using Distags.Api.Hubs;
@@ -61,6 +62,7 @@ public class Program
                 .AsImplementedInterfaces());
 
             builder.Services.AddHostedService<SessionCleanupService>();
+            builder.Services.AddAutoTaggerWorker();
 
             WebApplication app = builder.Build();
 
