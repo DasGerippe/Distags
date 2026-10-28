@@ -1,11 +1,6 @@
 <Solution>
   <Folder Name="/AutoTagging/">
-    <Project Path="src/AutoTaggerRunner/AutoTaggerRunner.csproj">
-      <BuildDependency Project="src/AutoTagging.GameMode/AutoTagging.GameMode.csproj" />
-      <BuildDependency Project="src/AutoTagging.LevelType/AutoTagging.LevelType.csproj" />
-      <BuildDependency Project="src/AutoTagging.MaxterCsvImporter/AutoTagging.MaxterCsvImporter.csproj" />
-      <BuildDependency Project="src/AutoTagging.MissingLevel/AutoTagging.MissingLevel.csproj" />
-    </Project>
+    <Project Path="src/AutoTaggerCli/AutoTaggerCli.csproj" />
     <Project Path="src/AutoTaggerWorker/AutoTaggerWorker.csproj" />
     <Project Path="src/AutoTagging.Abstractions/AutoTagging.Abstractions.csproj" />
     <Project Path="src/AutoTagging.GameMode/AutoTagging.GameMode.csproj" />

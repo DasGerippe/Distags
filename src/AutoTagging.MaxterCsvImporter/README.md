@@ -11,7 +11,7 @@ This AutoTagger needs a **mapping file** (`maxter_tag_mapping.json`) that transl
 dotnet run --project AutoTagging.MaxterCsvImporter -- generate-mapping
 
 # Run just this auto-tagger.
-dotnet run --project AutoTaggerRunner -- MaxterCsvImporter
+dotnet run --project AutoTaggerCli -- MaxterCsvImporter
 ```
 
 ## Key Properties of the Mapping Generation

@@ -15,7 +15,7 @@
     },
     "Run LevelType, GameMode, MissingLevel": {
       "commandName": "Project",
-      "commandLineArgs": "LevelType GameMode MissingLevel",
+      "commandLineArgs": "LevelTypeAutoTagger GameModeAutoTagger MissingLevelAutoTagger",
       "environmentVariables": {
         "DOTNET_ENVIRONMENT": "Development"
       }

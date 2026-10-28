@@ -1,5 +1,5 @@
+using AutoTagging;
 using AutoTagging.Abstractions;
-using AutoTagging.Abstractions.Progress;
 using Distags.Core;
 using Distags.Persistence;
 using Microsoft.Extensions.Configuration;
@@ -10,14 +10,14 @@ using Serilog;
 using SerilogUtils;
 using System.Runtime.CompilerServices;
 
-namespace AutoTaggerRunner;
+namespace AutoTaggerCli;
 
 internal class Program
 {
     private static async Task Main(string[] args)
     {
         Log.Logger = new LoggerConfiguration()
-            .ConfigureConsoleAndFileSinks(nameof(AutoTaggerRunner))
+            .ConfigureConsoleAndFileSinks(nameof(AutoTaggerCli))
             .CreateBootstrapLogger();
 
         try
@@ -29,11 +29,6 @@ internal class Program
             hostBuilder.ConfigureAppConfiguration((context, configBuilder) =>
             {
                 IHostEnvironment environment = context.HostingEnvironment;
-
-                configBuilder.AddInMemoryCollection(new Dictionary<string, string?>
-                {
-                    ["ProgressDirectoryPath"] = Constants.PluginsFolderName,
-                });
 
                 configBuilder.AddJsonFile("appsettings.json", optional: false);
                 configBuilder.AddJsonFile($"appsettings.{environment.EnvironmentName}.json", optional: true);
@@ -48,23 +43,16 @@ internal class Program
             {
                 services.AddSerilog(loggerConfig => loggerConfig
                     .ReadFrom.Configuration(context.Configuration)
-                    .ConfigureConsoleAndFileSinks(nameof(AutoTaggerRunner)));
+                    .ConfigureConsoleAndFileSinks(nameof(AutoTaggerCli)));
 
                 string distagsDbConnectionString = context.Configuration.GetConnectionString("DistagsDatabase") ??
                                                    throw new InvalidOperationException("Connection string not configured.");
                 services.AddDistagsPersistence(distagsDbConnectionString);
                 services.AddDistagsCore();
 
-                services.AddHttpClient<DistagsApiClient>(httpClient =>
-                {
-                    string distagsApiUri = context.Configuration["DistagsApi:Uri"]!;
-                    httpClient.BaseAddress = new Uri(distagsApiUri);
-                });
+                services.AddAutoTagging();
+                services.AddAutoTaggers(args);
 
-                services.AddTransient<IAutoTaggerProgressManager, AutoTaggerProgressFileManager>();
-
-                services.AddTransient<AutoTaggerLoader>();
-                services.AddTransient<AutoTaggerRunner>();
                 services.AddTransient<Program>();
             });
 
@@ -82,7 +70,7 @@ internal class Program
             await using ConfiguredAsyncDisposable _ = scope.ConfigureAwait(false);
 
             Program program = scope.ServiceProvider.GetRequiredService<Program>();
-            await program.Run(args).ConfigureAwait(false);
+            await program.Run().ConfigureAwait(false);
         }
         catch (Exception ex)
         {
@@ -94,23 +82,32 @@ internal class Program
         }
     }
 
-    private readonly AutoTaggerLoader _AutoTaggerLoader;
     private readonly AutoTaggerRunner _AutoTaggerRunner;
+    private readonly IEnumerable<AutoTagger> _AutoTaggers;
     private readonly ILogger<Program> _Logger;
 
-    public Program(AutoTaggerLoader autoTaggerLoader, AutoTaggerRunner autoTaggerRunner, ILogger<Program> logger)
+    public Program(AutoTaggerRunner autoTaggerRunner, IEnumerable<AutoTagger> autoTaggers, ILogger<Program> logger)
     {
-        _AutoTaggerLoader = autoTaggerLoader;
         _AutoTaggerRunner = autoTaggerRunner;
+        _AutoTaggers = autoTaggers;
         _Logger = logger;
     }
 
-    private async Task Run(string[] args)
+    private async Task Run()
     {
         _Logger.LogDebug("Starting application...");
 
-        List<AutoTagger> autoTaggers = _AutoTaggerLoader.LoadAutoTaggersFromDlls(args);
-        await _AutoTaggerRunner.TryRunAutoTaggersAsync(autoTaggers);
+        foreach (AutoTagger autoTagger in _AutoTaggers)
+        {
+            try
+            {
+                await _AutoTaggerRunner.RunAsync(autoTagger);
+            }
+            catch (Exception ex)
+            {
+                _Logger.LogError(ex, "An error occurred while running {autoTagger}.", autoTagger.Name);
+            }
+        }
 
         _Logger.LogDebug("End of application.");
     }

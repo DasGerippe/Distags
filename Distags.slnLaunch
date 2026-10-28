@@ -11,35 +11,5 @@
         "Action": "Start"
       }
     ]
-  },
-  {
-    "Name": "API, AutoTagger (All)",
-    "Projects": [
-      {
-        "Path": "src\\Distags.Api\\Distags.Api.csproj",
-        "Action": "Start"
-      },
-      {
-        "Path": "src\\AutoTaggerRunner\\AutoTaggerRunner.csproj",
-        "Action": "Start"
-      }
-    ]
-  },
-  {
-    "Name": "API, WebApp, AutoTagger (All)",
-    "Projects": [
-      {
-        "Path": "src\\Distags.Api\\Distags.Api.csproj",
-        "Action": "Start"
-      },
-      {
-        "Path": "src\\Distags.WebApp\\Distags.WebApp.csproj",
-        "Action": "Start"
-      },
-      {
-        "Path": "src\\AutoTaggerRunner\\AutoTaggerRunner.csproj",
-        "Action": "Start"
-      }
-    ]
   }
 ]
