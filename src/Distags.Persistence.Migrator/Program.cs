@@ -10,42 +10,55 @@ namespace Distags.Persistence.Migrator;
 
 internal class Program
 {
-    static async Task Main(string[] args)
+    static async Task<int> Main(string[] args)
     {
-        IHostBuilder builder = Host.CreateDefaultBuilder(args);
-
-        builder.ConfigureAppConfiguration((context, configBuilder) =>
+        try
         {
-            IHostEnvironment environment = context.HostingEnvironment;
+            IHostBuilder builder = Host.CreateDefaultBuilder(args);
 
-            configBuilder.AddJsonFile("appsettings.json", optional: true);
-            configBuilder.AddJsonFile($"appsettings.{environment.EnvironmentName}.json", optional: true);
+            builder.ConfigureAppConfiguration((context, configBuilder) =>
+            {
+                IHostEnvironment environment = context.HostingEnvironment;
 
-            if (environment.IsDevelopment())
-                configBuilder.AddUserSecrets<Program>();
+                configBuilder.AddJsonFile("appsettings.json", optional: true);
+                configBuilder.AddJsonFile($"appsettings.{environment.EnvironmentName}.json", optional: true);
 
-            configBuilder.AddEnvironmentVariables();
-            configBuilder.AddKeyPerFile("/run/secrets", optional: true);
-        });
+                if (environment.IsDevelopment())
+                    configBuilder.AddUserSecrets<Program>();
 
-        builder.ConfigureServices((context, services) =>
+                configBuilder.AddEnvironmentVariables();
+                configBuilder.AddKeyPerFile("/run/secrets", optional: true);
+            });
+
+            builder.ConfigureServices((context, services) =>
+            {
+                string connectionString = context.Configuration.GetRequiredConnectionString("DistagsDatabase");
+                string migrationsAssemblyName = context.Configuration.GetRequiredValue("MigrationsAssemblyName");
+                services.AddDistagsPersistence(
+                    connectionString,
+                    npgsqlOptionsAction: npgsqlOptions => npgsqlOptions.MigrationsAssembly(migrationsAssemblyName));
+                services.AddDistagsCore();
+            });
+            IHost host = builder.Build();
+
+            AsyncServiceScope scope = host.Services.CreateAsyncScope();
+            await using ConfiguredAsyncDisposable awaitedScope = scope.ConfigureAwait(false);
+
+            DistagsDbContext dbContext = scope.ServiceProvider.GetRequiredService<DistagsDbContext>();
+
+            Console.WriteLine("Applying EF Core migrations...");
+            await dbContext.Database.MigrateAsync();
+            Console.WriteLine("Done!");
+            return 0;
+        }
+        catch (OperationCanceledException)
         {
-            string connectionString = context.Configuration.GetRequiredConnectionString("DistagsDatabase");
-            string migrationsAssemblyName = context.Configuration.GetRequiredValue("MigrationsAssemblyName");
-            services.AddDistagsPersistence(
-                connectionString,
-                npgsqlOptionsAction: npgsqlOptions => npgsqlOptions.MigrationsAssembly(migrationsAssemblyName));
-            services.AddDistagsCore();
-        });
-        IHost host = builder.Build();
-
-        AsyncServiceScope scope = host.Services.CreateAsyncScope();
-        await using ConfiguredAsyncDisposable awaitedScope = scope.ConfigureAwait(false);
-
-        DistagsDbContext dbContext = scope.ServiceProvider.GetRequiredService<DistagsDbContext>();
-
-        Console.WriteLine("Applying EF Core migrations...");
-        await dbContext.Database.MigrateAsync();
-        Console.WriteLine("Done!");
+            return 2;
+        }
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine(ex);
+            return 1;
+        }
     }
 }
