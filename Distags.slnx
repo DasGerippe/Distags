@@ -29,5 +29,4 @@
   <Project Path="src/SteamDataScraper/SteamDataScraper.csproj" />
   <Project Path="src/SteamWebApi.Contract/SteamWebApi.Contract.csproj" />
   <Project Path="src/SteamWebApi/SteamWebApi.csproj" />
-  <Project Path="src/TestProject/TestProject.csproj" />
 </Solution>
