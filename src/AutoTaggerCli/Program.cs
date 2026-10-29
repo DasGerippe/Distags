@@ -17,7 +17,7 @@ internal class Program
     private static async Task Main(string[] args)
     {
         Log.Logger = new LoggerConfiguration()
-            .ConfigureConsoleAndFileSinks(nameof(AutoTaggerCli))
+            .ConfigureBootstrapLogger()
             .CreateBootstrapLogger();
 
         try
@@ -44,7 +44,7 @@ internal class Program
             {
                 services.AddSerilog(loggerConfig => loggerConfig
                     .ReadFrom.Configuration(context.Configuration)
-                    .ConfigureConsoleAndFileSinks(nameof(AutoTaggerCli)));
+                    .ConfigureSinks<Program>(writeToFile: context.HostingEnvironment.IsDevelopment()));
 
                 string distagsDbConnectionString = context.Configuration.GetConnectionString("DistagsDatabase") ??
                                                    throw new InvalidOperationException("Connection string not configured.");

@@ -13,7 +13,7 @@ public class Program
     public static void Main(string[] args)
     {
         Log.Logger = new LoggerConfiguration()
-            .ConfigureConsoleAndFileSinks<Program>(OutputTemplates.Web)
+            .ConfigureBootstrapLogger()
             .CreateBootstrapLogger();
 
         try
@@ -22,7 +22,7 @@ public class Program
 
             builder.Services.AddSerilog(loggerConfig => loggerConfig
                 .ReadFrom.Configuration(builder.Configuration)
-                .ConfigureConsoleAndFileSinks<Program>(OutputTemplates.Web));
+                .ConfigureSinks<Program>(writeToFile: builder.Environment.IsDevelopment(), OutputTemplates.Web));
 
             // Add services to the container.
             builder.Services.AddRazorComponents()

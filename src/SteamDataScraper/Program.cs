@@ -19,7 +19,7 @@ internal class Program
     static async Task Main(string[] args)
     {
         Log.Logger = new LoggerConfiguration()
-            .ConfigureConsoleAndFileSinks(nameof(SteamDataScraper))
+            .ConfigureBootstrapLogger()
             .CreateBootstrapLogger();
 
         try
@@ -46,7 +46,7 @@ internal class Program
             {
                 services.AddSerilog(loggerConfig => loggerConfig
                     .ReadFrom.Configuration(context.Configuration)
-                    .ConfigureConsoleAndFileSinks(nameof(SteamDataScraper)));
+                    .ConfigureSinks<Program>(writeToFile: context.HostingEnvironment.IsDevelopment()));
 
                 services.AddSteamWebApi("SteamWebApi");
 
