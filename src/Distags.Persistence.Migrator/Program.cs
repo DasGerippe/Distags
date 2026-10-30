@@ -1,7 +1,6 @@
 using ConfigUtils;
 using Distags.Core;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using System.Runtime.CompilerServices;
@@ -14,32 +13,19 @@ internal class Program
     {
         try
         {
-            IHostBuilder builder = Host.CreateDefaultBuilder(args);
+            HostApplicationBuilder hostBuilder = Host.CreateApplicationBuilder(args);
 
-            builder.ConfigureAppConfiguration((context, configBuilder) =>
-            {
-                IHostEnvironment environment = context.HostingEnvironment;
+            hostBuilder.Configuration.AddDockerSecrets();
+            hostBuilder.Configuration.ReplaceConnectionStringPassword("DistagsDatabase");
 
-                configBuilder.AddJsonFile("appsettings.json", optional: true);
-                configBuilder.AddJsonFile($"appsettings.{environment.EnvironmentName}.json", optional: true);
+            string connectionString = hostBuilder.Configuration.GetRequiredConnectionString("DistagsDatabase");
+            string migrationsAssemblyName = hostBuilder.Configuration.GetRequiredValue("MigrationsAssemblyName");
+            hostBuilder.Services.AddDistagsPersistence(
+                connectionString,
+                npgsqlOptionsAction: npgsqlOptions => npgsqlOptions.MigrationsAssembly(migrationsAssemblyName));
+            hostBuilder.Services.AddDistagsCore();
 
-                if (environment.IsDevelopment())
-                    configBuilder.AddUserSecrets<Program>();
-
-                configBuilder.AddEnvironmentVariables();
-                configBuilder.AddKeyPerFile("/run/secrets", optional: true);
-            });
-
-            builder.ConfigureServices((context, services) =>
-            {
-                string connectionString = context.Configuration.GetRequiredConnectionString("DistagsDatabase");
-                string migrationsAssemblyName = context.Configuration.GetRequiredValue("MigrationsAssemblyName");
-                services.AddDistagsPersistence(
-                    connectionString,
-                    npgsqlOptionsAction: npgsqlOptions => npgsqlOptions.MigrationsAssembly(migrationsAssemblyName));
-                services.AddDistagsCore();
-            });
-            IHost host = builder.Build();
+            IHost host = hostBuilder.Build();
 
             AsyncServiceScope scope = host.Services.CreateAsyncScope();
             await using ConfiguredAsyncDisposable awaitedScope = scope.ConfigureAwait(false);

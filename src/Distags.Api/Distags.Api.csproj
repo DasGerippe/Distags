@@ -23,6 +23,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\AutoTaggerWorker\AutoTaggerWorker.csproj" />
+    <ProjectReference Include="..\ConfigUtils\ConfigUtils.csproj" />
     <ProjectReference Include="..\Distags.Api.Contracts\Distags.Api.Contracts.csproj" />
     <ProjectReference Include="..\Distags.Contracts\Distags.Contracts.csproj" />
     <ProjectReference Include="..\Distags.Core\Distags.Core.csproj" />

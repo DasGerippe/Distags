@@ -1,4 +1,5 @@
 using AutoTaggerWorker;
+using ConfigUtils;
 using Distags.Api.Caching;
 using Distags.Api.Contracts;
 using Distags.Api.Hubs;
@@ -28,8 +29,10 @@ public class Program
         {
             WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
-            builder.Configuration.AddKeyPerFile("/run/secrets", optional: true);
+            builder.Configuration.AddDockerSecrets();
+            builder.Configuration.ReplaceConnectionStringPassword("DistagsDatabase");
 
+            builder.Logging.ClearProviders();
             builder.Services.AddSerilog(loggerConfig => loggerConfig
                 .ReadFrom.Configuration(builder.Configuration)
                 .ConfigureSinks<Program>(writeToFile: builder.Environment.IsDevelopment(), OutputTemplates.Web));
@@ -46,9 +49,7 @@ public class Program
 
             builder.Services.AddSignalR();
 
-            string distagsDbConnectionString = builder.Configuration.GetConnectionString("DistagsDatabase") ??
-                                               throw new InvalidOperationException("Connection string not configured.");
-            builder.Services.AddDistagsPersistence(distagsDbConnectionString);
+            builder.Services.AddDistagsPersistence(builder.Configuration.GetRequiredConnectionString("DistagsDatabase"));
             builder.Services.AddDistagsCore();
 
             builder.Services.AddSteamWebApi("SteamWebApi");
