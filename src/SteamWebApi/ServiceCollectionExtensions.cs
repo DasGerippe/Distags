@@ -1,5 +1,5 @@
+using AppHostUtils;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Options;
 using SteamWebApi.ApiInterfaces;
 using SteamWebApi.DelegatingHandlers;
 
@@ -11,9 +11,9 @@ public static class ServiceCollectionExtensions
 
     public static IServiceCollection AddSteamWebApi(this IServiceCollection services, string configSectionPath)
     {
-        AddValidatedConfigOptions<SteamWebApiSettings>(services, configSectionPath);
-        AddValidatedConfigOptions<RetrySettings>(services, $"{configSectionPath}:{nameof(RetrySettings)}");
-        AddValidatedConfigOptions<RateLimitSettings>(services, $"{configSectionPath}:{nameof(RateLimitSettings)}");
+        services.AddValidatedConfigOptions<SteamWebApiSettings>(configSectionPath);
+        services.AddValidatedConfigOptions<RetrySettings>($"{configSectionPath}:{nameof(RetrySettings)}");
+        services.AddValidatedConfigOptions<RateLimitSettings>($"{configSectionPath}:{nameof(RateLimitSettings)}");
 
         services.AddTransient<RetryHandler>();
         services.AddTransient<RateLimitHandler>();
@@ -29,17 +29,5 @@ public static class ServiceCollectionExtensions
         services.AddTransient<ISteamUser, SteamUser>();
 
         return services;
-    }
-
-    private static void AddValidatedConfigOptions<TOptions>(IServiceCollection services, string configSectionPath)
-        where TOptions : class
-    {
-        services
-            .AddOptions<TOptions>()
-            .BindConfiguration(configSectionPath)
-            .ValidateDataAnnotations()
-            .ValidateOnStart();
-
-        services.AddTransient<TOptions>(services => services.GetRequiredService<IOptions<TOptions>>().Value);
     }
 }

@@ -9,7 +9,6 @@ using Distags.Core.Events;
 using Distags.Persistence;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Diagnostics;
-using Microsoft.Extensions.Options;
 using Serilog;
 using SerilogUtils;
 using SteamWebApi;
@@ -54,7 +53,7 @@ public class Program
 
             builder.Services.AddSteamWebApi("SteamWebApi");
 
-            AddValidatedConfigOptions<DistagsApiSettings>(builder, "DistagsApiSettings");
+            builder.Services.AddValidatedConfigOptions<DistagsApiSettings>("DistagsApiSettings");
 
             builder.Services.AddSingleton<ITicketStore<long>, ConcurrentTicketStore<long>>();
             builder.Services.AddTransient<ITokenGenerator, RandomBase64UrlTokenGenerator>();
@@ -100,18 +99,6 @@ public class Program
         {
             Log.CloseAndFlush();
         }
-    }
-
-    private static void AddValidatedConfigOptions<TOptions>(WebApplicationBuilder builder, string configSectionPath)
-        where TOptions : class
-    {
-        builder.Services
-            .AddOptions<TOptions>()
-            .BindConfiguration(configSectionPath)
-            .ValidateDataAnnotations()
-            .ValidateOnStart();
-
-        builder.Services.AddTransient<TOptions>(services => services.GetRequiredService<IOptions<TOptions>>().Value);
     }
 
     private static void AddAuthentication(WebApplicationBuilder builder)
