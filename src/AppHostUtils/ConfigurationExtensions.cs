@@ -1,7 +1,7 @@
 using Microsoft.Extensions.Configuration;
 using System.Data.Common;
 
-namespace ConfigUtils;
+namespace AppHostUtils;
 
 public static class ConfigurationExtensions
 {

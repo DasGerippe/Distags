@@ -1,5 +1,5 @@
+using AppHostUtils;
 using AutoTaggerWorker;
-using ConfigUtils;
 using Distags.Api.Caching;
 using Distags.Api.Contracts;
 using Distags.Api.Hubs;

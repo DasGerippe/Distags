@@ -14,7 +14,7 @@
     <Project Path="src/Mod.OfficialLevelExport/Mod.OfficialLevelExport.csproj" Id="521ae58a-10ce-4646-818f-90dcab8708f4" />
   </Folder>
   <Folder Name="/Utils/">
-    <Project Path="src/ConfigUtils/ConfigUtils.csproj" />
+    <Project Path="src/AppHostUtils/AppHostUtils.csproj" />
     <Project Path="src/HttpUtils/HttpUtils.csproj" />
     <Project Path="src/SerilogUtils/SerilogUtils.csproj" />
   </Folder>

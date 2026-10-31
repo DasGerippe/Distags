@@ -1,4 +1,4 @@
-namespace ConfigUtils;
+namespace AppHostUtils;
 
 public class ConfigurationMissingException : Exception
 {

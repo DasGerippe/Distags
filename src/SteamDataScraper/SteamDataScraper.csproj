@@ -16,7 +16,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\ConfigUtils\ConfigUtils.csproj" />
+    <ProjectReference Include="..\AppHostUtils\AppHostUtils.csproj" />
     <ProjectReference Include="..\Distags.Core\Distags.Core.csproj" />
     <ProjectReference Include="..\Distags.Persistence\Distags.Persistence.csproj" />
     <ProjectReference Include="..\SerilogUtils\SerilogUtils.csproj" />

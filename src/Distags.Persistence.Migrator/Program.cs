@@ -1,4 +1,4 @@
-using ConfigUtils;
+using AppHostUtils;
 using Distags.Core;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;

@@ -1,6 +1,6 @@
+using AppHostUtils;
 using AutoTagging;
 using AutoTagging.Abstractions;
-using ConfigUtils;
 using Distags.Core;
 using Distags.Persistence;
 using Microsoft.Extensions.DependencyInjection;

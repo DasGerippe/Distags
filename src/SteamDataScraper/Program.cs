@@ -1,4 +1,4 @@
-using ConfigUtils;
+using AppHostUtils;
 using Distags.Core;
 using Distags.Persistence;
 using Microsoft.Extensions.DependencyInjection;

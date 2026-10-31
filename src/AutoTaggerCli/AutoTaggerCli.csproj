@@ -22,7 +22,7 @@
     <ProjectReference Include="..\AutoTagging.MaxterCsvImporter\AutoTagging.MaxterCsvImporter.csproj" />
     <ProjectReference Include="..\AutoTagging.MissingLevel\AutoTagging.MissingLevel.csproj" />
     <ProjectReference Include="..\AutoTagging\AutoTagging.csproj" />
-    <ProjectReference Include="..\ConfigUtils\ConfigUtils.csproj" />
+    <ProjectReference Include="..\AppHostUtils\AppHostUtils.csproj" />
     <ProjectReference Include="..\Distags.Contracts\Distags.Contracts.csproj" />
     <ProjectReference Include="..\Distags.Core\Distags.Core.csproj" />
     <ProjectReference Include="..\Distags.Persistence\Distags.Persistence.csproj" />
