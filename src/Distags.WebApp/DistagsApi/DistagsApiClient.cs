@@ -21,25 +21,25 @@ namespace Distags.WebApp.DistagsApi;
 public class DistagsApiClient : IDisposable
 {
     private readonly HttpClient _HttpClient;
-    private readonly JsonSerializerOptions _JsonOptions;
+    private readonly DistagsWebAppSettings _WebAppSettings;
     private readonly ISessionTokenProvider _SessionTokenProvider;
+    private readonly JsonSerializerOptions _JsonOptions;
 
     public Uri LevelHubEndpoint { get; }
 
     public Uri ContributionHubEndpoint { get; }
 
-    public DistagsApiClient(HttpClient httpClient, ISessionTokenProvider sessionTokenProvider)
+    public DistagsApiClient(HttpClient httpClient, DistagsWebAppSettings webAppSettings, ISessionTokenProvider sessionTokenProvider)
     {
         _HttpClient = httpClient;
+        _WebAppSettings = webAppSettings;
         _SessionTokenProvider = sessionTokenProvider;
 
         _JsonOptions = new JsonSerializerOptions(JsonSerializerOptions.Web);
         _JsonOptions.Converters.Add(new PatchValueConverterFactory());
         _JsonOptions.DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull;
 
-        if (_HttpClient.BaseAddress == null)
-            throw new ArgumentException("BaseAddress of HttpClient not set.", nameof(httpClient));
-
+        _HttpClient.BaseAddress = new Uri(webAppSettings.DistagsApiUrlInternal);
         LevelHubEndpoint = new Uri(_HttpClient.BaseAddress, "hubs/levels");
         ContributionHubEndpoint = new Uri(_HttpClient.BaseAddress, "hubs/contributions");
 
@@ -125,10 +125,7 @@ public class DistagsApiClient : IDisposable
 
     public string GetSteamLoginEndpoint(string? returnUrl = null)
     {
-        if (_HttpClient.BaseAddress == null)
-            throw new InvalidOperationException("BaseAddress of HttpClient not set.");
-
-        UriBuilder uriBuilder = new UriBuilder(_HttpClient.BaseAddress);
+        UriBuilder uriBuilder = new UriBuilder(_WebAppSettings.DistagsApiUrlExternal);
         uriBuilder.Path = "authentication/steam-login";
         if (!string.IsNullOrEmpty(returnUrl))
             uriBuilder.Query = $"returnUrl={returnUrl}";

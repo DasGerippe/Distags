@@ -1,3 +1,4 @@
+using AppHostUtils;
 using Distags.WebApp.Components;
 using Distags.WebApp.DistagsApi;
 using Distags.WebApp.Security;
@@ -20,20 +21,17 @@ public class Program
         {
             WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
+            builder.Services.AddValidatedConfigOptions<DistagsWebAppSettings>("Distags:WebApp");
+
             builder.Logging.ClearProviders();
             builder.Services.AddSerilog(loggerConfig => loggerConfig
                 .ReadFrom.Configuration(builder.Configuration)
                 .ConfigureSinks<Program>(writeToFile: builder.Environment.IsDevelopment(), OutputTemplates.Web));
 
-            // Add services to the container.
             builder.Services.AddRazorComponents()
                 .AddInteractiveServerComponents();
 
-            builder.Services.AddHttpClient<DistagsApiClient>(httpClient =>
-            {
-                string distagsApiUri = builder.Configuration["DistagsWebApp:DistagsApiUri"]!;
-                httpClient.BaseAddress = new Uri(distagsApiUri);
-            });
+            builder.Services.AddHttpClient<DistagsApiClient>();
 
             builder.Services.AddLocalization();
             builder.Services.AddHttpContextAccessor();
@@ -51,7 +49,6 @@ public class Program
 
             WebApplication app = builder.Build();
 
-            // Configure the HTTP request pipeline.
             if (!app.Environment.IsDevelopment())
             {
                 app.UseExceptionHandler("/Error");

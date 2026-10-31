@@ -53,7 +53,7 @@ public class Program
 
             builder.Services.AddSteamWebApi("SteamWebApi");
 
-            builder.Services.AddValidatedConfigOptions<DistagsApiSettings>("DistagsApiSettings");
+            builder.Services.AddValidatedConfigOptions<DistagsApiSettings>("Distags:Api");
 
             builder.Services.AddSingleton<ITicketStore<long>, ConcurrentTicketStore<long>>();
             builder.Services.AddTransient<ITokenGenerator, RandomBase64UrlTokenGenerator>();
