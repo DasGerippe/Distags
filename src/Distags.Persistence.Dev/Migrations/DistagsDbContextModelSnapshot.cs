@@ -282,7 +282,7 @@ namespace Distags.Persistence.Dev
                         .HasColumnName("key");
 
                     b.Property<string>("Value")
-                        .HasColumnType("text")
+                        .HasColumnType("jsonb")
                         .HasColumnName("value");
 
                     b.HasKey("Key")

@@ -1,11 +1,10 @@
 using Distags.Core.Entities;
 using Microsoft.EntityFrameworkCore;
-using System.Globalization;
+using System.Text.Json;
 
 namespace Distags.Core.Management;
 
 public abstract class SettingManager<TValue>
-    where TValue : struct, IParsable<TValue>
 {
     private readonly DistagsDbContext _DbContext;
 
@@ -27,17 +26,18 @@ public abstract class SettingManager<TValue>
             _DbContext.Add(setting);
         }
 
-        setting.Value = Convert.ToString(value, CultureInfo.InvariantCulture);
+        setting.Value = JsonSerializer.Serialize(value);
 
         await _DbContext.SaveChangesAsync().ConfigureAwait(false);
     }
 
-    public virtual async Task<TValue> GetSettingValueAsync()
+    public virtual async Task<TValue?> GetSettingValueAsync()
     {
         Setting? setting = await LoadSetting().ConfigureAwait(false);
-        if (setting == null || !TValue.TryParse(setting.Value, CultureInfo.InvariantCulture, out TValue value))
+        if (setting == null)
             return DefaultValue;
 
+        TValue? value = setting.Value == null ? default : JsonSerializer.Deserialize<TValue>(setting.Value);
         return value;
     }
 
