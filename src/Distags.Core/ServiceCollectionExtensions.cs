@@ -36,7 +36,10 @@ public static class ServiceCollectionExtensions
 
         services.AddScoped<FallbackTagProvider>();
 
-        services.AddTransient<MaintenanceManager>();
+        services.Scan(scan => scan
+            .FromAssemblies(typeof(ServiceCollectionExtensions).Assembly)
+            .AddClasses(classes => classes.AssignableTo(typeof(SettingManager<>)))
+            .AsSelf());
 
         services.AddTransient<IQueryableFilterFactory<Contribution, ContributionFilterParameters>, ContributionFilterFactory>();
         services.AddTransient<IQueryableFilterFactory<Level, LevelFilterParameters>, LevelFilterFactory>();
