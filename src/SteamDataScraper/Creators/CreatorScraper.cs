@@ -41,40 +41,47 @@ public class CreatorScraper
     {
         _Logger.LogDebug("Scraping level creators from Steam web API...");
 
-        List<long> creatorIds = await GetCreatorIdsForScrapingAsync(cancellationToken).ConfigureAwait(false);
-        List<ScrapedCreator> scrapedCreators = await ScrapeLevelCreatorsAsync(creatorIds, cancellationToken).ConfigureAwait(false);
-
-        ImportCreatorsCommand importCreatorsCommand = new ImportCreatorsCommand { ScrapedCreators = scrapedCreators };
-        await _RequestDispatcher.DispatchAsync(importCreatorsCommand).ConfigureAwait(false);
-
-        await _RefreshDateManager.SetRefreshDateAsync(DateTimeOffset.UtcNow, cancellationToken).ConfigureAwait(false);
+        await ScrapeUnknownLevelCreatorsAsync(cancellationToken).ConfigureAwait(false);
+        await ScrapeStaleLevelCreatorsAsync(cancellationToken).ConfigureAwait(false);
 
         _Logger.LogDebug("Scraped level creators from Steam web API.");
     }
 
-    private async Task<List<long>> GetCreatorIdsForScrapingAsync(CancellationToken cancellationToken)
+    private async Task ScrapeUnknownLevelCreatorsAsync(CancellationToken cancellationToken = default)
     {
-        _Logger.LogDebug("Determining IDs of creators to be scraped...");
+        List<long> unknownCreatorIds = await _RequestDispatcher.DispatchAsync(new UnknownCreatorsQuery()).ConfigureAwait(false);
 
-        List<long> creatorIds = await _RequestDispatcher.DispatchAsync(new UnknownCreatorsQuery()).ConfigureAwait(false);
+        _Logger.LogDebug("Scraping {count} unknown level creators...", unknownCreatorIds.Count);
 
+        List<ScrapedCreator> scrapedCreators = await ScrapeLevelCreatorsAsync(unknownCreatorIds, cancellationToken).ConfigureAwait(false);
+        await ImportLevelCreatorsAsync(scrapedCreators, cancellationToken);
+    }
+
+    private async Task ScrapeStaleLevelCreatorsAsync(CancellationToken cancellationToken = default)
+    {
         int refreshCount = await _RefreshCountCalculator.CalculateCreatorRefreshCountAsync(cancellationToken).ConfigureAwait(false);
-        if (refreshCount > 0)
-        {
-            StalestCreatorsQuery stalestCreatorsQuery = new StalestCreatorsQuery { Limit = refreshCount };
-            List<long> stalestCreatorIds = await _RequestDispatcher.DispatchAsync(stalestCreatorsQuery).ConfigureAwait(false);
-            creatorIds.AddRange(stalestCreatorIds);
-        }
+        if (refreshCount <= 0)
+            return;
 
-        _Logger.LogDebug("Got {count} creator IDs for scraping.", creatorIds.Count);
+        StalestCreatorsQuery stalestCreatorsQuery = new StalestCreatorsQuery { Limit = refreshCount };
+        List<long> stalestCreatorIds = await _RequestDispatcher.DispatchAsync(stalestCreatorsQuery).ConfigureAwait(false);
 
-        return creatorIds;
+        _Logger.LogDebug("Scraping {count} stalest level creators...", stalestCreatorIds.Count);
+
+        List<ScrapedCreator> scrapedCreators = await ScrapeLevelCreatorsAsync(stalestCreatorIds, cancellationToken).ConfigureAwait(false);
+        await ImportLevelCreatorsAsync(scrapedCreators, cancellationToken);
+
+        await _RefreshDateManager.SetRefreshDateAsync(DateTimeOffset.UtcNow, cancellationToken).ConfigureAwait(false);
     }
 
     private async Task<List<ScrapedCreator>> ScrapeLevelCreatorsAsync(
         IEnumerable<long> creatorIds, CancellationToken cancellationToken = default)
     {
-        GetPlayerSummariesParameters parameters = CreateParameters(creatorIds);
+        GetPlayerSummariesParameters parameters = new GetPlayerSummariesParameters
+        {
+            Key = _SteamWebApiKey,
+            SteamIds = creatorIds,
+        };
         IAsyncEnumerable<PlayerSummary> playerSummariesQuery = _SteamUser.GetPlayerSummariesAsync(parameters, cancellationToken);
 
         List<ScrapedCreator> scrapedCreators = [];
@@ -89,13 +96,13 @@ public class CreatorScraper
         return scrapedCreators;
     }
 
-    private GetPlayerSummariesParameters CreateParameters(IEnumerable<long> creatorIds)
+    private async Task ImportLevelCreatorsAsync(List<ScrapedCreator> scrapedCreators, CancellationToken cancellationToken = default)
     {
-        return new GetPlayerSummariesParameters
+        ImportCreatorsCommand command = new ImportCreatorsCommand
         {
-            Key = _SteamWebApiKey,
-            SteamIds = creatorIds,
+            ScrapedCreators = scrapedCreators,
         };
+        await _RequestDispatcher.DispatchAsync(command);
     }
 
     private ScrapedCreator ToScrapedCreator(PlayerSummary playerSummary)

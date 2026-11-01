@@ -64,7 +64,7 @@ internal class Program
                 services.AddTransient<Program>();
                 services.AddTransient<LevelScraper>();
                 services.AddTransient<CreatorScraper>();
-                services.AddTransient<ICreatorRefreshDateManager, CreatorRefreshDateFileManager>();
+                services.AddTransient<ICreatorRefreshDateManager, CreatorRefreshDateDatabaseManager>();
                 services.AddTransient<ICreatorRefreshCountCalculator, CreatorRefreshCountCalculator>();
             });
 

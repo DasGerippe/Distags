@@ -113,6 +113,10 @@ public class DistagsDbContext : Distags.Core.DistagsDbContext
     {
         modelBuilder.Entity<Setting>()
             .HasKey(setting => setting.Key);
+
+        modelBuilder.Entity<Setting>()
+            .Property(setting => setting.Value)
+            .HasColumnType("jsonb");
     }
 
     private void ConfigureTagEntity(ModelBuilder modelBuilder)
