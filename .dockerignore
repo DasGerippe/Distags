@@ -3,6 +3,7 @@
 **/.dockerignore
 **/.editorconfig
 **/.env
+**/.env.example
 **/.git
 **/.gitattributes
 **/.gitignore
