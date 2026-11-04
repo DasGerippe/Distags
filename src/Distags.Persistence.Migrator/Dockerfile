@@ -13,7 +13,7 @@ ARG BUILD_CONFIGURATION=Release
 ARG TARGETARCH
 WORKDIR /app
 
-COPY Distags.slnx ./
+COPY Directory.Build.props ./
 COPY src/ src/
 
 RUN --mount=type=cache,id=nuget,target=/root/.nuget/packages \
