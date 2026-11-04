@@ -1,0 +1,184 @@
+name: distags
+
+x-logging: &logging
+  driver: local
+
+x-dotnet-env: &dotnet-env
+  DOTNET_ENVIRONMENT: Production
+  ASPNETCORE_ENVIRONMENT: Production
+
+services:
+  # Caddy - Reverse Proxy
+  caddy:
+    image: caddy:2
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+      - "443:443/udp" # HTTP/3
+    environment:
+      ACME_EMAIL: ${ACME_EMAIL}
+      DISTAGS_API_HOST: ${DISTAGS_API_HOST}
+      DISTAGS_WEBAPP_HOST: ${DISTAGS_WEBAPP_HOST}
+    volumes:
+      - ./infra/caddy:/etc/caddy:ro
+      - caddy-data:/data
+      - caddy-config:/config
+    networks: [frontend]
+    depends_on:
+      - api
+      - webapp
+    logging: *logging
+
+  # Postgres Database
+  postgres:
+    image: postgres:18
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: distags
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD_FILE: /run/secrets/db_superuser_password
+    volumes:
+      - pgdata:/var/lib/postgresql
+      - ./infra/database/init:/docker-entrypoint-initdb.d:ro
+      - ./infra/database/sql:/opt/distags/sql:ro
+    secrets:
+      - db_superuser_password
+      - db_distags_admin_password
+      - db_distags_app_password
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      start_period: 30s
+      start_interval: 3s
+      interval: 30s
+      timeout: 10s
+      retries: 5
+    networks: [backend]
+    logging: *logging
+
+  # Postgres Database Backup
+  postgres-backup:
+    image: prodrigestivill/postgres-backup-local:18
+    restart: unless-stopped
+    environment:
+      POSTGRES_HOST: postgres
+      POSTGRES_DB: distags
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD_FILE: /run/secrets/db_superuser_password
+      SCHEDULE: "@daily"
+      TZ: Europe/Berlin
+      BACKUP_KEEP_DAYS: 7
+      BACKUP_KEEP_WEEKS: 4
+      BACKUP_KEEP_MONTHS: 6
+    volumes:
+      - db_backups:/backups
+    secrets:
+      - db_superuser_password
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks: [backend]
+    logging: *logging
+
+  # Database Migrator
+  migrator:
+    build:
+      context: .
+      dockerfile: ./src/Distags.Persistence.Migrator/Dockerfile
+    image: distags-migrator:${DISTAGS_VERSION:?error}
+    restart: no
+    environment:
+      <<: *dotnet-env
+      ConnectionStrings__DistagsDatabase: Host=postgres;Port=5432;Database=distags;Username=distags_admin
+    secrets:
+      - source: db_distags_admin_password
+        target: Database__DistagsDatabase__Password
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks: [backend]
+    logging: *logging
+
+  # Distags API
+  api:
+    build:
+      context: .
+      dockerfile: ./src/Distags.Api/Dockerfile
+    image: distags-api:${DISTAGS_VERSION:?error}
+    restart: unless-stopped
+    environment:
+      <<: *dotnet-env
+      ConnectionStrings__DistagsDatabase: Host=postgres;Port=5432;Database=distags;Username=distags_app
+      Distags__Core__AdministratorSteamIds__0: ${Distags__Core__AdministratorSteamIds__0}
+    secrets:
+      - source: db_distags_app_password
+        target: Database__DistagsDatabase__Password
+      - source: steam_api_key
+        target: SteamWebApi__ApiKey
+    depends_on:
+      postgres:
+        condition: service_healthy
+      migrator:
+        condition: service_completed_successfully
+    networks: [frontend, backend]
+    logging: *logging
+
+  # Distags Blazor Server Web App
+  webapp:
+    build:
+      context: .
+      dockerfile: ./src/Distags.WebApp/Dockerfile
+    image: distags-webapp:${DISTAGS_VERSION:?error}
+    restart: unless-stopped
+    environment:
+      <<: *dotnet-env
+      Distags__WebApp__DistagsApiUrlInternal: ${Distags__WebApp__DistagsApiUrlInternal}
+      Distags__WebApp__DistagsApiUrlExternal: ${Distags__WebApp__DistagsApiUrlExternal}
+    depends_on:
+      api:
+        condition: service_started
+    networks: [frontend]
+    logging: *logging
+
+  # Distags Steam Data Scraper
+  steam-data-scraper:
+    build:
+      context: .
+      dockerfile: ./src/SteamDataScraper/Dockerfile
+    image: distags-steam-data-scraper:${DISTAGS_VERSION:?error}
+    restart: no
+    profiles: [jobs]
+    environment:
+      <<: *dotnet-env
+      ConnectionStrings__DistagsDatabase: Host=postgres;Port=5432;Database=distags;Username=distags_app
+    secrets:
+      - source: steam_api_key
+        target: SteamWebApi__ApiKey
+      - source: db_distags_app_password
+        target: Database__DistagsDatabase__Password
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks: [frontend, backend]
+    logging: *logging
+
+networks:
+  frontend:
+  backend:
+    internal: true
+
+volumes:
+  pgdata:
+  db_backups:
+  caddy-data:
+  caddy-config:
+
+secrets:
+  db_superuser_password:
+    file: ./infra/secrets/database_superuser_password.txt
+  db_distags_admin_password:
+    file: ./infra/secrets/database_distags_admin_password.txt
+  db_distags_app_password:
+    file: ./infra/secrets/database_distags_app_password.txt
+  steam_api_key:
+    file: ./infra/secrets/steam_api_key.txt
