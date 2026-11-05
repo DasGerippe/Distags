@@ -22,7 +22,7 @@
   <Project Path="src/Distags.Api/Distags.Api.csproj" />
   <Project Path="src/Distags.Contracts/Distags.Contracts.csproj" />
   <Project Path="src/Distags.Core/Distags.Core.csproj" />
-  <Project Path="src/Distags.Persistence.Dev/Distags.Persistence.Dev.csproj" />
+  <Project Path="src/Distags.Persistence.Migrations/Distags.Persistence.Migrations.csproj" />
   <Project Path="src/Distags.Persistence.Migrator/Distags.Persistence.Migrator.csproj" />
   <Project Path="src/Distags.Persistence/Distags.Persistence.csproj" />
   <Project Path="src/Distags.WebApp/Distags.WebApp.csproj" />

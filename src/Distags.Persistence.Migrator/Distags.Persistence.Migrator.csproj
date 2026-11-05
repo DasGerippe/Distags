@@ -18,7 +18,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\AppHostUtils\AppHostUtils.csproj" />
-    <ProjectReference Include="..\Distags.Persistence.Dev\Distags.Persistence.Dev.csproj" />
+    <ProjectReference Include="..\Distags.Persistence.Migrations\Distags.Persistence.Migrations.csproj" />
     <ProjectReference Include="..\Distags.Persistence\Distags.Persistence.csproj" />
   </ItemGroup>
 
