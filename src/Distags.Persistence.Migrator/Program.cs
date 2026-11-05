@@ -37,11 +37,7 @@ internal class Program
             Console.WriteLine("Done!");
             return 0;
         }
-        catch (OperationCanceledException)
-        {
-            return 2;
-        }
-        catch (Exception ex)
+        catch (Exception ex) when (ex is not HostAbortedException)
         {
             Console.Error.WriteLine(ex);
             return 1;
