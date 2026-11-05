@@ -19,10 +19,10 @@ internal class Program
             hostBuilder.Configuration.ReplaceConnectionStringPassword("DistagsDatabase");
 
             string connectionString = hostBuilder.Configuration.GetRequiredConnectionString("DistagsDatabase");
-            string migrationsAssemblyName = hostBuilder.Configuration.GetRequiredValue("MigrationsAssemblyName");
             hostBuilder.Services.AddDistagsPersistence(
                 connectionString,
-                npgsqlOptionsAction: npgsqlOptions => npgsqlOptions.MigrationsAssembly(migrationsAssemblyName));
+                npgsqlOptionsAction: npgsqlOptions =>
+                    npgsqlOptions.MigrationsAssembly($"{nameof(Distags)}.{nameof(Persistence)}.{nameof(Migrations)}"));
             hostBuilder.Services.AddDistagsCore();
 
             IHost host = hostBuilder.Build();
