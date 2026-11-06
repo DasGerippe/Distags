@@ -18,3 +18,6 @@ indent_size = 2
 
 [*.{cs,vb}]
 dotnet_sort_system_directives_first = false
+
+[*.{sh,bash}]
+end_of_line = lf
