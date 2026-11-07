@@ -29,15 +29,27 @@
             @foreach (DisplayGroupWithTags tagGroup in _TagTree)
             {
                 <TagGroupColumnCard Title="@tagGroup.DisplayGroup.DisplayName">
-                    @foreach (TagResponse tag in tagGroup.Tags)
-                    {
-                        TagFilter tagFilter = _TagFilters[tag.Name];
-                        <IconCheckbox TState="TagFilterState"
-                                      Label="@tag.DisplayName"
-                                      Logic="GetCheckboxLogic(tagGroup.AllTagsExclusive)"
-                                      IconProvider="_TagFilterStateIconProvider"
-                                      State="tagFilter.State"
-                                      StateChanged="newState => OnTagFilterStateChanged(tagFilter, newState)" />
+                    @{
+                        bool isFirst = true;
+                        string? previousLogicGroupName = null;
+                        foreach (TagResponse tag in tagGroup.Tags)
+                        {
+                            if (!isFirst && tag.LogicGroupName != previousLogicGroupName)
+                            {
+                                <div class="my-2"></div>
+                            }
+
+                            TagFilter tagFilter = _TagFilters[tag.Name];
+                            <IconCheckbox TState="TagFilterState"
+                                          Label="@tag.DisplayName"
+                                          Logic="GetCheckboxLogic(tagGroup.AllTagsExclusive)"
+                                          IconProvider="_TagFilterStateIconProvider"
+                                          State="tagFilter.State"
+                                          StateChanged="newState => OnTagFilterStateChanged(tagFilter, newState)"/>
+
+                            previousLogicGroupName = tag.LogicGroupName;
+                            isFirst = false;
+                        }
                     }
                 </TagGroupColumnCard>
             }
