@@ -88,7 +88,7 @@ discoverables;Discoverables;gimmicks;gimmicks;False;False;False;Secrets, Easter 
 readability-unspecified;Unspecified;readability;readability;True;True;False;Readability has not been specified yet.
 very-readable;Very Readable;readability;readability;True;False;False;Very clear where to go and what to do.
 mostly-readable;Mostly Readable;readability;readability;True;False;False;Not sure where/how to land after a jump. Obstacles that need quick reactions.
-poorly-readable;Poorly Readable;readability;readability;True;False;False;Not sure where the next section is. Obstacles that are hard to react to.
+somewhat-readable;Somewhat Readable;readability;readability;True;False;False;Not sure where the next section is. Obstacles that are hard to react to.
 unreadable;Unreadable;readability;readability;True;False;False;Where am I? Where is the road? Where is anything? Where did that obstacle come from?
 theme-unspecified;Unspecified;theme;theme;True;True;False;Themes have not been specified yet.
 theme-other;Other;theme;theme;False;False;False;Theme that can't be described by any of the other tags.
