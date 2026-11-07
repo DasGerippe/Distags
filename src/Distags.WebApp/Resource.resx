@@ -163,7 +163,7 @@
     <value>Please log in with your Steam account to add or remove tags.</value>
   </data>
   <data name="ContributionPrerequisiteGuidelinesText" xml:space="preserve">
-    <value>Please accept the contribution guidelines to add or remove tags.</value>
+    <value>Please accept the contribution guidelines in your settings to add or remove tags.</value>
   </data>
   <data name="Setting_ContributionGuidelines_Title" xml:space="preserve">
     <value>Contribution Guidelines</value>
