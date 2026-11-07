@@ -172,7 +172,7 @@
     <value>Accept Contribution Guidelines</value>
   </data>
   <data name="Setting_ContributionGuidelines_Accepted" xml:space="preserve">
-    <value>You already agreed to our contribution guidelines.</value>
+    <value>You agreed to our contribution guidelines.</value>
   </data>
   <data name="Setting_Anonymous_Title" xml:space="preserve">
     <value>Anonymous Contributions</value>

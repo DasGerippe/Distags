@@ -561,7 +561,7 @@ namespace Distags.WebApp {
         }
         
         /// <summary>
-        ///   Sucht eine lokalisierte Zeichenfolge, die You already agreed to our contribution guidelines. ähnelt.
+        ///   Sucht eine lokalisierte Zeichenfolge, die You agreed to our contribution guidelines. ähnelt.
         /// </summary>
         internal static string Setting_ContributionGuidelines_Accepted {
             get {
