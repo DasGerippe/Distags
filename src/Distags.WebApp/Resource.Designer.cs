@@ -106,7 +106,7 @@ namespace Distags.WebApp {
         }
         
         /// <summary>
-        ///   Sucht eine lokalisierte Zeichenfolge, die Please accept the contribution guidelines to add or remove tags. ähnelt.
+        ///   Sucht eine lokalisierte Zeichenfolge, die Please accept the contribution guidelines in your settings to add or remove tags. ähnelt.
         /// </summary>
         internal static string ContributionPrerequisiteGuidelinesText {
             get {
@@ -561,7 +561,7 @@ namespace Distags.WebApp {
         }
         
         /// <summary>
-        ///   Sucht eine lokalisierte Zeichenfolge, die You already agreed to our contribution guidelines. ähnelt.
+        ///   Sucht eine lokalisierte Zeichenfolge, die You agreed to our contribution guidelines. ähnelt.
         /// </summary>
         internal static string Setting_ContributionGuidelines_Accepted {
             get {
