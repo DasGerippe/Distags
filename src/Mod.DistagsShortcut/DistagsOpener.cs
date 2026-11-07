@@ -50,13 +50,13 @@ namespace DistagsShortcut
 
         public void OpenDistagsOfficialLevel(string levelSlug)
         {
-            string levelPath = $"{DistagsUrl}/level/official/{levelSlug}";
+            string levelPath = $"/level/official/{levelSlug}";
             OpenDistags(levelPath);
         }
 
         public void OpenDistagsWorkshopLevel(long levelWorkshopId)
         {
-            string levelPath = $"{DistagsUrl}/level/workshop/{levelWorkshopId}";
+            string levelPath = $"/level/workshop/{levelWorkshopId}";
             OpenDistags(levelPath);
         }
 
