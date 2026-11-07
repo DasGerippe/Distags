@@ -14,6 +14,7 @@
     <Project Path="src/Mod.OfficialLevelExport/Mod.OfficialLevelExport.csproj" Id="521ae58a-10ce-4646-818f-90dcab8708f4" />
   </Folder>
   <Folder Name="/Utils/">
+    <Project Path="src/AppHostUtils/AppHostUtils.csproj" />
     <Project Path="src/HttpUtils/HttpUtils.csproj" />
     <Project Path="src/SerilogUtils/SerilogUtils.csproj" />
   </Folder>
@@ -21,12 +22,11 @@
   <Project Path="src/Distags.Api/Distags.Api.csproj" />
   <Project Path="src/Distags.Contracts/Distags.Contracts.csproj" />
   <Project Path="src/Distags.Core/Distags.Core.csproj" />
-  <Project Path="src/Distags.Persistence.Dev/Distags.Persistence.Dev.csproj" />
+  <Project Path="src/Distags.Persistence.Migrations/Distags.Persistence.Migrations.csproj" />
   <Project Path="src/Distags.Persistence.Migrator/Distags.Persistence.Migrator.csproj" />
   <Project Path="src/Distags.Persistence/Distags.Persistence.csproj" />
   <Project Path="src/Distags.WebApp/Distags.WebApp.csproj" />
   <Project Path="src/SteamDataScraper/SteamDataScraper.csproj" />
   <Project Path="src/SteamWebApi.Contract/SteamWebApi.Contract.csproj" />
   <Project Path="src/SteamWebApi/SteamWebApi.csproj" />
-  <Project Path="src/TestProject/TestProject.csproj" />
 </Solution>

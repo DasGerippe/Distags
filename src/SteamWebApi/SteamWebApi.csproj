@@ -16,6 +16,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\AppHostUtils\AppHostUtils.csproj" />
     <ProjectReference Include="..\SteamWebApi.Contract\SteamWebApi.Contract.csproj" />
   </ItemGroup>
 

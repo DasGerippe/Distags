@@ -1,6 +1,6 @@
+using AppHostUtils;
 using Distags.Core;
 using Distags.Persistence;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
@@ -19,54 +19,40 @@ internal class Program
     static async Task Main(string[] args)
     {
         Log.Logger = new LoggerConfiguration()
-            .ConfigureConsoleAndFileSinks(nameof(SteamDataScraper))
+            .ConfigureBootstrapLogger()
             .CreateBootstrapLogger();
 
         try
         {
             Log.Debug("Setting up application host...");
 
-            IHostBuilder hostBuilder = Host.CreateDefaultBuilder();
+            HostApplicationBuilder hostBuilder = Host.CreateApplicationBuilder(args);
 
-            hostBuilder.ConfigureAppConfiguration((context, configBuilder) =>
-            {
-                IHostEnvironment environment = context.HostingEnvironment;
+            hostBuilder.Configuration.AddDockerSecrets();
+            hostBuilder.Configuration.ReplaceConnectionStringPassword("DistagsDatabase");
 
-                configBuilder.AddJsonFile("appsettings.json", optional: false);
-                configBuilder.AddJsonFile($"appsettings.{environment.EnvironmentName}.json", optional: true);
+            hostBuilder.Logging.ClearProviders();
+            hostBuilder.Services.AddSerilog(loggerConfig => loggerConfig
+                .ReadFrom.Configuration(hostBuilder.Configuration)
+                .ConfigureSinks<Program>(writeToFile: hostBuilder.Environment.IsDevelopment()));
 
-                if (environment.IsDevelopment())
-                    configBuilder.AddUserSecrets<Program>();
+            hostBuilder.Services.AddSteamWebApi("SteamWebApi");
 
-                configBuilder.AddEnvironmentVariables();
-            });
+            hostBuilder.Services.AddOptions<CreatorRefreshSettings>()
+                .BindConfiguration($"{nameof(SteamDataScraper)}:{nameof(CreatorRefreshSettings)}")
+                .ValidateDataAnnotations()
+                .ValidateOnStart();
+            hostBuilder.Services.AddTransient<CreatorRefreshSettings>(serviceProvider =>
+                serviceProvider.GetRequiredService<IOptions<CreatorRefreshSettings>>().Value);
 
-            hostBuilder.ConfigureServices((context, services) =>
-            {
-                services.AddSerilog(loggerConfig => loggerConfig
-                    .ReadFrom.Configuration(context.Configuration)
-                    .ConfigureConsoleAndFileSinks(nameof(SteamDataScraper)));
+            hostBuilder.Services.AddDistagsPersistence(hostBuilder.Configuration.GetRequiredConnectionString("DistagsDatabase"));
+            hostBuilder.Services.AddDistagsCore();
 
-                services.AddSteamWebApi("SteamWebApi");
-
-                services.AddOptions<CreatorRefreshSettings>()
-                    .BindConfiguration($"{nameof(SteamDataScraper)}:{nameof(CreatorRefreshSettings)}")
-                    .ValidateDataAnnotations()
-                    .ValidateOnStart();
-                services.AddTransient<CreatorRefreshSettings>(services =>
-                    services.GetRequiredService<IOptions<CreatorRefreshSettings>>().Value);
-
-                string distagsDbConnectionString = context.Configuration.GetConnectionString("DistagsDatabase") ??
-                                                   throw new InvalidOperationException("Connection string not configured.");
-                services.AddDistagsPersistence(distagsDbConnectionString);
-                services.AddDistagsCore();
-
-                services.AddTransient<Program>();
-                services.AddTransient<LevelScraper>();
-                services.AddTransient<CreatorScraper>();
-                services.AddTransient<ICreatorRefreshDateManager, CreatorRefreshDateDatabaseManager>();
-                services.AddTransient<ICreatorRefreshCountCalculator, CreatorRefreshCountCalculator>();
-            });
+            hostBuilder.Services.AddTransient<Program>();
+            hostBuilder.Services.AddTransient<LevelScraper>();
+            hostBuilder.Services.AddTransient<CreatorScraper>();
+            hostBuilder.Services.AddTransient<ICreatorRefreshDateManager, CreatorRefreshDateDatabaseManager>();
+            hostBuilder.Services.AddTransient<ICreatorRefreshCountCalculator, CreatorRefreshCountCalculator>();
 
             IHost host = hostBuilder.Build();
 

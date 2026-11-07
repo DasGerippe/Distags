@@ -1,3 +1,4 @@
+using AppHostUtils;
 using AutoTaggerWorker;
 using Distags.Api.Caching;
 using Distags.Api.Contracts;
@@ -8,7 +9,6 @@ using Distags.Core.Events;
 using Distags.Persistence;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Diagnostics;
-using Microsoft.Extensions.Options;
 using Serilog;
 using SerilogUtils;
 using SteamWebApi;
@@ -21,16 +21,20 @@ public class Program
     public static void Main(string[] args)
     {
         Log.Logger = new LoggerConfiguration()
-            .ConfigureConsoleAndFileSinks<Program>(OutputTemplates.Web)
+            .ConfigureBootstrapLogger()
             .CreateBootstrapLogger();
 
         try
         {
             WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
+            builder.Configuration.AddDockerSecrets();
+            builder.Configuration.ReplaceConnectionStringPassword("DistagsDatabase");
+
+            builder.Logging.ClearProviders();
             builder.Services.AddSerilog(loggerConfig => loggerConfig
                 .ReadFrom.Configuration(builder.Configuration)
-                .ConfigureConsoleAndFileSinks<Program>(OutputTemplates.Web));
+                .ConfigureSinks<Program>(writeToFile: builder.Environment.IsDevelopment(), OutputTemplates.Web));
 
             AddAuthentication(builder);
             AddOutputCaching(builder);
@@ -44,14 +48,12 @@ public class Program
 
             builder.Services.AddSignalR();
 
-            string distagsDbConnectionString = builder.Configuration.GetConnectionString("DistagsDatabase") ??
-                                               throw new InvalidOperationException("Connection string not configured.");
-            builder.Services.AddDistagsPersistence(distagsDbConnectionString);
+            builder.Services.AddDistagsPersistence(builder.Configuration.GetRequiredConnectionString("DistagsDatabase"));
             builder.Services.AddDistagsCore();
 
             builder.Services.AddSteamWebApi("SteamWebApi");
 
-            AddValidatedConfigOptions<DistagsApiSettings>(builder, "DistagsApiSettings");
+            builder.Services.AddValidatedConfigOptions<DistagsApiSettings>("Distags:Api");
 
             builder.Services.AddSingleton<ITicketStore<long>, ConcurrentTicketStore<long>>();
             builder.Services.AddTransient<ITokenGenerator, RandomBase64UrlTokenGenerator>();
@@ -64,6 +66,8 @@ public class Program
             builder.Services.AddHostedService<SessionCleanupService>();
             builder.Services.AddAutoTaggerWorker();
 
+            builder.Services.AddHealthChecks();
+
             WebApplication app = builder.Build();
 
             app.UseExceptionHandler();
@@ -72,13 +76,13 @@ public class Program
             if (app.Environment.IsDevelopment())
                 app.MapOpenApi();
 
-            app.UseHttpsRedirection();
-
             app.UseAuthorization();
             app.UseOutputCache();
 
             app.MapStaticAssets();
             app.MapControllers();
+
+            app.MapHealthChecks("/health");
 
             app.MapHub<LevelHub>("/hubs/levels");
             app.MapHub<ContributionHub>("/hubs/contributions");
@@ -93,18 +97,6 @@ public class Program
         {
             Log.CloseAndFlush();
         }
-    }
-
-    private static void AddValidatedConfigOptions<TOptions>(WebApplicationBuilder builder, string configSectionPath)
-        where TOptions : class
-    {
-        builder.Services
-            .AddOptions<TOptions>()
-            .BindConfiguration(configSectionPath)
-            .ValidateDataAnnotations()
-            .ValidateOnStart();
-
-        builder.Services.AddTransient<TOptions>(services => services.GetRequiredService<IOptions<TOptions>>().Value);
     }
 
     private static void AddAuthentication(WebApplicationBuilder builder)

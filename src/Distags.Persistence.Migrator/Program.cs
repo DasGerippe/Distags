@@ -1,45 +1,64 @@
+using AppHostUtils;
 using Distags.Core;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
+using Serilog;
+using SerilogUtils;
 using System.Runtime.CompilerServices;
 
 namespace Distags.Persistence.Migrator;
 
 internal class Program
 {
-    static async Task Main(string[] args)
+    static async Task<int> Main(string[] args)
     {
-        IHostBuilder builder = Host.CreateDefaultBuilder(args);
+        Log.Logger = new LoggerConfiguration()
+            .ConfigureBootstrapLogger()
+            .CreateBootstrapLogger();
 
-        builder.ConfigureAppConfiguration((context, configBuilder) =>
+        try
         {
-            configBuilder.AddJsonFile("appsettings.json", optional: false);
+            Log.Debug("Setting up application host...");
 
-            if (context.HostingEnvironment.IsDevelopment())
-                configBuilder.AddUserSecrets<Program>();
-        });
+            HostApplicationBuilder hostBuilder = Host.CreateApplicationBuilder(args);
 
-        builder.ConfigureServices((context, services) =>
-        {
-            string connectionString = context.Configuration.GetConnectionString("DistagsDatabase")
-                                      ?? throw new Exception("Connection string missing.");
-            services.AddDistagsPersistence(
+            hostBuilder.Configuration.AddDockerSecrets();
+            hostBuilder.Configuration.ReplaceConnectionStringPassword("DistagsDatabase");
+
+            hostBuilder.Logging.ClearProviders();
+            hostBuilder.Services.AddSerilog(loggerConfig => loggerConfig
+                .ReadFrom.Configuration(hostBuilder.Configuration)
+                .ConfigureSinks<Program>(writeToFile: hostBuilder.Environment.IsDevelopment()));
+
+            string connectionString = hostBuilder.Configuration.GetRequiredConnectionString("DistagsDatabase");
+            hostBuilder.Services.AddDistagsPersistence(
                 connectionString,
-                npgsqlOptionsAction: npgsqlOptions => npgsqlOptions
-                    .MigrationsAssembly($"{nameof(Distags)}.{nameof(Persistence)}.{nameof(Dev)}"));
-            services.AddDistagsCore();
-        });
-        IHost host = builder.Build();
+                npgsqlOptionsAction: npgsqlOptions =>
+                    npgsqlOptions.MigrationsAssembly($"{nameof(Distags)}.{nameof(Persistence)}.{nameof(Migrations)}"));
+            hostBuilder.Services.AddDistagsCore();
 
-        AsyncServiceScope scope = host.Services.CreateAsyncScope();
-        await using ConfiguredAsyncDisposable awaitedScope = scope.ConfigureAwait(false);
+            IHost host = hostBuilder.Build();
 
-        DistagsDbContext dbContext = scope.ServiceProvider.GetRequiredService<DistagsDbContext>();
+            AsyncServiceScope scope = host.Services.CreateAsyncScope();
+            await using ConfiguredAsyncDisposable awaitedScope = scope.ConfigureAwait(false);
 
-        Console.WriteLine("Applying EF Core migrations...");
-        await dbContext.Database.MigrateAsync();
-        Console.WriteLine("Done!");
+            DistagsDbContext dbContext = scope.ServiceProvider.GetRequiredService<DistagsDbContext>();
+
+            Log.Debug("Applying EF Core migrations...");
+            await dbContext.Database.MigrateAsync();
+            Log.Debug("Done!");
+            return 0;
+        }
+        catch (Exception ex) when (ex is not HostAbortedException)
+        {
+            Log.Fatal(ex, "An unexpected error occurred causing the Host to terminate.");
+            return 1;
+        }
+        finally
+        {
+            await Log.CloseAndFlushAsync();
+        }
     }
 }

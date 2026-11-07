@@ -1,0 +1,14 @@
+{
+    # Contact address for Let's Encrypt expiry notices.
+    email {$ACME_EMAIL}
+}
+
+{$DISTAGS_API_HOST} {
+    encode zstd gzip
+    reverse_proxy api:8080
+}
+
+{$DISTAGS_WEBAPP_HOST} {
+    encode zstd gzip
+    reverse_proxy webapp:8080
+}

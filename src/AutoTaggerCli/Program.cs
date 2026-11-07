@@ -1,8 +1,8 @@
+using AppHostUtils;
 using AutoTagging;
 using AutoTagging.Abstractions;
 using Distags.Core;
 using Distags.Persistence;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
@@ -17,50 +17,32 @@ internal class Program
     private static async Task Main(string[] args)
     {
         Log.Logger = new LoggerConfiguration()
-            .ConfigureConsoleAndFileSinks(nameof(AutoTaggerCli))
+            .ConfigureBootstrapLogger()
             .CreateBootstrapLogger();
 
         try
         {
             Log.Debug("Setting up application host...");
 
-            IHostBuilder hostBuilder = Host.CreateDefaultBuilder();
+            HostApplicationBuilder hostBuilder = Host.CreateApplicationBuilder();
 
-            hostBuilder.ConfigureAppConfiguration((context, configBuilder) =>
-            {
-                IHostEnvironment environment = context.HostingEnvironment;
+            hostBuilder.Configuration.AddDockerSecrets();
+            hostBuilder.Configuration.ReplaceConnectionStringPassword("DistagsDatabase");
 
-                configBuilder.AddJsonFile("appsettings.json", optional: false);
-                configBuilder.AddJsonFile($"appsettings.{environment.EnvironmentName}.json", optional: true);
+            hostBuilder.Logging.ClearProviders();
+            hostBuilder.Logging.AddConsole();
 
-                if (environment.IsDevelopment())
-                    configBuilder.AddUserSecrets<Program>();
+            hostBuilder.Services.AddSerilog(loggerConfig => loggerConfig
+                .ReadFrom.Configuration(hostBuilder.Configuration)
+                .ConfigureSinks<Program>(writeToFile: hostBuilder.Environment.IsDevelopment()));
 
-                configBuilder.AddEnvironmentVariables();
-            });
+            hostBuilder.Services.AddDistagsPersistence(hostBuilder.Configuration.GetRequiredConnectionString("DistagsDatabase"));
+            hostBuilder.Services.AddDistagsCore();
 
-            hostBuilder.ConfigureServices((context, services) =>
-            {
-                services.AddSerilog(loggerConfig => loggerConfig
-                    .ReadFrom.Configuration(context.Configuration)
-                    .ConfigureConsoleAndFileSinks(nameof(AutoTaggerCli)));
+            hostBuilder.Services.AddAutoTagging();
+            hostBuilder.Services.AddAutoTaggers(args);
 
-                string distagsDbConnectionString = context.Configuration.GetConnectionString("DistagsDatabase") ??
-                                                   throw new InvalidOperationException("Connection string not configured.");
-                services.AddDistagsPersistence(distagsDbConnectionString);
-                services.AddDistagsCore();
-
-                services.AddAutoTagging();
-                services.AddAutoTaggers(args);
-
-                services.AddTransient<Program>();
-            });
-
-            hostBuilder.ConfigureLogging(loggingBuilder =>
-            {
-                loggingBuilder.ClearProviders();
-                loggingBuilder.AddConsole();
-            });
+            hostBuilder.Services.AddTransient<Program>();
 
             IHost host = hostBuilder.Build();
 

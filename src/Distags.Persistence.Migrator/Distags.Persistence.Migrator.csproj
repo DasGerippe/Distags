@@ -14,14 +14,22 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
     <PackageReference Include="Microsoft.Extensions.Hosting" Version="10.0.12" />
+    <PackageReference Include="Serilog" Version="4.4.0" />
+    <PackageReference Include="Serilog.Extensions.Hosting" Version="10.0.0" />
+    <PackageReference Include="Serilog.Settings.Configuration" Version="10.0.1" />
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Distags.Persistence.Dev\Distags.Persistence.Dev.csproj" />
+    <ProjectReference Include="..\AppHostUtils\AppHostUtils.csproj" />
+    <ProjectReference Include="..\Distags.Persistence.Migrations\Distags.Persistence.Migrations.csproj" />
     <ProjectReference Include="..\Distags.Persistence\Distags.Persistence.csproj" />
+    <ProjectReference Include="..\SerilogUtils\SerilogUtils.csproj" />
   </ItemGroup>
 
   <ItemGroup>
+    <None Update="appsettings.Development.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
     <None Update="appsettings.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>

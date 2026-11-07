@@ -1,3 +1,4 @@
+using AppHostUtils;
 using Distags.WebApp.Components;
 using Distags.WebApp.DistagsApi;
 using Distags.WebApp.Security;
@@ -13,26 +14,24 @@ public class Program
     public static void Main(string[] args)
     {
         Log.Logger = new LoggerConfiguration()
-            .ConfigureConsoleAndFileSinks<Program>(OutputTemplates.Web)
+            .ConfigureBootstrapLogger()
             .CreateBootstrapLogger();
 
         try
         {
             WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
+            builder.Services.AddValidatedConfigOptions<DistagsWebAppSettings>("Distags:WebApp");
+
+            builder.Logging.ClearProviders();
             builder.Services.AddSerilog(loggerConfig => loggerConfig
                 .ReadFrom.Configuration(builder.Configuration)
-                .ConfigureConsoleAndFileSinks<Program>(OutputTemplates.Web));
+                .ConfigureSinks<Program>(writeToFile: builder.Environment.IsDevelopment(), OutputTemplates.Web));
 
-            // Add services to the container.
             builder.Services.AddRazorComponents()
                 .AddInteractiveServerComponents();
 
-            builder.Services.AddHttpClient<DistagsApiClient>(httpClient =>
-            {
-                string distagsApiUri = builder.Configuration["DistagsWebApp:DistagsApiUri"]!;
-                httpClient.BaseAddress = new Uri(distagsApiUri);
-            });
+            builder.Services.AddHttpClient<DistagsApiClient>();
 
             builder.Services.AddLocalization();
             builder.Services.AddHttpContextAccessor();
@@ -50,15 +49,12 @@ public class Program
 
             WebApplication app = builder.Build();
 
-            // Configure the HTTP request pipeline.
             if (!app.Environment.IsDevelopment())
             {
                 app.UseExceptionHandler("/Error");
                 // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
                 app.UseHsts();
             }
-
-            app.UseHttpsRedirection();
 
             app.UseAntiforgery();
 

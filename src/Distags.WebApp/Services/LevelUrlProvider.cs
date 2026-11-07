@@ -4,12 +4,11 @@ namespace Distags.WebApp.Services;
 
 public class LevelUrlProvider
 {
-    private readonly string _DistagsBaseUrl;
+    private readonly string _ApiUrlExternal;
 
-    public LevelUrlProvider(IConfiguration configuration)
+    public LevelUrlProvider(DistagsWebAppSettings webAppSettings)
     {
-        _DistagsBaseUrl = configuration["DistagsWebApp:DistagsApiUri"]?.TrimEnd('/')
-                          ?? throw new ArgumentException("Configuration is missing a Distags API Uri.", nameof(configuration));
+        _ApiUrlExternal = webAppSettings.DistagsApiUrlExternal.TrimEnd('/');
     }
 
     public string GetLevelUrlRelative(LevelResponse level)
@@ -26,7 +25,7 @@ public class LevelUrlProvider
     {
         return level switch
         {
-            OfficialLevelResponse officialLevel => $"{_DistagsBaseUrl}/images/levels/official/{officialLevel.Slug}.png",
+            OfficialLevelResponse officialLevel => $"{_ApiUrlExternal}/images/levels/official/{officialLevel.Slug}.png",
             WorkshopLevelResponse workshopLevel => workshopLevel.ImageUrl,
             _ => throw new ArgumentOutOfRangeException(nameof(level), level, "Unsupported level type."),
         };
