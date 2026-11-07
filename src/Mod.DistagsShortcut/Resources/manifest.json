@@ -1,0 +1,9 @@
+{
+  "name": "DistagsShortcut",
+  "version_number": "1.0.0",
+  "website_url": "https://github.com/DasGerippe/Distags",
+  "description": "Opens the Distags website for the level you're currently playing or focusing in menus.",
+  "dependencies": [
+    "BepInEx-BepInExPack-5.4.2100"
+  ]
+}
