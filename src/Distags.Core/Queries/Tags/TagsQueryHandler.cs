@@ -17,6 +17,8 @@ public class TagsQueryHandler : IQueryHandler<TagsQuery, List<TagDto>>
     public async Task<List<TagDto>> HandleAsync(TagsQuery query)
     {
         return await _DbContext.Set<Tag>()
+            .OrderBy(tag => tag.DisplayGroup.Position)
+            .ThenBy(tag => tag.Position)
             .SelectDto()
             .ToListAsync()
             .ConfigureAwait(false);
