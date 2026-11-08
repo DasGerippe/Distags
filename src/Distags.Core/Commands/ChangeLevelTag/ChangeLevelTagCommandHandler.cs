@@ -58,6 +58,7 @@ public abstract class ChangeLevelTagCommandHandler
     private async Task<Level> GetLevelAsync(long levelId)
     {
         Level? level = await DbContext.Set<Level>()
+            .Include(level => ((WorkshopLevel)level).Creator)
             .Include(level => level.Tags)
             .Where(level => level.Id == levelId)
             .FirstOrDefaultAsync()
