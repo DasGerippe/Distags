@@ -120,10 +120,10 @@ spectacular;Spectacular;theme;theme;False;False;False;The level has an impressiv
 corrupted;Corrupted;theme;theme;False;False;False;The level looks corrupted or infected.
 geometric;Geometric;theme;theme;False;False;False;The level has a lot of geometric shapes or objects.
 abstract;Abstract;theme;theme;False;False;False;The level uses abstract visuals without a recognizeable setting.
-media-reference;Video Game/Movie;theme;theme;False;False;False;The level references a video game, moovie or other media.
-meme;Meme;theme;theme;False;False;False;The level references meme.
+media-reference;Video Game/Movie;theme;theme;False;False;False;The level references a video game, movie or other media.
+meme;Meme;theme;theme;False;False;False;The level references a meme.
 first-level;First Level;theme;theme;False;False;False;The level looks like someone's first level.
-vertical;Vertical;theme;theme;False;False;False;The level extends maily upwards or downwards instead of forwards.
+vertical;Vertical;theme;theme;False;False;False;The level extends mainly upwards or downwards instead of forwards.
 spaghetti;Spaghetti;theme;theme;False;False;False;The level has tangled, crossing or overlapping roads.
 variety;Variety;theme;theme;False;False;False;The level changes its look and style between sections.
 clutter;Clutter;theme;theme;False;False;False;The level is filled with a lot of objects or overall visually busy.
