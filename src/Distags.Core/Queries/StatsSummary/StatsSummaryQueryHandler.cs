@@ -17,7 +17,7 @@ public class StatsSummaryQueryHandler : IQueryHandler<StatsSummaryQuery, StatsSu
     {
         StatsSummaryDto statsSummary = new StatsSummaryDto
         {
-            LevelTagCount = await _DbContext.Set<LevelTag>().CountAsync().ConfigureAwait(false),
+            LevelTagCount = await GetLevelTagCount().ConfigureAwait(false),
             LevelCount = await _DbContext.Set<Level>().CountAsync().ConfigureAwait(false),
             UserContributionCount = await GetUserContributionCount().ConfigureAwait(false),
             ContributingUserCount = await GetContributingUserCount().ConfigureAwait(false),
@@ -26,6 +26,11 @@ public class StatsSummaryQueryHandler : IQueryHandler<StatsSummaryQuery, StatsSu
         };
 
         return statsSummary;
+    }
+
+    private Task<int> GetLevelTagCount()
+    {
+        return _DbContext.Set<LevelTag>().CountAsync(levelTag => !levelTag.Tag.IsFallback);
     }
 
     private Task<int> GetUserContributionCount()
