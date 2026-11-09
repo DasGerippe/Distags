@@ -7,30 +7,27 @@ public class TagProvider
 {
     private readonly DistagsApiClient _DistagsApiClient;
 
-    private bool _IsInitialized;
+    private readonly Lazy<Task> _InitializationTask;
+
     private Dictionary<string, TagResponse> _Tags = [];
 
     public TagProvider(DistagsApiClient distagsApiClient)
     {
         _DistagsApiClient = distagsApiClient;
+
+        _InitializationTask = new Lazy<Task>(InitializeAsync, LazyThreadSafetyMode.ExecutionAndPublication);
+    }
+
+    private async Task InitializeAsync()
+    {
+        ApiResult<List<TagResponse>> tagsResult = await _DistagsApiClient.GetTagsAsync();
+        _Tags = tagsResult.Value?.ToDictionary(tag => tag.Name) ?? [];
     }
 
     public async Task<IReadOnlyDictionary<string, TagResponse>> GetTagsDictionary()
     {
-        await Initialize();
+        await _InitializationTask.Value;
 
         return _Tags;
-    }
-
-    private async Task Initialize()
-    {
-        if (_IsInitialized)
-            return;
-
-        ApiResult<List<TagResponse>> tagsResult = await _DistagsApiClient.GetTagsAsync();
-        if (tagsResult.IsSuccess)
-            _Tags = tagsResult.Value.ToDictionary(tag => tag.Name);
-
-        _IsInitialized = true;
     }
 }
