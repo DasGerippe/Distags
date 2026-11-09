@@ -1,5 +1,6 @@
 @using Constants = Distags.WebApp.Constants;
 @using Distags.Api.Contracts.Users
+@using Distags.WebApp.Components.Inputs
 @using Distags.WebApp.DistagsApi
 @using Microsoft.AspNetCore.WebUtilities
 
@@ -49,7 +50,9 @@
             </ul>
 
             <!-- Profile Section -->
-            <ul class="navbar-nav">
+            <ul class="navbar-nav align-items-md-center">
+                <ThemeSwitcher />
+
                 @if (User == null)
                 {
                     <!-- Steam Login Button -->

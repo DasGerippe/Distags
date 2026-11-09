@@ -1,0 +1,77 @@
+@implements IAsyncDisposable
+
+@inject IJSRuntime JsRuntime
+
+<li class="nav-item dropdown">
+    <a id="themeDropdown" class="nav-link dropdown-toggle d-flex align-items-center"
+       href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false"
+       title="@Resource.Theme_Toggle" aria-label="@Resource.Theme_Toggle">
+        <i class="bi @GetIcon(_Mode)" style="font-size: 1.25rem;"></i>
+    </a>
+    <ul class="dropdown-menu dropdown-menu-end shadow" aria-labelledby="themeDropdown">
+        @foreach ((string mode, string label) in Modes)
+        {
+            <li>
+                <button class="dropdown-item d-flex align-items-center gap-2 @(mode == _Mode ? "active" : null)"
+                        aria-pressed="@(mode == _Mode)" @onclick="() => SetModeAsync(mode)">
+                    <i class="bi @GetIcon(mode)"></i>
+                    @label
+                </button>
+            </li>
+        }
+    </ul>
+</li>
+
+@code {
+
+    private static readonly (string Mode, string Label)[] Modes =
+    [
+        ("light", Resource.Theme_Light),
+        ("dark", Resource.Theme_Dark),
+        ("auto", Resource.Theme_System),
+    ];
+
+    private IJSObjectReference? _JsThemeModule;
+    private string _Mode = "auto";
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            _JsThemeModule = await JsRuntime.InvokeAsync<IJSObjectReference>("import", "./js/theme.js");
+            _Mode = await _JsThemeModule.InvokeAsync<string>("getStoredTheme");
+            StateHasChanged();
+        }
+
+        await base.OnAfterRenderAsync(firstRender);
+    }
+
+    private async Task SetModeAsync(string mode)
+    {
+        if (_JsThemeModule == null)
+            return;
+
+        await _JsThemeModule.InvokeVoidAsync("setTheme", mode);
+        _Mode = mode;
+    }
+
+    private static string GetIcon(string mode) => mode switch
+    {
+        "light" => "bi-sun-fill",
+        "dark" => "bi-moon-stars-fill",
+        _ => "bi-circle-half",
+    };
+
+    public async ValueTask DisposeAsync()
+    {
+        if (_JsThemeModule == null)
+            return;
+
+        try
+        {
+            await _JsThemeModule.DisposeAsync();
+        }
+        catch (JSDisconnectedException) { }
+    }
+
+}
