@@ -8,7 +8,7 @@
 
 @inject TagProvider TagProvider
 
-<div class="row align-items-center border border-1 rounded-3 shadow mx-0 py-2 row-gap-2 @GetContainerClass()">
+<div class="row align-items-center border border-1 rounded-3 shadow mx-0 py-2 row-gap-2 @_ContainerCssClass">
     <!-- Level -->
     <div class="col-12 col-sm-7 col-md-4 d-flex align-items-center gap-1">
         @if (EnableModeration)
@@ -50,7 +50,7 @@
 
 @code {
 
-    private List<TagChangeResponse> _NonFallbackTagChanges = [];
+    private string _ContainerCssClass = string.Empty;
 
     [Parameter]
     public required ContributionResponse Contribution { get; set; }
@@ -73,19 +73,18 @@
     protected override async Task OnParametersSetAsync()
     {
         IReadOnlyDictionary<string, TagResponse> tagsDictionary = await TagProvider.GetTagsDictionary();
-        _NonFallbackTagChanges = Contribution.Changes
-            .Where(tagChange => tagsDictionary.GetValueOrDefault(tagChange.TagName)?.IsFallback != true)
-            .ToList();
-    }
 
-    private string GetContainerClass()
-    {
-        if (_NonFallbackTagChanges.Count == 1)
-            return _NonFallbackTagChanges[0].Action == TagChangeAction.Add
+        HashSet<TagChangeAction> nonFallbackChangeActions = Contribution.Changes
+            .Where(tagChange => tagsDictionary.GetValueOrDefault(tagChange.TagName)?.IsFallback != true)
+            .Select(tagChange => tagChange.Action)
+            .ToHashSet();
+
+        if (nonFallbackChangeActions.Count == 1)
+            _ContainerCssClass = nonFallbackChangeActions.Contains(TagChangeAction.Add)
                 ? "bg-success-subtle border-success-subtle"
                 : "bg-danger-subtle border-danger-subtle";
         else
-            return "bg-warning-subtle border-warning border-opacity-50";
+            _ContainerCssClass = "bg-warning-subtle border-warning border-opacity-50";
     }
 
     private string GetFilterIconClassName(bool isFilterActive)
