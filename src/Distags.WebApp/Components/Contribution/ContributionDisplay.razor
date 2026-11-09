@@ -1,8 +1,12 @@
 @using Distags.Api.Contracts.Contributions
 @using Distags.Api.Contracts.Levels
+@using Distags.Api.Contracts.Tags
 @using Distags.Contracts
 @using Distags.WebApp.Components.Inputs
 @using Distags.WebApp.Components.Level
+@using Distags.WebApp.Services
+
+@inject TagProvider TagProvider
 
 <div class="row align-items-center border border-1 rounded-3 shadow mx-0 py-2 row-gap-2 @GetContainerClass()">
     <!-- Level -->
@@ -46,6 +50,8 @@
 
 @code {
 
+    private List<TagChangeResponse> _NonFallbackTagChanges = [];
+
     [Parameter]
     public required ContributionResponse Contribution { get; set; }
 
@@ -64,10 +70,18 @@
     [Parameter]
     public EventCallback<ContributionUserResponse> UserFilterClicked { get; set; }
 
+    protected override async Task OnParametersSetAsync()
+    {
+        IReadOnlyDictionary<string, TagResponse> tagsDictionary = await TagProvider.GetTagsDictionary();
+        _NonFallbackTagChanges = Contribution.Changes
+            .Where(tagChange => tagsDictionary.GetValueOrDefault(tagChange.TagName)?.IsFallback != true)
+            .ToList();
+    }
+
     private string GetContainerClass()
     {
-        if (Contribution.Changes.Count == 1)
-            return Contribution.Changes[0].Action == TagChangeAction.Add
+        if (_NonFallbackTagChanges.Count == 1)
+            return _NonFallbackTagChanges[0].Action == TagChangeAction.Add
                 ? "bg-success-subtle border-success-subtle"
                 : "bg-danger-subtle border-danger-subtle";
         else
