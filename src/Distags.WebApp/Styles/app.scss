@@ -2,6 +2,8 @@
 @import "bootstrap/functions";
 
 // 2. Include any default variable overrides here
+$link-color: #006bb7;
+$link-color-dark: tint-color($link-color, 40%);
 
 // 3. Include remainder of required Bootstrap stylesheets (including any separate color mode stylesheets)
 @import "bootstrap/variables";
@@ -57,10 +59,6 @@
 
 html, body {
     font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
-}
-
-a, .btn-link {
-    color: #006bb7;
 }
 
 .btn-primary {
