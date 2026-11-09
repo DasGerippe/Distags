@@ -163,7 +163,7 @@
     <value>Please log in with your Steam account to add or remove tags.</value>
   </data>
   <data name="ContributionPrerequisiteGuidelinesText" xml:space="preserve">
-    <value>Please accept the contribution guidelines in your settings to add or remove tags.</value>
+    <value>Please accept the contribution guidelines in your {0} to add or remove tags.</value>
   </data>
   <data name="Setting_ContributionGuidelines_Title" xml:space="preserve">
     <value>Contribution Guidelines</value>
@@ -292,5 +292,8 @@ with {2} contributions
 from {3} users
 and {4} contributions
 from {5} auto taggers</value>
+  </data>
+  <data name="ContributionPrerequisiteGuidelinesText_HyperlinkPhrase" xml:space="preserve">
+    <value>settings</value>
   </data>
 </root>

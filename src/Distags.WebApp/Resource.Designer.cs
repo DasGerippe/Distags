@@ -106,11 +106,20 @@ namespace Distags.WebApp {
         }
         
         /// <summary>
-        ///   Sucht eine lokalisierte Zeichenfolge, die Please accept the contribution guidelines in your settings to add or remove tags. ähnelt.
+        ///   Sucht eine lokalisierte Zeichenfolge, die Please accept the contribution guidelines in your {0} to add or remove tags. ähnelt.
         /// </summary>
         internal static string ContributionPrerequisiteGuidelinesText {
             get {
                 return ResourceManager.GetString("ContributionPrerequisiteGuidelinesText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die settings ähnelt.
+        /// </summary>
+        internal static string ContributionPrerequisiteGuidelinesText_HyperlinkPhrase {
+            get {
+                return ResourceManager.GetString("ContributionPrerequisiteGuidelinesText_HyperlinkPhrase", resourceCulture);
             }
         }
         

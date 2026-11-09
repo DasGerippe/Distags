@@ -6,7 +6,7 @@
 <div class="bg-warning-subtle shadow-sm">
     <div class="container-fluid content">
         <p class="py-2 text-center">
-            @_Text
+            @((MarkupString)_Text)
         </p>
     </div>
 </div>
@@ -21,9 +21,15 @@
     protected override void OnParametersSet()
     {
         if (User == null)
+        {
             _Text = Resource.ContributionPrerequisiteLoginText;
+        }
         else if (!User.AcceptsGuidelines)
-            _Text = Resource.ContributionPrerequisiteGuidelinesText;
+        {
+            _Text = string.Format(
+                Resource.ContributionPrerequisiteGuidelinesText,
+                $"<a href=\"settings\">{Resource.ContributionPrerequisiteGuidelinesText_HyperlinkPhrase}</a>");
+        }
     }
 
 }
