@@ -159,3 +159,9 @@ h1:focus {
         color: var(--bs-tertiary-color);
         pointer-events: none;
     }
+
+// Shows only the logo variant matching the active color mode (see NavMenu).
+[data-bs-theme="dark"] .logo-for-light,
+:root:not([data-bs-theme="dark"]) .logo-for-dark {
+    display: none;
+}
