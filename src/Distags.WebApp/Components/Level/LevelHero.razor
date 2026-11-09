@@ -11,20 +11,34 @@
             <img src="@_LevelImageUrl"
                  alt="Level Preview Image"
                  class="img-fluid w-100 rounded-4 shadow mb-3"
-                 style="max-width:480px;"/>
+                 style="max-width:480px;" />
 
             <div class="hero-caption w-100 text-center text-break">
                 <h1 class="display-6 fw-bold">
                     @Level.Name
-                    @if (Level is WorkshopLevelResponse workshopLevel)
+                    @if (_WorkshopLevel != null)
                     {
-                        <a class="ms-2" href="https://steamcommunity.com/sharedfiles/filedetails/?id=@(workshopLevel.WorkshopId)">
+                        <a class="ms-2" href="https://steamcommunity.com/sharedfiles/filedetails/?id=@(_WorkshopLevel.WorkshopId)">
                             <i class="bi bi-steam" style="color: #ddd;"></i>
                         </a>
                     }
                 </h1>
 
-                <p class="lead mb-0">@_CreatorName</p>
+                <p class="lead mb-1">@_CreatorName</p>
+
+                @if (_WorkshopLevel != null)
+                {
+                    <p class="text-truncate mb-0">
+                        <span class="mx-1">
+                            <i class="bi bi-upload" style="color: #ddd;"></i>
+                            @_WorkshopLevel.CreatedOn.ToString("d")
+                        </span>
+                        <span class="mx-1">
+                            <i class="bi bi-arrow-repeat" style="color: #ddd;"></i>
+                            @_WorkshopLevel.UpdatedOn.ToString("d")
+                        </span>
+                    </p>
+                }
             </div>
 
         </div>
@@ -36,6 +50,8 @@
     private string _LevelImageUrl = string.Empty;
     private string _CreatorName = string.Empty;
 
+    private WorkshopLevelResponse? _WorkshopLevel;
+
     [Parameter]
     public required LevelResponse Level { get; set; }
 
@@ -43,6 +59,8 @@
     {
         _LevelImageUrl = LevelUrlProvider.GetLevelImageUrl(Level);
         _CreatorName = LevelCreatorNameProvider.GetCreatorName(Level);
+
+        _WorkshopLevel = Level as WorkshopLevelResponse;
     }
 
 }
