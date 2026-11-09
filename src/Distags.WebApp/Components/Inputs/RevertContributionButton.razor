@@ -15,7 +15,7 @@
 
     private string GetIconColor()
     {
-        return Contribution.User != null ? "black" : "#AAA";
+        return Contribution.User != null ? "var(--bs-emphasis-color)" : "var(--bs-tertiary-color)";
     }
 
     private async Task OnRevertContributionClicked()

@@ -17,7 +17,7 @@
 
     private string GetIconColor()
     {
-        return UserSteamId != null ? "darkred" : "#AAA";
+        return UserSteamId != null ? "var(--bs-danger-text-emphasis)" : "var(--bs-tertiary-color)";
     }
 
     private async Task OnBanUserButtonClicked()
