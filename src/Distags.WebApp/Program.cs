@@ -43,6 +43,7 @@ public class Program
             builder.Services.AddScoped<CircuitHandler, CircuitSessionTokenInitializer>();
             builder.Services.AddScoped<ISessionTokenProvider, SessionTokenProvider>();
             builder.Services.AddScoped<IDialogService, DialogService>();
+            builder.Services.AddScoped<TagProvider>();
             builder.Services.AddScoped<TagTreeProvider>();
 
             builder.Services.AddScoped<TimeRefreshService>();
