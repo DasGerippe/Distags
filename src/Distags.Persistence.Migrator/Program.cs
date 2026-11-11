@@ -1,6 +1,7 @@
 using AppHostUtils;
 using Distags.Core;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
@@ -45,10 +46,21 @@ internal class Program
             await using ConfiguredAsyncDisposable awaitedScope = scope.ConfigureAwait(false);
 
             DistagsDbContext dbContext = scope.ServiceProvider.GetRequiredService<DistagsDbContext>();
+            IConfiguration config = scope.ServiceProvider.GetRequiredService<IConfiguration>();
 
-            Log.Debug("Applying EF Core migrations...");
-            await dbContext.Database.MigrateAsync();
+            string? targetMigrationName = config["TargetMigration"];
+            if (string.IsNullOrEmpty(targetMigrationName))
+            {
+                Log.Debug("Migrating database to latest migration...");
+                await dbContext.Database.MigrateAsync();
+            }
+            else
+            {
+                Log.Debug("Migrating database to migration {migration}...", targetMigrationName);
+                await dbContext.Database.MigrateAsync(targetMigrationName);
+            }
             Log.Debug("Done!");
+
             return 0;
         }
         catch (Exception ex) when (ex is not HostAbortedException)
