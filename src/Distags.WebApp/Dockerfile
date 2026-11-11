@@ -16,7 +16,7 @@ FROM --platform=$BUILDPLATFORM mcr.microsoft.com/dotnet/sdk:10.0-alpine AS build
 RUN apk add --no-cache gcompat libstdc++
 
 ARG BUILD_CONFIGURATION=Release
-ARG TARGETARCH
+ARG VERSION=0.0.0
 WORKDIR /app
 
 COPY Directory.Build.props ./
@@ -26,6 +26,7 @@ RUN --mount=type=cache,id=nuget,target=/root/.nuget/packages \
     dotnet publish src/Distags.WebApp/Distags.WebApp.csproj \
       -c $BUILD_CONFIGURATION \
       -p:UseAppHost=false \
+      -p:Version=$VERSION \
       -o /app/publish
 
 ################################################################################
