@@ -2,6 +2,8 @@
 @import "bootstrap/functions";
 
 // 2. Include any default variable overrides here
+$link-color: #006bb7;
+$link-color-dark: tint-color($link-color, 40%);
 
 // 3. Include remainder of required Bootstrap stylesheets (including any separate color mode stylesheets)
 @import "bootstrap/variables";
@@ -59,10 +61,6 @@ html, body {
     font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
 }
 
-a, .btn-link {
-    color: #006bb7;
-}
-
 .btn-primary {
     color: #fff;
     background-color: #1b6ec2;
@@ -70,7 +68,7 @@ a, .btn-link {
 }
 
 .btn:focus, .btn:active:focus, .btn-link.nav-link:focus, .form-control:focus, .form-check-input:focus {
-    box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #258cfb;
+    box-shadow: 0 0 0 0.1rem var(--bs-body-bg), 0 0 0 0.25rem #258cfb;
 }
 
 .content-wide {
@@ -90,15 +88,15 @@ h1:focus {
 }
 
 .valid.modified:not([type=checkbox]) {
-    outline: 1px solid #26b050;
+    outline: 1px solid var(--bs-form-valid-border-color);
 }
 
 .invalid {
-    outline: 1px solid #e50000;
+    outline: 1px solid var(--bs-form-invalid-border-color);
 }
 
 .validation-message {
-    color: #e50000;
+    color: var(--bs-form-invalid-color);
 }
 
 .blazor-error-boundary {
@@ -112,7 +110,7 @@ h1:focus {
     }
 
 .darker-border-checkbox.form-check-input {
-    border-color: #929292;
+    border-color: var(--bs-secondary-color);
 }
 
 .form-floating > .form-control-plaintext::placeholder, .form-floating > .form-control::placeholder {
@@ -143,21 +141,27 @@ h1:focus {
     border: none;
     border-radius: 50%;
     background: transparent;
-    color: #333;
+    color: var(--bs-body-color);
     cursor: pointer;
     transition: background-color 0.2s ease, transform 0.1s ease;
 }
 
     .icon-button:hover {
-        background-color: rgba(0, 0, 0, 0.06);
+        background-color: rgba(var(--bs-emphasis-color-rgb), 0.06);
     }
 
     .icon-button:active {
-        background-color: rgba(0, 0, 0, 0.12);
+        background-color: rgba(var(--bs-emphasis-color-rgb), 0.12);
         transform: scale(0.92);
     }
 
     .icon-button:disabled {
-        color: #b0b0b0;
+        color: var(--bs-tertiary-color);
         pointer-events: none;
     }
+
+// Shows only the logo variant matching the active color mode (see NavMenu).
+[data-bs-theme="dark"] .logo-for-light,
+:root:not([data-bs-theme="dark"]) .logo-for-dark {
+    display: none;
+}
