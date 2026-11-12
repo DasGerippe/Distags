@@ -85,11 +85,12 @@ services:
     build:
       context: .
       dockerfile: ./src/Distags.Persistence.Migrator/Dockerfile
-    image: distags-migrator:${DISTAGS_VERSION:?error}
+    image: distags-migrator:${DISTAGS_MIGRATOR_VERSION:-${DISTAGS_VERSION:?DISTAGS_VERSION not set.}}
     restart: no
     environment:
       <<: *dotnet-env
       ConnectionStrings__DistagsDatabase: Host=postgres;Port=5432;Database=distags;Username=distags_admin
+      TargetMigration: ${TARGET_MIGRATION}
     secrets:
       - source: db_distags_admin_password
         target: Database__DistagsDatabase__Password
@@ -104,7 +105,7 @@ services:
     build:
       context: .
       dockerfile: ./src/Distags.Api/Dockerfile
-    image: distags-api:${DISTAGS_VERSION:?error}
+    image: distags-api:${DISTAGS_VERSION:?DISTAGS_VERSION not set.}
     restart: unless-stopped
     environment:
       <<: *dotnet-env
@@ -128,7 +129,7 @@ services:
     build:
       context: .
       dockerfile: ./src/Distags.WebApp/Dockerfile
-    image: distags-webapp:${DISTAGS_VERSION:?error}
+    image: distags-webapp:${DISTAGS_VERSION:?DISTAGS_VERSION not set.}
     restart: unless-stopped
     environment:
       <<: *dotnet-env
@@ -145,7 +146,7 @@ services:
     build:
       context: .
       dockerfile: ./src/SteamDataScraper/Dockerfile
-    image: distags-steam-data-scraper:${DISTAGS_VERSION:?error}
+    image: distags-steam-data-scraper:${DISTAGS_VERSION:?DISTAGS_VERSION not set.}
     restart: no
     profiles: [jobs]
     environment:
