@@ -85,6 +85,8 @@ services:
     build:
       context: .
       dockerfile: ./src/Distags.Persistence.Migrator/Dockerfile
+      args:
+        VERSION: ${DISTAGS_MIGRATOR_VERSION:-${DISTAGS_VERSION}}
     image: distags-migrator:${DISTAGS_MIGRATOR_VERSION:-${DISTAGS_VERSION:?DISTAGS_VERSION not set.}}
     restart: no
     environment:
@@ -105,6 +107,8 @@ services:
     build:
       context: .
       dockerfile: ./src/Distags.Api/Dockerfile
+      args:
+        VERSION: ${DISTAGS_VERSION}
     image: distags-api:${DISTAGS_VERSION:?DISTAGS_VERSION not set.}
     restart: unless-stopped
     environment:
@@ -129,6 +133,8 @@ services:
     build:
       context: .
       dockerfile: ./src/Distags.WebApp/Dockerfile
+      args:
+        VERSION: ${DISTAGS_VERSION}
     image: distags-webapp:${DISTAGS_VERSION:?DISTAGS_VERSION not set.}
     restart: unless-stopped
     environment:
@@ -146,6 +152,8 @@ services:
     build:
       context: .
       dockerfile: ./src/SteamDataScraper/Dockerfile
+      args:
+        VERSION: ${DISTAGS_VERSION}
     image: distags-steam-data-scraper:${DISTAGS_VERSION:?DISTAGS_VERSION not set.}
     restart: no
     profiles: [jobs]
