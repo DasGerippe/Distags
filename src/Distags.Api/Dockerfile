@@ -18,7 +18,7 @@ WORKDIR /app
 COPY Directory.Build.props ./
 COPY src/ src/
 
-RUN --mount=type=cache,id=nuget,target=/root/.nuget/packages \
+RUN --mount=type=cache,id=nuget,target=/root/.nuget/packages,sharing=locked \
     dotnet publish src/Distags.Api/Distags.Api.csproj \
       -c $BUILD_CONFIGURATION \
       -p:UseAppHost=false \
