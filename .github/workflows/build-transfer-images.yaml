@@ -1,0 +1,64 @@
+name: Build and Transfer Docker Images
+
+permissions:
+  contents: read
+
+on:
+  push:
+    tags:
+      - 'v[0-9]+.[0-9]+.[0-9]+'
+      - 'v[0-9]+.[0-9]+.[0-9]+-*'
+
+jobs:
+  build-transfer:
+    runs-on: ubuntu-latest
+    environment: production
+    steps:
+      - name: Derive Version From Tag
+        run: |
+          VERSION="${GITHUB_REF_NAME#v}"
+          if ! [[ "$VERSION" =~ ^[0-9]+\.[0-9]+\.[0-9]+(-[0-9A-Za-z.-]+)?$ ]]
+          then
+              echo "Tag '$GITHUB_REF_NAME' is not a valid SemVer tag."
+              exit 1
+          fi
+          echo "VERSION=$VERSION" >> "$GITHUB_ENV"
+
+      - uses: actions/checkout@v4
+
+      - name: Build Docker Images
+        env:
+          DISTAGS_VERSION: ${{ env.VERSION }}
+          DISTAGS_MIGRATOR_VERSION: ${{ env.VERSION }}
+        run: docker compose --profile "jobs" build
+
+      - name: Configure SSH
+        env:
+          SSH_KEY: ${{ secrets.DEPLOY_SSH_KEY }}
+          SSH_KNOWN_HOSTS: ${{ secrets.DEPLOY_KNOWN_HOSTS }}
+        run: |
+          install -m 700 -d ~/.ssh
+          printf '%s\n' "$SSH_KEY" > ~/.ssh/id_deploy
+          chmod 600 ~/.ssh/id_deploy
+          printf '%s\n' "$SSH_KNOWN_HOSTS" > ~/.ssh/known_hosts
+
+      - name: Transfer Images to Server
+        env:
+          DISTAGS_VERSION: ${{ env.VERSION }}
+          DISTAGS_MIGRATOR_VERSION: ${{ env.VERSION }}
+          DISTAGS_SSH_TARGET: ${{ secrets.DEPLOY_USER }}@${{ secrets.DEPLOY_HOST }}
+        run: |
+          set -euo pipefail
+          mapfile -t IMAGES < <(docker compose --profile "jobs" config --images | sort -u | grep '^distags-')
+
+          if [ "${#IMAGES[@]}" -eq 0 ]
+          then
+            echo "No distags-* images found to transfer."
+            exit 1
+          fi
+
+          echo "Transferring:"
+          printf '%s\n' "${IMAGES[@]}"
+
+          docker save "${IMAGES[@]}" | gzip \
+            | ssh -i ~/.ssh/id_deploy "$DISTAGS_SSH_TARGET" 'gunzip | docker load'

@@ -12,15 +12,17 @@ EXPOSE 8081
 # This stage is used to build and publish the project for the final stage.
 FROM --platform=$BUILDPLATFORM mcr.microsoft.com/dotnet/sdk:10.0-alpine AS build
 ARG BUILD_CONFIGURATION=Release
+ARG VERSION=0.0.0
 WORKDIR /app
 
 COPY Directory.Build.props ./
 COPY src/ src/
 
-RUN --mount=type=cache,id=nuget,target=/root/.nuget/packages \
+RUN --mount=type=cache,id=nuget,target=/root/.nuget/packages,sharing=locked \
     dotnet publish src/Distags.Api/Distags.Api.csproj \
       -c $BUILD_CONFIGURATION \
       -p:UseAppHost=false \
+      -p:Version=$VERSION \
       -o /app/publish
 
 ################################################################################
