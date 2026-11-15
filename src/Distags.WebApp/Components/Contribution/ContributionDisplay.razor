@@ -6,7 +6,7 @@
 @using Distags.WebApp.Components.Level
 @using Distags.WebApp.Services
 
-@inject TagProvider TagProvider
+@inject TagDictionaryProvider TagDictionaryProvider
 
 <div class="row align-items-center border border-1 rounded-3 shadow mx-0 py-2 row-gap-2 @_ContainerCssClass">
     <!-- Level -->
@@ -72,8 +72,7 @@
 
     protected override async Task OnParametersSetAsync()
     {
-        List<TagResponse> tags = await TagProvider.GetResourceAsync();
-        Dictionary<string, TagResponse> tagsDictionary = tags.ToDictionary(tag => tag.Name);
+        IReadOnlyDictionary<string, TagResponse> tagsDictionary = await TagDictionaryProvider.GetTagDictionaryAsync();
 
         HashSet<TagChangeAction> nonFallbackChangeActions = Contribution.Changes
             .Where(tagChange => tagsDictionary.GetValueOrDefault(tagChange.TagName)?.IsFallback != true)
