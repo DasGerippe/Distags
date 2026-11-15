@@ -4,6 +4,7 @@
 @using Distags.Api.Contracts.Tags
 @using Distags.WebApp.Components.Inputs
 @using Distags.WebApp.Components.Level
+@using Distags.WebApp.Components.Tag
 @using Distags.WebApp.DistagsApi
 @using Distags.WebApp.Models
 @using Distags.WebApp.Services
@@ -15,6 +16,7 @@
 @inject HistoryManager History
 @inject NavigationManager Navigation
 @inject DistagsApiClient DistagsApi
+@inject TagProvider TagProvider
 @inject TagTreeProvider TagTreeProvider
 
 <PageTitle>@Resource.PageTitle_BrowseLevels</PageTitle>
@@ -39,13 +41,10 @@
                                 <div class="my-2"></div>
                             }
 
-                            TagFilter tagFilter = _TagFilters[tag.Name];
-                            <IconCheckbox TState="TagFilterState"
-                                          Label="@tag.DisplayName"
-                                          Logic="GetCheckboxLogic(tagGroup.AllTagsExclusive)"
-                                          IconProvider="_TagFilterStateIconProvider"
-                                          State="tagFilter.State"
-                                          StateChanged="newState => OnTagFilterStateChanged(tagFilter, newState)"/>
+                            <TagFilter TagName="@tag.Name"
+                                       TagDisplayName="@tag.DisplayName"
+                                       FilterState="@_TagFilterStates[tag.Name]"
+                                       FilterStateChanged="newState => OnTagFilterStateChanged(tag, newState)" />
 
                             previousLogicGroupName = tag.LogicGroupName;
                             isFirst = false;
@@ -116,12 +115,10 @@
     private bool _IsInitialized;
     private bool _BrowseClicked;
 
+    private List<TagResponse> _Tags = [];
+    private Dictionary<string, TagFilterState> _TagFilterStates = [];
     private IReadOnlyCollection<DisplayGroupWithTags> _TagTree = [];
-    private Dictionary<string, TagFilter> _TagFilters = [];
-
-    private readonly ICheckboxLogic<TagFilterState> _ExclusiveTagFilterLogic = new ExclusiveTagCheckboxLogic();
-    private readonly ICheckboxLogic<TagFilterState> _CombinableTagFilterLogic = new CombinableTagCheckboxLogic();
-    private readonly ICheckboxIconProvider<TagFilterState> _TagFilterStateIconProvider = new TagFilterStateIconProvider();
+    private ILookup<string?, TagResponse> _LogicGroupTagLookup = null!;
 
     private readonly IGenericDropdownItemProvider<int> _PageSizeItemsProvider = new IntDropdownItemProvider(10, 20, 30, 50, 100);
     private IGenericDropdownItemProvider<LevelSortStrategy> _SortStrategyItemsProvider = null!;
@@ -146,10 +143,11 @@
 
     protected override async Task OnInitializedAsync()
     {
+        _Tags = await TagProvider.GetResourceAsync();
+        _TagFilterStates = _Tags.ToDictionary(tag => tag.Name, _ => TagFilterState.Neutral);
+
         _TagTree = await TagTreeProvider.GetTagTreeAsync();
-        _TagFilters = _TagTree
-            .SelectMany(tagGroup => tagGroup.Tags.Select(tag => new TagFilter(tag)))
-            .ToDictionary(tagFilter => tagFilter.Tag.Name);
+        _LogicGroupTagLookup = _Tags.ToLookup(tag => tag.LogicGroupName);
 
         LoadStateFromQueryParameters();
 
@@ -179,16 +177,30 @@
         string[] tagNames = commaSeparatedTags.Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
         foreach (string tagName in tagNames)
         {
-            bool filterExists = _TagFilters.TryGetValue(tagName, out TagFilter? tagFilter);
-            if (filterExists)
-                tagFilter!.State = filterState;
+            _TagFilterStates[tagName] = filterState;
         }
     }
 
-    private async Task OnTagFilterStateChanged(TagFilter tagFilter, TagFilterState newState)
+    private async Task OnTagFilterStateChanged(TagResponse tag, TagFilterState newState)
     {
-        tagFilter.State = newState;
+        _TagFilterStates[tag.Name] = newState;
+        UpdateTagFiltersOfSameLogicGroup(tag, newState);
         await UpdateBrowserUrl();
+    }
+
+    private void UpdateTagFiltersOfSameLogicGroup(TagResponse tag, TagFilterState newState)
+    {
+        if (newState != TagFilterState.Required || !tag.IsExclusive)
+            return;
+
+        foreach (TagResponse logicGroupTag in _LogicGroupTagLookup[tag.LogicGroupName])
+        {
+            if (logicGroupTag.Name == tag.Name)
+                continue;
+
+            if (_TagFilterStates[logicGroupTag.Name] == TagFilterState.Required)
+                _TagFilterStates[logicGroupTag.Name] = TagFilterState.Neutral;
+        }
     }
 
     private async Task OnLevelFilterChanged(ChangeEventArgs args)
@@ -218,11 +230,6 @@
     private async Task OnPageChanged(int newPage)
     {
         await QueryLevelsAsync(newPage);
-    }
-
-    private ICheckboxLogic<TagFilterState> GetCheckboxLogic(bool allTagsExclusive)
-    {
-        return allTagsExclusive ? _ExclusiveTagFilterLogic : _CombinableTagFilterLogic;
     }
 
     private async Task UpdateBrowserUrl()
@@ -269,23 +276,12 @@
 
     private string? GetTagParameterByState(TagFilterState tagFilterState)
     {
-        IEnumerable<string> tagNames = _TagFilters
-            .Where(tagFilter => tagFilter.Value.State == tagFilterState)
-            .Select(tagFilter => tagFilter.Key);
+        IEnumerable<string> tagNames = _TagFilterStates
+            .Where(filterStatePair => filterStatePair.Value == tagFilterState)
+            .Select(filterStatePair => filterStatePair.Key);
 
         string tagsParameter = string.Join(',', tagNames);
         return string.IsNullOrEmpty(tagsParameter) ? null : tagsParameter;
-    }
-
-    private class TagFilter
-    {
-        public TagResponse Tag { get; }
-        public TagFilterState State { get; set; } = TagFilterState.Neutral;
-
-        public TagFilter(TagResponse tag)
-        {
-            Tag = tag;
-        }
     }
 
 }

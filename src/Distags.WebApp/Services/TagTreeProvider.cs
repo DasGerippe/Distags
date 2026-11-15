@@ -1,44 +1,43 @@
 using Distags.Api.Contracts.DisplayGroups;
 using Distags.Api.Contracts.Tags;
-using Distags.WebApp.DistagsApi;
 using Distags.WebApp.Models;
 
 namespace Distags.WebApp.Services;
 
 public class TagTreeProvider
 {
-    private readonly DistagsApiClient _DistagsApiClient;
+    private readonly DisplayGroupProvider _DisplayGroupProvider;
+    private readonly TagProvider _TagProvider;
 
-    private IReadOnlyCollection<DisplayGroupWithTags>? _TagGroups;
+    private readonly Lazy<Task> _InitializationTask;
+    private IReadOnlyCollection<DisplayGroupWithTags>? _TagTree;
 
-    public TagTreeProvider(DistagsApiClient distagsApiClient)
+    public TagTreeProvider(DisplayGroupProvider displayGroupProvider, TagProvider tagProvider)
     {
-        _DistagsApiClient = distagsApiClient;
+        _DisplayGroupProvider = displayGroupProvider;
+        _TagProvider = tagProvider;
+
+        _InitializationTask = new Lazy<Task>(InitializeAsync, LazyThreadSafetyMode.ExecutionAndPublication);
+    }
+
+    private async Task InitializeAsync()
+    {
+        Task<List<DisplayGroupResponse>> displayGroupsTask = _DisplayGroupProvider.GetResourceAsync();
+        Task<List<TagResponse>> tagsTask = _TagProvider.GetResourceAsync();
+
+        List<DisplayGroupResponse> displayGroups = await displayGroupsTask.ConfigureAwait(false);
+        List<TagResponse> tags = await tagsTask.ConfigureAwait(false);
+
+        _TagTree = displayGroups
+            .Select(displayGroup => new DisplayGroupWithTags(
+                displayGroup,
+                tags.Where(tag => tag.DisplayGroupName == displayGroup.Name).ToList()))
+            .ToList();
     }
 
     public async Task<IReadOnlyCollection<DisplayGroupWithTags>> GetTagTreeAsync()
     {
-        _TagGroups ??= await BuildTagTreeAsync();
-        return _TagGroups;
-    }
-
-    private async Task<List<DisplayGroupWithTags>> BuildTagTreeAsync()
-    {
-        Task<ApiResult<List<DisplayGroupResponse>>> displayGroupsTask = _DistagsApiClient.GetDisplayGroupsAsync();
-        Task<ApiResult<List<TagResponse>>> tagsTask = _DistagsApiClient.GetTagsAsync();
-
-        ApiResult<List<DisplayGroupResponse>> displayGroupsResult = await displayGroupsTask.ConfigureAwait(false);
-        ApiResult<List<TagResponse>> tagsResult = await tagsTask.ConfigureAwait(false);
-
-        displayGroupsResult.EnsureSuccess();
-        tagsResult.EnsureSuccess();
-
-        List<DisplayGroupWithTags> tagTree = displayGroupsResult.Value
-            .Select(displayGroup => new DisplayGroupWithTags(
-                displayGroup,
-                tagsResult.Value.Where(tag => tag.DisplayGroupName == displayGroup.Name).ToList()))
-            .ToList();
-
-        return tagTree;
+        await _InitializationTask.Value;
+        return _TagTree!;
     }
 }

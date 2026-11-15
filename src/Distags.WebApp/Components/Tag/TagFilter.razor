@@ -1,0 +1,57 @@
+@using Distags.WebApp.Models
+
+<div class="d-flex align-items-start gap-2">
+    <label>
+        <input type="checkbox" class="btn-check" checked="@(FilterState == TagFilterState.Required)" @onchange="IncludeClicked" />
+        <i class="@GetIncludeIconClass()"></i>
+    </label>
+
+    <label>
+        <input type="checkbox" class="btn-check" checked="@(FilterState == TagFilterState.Forbidden)" @onchange="ExcludeClicked" />
+        <i class="@GetExcludeIconClass()"></i>
+    </label>
+
+    <span class="tag-filter-label">@TagDisplayName</span>
+</div>
+
+@code {
+
+    [Parameter]
+    public required string TagName { get; set; }
+
+    [Parameter]
+    public required string TagDisplayName { get; set; }
+
+    [Parameter]
+    public TagFilterState FilterState { get; set; } = TagFilterState.Neutral;
+
+    [Parameter]
+    public EventCallback<TagFilterState> FilterStateChanged { get; set; }
+
+    private string GetIncludeIconClass()
+    {
+        return FilterState == TagFilterState.Required
+            ? "bi bi-check-square-fill text-success"
+            : "bi bi-check-square text-body-tertiary";
+    }
+
+    private string GetExcludeIconClass()
+    {
+        return FilterState == TagFilterState.Forbidden
+            ? "bi bi-x-square-fill text-danger"
+            : "bi bi-x-square text-body-tertiary";
+    }
+
+    private Task IncludeClicked()
+    {
+        FilterState = FilterState == TagFilterState.Required ? TagFilterState.Neutral : TagFilterState.Required;
+        return FilterStateChanged.InvokeAsync(FilterState);
+    }
+
+    private Task ExcludeClicked()
+    {
+        FilterState = FilterState == TagFilterState.Forbidden ? TagFilterState.Neutral : TagFilterState.Forbidden;
+        return FilterStateChanged.InvokeAsync(FilterState);
+    }
+
+}
