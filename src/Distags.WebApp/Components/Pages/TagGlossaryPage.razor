@@ -7,16 +7,11 @@
 
 @inject TagTreeProvider TagTreeProvider
 
-@if (TagTree == null)
-{
-    return;
-}
-
 <div class="container-fluid content py-4">
     <h1 class="h1 text-center">Tag Glossary</h1>
 
     <div class="d-flex flex-column gap-3">
-        @foreach (DisplayGroupWithTags displayGroupWithTags in TagTree)
+        @foreach (DisplayGroupWithTags displayGroupWithTags in _TagTree)
         {
             DisplayGroupResponse displayGroup = displayGroupWithTags.DisplayGroup;
             string collapseId = $"{displayGroup.Name}Collapse";
@@ -68,12 +63,11 @@
 
 @code {
 
-    [PersistentState]
-    public IReadOnlyCollection<DisplayGroupWithTags>? TagTree { get; set; }
+    private IReadOnlyCollection<DisplayGroupWithTags> _TagTree = [];
 
     protected override async Task OnInitializedAsync()
     {
-        TagTree ??= await TagTreeProvider.GetTagTreeAsync();
+        _TagTree = await TagTreeProvider.GetTagTreeAsync();
     }
 
 }
