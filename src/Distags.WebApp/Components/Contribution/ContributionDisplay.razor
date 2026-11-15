@@ -72,7 +72,8 @@
 
     protected override async Task OnParametersSetAsync()
     {
-        IReadOnlyDictionary<string, TagResponse> tagsDictionary = await TagProvider.GetTagsDictionary();
+        List<TagResponse> tags = await TagProvider.GetResourceAsync();
+        Dictionary<string, TagResponse> tagsDictionary = tags.ToDictionary(tag => tag.Name);
 
         HashSet<TagChangeAction> nonFallbackChangeActions = Contribution.Changes
             .Where(tagChange => tagsDictionary.GetValueOrDefault(tagChange.TagName)?.IsFallback != true)
