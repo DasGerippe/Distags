@@ -44,6 +44,8 @@ public class Program
             builder.Services.AddScoped<ISessionTokenProvider, SessionTokenProvider>();
             builder.Services.AddScoped<IDialogService, DialogService>();
             builder.Services.AddScoped<TagProvider>();
+            builder.Services.AddScoped<LogicGroupProvider>();
+            builder.Services.AddScoped<DisplayGroupProvider>();
             builder.Services.AddScoped<TagTreeProvider>();
 
             builder.Services.AddScoped<TimeRefreshService>();
