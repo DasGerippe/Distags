@@ -13,9 +13,9 @@
         "DOTNET_ENVIRONMENT": "Development"
       }
     },
-    "Run LevelType, GameMode, MissingLevel": {
+    "Run Periodic AutoTaggers": {
       "commandName": "Project",
-      "commandLineArgs": "LevelTypeAutoTagger GameModeAutoTagger MissingLevelAutoTagger",
+      "commandLineArgs": "LevelTypeAutoTagger GameModeAutoTagger DifficultyAutoTagger MissingLevelAutoTagger",
       "environmentVariables": {
         "DOTNET_ENVIRONMENT": "Development"
       }
