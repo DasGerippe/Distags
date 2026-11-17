@@ -14,78 +14,96 @@ public class TagSeeder
 
     public async Task SeedGroupsAndTagsAsync(DbContext dbContext, CancellationToken cancellationToken = default)
     {
-        bool shouldSeedGroupsAndTags =
-            !await dbContext.Set<DisplayGroup>().AnyAsync(cancellationToken).ConfigureAwait(false) &&
-            !await dbContext.Set<LogicGroup>().AnyAsync(cancellationToken).ConfigureAwait(false) &&
-            !await dbContext.Set<Tag>().AnyAsync(cancellationToken).ConfigureAwait(false);
-
-        if (!shouldSeedGroupsAndTags)
-            return;
-
-        Dictionary<string, DisplayGroup> displayGroups = CreateDisplayGroupsDictionary();
-        Dictionary<string, LogicGroup> logicGroups = CreateLogicGroupDictionary();
-        List<Tag> tags = CreateTags(displayGroups, logicGroups);
-
-        dbContext.AddRange(displayGroups.Values);
-        dbContext.AddRange(logicGroups.Values);
-        dbContext.AddRange(tags);
+        Dictionary<string, DisplayGroup> displayGroups = await SyncDisplayGroupsAsync(dbContext, cancellationToken).ConfigureAwait(false);
+        Dictionary<string, LogicGroup> logicGroups = await SyncLogicGroupsAsync(dbContext, cancellationToken).ConfigureAwait(false);
+        await SyncTagsAsync(dbContext, displayGroups, logicGroups, cancellationToken).ConfigureAwait(false);
 
         await dbContext.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
     }
 
-    private Dictionary<string, DisplayGroup> CreateDisplayGroupsDictionary()
+    private async Task<Dictionary<string, DisplayGroup>> SyncDisplayGroupsAsync(
+        DbContext dbContext, CancellationToken cancellationToken = default)
     {
+        Dictionary<string, DisplayGroup> displayGroupsDict = await dbContext.Set<DisplayGroup>()
+            .ToDictionaryAsync(displayGroup => displayGroup.Name, cancellationToken)
+            .ConfigureAwait(false);
+
+        List<SeedDisplayGroup> seedDisplayGroups = _SeedTagsAndGroupsProvider.GetSeedDisplayGroups();
         int position = 0;
-
-        return _SeedTagsAndGroupsProvider.GetSeedDisplayGroups()
-            .Select(seedDisplayGroup => new DisplayGroup
-            {
-                Name = seedDisplayGroup.Name,
-                DisplayName = seedDisplayGroup.DisplayName,
-                Description = seedDisplayGroup.Description,
-                Position = ++position,
-            })
-            .ToDictionary(displayGroup => displayGroup.Name);
-    }
-
-    private Dictionary<string, LogicGroup> CreateLogicGroupDictionary()
-    {
-        return _SeedTagsAndGroupsProvider.GetSeedLogicGroups()
-            .Select(seedLogicGroup => new LogicGroup()
-            {
-                Name = seedLogicGroup.Name,
-                AllExclusive = seedLogicGroup.AllExclusive,
-            })
-            .ToDictionary(logicGroup => logicGroup.Name);
-    }
-
-    private List<Tag> CreateTags(Dictionary<string, DisplayGroup> displayGroups, Dictionary<string, LogicGroup> logicGroups)
-    {
-        List<Tag> tags = _SeedTagsAndGroupsProvider.GetSeedTags()
-            .Select(seedTag => new Tag
-            {
-                Name = seedTag.Name,
-                DisplayName = seedTag.DisplayName,
-                DisplayGroup = displayGroups[seedTag.DisplayGroupName],
-                LogicGroup = string.IsNullOrEmpty(seedTag.LogicGroupName) ? null : logicGroups[seedTag.LogicGroupName],
-                IsExclusive = seedTag.IsExclusive,
-                IsFallback = seedTag.IsFallback,
-                IsAutoTag = seedTag.IsAutoTag,
-                Description = seedTag.Description,
-            })
-            .ToList();
-
-        DisplayGroup? lastDisplayGroup = null;
-        int position = 0;
-        foreach (Tag tag in tags)
+        foreach (SeedDisplayGroup seedDisplayGroup in seedDisplayGroups)
         {
+            if (!displayGroupsDict.TryGetValue(seedDisplayGroup.Name, out DisplayGroup? displayGroup))
+            {
+                displayGroup = new DisplayGroup { Name = seedDisplayGroup.Name };
+                displayGroupsDict[seedDisplayGroup.Name] = displayGroup;
+                dbContext.Add(displayGroup);
+            }
+
+            displayGroup.DisplayName = seedDisplayGroup.DisplayName;
+            displayGroup.Description = seedDisplayGroup.Description;
+            displayGroup.Position = ++position;
+        }
+
+        return displayGroupsDict;
+    }
+
+    private async Task<Dictionary<string, LogicGroup>> SyncLogicGroupsAsync(
+        DbContext dbContext, CancellationToken cancellationToken = default)
+    {
+        Dictionary<string, LogicGroup> logicGroupsDict = await dbContext.Set<LogicGroup>()
+            .ToDictionaryAsync(logicGroup => logicGroup.Name, cancellationToken)
+            .ConfigureAwait(false);
+
+        List<SeedLogicGroup> seedLogicGroups = _SeedTagsAndGroupsProvider.GetSeedLogicGroups();
+        foreach (SeedLogicGroup seedLogicGroup in seedLogicGroups)
+        {
+            if (!logicGroupsDict.TryGetValue(seedLogicGroup.Name, out LogicGroup? logicGroup))
+            {
+                logicGroup = new LogicGroup { Name = seedLogicGroup.Name };
+                logicGroupsDict[seedLogicGroup.Name] = logicGroup;
+                dbContext.Add(logicGroup);
+            }
+
+            logicGroup.AllExclusive = seedLogicGroup.AllExclusive;
+        }
+
+        return logicGroupsDict;
+    }
+
+    private async Task SyncTagsAsync(
+        DbContext dbContext,
+        Dictionary<string, DisplayGroup> displayGroups,
+        Dictionary<string, LogicGroup> logicGroups,
+        CancellationToken cancellationToken = default)
+    {
+        Dictionary<string, Tag> tagsDict = await dbContext.Set<Tag>()
+            .ToDictionaryAsync(tag => tag.Name, cancellationToken)
+            .ConfigureAwait(false);
+
+        List<SeedTag> seedTags = _SeedTagsAndGroupsProvider.GetSeedTags();
+        int position = 0;
+        DisplayGroup? lastDisplayGroup = null;
+        foreach (SeedTag seedTag in seedTags)
+        {
+            if (!tagsDict.TryGetValue(seedTag.Name, out Tag? tag))
+            {
+                tag = new Tag { Name = seedTag.Name };
+                dbContext.Add(tag);
+            }
+
+            tag.DisplayName = seedTag.DisplayName;
+            tag.Description = seedTag.Description;
+            tag.DisplayGroup = displayGroups[seedTag.DisplayGroupName];
+            tag.LogicGroup = string.IsNullOrEmpty(seedTag.LogicGroupName) ? null : logicGroups[seedTag.LogicGroupName];
+            tag.IsExclusive = seedTag.IsExclusive;
+            tag.IsFallback = seedTag.IsFallback;
+            tag.IsAutoTag = seedTag.IsAutoTag;
+
             if (tag.DisplayGroup != lastDisplayGroup)
                 position = 0;
 
             tag.Position = ++position;
             lastDisplayGroup = tag.DisplayGroup;
         }
-
-        return tags;
     }
 }
