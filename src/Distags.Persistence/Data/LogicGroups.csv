@@ -11,6 +11,7 @@ gimmicks;False
 readability;True
 theme;False
 level-type;True
+event;True
 wr-difficulty;True
 wr-length;True
 wr-tech;False

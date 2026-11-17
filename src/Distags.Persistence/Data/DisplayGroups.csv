@@ -8,6 +8,7 @@ gimmicks;Gimmicks;Additional features of a level that can alter the experience w
 readability;Readability;How well a level communicates where to go and what to do.
 theme;Theme;The thematic design and visual style of a level.
 level-info;Level Info;Miscellaneous information about a level.
+event;Event;The event during which a level was released.
 wr-difficulty;WR Difficulty;The overall difficulty of completing a level using the world record route. This is not how hard it is to beat the current world record, and it may exclude the difficulty of optional WR Tech.
 wr-length;WR Length;The time to complete a level using the current world record route.
 wr-tech;WR Tech;Advanced or annoying mechanics used in the world record route. The current world record doesn't necessarily use all of them, and they may not be required to be competitive.

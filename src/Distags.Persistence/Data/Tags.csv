@@ -118,7 +118,7 @@ hot-wheels;Hot Wheels;theme;theme;False;False;False;The level is themed around H
 spooky;Spooky;theme;theme;False;False;False;The level has a spooky or eerie atmosphere.
 evil;Evil;theme;theme;False;False;False;The level has a evil, menacing or sinister atmosphere.
 silly;Silly;theme;theme;False;False;False;The level has a silly or humorous atmosphere.
-spectacular;Spectacular;theme;theme;False;False;False;The level has an impressive, grand or cinematic presentation. 
+spectacular;Spectacular;theme;theme;False;False;False;The level has an impressive, grand or cinematic presentation.
 corrupted;Corrupted;theme;theme;False;False;False;The level looks corrupted or infected.
 geometric;Geometric;theme;theme;False;False;False;The level has a lot of geometric shapes or objects.
 abstract;Abstract;theme;theme;False;False;False;The level uses abstract visuals without a recognizeable setting.
@@ -144,6 +144,38 @@ official;Official Level;level-info;level-type;True;False;True;An official level 
 workshop;Workshop Level;level-info;level-type;True;False;True;A workshop level that needs to be subscribed to/downloaded.
 medals;Medals;level-info;;False;False;False;The level supports medals.
 missing-level;Missing Level Bug;level-info;;False;False;True;"The level cannot be downloaded with the newest game version and causes the ""Missing Level"" error in Multiplayer."
+dac-2026;DAC 2026;event;event;True;False;False;The level was released during Distance Advent Calendar 2026.
+dac-2025;DAC 2025;event;event;True;False;False;The level was released during Distance Advent Calendar 2025.
+dac-2024;DAC 2024;event;event;True;False;False;The level was released during Distance Advent Calendar 2024.
+dac-2023;DAC 2023;event;event;True;False;False;The level was released during Distance Advent Calendar 2023.
+dac-2022;DAC 2022;event;event;True;False;False;The level was released during Distance Advent Calendar 2022.
+dac-2021;DAC 2021;event;event;True;False;False;The level was released during Distance Advent Calendar 2021.
+dac-2020;DAC 2020;event;event;True;False;False;The level was released during Distance Advent Calendar 2020.
+dac-2019;DAC 2019;event;event;True;False;False;The level was released during Distance Advent Calendar 2019.
+dac-2018;DAC 2018;event;event;True;False;False;The level was released during Distance Advent Calendar 2018.
+dac-2017;DAC 2017;event;event;True;False;False;The level was released during Distance Advent Calendar 2017.
+dac-2016;DAC 2016;event;event;True;False;False;The level was released during Distance Advent Calendar 2016.
+dac-2015;DAC 2015;event;event;True;False;False;The level was released during Distance Advent Calendar 2015.
+dac-2014;DAC 2014;event;event;True;False;False;The level was released during Distance Advent Calendar 2014.
+dread-2026;Dread Fest 2026;event;event;True;False;False;The level was released during Dread Fest 2026.
+dread-2025;Dread Fest 2025;event;event;True;False;False;The level was released during Dread Fest 2025.
+dread-2024;Dread Fest 2024;event;event;True;False;False;The level was released during Dread Fest 2024.
+dread-2023;Dread Fest 2023;event;event;True;False;False;The level was released during Dread Fest 2023.
+dread-2022;Dread Fest 2022;event;event;True;False;False;The level was released during Dread Fest 2022.
+ste-1;Survive the Editor 1;event;event;True;False;False;The level was released during Survive the Editor 1.
+ste-2;Survive the Editor 2;event;event;True;False;False;The level was released during Survive the Editor 2.
+etc-1;Edit the Clock 1;event;event;True;False;False;The level was released during Edit the Clock 1.
+etc-2;Edit the Clock 2;event;event;True;False;False;The level was released during Edit the Clock 2.
+etc-3;Edit the Clock 3;event;event;True;False;False;The level was released during Edit the Clock 3.
+potm-1;Prompt of the Month 1;event;event;True;False;False;The level was released during Prompt of the Month 1.
+potm-2;Prompt of the Month 2;event;event;True;False;False;The level was released during Prompt of the Month 2.
+potm-3;Prompt of the Month 3;event;event;True;False;False;The level was released during Prompt of the Month 3.
+potm-4;Prompt of the Month 4;event;event;True;False;False;The level was released during Prompt of the Month 4.
+potm-5;Prompt of the Month 5;event;event;True;False;False;The level was released during Prompt of the Month 5.
+potm-6;Prompt of the Month 6;event;event;True;False;False;The level was released during Prompt of the Month 6.
+potm-7;Prompt of the Month 7;event;event;True;False;False;The level was released during Prompt of the Month 7.
+potm-8;Prompt of the Month 8;event;event;True;False;False;The level was released during Prompt of the Month 8.
+potm-9;Prompt of the Month 9;event;event;True;False;False;The level was released during Prompt of the Month 9.
 wr-difficulty-unspecified;Unspecified;wr-difficulty;wr-difficulty;True;True;False;World record difficulty has not been specified yet.
 wr-casual;Casual;wr-difficulty;wr-difficulty;True;False;False;The world record route has minimal obstacles and little to no chance of death.
 wr-normal;Normal;wr-difficulty;wr-difficulty;True;False;False;The world record route has minimal transfers and some obstacles.
