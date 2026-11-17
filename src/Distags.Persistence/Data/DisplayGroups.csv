@@ -1,5 +1,5 @@
 Name;DisplayName;Description
-game-mode;Game Mode;The game modes that a level supports.
+level-info;Level Info;Miscellaneous information about a level.
 difficulty;Difficulty;The overall difficulty of completing a level in a casual playthrough. Even minor sections may warrant a higher difficulty.
 length;Length;The average time to complete a level in a casual playthrough, without major or unintended skips.
 abilities;Abilities;Which car abilities are enabled, disabled, or toggling throughout a level. Minor sections may not warrant a tag.
@@ -7,7 +7,6 @@ gameplay;Gameplay;The core types of gameplay of a level. Minor sections may not 
 gimmicks;Gimmicks;Additional features of a level that can alter the experience without changing the core gameplay.
 readability;Readability;How well a level communicates where to go and what to do.
 theme;Theme;The thematic design and visual style of a level.
-level-info;Level Info;Miscellaneous information about a level.
 event;Event;The event during which a level was released.
 wr-difficulty;WR Difficulty;The overall difficulty of completing a level using the world record route. This is not how hard it is to beat the current world record, and it may exclude the difficulty of optional WR Tech.
 wr-length;WR Length;The time to complete a level using the current world record route.

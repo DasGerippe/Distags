@@ -1,9 +1,13 @@
 Name;DisplayName;DisplayGroupName;LogicGroupName;IsExclusive;IsFallback;IsAutoTag;Description
-sprint;Sprint;game-mode;;False;False;True;The level can be played in Sprint mode.
-challenge;Challenge;game-mode;;False;False;True;The level can be played in Challenge mode.
-stunt;Stunt;game-mode;;False;False;True;The level can be played in Stunt mode.
-reverse-tag;Reverse Tag;game-mode;;False;False;True;The level can be played in Reverse Tag mode.
-main-menu;Main Menu;game-mode;;False;False;True;The level can be used as a Main Menu.
+official;Official Level;level-info;level-type;True;False;True;An official level that ships with the base game.
+workshop;Workshop Level;level-info;level-type;True;False;True;A workshop level that needs to be subscribed to/downloaded.
+sprint;Sprint;level-info;game-mode;False;False;True;The level can be played in Sprint mode.
+challenge;Challenge;level-info;game-mode;False;False;True;The level can be played in Challenge mode.
+stunt;Stunt;level-info;game-mode;False;False;True;The level can be played in Stunt mode.
+reverse-tag;Reverse Tag;level-info;game-mode;False;False;True;The level can be played in Reverse Tag mode.
+main-menu;Main Menu;level-info;game-mode;False;False;True;The level can be used as a Main Menu.
+medals;Medals;level-info;;False;False;False;The level supports medals.
+missing-level;Missing Level Bug;level-info;;False;False;True;"The level cannot be downloaded with the newest game version and causes the ""Missing Level"" error in Multiplayer."
 difficulty-unspecified;Unspecified;difficulty;difficulty;True;True;False;Difficulty has not been specified yet.
 casual;Casual;difficulty;difficulty;True;False;False;Minimal amounts of obstacles with little to no chance of death.
 normal;Normal;difficulty;difficulty;True;False;False;Minimal transfers and some obstacles. Early Arcade.
@@ -140,10 +144,6 @@ flashy;Flashy;theme;theme;False;False;False;The level has flashing or fast-chang
 contrast;High Contrast;theme;theme;False;False;False;The level has high contrast between light and dark or between colors.
 colorful;Colorful;theme;theme;False;False;False;The level uses a wide range of colors.
 monochromatic;Monochromatic;theme;theme;False;False;False;The level only uses one color or only a few shades.
-official;Official Level;level-info;level-type;True;False;True;An official level that ships with the base game.
-workshop;Workshop Level;level-info;level-type;True;False;True;A workshop level that needs to be subscribed to/downloaded.
-medals;Medals;level-info;;False;False;False;The level supports medals.
-missing-level;Missing Level Bug;level-info;;False;False;True;"The level cannot be downloaded with the newest game version and causes the ""Missing Level"" error in Multiplayer."
 dac-2026;DAC 2026;event;event;True;False;False;The level was released during Distance Advent Calendar 2026.
 dac-2025;DAC 2025;event;event;True;False;False;The level was released during Distance Advent Calendar 2025.
 dac-2024;DAC 2024;event;event;True;False;False;The level was released during Distance Advent Calendar 2024.
