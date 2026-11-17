@@ -112,7 +112,7 @@ cave;Cave;theme;theme;False;False;False;The level is set in caves or underground
 corn;Corn;theme;theme;False;False;False;The level is themed around corn.
 food;Food;theme;theme;False;False;False;The level is themed around food or drinks.
 broken-symmetry;Broken Symmetry;theme;theme;False;False;False;The level is themed around or a modification of the official Broken Symmetry level.
-acceleracers;Acceleracers;theme;theme;False;False;False;The level is themed around Hot Wheels Acceleracers Realms.
+hot-wheels;Hot Wheels;theme;theme;False;False;False;The level is themed around Hot Wheels.
 spooky;Spooky;theme;theme;False;False;False;The level has a spooky or eerie atmosphere.
 evil;Evil;theme;theme;False;False;False;The level has a evil, menacing or sinister atmosphere.
 silly;Silly;theme;theme;False;False;False;The level has a silly or humorous atmosphere.
