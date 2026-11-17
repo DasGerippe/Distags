@@ -105,6 +105,7 @@ water;Water;theme;theme;False;False;False;The level is themed around water, ocea
 snow;Snow;theme;theme;False;False;False;The level is themed around snow or ice.
 sky;Sky;theme;theme;False;False;False;The level is set in the sky, among clouds or high above the ground.
 space;Space;theme;theme;False;False;False;The level is themed around outer space.
+glass;Glass;theme;theme;False;False;False;The level is made out of glass or has lots of glass in it.
 toy-box;Toy Box;theme;theme;False;False;False;The level is themed around toys and playrooms.
 industrial;Industrial;theme;theme;False;False;False;The level is themed around factories, machinery or industrial settings.
 cityscape;Cityscape;theme;theme;False;False;False;The level is set in a city or urban environment.
