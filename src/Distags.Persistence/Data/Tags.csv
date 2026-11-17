@@ -8,8 +8,8 @@ difficulty-unspecified;Unspecified;difficulty;difficulty;True;True;False;Difficu
 casual;Casual;difficulty;difficulty;True;False;False;Minimal amounts of obstacles with little to no chance of death.
 normal;Normal;difficulty;difficulty;True;False;False;Minimal transfers and some obstacles. Early Arcade.
 advanced;Advanced;difficulty;difficulty;True;False;False;Standard Distance gameplay with moderate amounts of obstacles and transfers. (End of Adventure, Nexus)
-expert;Expert;difficulty;difficulty;True;False;False;Increasing amount of transfers and obstacles and/or faster paced gameplay. (Around Lost To Echoes)
-nightmare;Nightmare;difficulty;difficulty;True;False;False;Entry level of advanced mechanics like gripflight and Kinix-transfers/dual-axis transfers. (Zenith, Inferno, etc.)
+expert;Expert;difficulty;difficulty;True;False;False;Increasing amount of transfers and obstacles, introduction to dual-axis transfers and/or faster paced gameplay. (Around Lost To Echoes)
+nightmare;Nightmare;difficulty;difficulty;True;False;False;Entry level of advanced mechanics like gripflight and more frequent dual-axis transfers.
 brutal;Brutal;difficulty;difficulty;True;False;False;Refined advanced mechanics and car control. (Levels ~2-10 Pred air control playlist?)
 lunatic;Lunatic;difficulty;difficulty;True;False;False;Precise advanced mechanics. (Levels ~11-20 Pred air control playlist?)
 insane;Insane;difficulty;difficulty;True;False;False;Anything even more difficult. (Levels ~21+ Pred air control playlist?)
