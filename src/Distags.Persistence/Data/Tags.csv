@@ -166,6 +166,8 @@ wr-tech-none;None;wr-tech;wr-tech;True;False;False;The level has none of the ava
 saw-boost;Saw Boost;wr-tech;wr-tech;False;False;False;Getting launched by a saw or grinder.
 wheelie-boost;Wheelie Boost;wr-tech;wr-tech;False;False;False;Wheelie boosting is used in the current world record or is effective on the world record route.
 thruster-reset;Thruster Reset;wr-tech;wr-tech;False;False;False;Thruster resets are used in the current world record or are reasonably viable.
+magnet-boost;Magnet Boost;wr-tech;wr-tech;False;False;False;Magnet Boosts are used in the current world record or are reasonably viable.
+gear-boost;Gear Boost;wr-tech;wr-tech;False;False;False;Getting boosted by rotating gears or other moving/animated objects.
 bounce;Bounce;wr-tech;wr-tech;False;False;False;Usually a thing on levels without grip or jump where there is an element of luck or precision to landing smoothly or getting up a railing/wall. (COAT Speedway, Past)
 bomb-boost;Bomb Boost;wr-tech;wr-tech;False;False;False;Launching the car with a bomb.
 sliced;Sliced;wr-tech;wr-tech;False;False;False;Slicing the car, usually with a laser, to allow it to fit somewhere a full car wouldn't. (It Was Supposed To Be Perfect)
