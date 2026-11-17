@@ -47,7 +47,8 @@ cooldown-disabled;Cooldown Disabled;abilities;cooldown;True;False;False;Cooldown
 gameplay-unspecified;Unspecified;gameplay;gameplay;True;True;False;Gameplay hasn't been specified yet.
 standard;Standard;gameplay;gameplay;False;False;False;Normal Distance gameplay with obstacles, jumps and transfers. Basically anything from Adventure.
 flat-driving;Flat Driving;gameplay;gameplay;False;False;False;No jumps or transfers.
-obstacles;Obstacles;gameplay;gameplay;False;False;False;Considerable amount of obstacles.
+obstacles;Obstacles;gameplay;gameplay;False;False;False;Considerable amount of obstacles that need to be dodged.
+jumps;Jumps;gameplay;gameplay;False;False;False;Considerable amount of obstacles or gaps that need to be jumped over.
 transfers;Transfers;gameplay;gameplay;False;False;False;Considerable amount of transfers.
 wing-flight;Wing Flight;gameplay;gameplay;False;False;False;Sections that intended for the player to fly with wings.
 grip-flight;Grip Flight;gameplay;gameplay;False;False;False;Sections that require gripflight to clear.
