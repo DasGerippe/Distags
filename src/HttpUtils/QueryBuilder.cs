@@ -52,13 +52,11 @@ public static class QueryBuilder
         {
             // Check for string before IEnumerable because string implements IEnumerable.
             case string stringValue:
-                value = Uri.EscapeDataString(stringValue);
-                queryStringBuilder.Append(value);
+                queryStringBuilder.Append(Uri.EscapeDataString(stringValue));
                 break;
 
             case Enum enumValue:
-                value = Convert.ChangeType(value, enumValue.GetType().GetEnumUnderlyingType());
-                queryStringBuilder.Append(value);
+                queryStringBuilder.Append(Convert.ChangeType(value, enumValue.GetType().GetEnumUnderlyingType()));
                 break;
 
             case IEnumerable enumerable:
@@ -66,8 +64,7 @@ public static class QueryBuilder
                 break;
 
             case DateTimeOffset dateTimeOffset:
-                value = Uri.EscapeDataString(dateTimeOffset.ToString("O"));
-                queryStringBuilder.Append(value);
+                queryStringBuilder.Append(Uri.EscapeDataString(dateTimeOffset.ToString("O")));
                 break;
 
             default:
