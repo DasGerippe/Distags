@@ -4,21 +4,21 @@ namespace SteamWebApi.Dtos.PublishedFileService;
 
 public class QueryFileParameters
 {
-    [QueryParameter("key")]
+    [HttpParameter("key")]
     public string? Key { get; set; }
 
-    [QueryParameter("appid")]
+    [HttpParameter("appid")]
     public int? AppId { get; set; }
 
-    [QueryParameter("query_type")]
+    [HttpParameter("query_type")]
     public QueryType? QueryType { get; set; }
 
-    [QueryParameter("numperpage")]
+    [HttpParameter("numperpage")]
     public int? ItemsPerPage { get; set; }
 
-    [QueryParameter("return_metadata")]
+    [HttpParameter("return_metadata")]
     public bool? ReturnMetadata { get; set; }
 
-    [QueryParameter("cursor")]
+    [HttpParameter("cursor")]
     public string? Cursor { get; set; } = "*";
 }
