@@ -1,15 +1,19 @@
 Name;DisplayName;DisplayGroupName;LogicGroupName;IsExclusive;IsFallback;IsAutoTag;Description
-sprint;Sprint;game-mode;;False;False;True;The level can be played in Sprint mode.
-challenge;Challenge;game-mode;;False;False;True;The level can be played in Challenge mode.
-stunt;Stunt;game-mode;;False;False;True;The level can be played in Stunt mode.
-reverse-tag;Reverse Tag;game-mode;;False;False;True;The level can be played in Reverse Tag mode.
-main-menu;Main Menu;game-mode;;False;False;True;The level can be used as a Main Menu.
+official;Official Level;level-info;level-type;True;False;True;An official level that ships with the base game.
+workshop;Workshop Level;level-info;level-type;True;False;True;A workshop level that needs to be subscribed to/downloaded.
+sprint;Sprint;level-info;game-mode;False;False;True;The level can be played in Sprint mode.
+challenge;Challenge;level-info;game-mode;False;False;True;The level can be played in Challenge mode.
+stunt;Stunt;level-info;game-mode;False;False;True;The level can be played in Stunt mode.
+reverse-tag;Reverse Tag;level-info;game-mode;False;False;True;The level can be played in Reverse Tag mode.
+main-menu;Main Menu;level-info;game-mode;False;False;True;The level can be used as a Main Menu.
+medals;Medals;level-info;;False;False;False;The level supports medals.
+missing-level;Missing Level Bug;level-info;;False;False;True;"The level cannot be downloaded with the newest game version and causes the ""Missing Level"" error in Multiplayer."
 difficulty-unspecified;Unspecified;difficulty;difficulty;True;True;False;Difficulty has not been specified yet.
 casual;Casual;difficulty;difficulty;True;False;False;Minimal amounts of obstacles with little to no chance of death.
 normal;Normal;difficulty;difficulty;True;False;False;Minimal transfers and some obstacles. Early Arcade.
 advanced;Advanced;difficulty;difficulty;True;False;False;Standard Distance gameplay with moderate amounts of obstacles and transfers. (End of Adventure, Nexus)
-expert;Expert;difficulty;difficulty;True;False;False;Increasing amount of transfers and obstacles and/or faster paced gameplay. (Around Lost To Echoes)
-nightmare;Nightmare;difficulty;difficulty;True;False;False;Entry level of advanced mechanics like gripflight and Kinix-transfers/dual-axis transfers. (Zenith, Inferno, etc.)
+expert;Expert;difficulty;difficulty;True;False;False;Increasing amount of transfers and obstacles, introduction to dual-axis transfers and/or faster paced gameplay. (Around Lost To Echoes)
+nightmare;Nightmare;difficulty;difficulty;True;False;False;Entry level of advanced mechanics like gripflight and more frequent dual-axis transfers.
 brutal;Brutal;difficulty;difficulty;True;False;False;Refined advanced mechanics and car control. (Levels ~2-10 Pred air control playlist?)
 lunatic;Lunatic;difficulty;difficulty;True;False;False;Precise advanced mechanics. (Levels ~11-20 Pred air control playlist?)
 insane;Insane;difficulty;difficulty;True;False;False;Anything even more difficult. (Levels ~21+ Pred air control playlist?)
@@ -47,7 +51,8 @@ cooldown-disabled;Cooldown Disabled;abilities;cooldown;True;False;False;Cooldown
 gameplay-unspecified;Unspecified;gameplay;gameplay;True;True;False;Gameplay hasn't been specified yet.
 standard;Standard;gameplay;gameplay;False;False;False;Normal Distance gameplay with obstacles, jumps and transfers. Basically anything from Adventure.
 flat-driving;Flat Driving;gameplay;gameplay;False;False;False;No jumps or transfers.
-obstacles;Obstacles;gameplay;gameplay;False;False;False;Considerable amount of obstacles.
+obstacles;Obstacles;gameplay;gameplay;False;False;False;Considerable amount of obstacles that need to be dodged.
+jumps;Jumps;gameplay;gameplay;False;False;False;Considerable amount of obstacles or gaps that need to be jumped over.
 transfers;Transfers;gameplay;gameplay;False;False;False;Considerable amount of transfers.
 wing-flight;Wing Flight;gameplay;gameplay;False;False;False;Sections that intended for the player to fly with wings.
 grip-flight;Grip Flight;gameplay;gameplay;False;False;False;Sections that require gripflight to clear.
@@ -104,6 +109,7 @@ water;Water;theme;theme;False;False;False;The level is themed around water, ocea
 snow;Snow;theme;theme;False;False;False;The level is themed around snow or ice.
 sky;Sky;theme;theme;False;False;False;The level is set in the sky, among clouds or high above the ground.
 space;Space;theme;theme;False;False;False;The level is themed around outer space.
+glass;Glass;theme;theme;False;False;False;The level is made out of glass or has lots of glass in it.
 toy-box;Toy Box;theme;theme;False;False;False;The level is themed around toys and playrooms.
 industrial;Industrial;theme;theme;False;False;False;The level is themed around factories, machinery or industrial settings.
 cityscape;Cityscape;theme;theme;False;False;False;The level is set in a city or urban environment.
@@ -112,11 +118,11 @@ cave;Cave;theme;theme;False;False;False;The level is set in caves or underground
 corn;Corn;theme;theme;False;False;False;The level is themed around corn.
 food;Food;theme;theme;False;False;False;The level is themed around food or drinks.
 broken-symmetry;Broken Symmetry;theme;theme;False;False;False;The level is themed around or a modification of the official Broken Symmetry level.
-acceleracers;Acceleracers;theme;theme;False;False;False;The level is themed around Hot Wheels Acceleracers Realms.
+hot-wheels;Hot Wheels;theme;theme;False;False;False;The level is themed around Hot Wheels.
 spooky;Spooky;theme;theme;False;False;False;The level has a spooky or eerie atmosphere.
 evil;Evil;theme;theme;False;False;False;The level has a evil, menacing or sinister atmosphere.
 silly;Silly;theme;theme;False;False;False;The level has a silly or humorous atmosphere.
-spectacular;Spectacular;theme;theme;False;False;False;The level has an impressive, grand or cinematic presentation. 
+spectacular;Spectacular;theme;theme;False;False;False;The level has an impressive, grand or cinematic presentation.
 corrupted;Corrupted;theme;theme;False;False;False;The level looks corrupted or infected.
 geometric;Geometric;theme;theme;False;False;False;The level has a lot of geometric shapes or objects.
 abstract;Abstract;theme;theme;False;False;False;The level uses abstract visuals without a recognizeable setting.
@@ -138,10 +144,38 @@ flashy;Flashy;theme;theme;False;False;False;The level has flashing or fast-chang
 contrast;High Contrast;theme;theme;False;False;False;The level has high contrast between light and dark or between colors.
 colorful;Colorful;theme;theme;False;False;False;The level uses a wide range of colors.
 monochromatic;Monochromatic;theme;theme;False;False;False;The level only uses one color or only a few shades.
-official;Official Level;level-info;level-type;True;False;True;An official level that ships with the base game.
-workshop;Workshop Level;level-info;level-type;True;False;True;A workshop level that needs to be subscribed to/downloaded.
-medals;Medals;level-info;;False;False;False;The level supports medals.
-missing-level;Missing Level Bug;level-info;;False;False;True;"The level cannot be downloaded with the newest game version and causes the ""Missing Level"" error in Multiplayer."
+dac-2026;DAC 2026;event;event;True;False;False;The level was released during Distance Advent Calendar 2026.
+dac-2025;DAC 2025;event;event;True;False;False;The level was released during Distance Advent Calendar 2025.
+dac-2024;DAC 2024;event;event;True;False;False;The level was released during Distance Advent Calendar 2024.
+dac-2023;DAC 2023;event;event;True;False;False;The level was released during Distance Advent Calendar 2023.
+dac-2022;DAC 2022;event;event;True;False;False;The level was released during Distance Advent Calendar 2022.
+dac-2021;DAC 2021;event;event;True;False;False;The level was released during Distance Advent Calendar 2021.
+dac-2020;DAC 2020;event;event;True;False;False;The level was released during Distance Advent Calendar 2020.
+dac-2019;DAC 2019;event;event;True;False;False;The level was released during Distance Advent Calendar 2019.
+dac-2018;DAC 2018;event;event;True;False;False;The level was released during Distance Advent Calendar 2018.
+dac-2017;DAC 2017;event;event;True;False;False;The level was released during Distance Advent Calendar 2017.
+dac-2016;DAC 2016;event;event;True;False;False;The level was released during Distance Advent Calendar 2016.
+dac-2015;DAC 2015;event;event;True;False;False;The level was released during Distance Advent Calendar 2015.
+dac-2014;DAC 2014;event;event;True;False;False;The level was released during Distance Advent Calendar 2014.
+dread-2026;Dread Fest 2026;event;event;True;False;False;The level was released during Dread Fest 2026.
+dread-2025;Dread Fest 2025;event;event;True;False;False;The level was released during Dread Fest 2025.
+dread-2024;Dread Fest 2024;event;event;True;False;False;The level was released during Dread Fest 2024.
+dread-2023;Dread Fest 2023;event;event;True;False;False;The level was released during Dread Fest 2023.
+dread-2022;Dread Fest 2022;event;event;True;False;False;The level was released during Dread Fest 2022.
+ste-1;Survive the Editor 1;event;event;True;False;False;The level was released during Survive the Editor 1.
+ste-2;Survive the Editor 2;event;event;True;False;False;The level was released during Survive the Editor 2.
+etc-1;Edit the Clock 1;event;event;True;False;False;The level was released during Edit the Clock 1.
+etc-2;Edit the Clock 2;event;event;True;False;False;The level was released during Edit the Clock 2.
+etc-3;Edit the Clock 3;event;event;True;False;False;The level was released during Edit the Clock 3.
+potm-1;Prompt of the Month 1;event;event;True;False;False;The level was released during Prompt of the Month 1.
+potm-2;Prompt of the Month 2;event;event;True;False;False;The level was released during Prompt of the Month 2.
+potm-3;Prompt of the Month 3;event;event;True;False;False;The level was released during Prompt of the Month 3.
+potm-4;Prompt of the Month 4;event;event;True;False;False;The level was released during Prompt of the Month 4.
+potm-5;Prompt of the Month 5;event;event;True;False;False;The level was released during Prompt of the Month 5.
+potm-6;Prompt of the Month 6;event;event;True;False;False;The level was released during Prompt of the Month 6.
+potm-7;Prompt of the Month 7;event;event;True;False;False;The level was released during Prompt of the Month 7.
+potm-8;Prompt of the Month 8;event;event;True;False;False;The level was released during Prompt of the Month 8.
+potm-9;Prompt of the Month 9;event;event;True;False;False;The level was released during Prompt of the Month 9.
 wr-difficulty-unspecified;Unspecified;wr-difficulty;wr-difficulty;True;True;False;World record difficulty has not been specified yet.
 wr-casual;Casual;wr-difficulty;wr-difficulty;True;False;False;The world record route has minimal obstacles and little to no chance of death.
 wr-normal;Normal;wr-difficulty;wr-difficulty;True;False;False;The world record route has minimal transfers and some obstacles.
@@ -166,6 +200,8 @@ wr-tech-none;None;wr-tech;wr-tech;True;False;False;The level has none of the ava
 saw-boost;Saw Boost;wr-tech;wr-tech;False;False;False;Getting launched by a saw or grinder.
 wheelie-boost;Wheelie Boost;wr-tech;wr-tech;False;False;False;Wheelie boosting is used in the current world record or is effective on the world record route.
 thruster-reset;Thruster Reset;wr-tech;wr-tech;False;False;False;Thruster resets are used in the current world record or are reasonably viable.
+magnet-boost;Magnet Boost;wr-tech;wr-tech;False;False;False;Magnet Boosts are used in the current world record or are reasonably viable.
+gear-boost;Gear Boost;wr-tech;wr-tech;False;False;False;Getting boosted by rotating gears or other moving/animated objects.
 bounce;Bounce;wr-tech;wr-tech;False;False;False;Usually a thing on levels without grip or jump where there is an element of luck or precision to landing smoothly or getting up a railing/wall. (COAT Speedway, Past)
 bomb-boost;Bomb Boost;wr-tech;wr-tech;False;False;False;Launching the car with a bomb.
 sliced;Sliced;wr-tech;wr-tech;False;False;False;Slicing the car, usually with a laser, to allow it to fit somewhere a full car wouldn't. (It Was Supposed To Be Perfect)

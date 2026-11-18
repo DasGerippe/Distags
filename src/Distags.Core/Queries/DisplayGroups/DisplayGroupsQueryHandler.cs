@@ -17,6 +17,7 @@ public class DisplayGroupsQueryHandler : IQueryHandler<DisplayGroupsQuery, List<
     public async Task<List<DisplayGroupDto>> HandleAsync(DisplayGroupsQuery query)
     {
         return await _DbContext.Set<DisplayGroup>()
+            .OrderBy(displayGroup => displayGroup.Position)
             .SelectDto()
             .ToListAsync()
             .ConfigureAwait(false);

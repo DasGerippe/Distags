@@ -19,6 +19,10 @@ public class TagSeeder
         await SyncTagsAsync(dbContext, displayGroups, logicGroups, cancellationToken).ConfigureAwait(false);
 
         await dbContext.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+
+        // Delete empty groups *after* sync so we don't cascade delete tags that are moved to different groups during sync.
+        await DeleteEmptyGroupsAsync(dbContext, cancellationToken).ConfigureAwait(false);
+        await dbContext.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
     }
 
     private async Task<Dictionary<string, DisplayGroup>> SyncDisplayGroupsAsync(
@@ -105,5 +109,22 @@ public class TagSeeder
             tag.Position = ++position;
             lastDisplayGroup = tag.DisplayGroup;
         }
+    }
+
+    private async Task DeleteEmptyGroupsAsync(DbContext dbContext, CancellationToken cancellationToken = default)
+    {
+        List<DisplayGroup> emptyDisplayGroups = await dbContext.Set<DisplayGroup>()
+            .Where(displayGroup => !displayGroup.Tags.Any())
+            .ToListAsync(cancellationToken)
+            .ConfigureAwait(false);
+
+        dbContext.RemoveRange(emptyDisplayGroups);
+
+        List<LogicGroup> emptyLogicGroups = await dbContext.Set<LogicGroup>()
+            .Where(logicGroup => !logicGroup.Tags.Any())
+            .ToListAsync(cancellationToken)
+            .ConfigureAwait(false);
+
+        dbContext.RemoveRange(emptyLogicGroups);
     }
 }
