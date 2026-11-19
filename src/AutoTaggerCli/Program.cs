@@ -30,8 +30,6 @@ internal class Program
             hostBuilder.Configuration.ReplaceConnectionStringPassword("DistagsDatabase");
 
             hostBuilder.Logging.ClearProviders();
-            hostBuilder.Logging.AddConsole();
-
             hostBuilder.Services.AddSerilog(loggerConfig => loggerConfig
                 .ReadFrom.Configuration(hostBuilder.Configuration)
                 .ConfigureSinks<Program>(writeToFile: hostBuilder.Environment.IsDevelopment()));
