@@ -134,7 +134,7 @@ public class PublishedFileDetail
     //public required int NumReports { get; set; }
 
     [JsonPropertyName("tags")]
-    public required List<Tag> Tags { get; set; }
+    public List<Tag> Tags { get; set; } = [];
 
     //[JsonPropertyName("language")]
     //public required int Language { get; set; }

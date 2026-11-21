@@ -10,6 +10,9 @@ public class QueryFileParameters
     [HttpParameter("appid")]
     public int? AppId { get; set; }
 
+    [HttpParameter("filetype")]
+    public FileType? FileType { get; set; }
+
     [HttpParameter("query_type")]
     public QueryType? QueryType { get; set; }
 
