@@ -16,6 +16,12 @@ public class QueryFileParameters
     [HttpParameter("query_type")]
     public QueryType? QueryType { get; set; }
 
+    [HttpParameter("search_text")]
+    public string? SearchText { get; set; }
+
+    [HttpParameter("search_text_target")]
+    public SearchTextTarget? SearchTextTarget { get; set; }
+
     [HttpParameter("numperpage")]
     public int? ItemsPerPage { get; set; }
 
