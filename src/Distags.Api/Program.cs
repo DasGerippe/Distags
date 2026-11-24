@@ -64,7 +64,8 @@ public class Program
                 .AsImplementedInterfaces());
 
             builder.Services.AddHostedService<SessionCleanupService>();
-            builder.Services.AddAutoTaggerWorker();
+            if (builder.Configuration.GetValue<bool>("Distags:Api:ExecuteAutoTaggers"))
+                builder.Services.AddAutoTaggerWorker();
 
             builder.Services.AddHealthChecks();
 
