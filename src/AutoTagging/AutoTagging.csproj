@@ -7,7 +7,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\AppHostUtils\AppHostUtils.csproj" />
     <ProjectReference Include="..\AutoTagging.Abstractions\AutoTagging.Abstractions.csproj" />
+    <ProjectReference Include="..\Distags.Core\Distags.Core.csproj" />
+    <ProjectReference Include="..\Distags.Persistence\Distags.Persistence.csproj" />
   </ItemGroup>
 
 </Project>
