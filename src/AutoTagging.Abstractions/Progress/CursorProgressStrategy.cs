@@ -3,15 +3,15 @@ using Distags.Core.Filtering.Levels;
 using Distags.Core.Queries;
 using Distags.Core.Queries.AutoTaggerLevels;
 
-namespace AutoTagging.Abstractions.TaggingStrategy;
+namespace AutoTagging.Abstractions.Progress;
 
-public class CursorTaggingStrategy
+public class CursorProgressStrategy : IProgressStrategy
 {
     private readonly LevelType? _LevelType;
     private readonly LevelSortStrategy _SortStrategy;
     private readonly Func<LevelDto, DateTimeOffset> _CursorTimestampSelector;
 
-    public CursorTaggingStrategy(
+    public CursorProgressStrategy(
         Func<LevelDto, DateTimeOffset> cursorTimestampSelector,
         LevelSortStrategy sortStrategy,
         LevelType? levelType = null)

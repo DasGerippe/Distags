@@ -1,4 +1,4 @@
-namespace AutoTagging.Abstractions.TaggingStrategy;
+namespace AutoTagging.Abstractions.Progress;
 
 public class TimestampLevelIdCursor
 {
