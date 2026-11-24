@@ -20,6 +20,7 @@ public class DistagsDbContext : Distags.Core.DistagsDbContext
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         ConfigureAutoTaggerEntity(modelBuilder);
+        ConfigureAutoTaggerStateEntity(modelBuilder);
         ConfigureContributionEntity(modelBuilder);
         ConfigureCreatorEntity(modelBuilder);
         ConfigureDisplayGroupEntity(modelBuilder);
@@ -38,9 +39,15 @@ public class DistagsDbContext : Distags.Core.DistagsDbContext
         modelBuilder.Entity<AutoTagger>()
             .HasIndex(autoTagger => autoTagger.Guid)
             .IsUnique();
+    }
 
-        modelBuilder.Entity<AutoTagger>()
-            .Property(autoTagger => autoTagger.State)
+    private void ConfigureAutoTaggerStateEntity(ModelBuilder modelBuilder)
+    {
+        modelBuilder.Entity<AutoTaggerState>()
+            .HasKey(state => new { state.AutoTaggerId, state.Key });
+
+        modelBuilder.Entity<AutoTaggerState>()
+            .Property(state => state.Value)
             .HasColumnType("jsonb");
     }
 

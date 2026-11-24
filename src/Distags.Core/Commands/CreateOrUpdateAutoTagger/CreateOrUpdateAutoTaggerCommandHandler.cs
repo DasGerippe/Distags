@@ -34,9 +34,6 @@ public class CreateOrUpdateAutoTaggerCommandHandler : ICommandHandler<CreateOrUp
         if (command.LastRunOn.HasValue)
             autoTagger.LastRunOn = command.LastRunOn.Value;
 
-        if (command.State.HasValue)
-            autoTagger.State = command.State.Value;
-
         await _DbContext.SaveChangesAsync().ConfigureAwait(false);
     }
 }

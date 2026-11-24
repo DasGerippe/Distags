@@ -45,10 +45,6 @@ namespace Distags.Persistence.Migrations.Migrations
                         .HasColumnType("text")
                         .HasColumnName("name");
 
-                    b.Property<string>("State")
-                        .HasColumnType("jsonb")
-                        .HasColumnName("state");
-
                     b.HasKey("Id")
                         .HasName("pk_auto_taggers");
 
@@ -57,6 +53,26 @@ namespace Distags.Persistence.Migrations.Migrations
                         .HasDatabaseName("ix_auto_taggers_guid");
 
                     b.ToTable("auto_taggers", (string)null);
+                });
+
+            modelBuilder.Entity("Distags.Core.Entities.AutoTaggerState", b =>
+                {
+                    b.Property<long>("AutoTaggerId")
+                        .HasColumnType("bigint")
+                        .HasColumnName("auto_tagger_id");
+
+                    b.Property<string>("Key")
+                        .HasColumnType("text")
+                        .HasColumnName("key");
+
+                    b.Property<string>("Value")
+                        .HasColumnType("jsonb")
+                        .HasColumnName("value");
+
+                    b.HasKey("AutoTaggerId", "Key")
+                        .HasName("pk_auto_tagger_states");
+
+                    b.ToTable("auto_tagger_states", (string)null);
                 });
 
             modelBuilder.Entity("Distags.Core.Entities.Contribution", b =>
@@ -552,6 +568,18 @@ namespace Distags.Persistence.Migrations.Migrations
                     b.ToTable("levels", (string)null);
 
                     b.HasDiscriminator().HasValue(1);
+                });
+
+            modelBuilder.Entity("Distags.Core.Entities.AutoTaggerState", b =>
+                {
+                    b.HasOne("Distags.Core.Entities.AutoTagger", "AutoTagger")
+                        .WithMany()
+                        .HasForeignKey("AutoTaggerId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("fk_auto_tagger_states_auto_taggers_auto_tagger_id");
+
+                    b.Navigation("AutoTagger");
                 });
 
             modelBuilder.Entity("Distags.Core.Entities.Contribution", b =>
