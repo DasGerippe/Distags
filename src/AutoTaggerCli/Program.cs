@@ -34,8 +34,8 @@ internal class Program
                 .ReadFrom.Configuration(hostBuilder.Configuration)
                 .ConfigureSinks<Program>(writeToFile: hostBuilder.Environment.IsDevelopment()));
 
-            hostBuilder.Services.AddDistagsPersistence(hostBuilder.Configuration.GetRequiredConnectionString("DistagsDatabase"));
             hostBuilder.Services.AddDistagsCore();
+            hostBuilder.Services.AddDistagsPersistence(hostBuilder.Configuration.GetRequiredConnectionString("DistagsDatabase"));
 
             hostBuilder.Services.AddAutoTagging();
             hostBuilder.Services.AddAutoTaggers(args);
@@ -49,8 +49,9 @@ internal class Program
             AsyncServiceScope scope = host.Services.CreateAsyncScope();
             await using ConfiguredAsyncDisposable _ = scope.ConfigureAwait(false);
 
+            IHostApplicationLifetime hostLifetime = scope.ServiceProvider.GetRequiredService<IHostApplicationLifetime>();
             Program program = scope.ServiceProvider.GetRequiredService<Program>();
-            await program.Run().ConfigureAwait(false);
+            await program.Run(hostLifetime.ApplicationStopping).ConfigureAwait(false);
         }
         catch (Exception ex)
         {
@@ -62,26 +63,34 @@ internal class Program
         }
     }
 
-    private readonly AutoTaggerRunner _AutoTaggerRunner;
-    private readonly IEnumerable<AutoTagger> _AutoTaggers;
+    private readonly AutoTaggerSeeder _AutoTaggerSeeder;
+    private readonly AutoTaggerHost _AutoTaggerHost;
+    private readonly IEnumerable<IAutoTagger> _AutoTaggers;
     private readonly ILogger<Program> _Logger;
 
-    public Program(AutoTaggerRunner autoTaggerRunner, IEnumerable<AutoTagger> autoTaggers, ILogger<Program> logger)
+    public Program(
+        AutoTaggerSeeder autoTaggerSeeder,
+        AutoTaggerHost autoTaggerHost,
+        IEnumerable<IAutoTagger> autoTaggers,
+        ILogger<Program> logger)
     {
-        _AutoTaggerRunner = autoTaggerRunner;
+        _AutoTaggerSeeder = autoTaggerSeeder;
+        _AutoTaggerHost = autoTaggerHost;
         _AutoTaggers = autoTaggers;
         _Logger = logger;
     }
 
-    private async Task Run()
+    private async Task Run(CancellationToken cancellationToken = default)
     {
         _Logger.LogDebug("Starting application...");
 
-        foreach (AutoTagger autoTagger in _AutoTaggers)
+        await _AutoTaggerSeeder.CreateOrUpdateRegisteredAutoTaggers(cancellationToken);
+
+        foreach (IAutoTagger autoTagger in _AutoTaggers)
         {
             try
             {
-                await _AutoTaggerRunner.RunAsync(autoTagger);
+                await _AutoTaggerHost.ExecuteAsync(autoTagger, cancellationToken);
             }
             catch (Exception ex)
             {
