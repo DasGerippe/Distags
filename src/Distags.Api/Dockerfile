@@ -15,7 +15,6 @@ ARG BUILD_CONFIGURATION=Release
 ARG VERSION=0.0.0
 WORKDIR /app
 
-COPY Directory.Build.props ./
 COPY src/ src/
 
 RUN --mount=type=cache,id=nuget,target=/root/.nuget/packages,sharing=locked \
