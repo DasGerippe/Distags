@@ -37,10 +37,10 @@ public class AutoTaggersController : ControllerBase
     [Authorize(Roles = UserRoles.Administrator)]
     public IActionResult RunAutoTagger(
         string autoTaggerName,
-        [FromServices] IEnumerable<AutoTagger> autoTaggers,
+        [FromServices] IEnumerable<IAutoTagger> autoTaggers,
         [FromServices] AutoTaggerQueue autoTaggerQueue)
     {
-        AutoTagger? autoTagger = autoTaggers.FirstOrDefault(autoTagger => autoTagger.Name == autoTaggerName);
+        IAutoTagger? autoTagger = autoTaggers.FirstOrDefault(autoTagger => autoTagger.Name == autoTaggerName);
         if (autoTagger == null)
             return DistagsProblemResults.AutoTaggerNotFound(autoTaggerName);
 

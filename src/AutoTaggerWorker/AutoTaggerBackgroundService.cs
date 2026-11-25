@@ -33,11 +33,11 @@ public class AutoTaggerBackgroundService : BackgroundService
             try
             {
                 using IServiceScope scope = _ScopeFactory.CreateScope();
+                
+                AutoTaggerHost autoTaggerHost = scope.ServiceProvider.GetRequiredService<AutoTaggerHost>();
+                IAutoTagger autoTagger = (IAutoTagger)scope.ServiceProvider.GetRequiredService(autoTaggerType);
 
-                AutoTaggerRunner autoTaggerRunner = scope.ServiceProvider.GetRequiredService<AutoTaggerRunner>();
-                AutoTagger autoTagger = (AutoTagger)scope.ServiceProvider.GetRequiredService(autoTaggerType);
-
-                await autoTaggerRunner.RunAsync(autoTagger, stoppingToken);
+                await autoTaggerHost.ExecuteAsync(autoTagger, stoppingToken);
             }
             catch (OperationCanceledException)
             {

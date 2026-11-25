@@ -26,6 +26,7 @@ public static class ServiceCollectionExtensions
             .AddHttpMessageHandler<RateLimitHandler>();
 
         services.AddTransient<IPublishedFileService, PublishedFileService>();
+        services.AddTransient<ISteamRemoteStorage, SteamRemoteStorage>();
         services.AddTransient<ISteamUser, SteamUser>();
 
         return services;

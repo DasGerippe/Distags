@@ -7,6 +7,4 @@ public class CreateOrUpdateAutoTaggerCommand : ICommand
     public UpdateValue<string> Name { get; set; }
 
     public UpdateValue<DateTimeOffset> LastRunOn { get; set; }
-
-    public UpdateValue<string?> State { get; set; }
 }

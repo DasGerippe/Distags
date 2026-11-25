@@ -1,7 +1,7 @@
+using AutoTagging;
 using AutoTagging.Abstractions;
 using Distags.Contracts;
 using Distags.Core;
-using Distags.Core.Commands.CreateOrUpdateAutoTagger;
 using Distags.Core.Queries.AutoTaggerByGuid;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -31,22 +31,18 @@ public class AutoTaggerScheduler : BackgroundService
 
     public override async Task StartAsync(CancellationToken cancellationToken)
     {
-        using IServiceScope scope = _ScopeFactory.CreateScope();
+        await using AsyncServiceScope scope = _ScopeFactory.CreateAsyncScope();
+
+        AutoTaggerSeeder autoTaggerSeeder = scope.ServiceProvider.GetRequiredService<AutoTaggerSeeder>();
+        await autoTaggerSeeder.CreateOrUpdateRegisteredAutoTaggers(cancellationToken);
 
         IRequestDispatcher requestDispatcher = scope.ServiceProvider.GetRequiredService<IRequestDispatcher>();
-        List<AutoTagger> autoTaggers = scope.ServiceProvider.GetServices<AutoTagger>().ToList();
+        List<IAutoTagger> autoTaggers = scope.ServiceProvider.GetServices<IAutoTagger>().ToList();
 
-        foreach (AutoTagger autoTagger in autoTaggers)
+        foreach (IAutoTagger autoTagger in autoTaggers)
         {
             if (cancellationToken.IsCancellationRequested)
                 break;
-
-            CreateOrUpdateAutoTaggerCommand command = new CreateOrUpdateAutoTaggerCommand
-            {
-                Guid = autoTagger.Guid,
-                Name = autoTagger.Name,
-            };
-            await requestDispatcher.DispatchAsync(command);
 
             if (autoTagger.Interval == null)
                 continue;

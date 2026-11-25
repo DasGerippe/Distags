@@ -4,9 +4,9 @@ namespace SteamWebApi.Dtos.SteamUser;
 
 public class GetPlayerSummariesParameters
 {
-    [QueryParameter("key")]
+    [HttpParameter("key")]
     public string? Key { get; set; }
 
-    [QueryParameter("steamids")]
+    [HttpParameter("steamids")]
     public IEnumerable<long> SteamIds { get; set; } = [];
 }
