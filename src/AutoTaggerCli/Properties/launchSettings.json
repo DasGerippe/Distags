@@ -6,16 +6,30 @@
         "DOTNET_ENVIRONMENT": "Development"
       }
     },
-    "Run MaxterCsvImporter": {
+    "Run LevelTypeAutoTagger": {
       "commandName": "Project",
-      "commandLineArgs": "MaxterCsvImporter",
+      "commandLineArgs": "LevelTypeAutoTagger",
       "environmentVariables": {
         "DOTNET_ENVIRONMENT": "Development"
       }
     },
-    "Run Periodic AutoTaggers": {
+    "Run GameModeAutoTagger": {
       "commandName": "Project",
-      "commandLineArgs": "LevelTypeAutoTagger GameModeAutoTagger DifficultyAutoTagger MissingLevelAutoTagger",
+      "commandLineArgs": "GameModeAutoTagger",
+      "environmentVariables": {
+        "DOTNET_ENVIRONMENT": "Development"
+      }
+    },
+    "Run DifficultyAutoTagger": {
+      "commandName": "Project",
+      "commandLineArgs": "DifficultyAutoTagger",
+      "environmentVariables": {
+        "DOTNET_ENVIRONMENT": "Development"
+      }
+    },
+    "Run MissingLevelAutoTagger": {
+      "commandName": "Project",
+      "commandLineArgs": "MissingLevelAutoTagger",
       "environmentVariables": {
         "DOTNET_ENVIRONMENT": "Development"
       }
@@ -23,6 +37,13 @@
     "Run EventAutoTagger": {
       "commandName": "Project",
       "commandLineArgs": "EventAutoTagger",
+      "environmentVariables": {
+        "DOTNET_ENVIRONMENT": "Development"
+      }
+    },
+    "Run MaxterCsvImporter": {
+      "commandName": "Project",
+      "commandLineArgs": "MaxterCsvImporter",
       "environmentVariables": {
         "DOTNET_ENVIRONMENT": "Development"
       }
