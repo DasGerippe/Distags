@@ -1,45 +1,19 @@
 using AutoTagging.Abstractions;
-using AutoTagging.Abstractions.TaggingStrategy;
-using Distags.Contracts;
-using Distags.Core.Queries.AutoTaggerLevels;
+using AutoTagging.Abstractions.Progress;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace AutoTagging.LevelType;
 
-public class LevelTypeAutoTagger : AutoTagger<TimestampLevelIdCursor>
+public class LevelTypeAutoTagger : StrategyAutoTagger
 {
-    private const string OfficialTagName = "official";
-    private const string WorkshopTagName = "workshop";
-
-    private readonly NewLevelsTaggingStrategy _TaggingStrategy = new NewLevelsTaggingStrategy();
-
     public override Guid Guid { get; } = new Guid("2E6677C5-DF38-498A-843E-0468B21CFF94");
 
-    public override TimeSpan? Interval { get; } = TimeSpan.FromMinutes(5);
+    public override TimeSpan? Interval { get; } = TimeSpan.FromMinutes(10);
 
-    public override AutoTaggerLevelsQuery GetLevelsQuery()
+    public override void ConfigureServices(IServiceCollection services)
     {
-        return _TaggingStrategy.GetLevelsQuery(State);
-    }
+        base.ConfigureServices(services);
 
-    public override Task<TagDelta> CalculateTagDeltaAsync(LevelDto level, CancellationToken cancellationToken = default)
-    {
-        TagDelta tagDelta = new TagDelta();
-
-        string desiredLevelTypeTagName = level.Type switch
-        {
-            Distags.Contracts.LevelType.Official => OfficialTagName,
-            Distags.Contracts.LevelType.Workshop => WorkshopTagName,
-            _ => throw new ArgumentOutOfRangeException(nameof(level)),
-        };
-
-        if (!level.Tags.Contains(desiredLevelTypeTagName))
-            tagDelta.AddTags.Add(desiredLevelTypeTagName);
-
-        return Task.FromResult(tagDelta);
-    }
-
-    public override void UpdateState(LevelDto level, TagDelta tagDelta)
-    {
-        State = _TaggingStrategy.UpdateCursor(State, level);
+        services.AddProgressiveStrategy<NewLevelsStrategy, LevelTypeCalculator>(string.Empty);
     }
 }
