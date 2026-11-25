@@ -19,6 +19,13 @@
       "environmentVariables": {
         "DOTNET_ENVIRONMENT": "Development"
       }
+    },
+    "Run EventAutoTagger": {
+      "commandName": "Project",
+      "commandLineArgs": "EventAutoTagger",
+      "environmentVariables": {
+        "DOTNET_ENVIRONMENT": "Development"
+      }
     }
   }
 }

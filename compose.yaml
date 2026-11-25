@@ -120,6 +120,8 @@ services:
         target: Database__DistagsDatabase__Password
       - source: steam_api_key
         target: SteamWebApi__ApiKey
+      - source: steam_api_key
+        target: AutoTagging__EventAutoTagger__SteamWebApi__ApiKey
     depends_on:
       postgres:
         condition: service_healthy
