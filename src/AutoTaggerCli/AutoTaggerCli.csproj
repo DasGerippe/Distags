@@ -20,6 +20,7 @@
     <ProjectReference Include="..\AutoTagging.Difficulty\AutoTagging.Difficulty.csproj" />
     <ProjectReference Include="..\AutoTagging.Event\AutoTagging.Event.csproj" />
     <ProjectReference Include="..\AutoTagging.GameMode\AutoTagging.GameMode.csproj" />
+    <ProjectReference Include="..\AutoTagging.Length\AutoTagging.Length.csproj" />
     <ProjectReference Include="..\AutoTagging.LevelType\AutoTagging.LevelType.csproj" />
     <ProjectReference Include="..\AutoTagging.MaxterCsvImporter\AutoTagging.MaxterCsvImporter.csproj" />
     <ProjectReference Include="..\AutoTagging.MissingLevel\AutoTagging.MissingLevel.csproj" />

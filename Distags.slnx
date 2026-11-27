@@ -6,6 +6,7 @@
     <Project Path="src/AutoTagging.Difficulty/AutoTagging.Difficulty.csproj" />
     <Project Path="src/AutoTagging.Event/AutoTagging.Event.csproj" />
     <Project Path="src/AutoTagging.GameMode/AutoTagging.GameMode.csproj" />
+    <Project Path="src/AutoTagging.Length/AutoTagging.Length.csproj" />
     <Project Path="src/AutoTagging.LevelType/AutoTagging.LevelType.csproj" />
     <Project Path="src/AutoTagging.MaxterCsvImporter/AutoTagging.MaxterCsvImporter.csproj" />
     <Project Path="src/AutoTagging.MissingLevel/AutoTagging.MissingLevel.csproj" />
