@@ -34,6 +34,13 @@
         "DOTNET_ENVIRONMENT": "Development"
       }
     },
+    "Run LengthAutoTagger": {
+      "commandName": "Project",
+      "commandLineArgs": "LengthAutoTagger",
+      "environmentVariables": {
+        "DOTNET_ENVIRONMENT": "Development"
+      }
+    },
     "Run EventAutoTagger": {
       "commandName": "Project",
       "commandLineArgs": "EventAutoTagger",

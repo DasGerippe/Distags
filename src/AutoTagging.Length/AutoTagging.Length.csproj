@@ -1,0 +1,26 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Remove="query_level_stats.sql" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="query_level_stats.sql" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Npgsql" Version="10.0.4" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\AppHostUtils\AppHostUtils.csproj" />
+    <ProjectReference Include="..\AutoTagging.Abstractions\AutoTagging.Abstractions.csproj" />
+  </ItemGroup>
+
+</Project>

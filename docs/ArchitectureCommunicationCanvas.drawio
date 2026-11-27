@@ -169,8 +169,8 @@
           </mxGeometry>
         </mxCell>
         <mxCell id="E2yZ15CAvVSJdylBaBJ9-42" parent="1" style="swimlane;whiteSpace=wrap;html=1;" value="AutoTaggers" vertex="1">
-          <mxGeometry height="220" width="160" x="-980" y="1142" as="geometry">
-            <mxRectangle height="30" width="160" x="-970" y="1142" as="alternateBounds" />
+          <mxGeometry height="288" width="160" x="-980" y="1132" as="geometry">
+            <mxRectangle height="30" width="160" x="-988" y="1132" as="alternateBounds" />
           </mxGeometry>
         </mxCell>
         <mxCell id="E2yZ15CAvVSJdylBaBJ9-39" parent="E2yZ15CAvVSJdylBaBJ9-42" style="rounded=0;whiteSpace=wrap;html=1;" value="GameModeAutoTagger" vertex="1">
@@ -179,7 +179,7 @@
         <mxCell id="E2yZ15CAvVSJdylBaBJ9-40" parent="E2yZ15CAvVSJdylBaBJ9-42" style="rounded=0;whiteSpace=wrap;html=1;" value="MissingFileAutoTagger" vertex="1">
           <mxGeometry height="30" width="150" x="5" y="142" as="geometry" />
         </mxCell>
-        <mxCell id="E2yZ15CAvVSJdylBaBJ9-41" parent="E2yZ15CAvVSJdylBaBJ9-42" style="rounded=0;whiteSpace=wrap;html=1;" value="MaxterCsvImporter" vertex="1">
+        <mxCell id="E2yZ15CAvVSJdylBaBJ9-41" parent="E2yZ15CAvVSJdylBaBJ9-42" style="rounded=0;whiteSpace=wrap;html=1;" value="LengthAutoTagger" vertex="1">
           <mxGeometry height="30" width="150" x="5" y="179" as="geometry" />
         </mxCell>
         <mxCell id="Z8bSJWz2dACTpnE2i3hV-1" parent="E2yZ15CAvVSJdylBaBJ9-42" style="rounded=0;whiteSpace=wrap;html=1;" value="LevelTypeAutoTagger" vertex="1">
@@ -187,6 +187,12 @@
         </mxCell>
         <mxCell id="k1DkTqknsclXx4Hh_rx8-1" parent="E2yZ15CAvVSJdylBaBJ9-42" style="rounded=0;whiteSpace=wrap;html=1;" value="DifficultyAutoTagger" vertex="1">
           <mxGeometry height="30" width="150" x="5" y="105" as="geometry" />
+        </mxCell>
+        <mxCell id="elvQomJ5i9cjLRWGNZGe-1" parent="E2yZ15CAvVSJdylBaBJ9-42" style="rounded=0;whiteSpace=wrap;html=1;" value="EventAutoTagger" vertex="1">
+          <mxGeometry height="30" width="150" x="5" y="216" as="geometry" />
+        </mxCell>
+        <mxCell id="elvQomJ5i9cjLRWGNZGe-2" parent="E2yZ15CAvVSJdylBaBJ9-42" style="rounded=0;whiteSpace=wrap;html=1;" value="MaxterCsvImporter" vertex="1">
+          <mxGeometry height="30" width="150" x="5" y="253" as="geometry" />
         </mxCell>
         <mxCell id="ffW-VCCpGV6xqcr3sewV-5" edge="1" parent="1" source="ffW-VCCpGV6xqcr3sewV-1" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0;exitY=0.5;exitDx=0;exitDy=0;entryX=0.75;entryY=0;entryDx=0;entryDy=0;startArrow=none;startFill=0;" target="E2yZ15CAvVSJdylBaBJ9-42">
           <mxGeometry relative="1" as="geometry" />
