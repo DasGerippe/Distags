@@ -2,20 +2,25 @@ using Distags.Contracts;
 using Distags.Core;
 using Distags.Core.Commands.ChangeLevelTag;
 using Distags.Core.Exceptions;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using System.Runtime.CompilerServices;
 
 namespace AutoTagging.Abstractions;
 
 public class TagChanger
 {
     private readonly AutoTaggerInfo _AutoTaggerInfo;
-    private readonly IRequestDispatcher _RequestDispatcher;
+    private readonly IServiceScopeFactory _ScopeFactory;
     private readonly ILogger<TagChanger> _Logger;
 
-    public TagChanger(AutoTaggerInfo autoTaggerInfo, IRequestDispatcher requestDispatcher, ILogger<TagChanger> logger)
+    public TagChanger(
+        AutoTaggerInfo autoTaggerInfo,
+        IServiceScopeFactory scopeFactory,
+        ILogger<TagChanger> logger)
     {
         _AutoTaggerInfo = autoTaggerInfo;
-        _RequestDispatcher = requestDispatcher;
+        _ScopeFactory = scopeFactory;
         _Logger = logger;
     }
 
@@ -26,18 +31,23 @@ public class TagChanger
 
         _Logger.LogDebug("Applying calculated tag delta: +{tagsToAdd}; -{tagsToRemove}", tagDelta.AddTags, tagDelta.RemoveTags);
 
+        AsyncServiceScope scope = _ScopeFactory.CreateAsyncScope();
+        await using ConfiguredAsyncDisposable configuredScope = scope.ConfigureAwait(false);
+
+        IRequestDispatcher requestDispatcher = scope.ServiceProvider.GetRequiredService<IRequestDispatcher>();
+
         foreach (string tagToAdd in tagDelta.AddTags)
         {
-            await ApplyTagChangeAsync(level, tagToAdd, TagChangeAction.Add).ConfigureAwait(false);
+            await ApplyTagChangeAsync(requestDispatcher, level, tagToAdd, TagChangeAction.Add).ConfigureAwait(false);
         }
 
         foreach (string tagToRemove in tagDelta.RemoveTags)
         {
-            await ApplyTagChangeAsync(level, tagToRemove, TagChangeAction.Remove).ConfigureAwait(false);
+            await ApplyTagChangeAsync(requestDispatcher, level, tagToRemove, TagChangeAction.Remove).ConfigureAwait(false);
         }
     }
 
-    private Task ApplyTagChangeAsync(LevelDto level, string tagName, TagChangeAction changeAction)
+    private Task ApplyTagChangeAsync(IRequestDispatcher requestDispatcher, LevelDto level, string tagName, TagChangeAction changeAction)
     {
         ChangeLevelTagCommand command = level switch
         {
@@ -50,14 +60,24 @@ public class TagChanger
         command.TagName = tagName;
         command.Action = changeAction;
 
-        return TryChangeLevelTagAsync(command);
+        return TryChangeLevelTagAsync(requestDispatcher, command);
     }
 
     public async Task TryChangeLevelTagAsync(ChangeLevelTagCommand changeLevelTagCommand)
     {
+        AsyncServiceScope scope = _ScopeFactory.CreateAsyncScope();
+        await using ConfiguredAsyncDisposable configuredScope = scope.ConfigureAwait(false);
+
+        IRequestDispatcher requestDispatcher = scope.ServiceProvider.GetRequiredService<IRequestDispatcher>();
+
+        await TryChangeLevelTagAsync(requestDispatcher, changeLevelTagCommand).ConfigureAwait(false);
+    }
+
+    private async Task TryChangeLevelTagAsync(IRequestDispatcher requestDispatcher, ChangeLevelTagCommand changeLevelTagCommand)
+    {
         try
         {
-            await _RequestDispatcher.DispatchAsync(changeLevelTagCommand).ConfigureAwait(false);
+            await requestDispatcher.DispatchAsync(changeLevelTagCommand).ConfigureAwait(false);
         }
         catch (UnknownLevelException)
         {
